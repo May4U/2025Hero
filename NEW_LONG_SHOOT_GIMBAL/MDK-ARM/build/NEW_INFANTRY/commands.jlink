@@ -1,0 +1,6 @@
+r
+halt
+loadfile "c:\Users\Z\Desktop\RM\HERO\NEW_LONG_SHOOT_GIMBAL\MDK-ARM\build\NEW_INFANTRY\MDK-ARM.hex"
+r
+go
+exit

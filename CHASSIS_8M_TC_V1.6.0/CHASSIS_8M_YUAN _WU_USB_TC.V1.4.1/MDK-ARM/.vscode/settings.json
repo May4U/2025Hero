@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "*.c": "c",
+        "bsp_imu.h": "c"
+    }
+}

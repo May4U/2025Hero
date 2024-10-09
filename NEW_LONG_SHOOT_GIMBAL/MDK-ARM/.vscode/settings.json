@@ -1,0 +1,22 @@
+{
+    "files.associations": {
+        "gimbal_task.h": "c",
+        "gimbal_struct_variables.h": "c",
+        "can1_receive.h": "c",
+        "can2_receive.h": "c",
+        "gimbal_behaviour.h": "c",
+        "pid.h": "c",
+        "queue": "c",
+        "random": "c",
+        "maths.h": "c",
+        "can1_send.h": "c",
+        "can2_send.h": "c",
+        "stm32f4xx_hal.h": "c",
+        "stm32f4xx_hal_conf.h": "c",
+        "stm32f4xx_hal_can.h": "c",
+        "fire_task.h": "c",
+        "bsp_motor_encoder.h": "c",
+        "task_safe.h": "c",
+        "safe_check.h": "c"
+    }
+}

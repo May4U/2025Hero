@@ -1,0 +1,9 @@
+.\build\NEW_INFANTRY\.obj\__\ACE-ECF\Algorithm\src\filter.o: .\..\ACE-ECF\Algorithm\src\filter.c
+.\build\NEW_INFANTRY\.obj\__\ACE-ECF\Algorithm\src\filter.o: ../ACE-ECF/Algorithm/inc/filter.h
+.\build\NEW_INFANTRY\.obj\__\ACE-ECF\Algorithm\src\filter.o: ../ACE-ECF/Algorithm/inc/struct_typedef.h
+.\build\NEW_INFANTRY\.obj\__\ACE-ECF\Algorithm\src\filter.o: ../Middlewares/ST/ARM/DSP/Inc/arm_math.h
+.\build\NEW_INFANTRY\.obj\__\ACE-ECF\Algorithm\src\filter.o: ../Drivers/CMSIS/Include/core_cm4.h
+.\build\NEW_INFANTRY\.obj\__\ACE-ECF\Algorithm\src\filter.o: ../Drivers/CMSIS/Include/cmsis_version.h
+.\build\NEW_INFANTRY\.obj\__\ACE-ECF\Algorithm\src\filter.o: ../Drivers/CMSIS/Include/cmsis_compiler.h
+.\build\NEW_INFANTRY\.obj\__\ACE-ECF\Algorithm\src\filter.o: ../Drivers/CMSIS/Include/cmsis_armcc.h
+.\build\NEW_INFANTRY\.obj\__\ACE-ECF\Algorithm\src\filter.o: ../ACE-ECF/Algorithm/inc/maths.h

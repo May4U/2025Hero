@@ -1,0 +1,14 @@
+.\build\NEW_INFANTRY\.obj\__\ACE-ECF\Application\src\IMU_Driver\QuaternionEKF.o: .\..\ACE-ECF\Application\src\IMU_Driver\QuaternionEKF.c
+.\build\NEW_INFANTRY\.obj\__\ACE-ECF\Application\src\IMU_Driver\QuaternionEKF.o: ../ACE-ECF/Application/inc/IMU_Driver/QuaternionEKF.h
+.\build\NEW_INFANTRY\.obj\__\ACE-ECF\Application\src\IMU_Driver\QuaternionEKF.o: ../ACE-ECF/Application/inc/IMU_Driver/kalman_filter.h
+.\build\NEW_INFANTRY\.obj\__\ACE-ECF\Application\src\IMU_Driver\QuaternionEKF.o: ../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f407xx.h
+.\build\NEW_INFANTRY\.obj\__\ACE-ECF\Application\src\IMU_Driver\QuaternionEKF.o: ../Drivers/CMSIS/Include/core_cm4.h
+.\build\NEW_INFANTRY\.obj\__\ACE-ECF\Application\src\IMU_Driver\QuaternionEKF.o: ../Drivers/CMSIS/Include/cmsis_version.h
+.\build\NEW_INFANTRY\.obj\__\ACE-ECF\Application\src\IMU_Driver\QuaternionEKF.o: ../Drivers/CMSIS/Include/cmsis_compiler.h
+.\build\NEW_INFANTRY\.obj\__\ACE-ECF\Application\src\IMU_Driver\QuaternionEKF.o: ../Drivers/CMSIS/Include/cmsis_armcc.h
+.\build\NEW_INFANTRY\.obj\__\ACE-ECF\Application\src\IMU_Driver\QuaternionEKF.o: ../Drivers/CMSIS/Include/mpu_armv7.h
+.\build\NEW_INFANTRY\.obj\__\ACE-ECF\Application\src\IMU_Driver\QuaternionEKF.o: ../Drivers/CMSIS/Device/ST/STM32F4xx/Include/system_stm32f4xx.h
+.\build\NEW_INFANTRY\.obj\__\ACE-ECF\Application\src\IMU_Driver\QuaternionEKF.o: ../Middlewares/ST/ARM/DSP/Inc/arm_math.h
+.\build\NEW_INFANTRY\.obj\__\ACE-ECF\Application\src\IMU_Driver\QuaternionEKF.o: ../Drivers/CMSIS/Include/core_cm4.h
+.\build\NEW_INFANTRY\.obj\__\ACE-ECF\Application\src\IMU_Driver\QuaternionEKF.o: ../ACE-ECF/Algorithm/inc/maths.h
+.\build\NEW_INFANTRY\.obj\__\ACE-ECF\Application\src\IMU_Driver\QuaternionEKF.o: ../ACE-ECF/Algorithm/inc/struct_typedef.h

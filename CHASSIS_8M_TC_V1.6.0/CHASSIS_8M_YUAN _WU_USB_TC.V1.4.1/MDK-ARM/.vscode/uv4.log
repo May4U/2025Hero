@@ -1,0 +1,11 @@
+*** Using Compiler 'V5.06 update 7 (build 960)', folder: 'D:\KELI5_\ARM\ARMCC\Bin'
+Build target 'INFANTRY_GIMBAL'
+compiling gimbal_task.c...
+..\TASK\src\gimbal_task.c(29): warning:  #1-D: last line of file ends without a newline
+  }
+..\TASK\src\gimbal_task.c: 1 warning, 0 errors
+linking...
+Program Size: Code=37544 RO-data=6464 RW-data=596 ZI-data=35492  
+FromELF: creating hex file...
+"INFANTRY_GIMBAL\INFANTRY_GIMBAL.axf" - 0 Error(s), 1 Warning(s).
+Build Time Elapsed:  00:00:02

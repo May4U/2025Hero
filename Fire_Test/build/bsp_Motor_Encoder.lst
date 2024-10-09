@@ -1,0 +1,1823 @@
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc5HsUmU.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.arch armv7e-m
+   3              		.fpu fpv4-sp-d16
+   4              		.eabi_attribute 27, 1
+   5              		.eabi_attribute 28, 1
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.file	"bsp_Motor_Encoder.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.EncoderValZero,"ax",%progbits
+  20              		.align	1
+  21              		.global	EncoderValZero
+  22              		.syntax unified
+  23              		.thumb
+  24              		.thumb_func
+  26              	EncoderValZero:
+  27              	.LVL0:
+  28              	.LFB137:
+  29              		.file 1 "User/src/bsp_Motor_Encoder.c"
+   1:User/src/bsp_Motor_Encoder.c **** /************************** Dongguan-University of Technology -ACE**************************
+   2:User/src/bsp_Motor_Encoder.c **** * @file bsp_Motor_Encoder.c
+   3:User/src/bsp_Motor_Encoder.c **** * @brief
+   4:User/src/bsp_Motor_Encoder.c **** * @author pansyhou侯文辉 (1677195845lyb@gmail.com)
+   5:User/src/bsp_Motor_Encoder.c **** * @version 1.0
+   6:User/src/bsp_Motor_Encoder.c **** * @date 2022-11-24
+   7:User/src/bsp_Motor_Encoder.c **** *
+   8:User/src/bsp_Motor_Encoder.c **** *
+   9:User/src/bsp_Motor_Encoder.c **** * @history
+  10:User/src/bsp_Motor_Encoder.c **** * <table>
+  11:User/src/bsp_Motor_Encoder.c **** * Date       Version Author Description
+  12:User/src/bsp_Motor_Encoder.c **** * 2022-11-24   1.0   侯文辉  加入电机编码器处理
+  13:User/src/bsp_Motor_Encoder.c **** * 2022-12-6    1.5   侯文辉  加入布瑞特编码器控制
+  14:User/src/bsp_Motor_Encoder.c **** * @verbatim
+  15:User/src/bsp_Motor_Encoder.c **** * ==============================================================================
+  16:User/src/bsp_Motor_Encoder.c **** *  已经把常用的速度、位置、加速度、多圈编码、堵转检测巴拉巴拉的混进
+  17:User/src/bsp_Motor_Encoder.c **** *  现在还加了个布瑞特的协议控制。
+  18:User/src/bsp_Motor_Encoder.c **** *  目前在结构体能用的部分：
+  19:User/src/bsp_Motor_Encoder.c **** *      Encode_Record_Val多圈编码器记录值
+  20:User/src/bsp_Motor_Encoder.c **** *      Radian转过的弧度
+  21:User/src/bsp_Motor_Encoder.c **** *      User_Radian弧度自定义，自己调PID的时候可以设置
+  22:User/src/bsp_Motor_Encoder.c **** *      Speed速度
+  23:User/src/bsp_Motor_Encoder.c **** *      AccSpeed加速度
+  24:User/src/bsp_Motor_Encoder.c **** *      position位置
+  25:User/src/bsp_Motor_Encoder.c **** *      State电机状态
+  26:User/src/bsp_Motor_Encoder.c **** *
+  27:User/src/bsp_Motor_Encoder.c **** *  使用方法：
+  28:User/src/bsp_Motor_Encoder.c **** *      将CAN_DATA_Encoder_Deal扔CAN接收部分
+  29:User/src/bsp_Motor_Encoder.c **** *      在初始化阶段加入Encoder_Init
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc5HsUmU.s 			page 2
+
+
+  30:User/src/bsp_Motor_Encoder.c **** *      done
+  31:User/src/bsp_Motor_Encoder.c **** *      需要将数值清零的可以用EncoderValZero(Encoder_t *Encoder)函数
+  32:User/src/bsp_Motor_Encoder.c **** *      该函数不会将编码器的编码器单圈码盘值设置为0
+  33:User/src/bsp_Motor_Encoder.c **** *
+  34:User/src/bsp_Motor_Encoder.c **** *      布瑞特的编码器
+  35:User/src/bsp_Motor_Encoder.c **** *          看手册，用函数。
+  36:User/src/bsp_Motor_Encoder.c **** *  注意事项：
+  37:User/src/bsp_Motor_Encoder.c **** *      改减速比的电机只能直接硬改结构体的gear_Ratio
+  38:User/src/bsp_Motor_Encoder.c **** *      Max_Block_Angle_Num、Max_Block_Num这两个都是调整堵转灵敏度的，需要自己在
+  39:User/src/bsp_Motor_Encoder.c **** *      CAN_ENCODER_NUM宏定义目前设置为10，方便工程有很多电机和编码器
+  40:User/src/bsp_Motor_Encoder.c **** *  最新版本已经将工程的去除Encoder的枚举里，他的编码器居然是在范围内�
+  41:User/src/bsp_Motor_Encoder.c **** *
+  42:User/src/bsp_Motor_Encoder.c **** * ==============================================================================
+  43:User/src/bsp_Motor_Encoder.c **** * @endverbatim
+  44:User/src/bsp_Motor_Encoder.c **** ************************** Dongguan-University of Technology -ACE***************************/
+  45:User/src/bsp_Motor_Encoder.c **** #include <string.h>
+  46:User/src/bsp_Motor_Encoder.c **** #include "bsp_Motor_Encoder.h"
+  47:User/src/bsp_Motor_Encoder.c **** #include "can.h"
+  48:User/src/bsp_Motor_Encoder.c **** //版本1是家华写的，用的是最原始的临界值判断的方案，但是感觉没有差值
+  49:User/src/bsp_Motor_Encoder.c **** //版本2是差值+溢出 计算的多圈编码器，频率是够用的
+  50:User/src/bsp_Motor_Encoder.c **** Encoder_t yaw_encoder;
+  51:User/src/bsp_Motor_Encoder.c **** Encoder_t pitch_encoder;
+  52:User/src/bsp_Motor_Encoder.c **** //函数声明
+  53:User/src/bsp_Motor_Encoder.c **** int16_t angle_limiting_int16(int16_t Angl_Err, int16_t lap_encoder);
+  54:User/src/bsp_Motor_Encoder.c **** int32_t check_codevalue(int32_t value, int16_t gear_Ratio, int16_t lap_encoder);
+  55:User/src/bsp_Motor_Encoder.c **** void Encoder_Struct_Zero(Encoder_t *Encoder);
+  56:User/src/bsp_Motor_Encoder.c **** 
+  57:User/src/bsp_Motor_Encoder.c **** Encoder_t CAN_Encoder[5];//四个驱动电机编码器，一个拨弹盘电机编码器
+  58:User/src/bsp_Motor_Encoder.c **** /*函数名称：Get_Chassis_motor_encoder_point
+  59:User/src/bsp_Motor_Encoder.c ****  *函数参数：CHASSIS_MOTOR_ENCODER  电机编码器序号
+  60:User/src/bsp_Motor_Encoder.c ****  *函数返回：&Encoder_t             电机编码器指针
+  61:User/src/bsp_Motor_Encoder.c ****  *函数功能：返回指定电机编码器指针
+  62:User/src/bsp_Motor_Encoder.c ****  *特别说明：传入参数推荐使用 bsp_Motot_Encoder.h 内的宏定义
+  63:User/src/bsp_Motor_Encoder.c ****  */
+  64:User/src/bsp_Motor_Encoder.c **** 
+  65:User/src/bsp_Motor_Encoder.c **** /**
+  66:User/src/bsp_Motor_Encoder.c **** * 编码器初始化
+  67:User/src/bsp_Motor_Encoder.c **** * 默认不开堵转检测，需要在初始化后手动开启，将Encoder结构体的Block_Detect
+  68:User/src/bsp_Motor_Encoder.c **** * @param Encoder_Type 编码器种类
+  69:User/src/bsp_Motor_Encoder.c **** * @parm  radius       半径(mm)
+  70:User/src/bsp_Motor_Encoder.c **** */
+  71:User/src/bsp_Motor_Encoder.c **** void Encoder_Init(Encoder_t * Temp_Encoder, Encoder_Type_e Encoder_Type, uint16_t radius)
+  72:User/src/bsp_Motor_Encoder.c **** {
+  73:User/src/bsp_Motor_Encoder.c ****    Encoder_Struct_Zero(Temp_Encoder);
+  74:User/src/bsp_Motor_Encoder.c ****    Temp_Encoder->radius = radius;
+  75:User/src/bsp_Motor_Encoder.c ****    Temp_Encoder->Encoder_Type = Encoder_Type;
+  76:User/src/bsp_Motor_Encoder.c ****    Temp_Encoder->State = NORM;      //状态
+  77:User/src/bsp_Motor_Encoder.c ****    Temp_Encoder->Block_Detect_Enable = 0;
+  78:User/src/bsp_Motor_Encoder.c ****    switch (Encoder_Type) {
+  79:User/src/bsp_Motor_Encoder.c ****         case M2006: {
+  80:User/src/bsp_Motor_Encoder.c **** 			Temp_Encoder->lap_encoder = 8192;//编码器单圈码盘值
+  81:User/src/bsp_Motor_Encoder.c **** 			Temp_Encoder->gear_Ratio = 36;   //2006减速比
+  82:User/src/bsp_Motor_Encoder.c **** 			Temp_Encoder->Max_Block_Angle_Num = 10;
+  83:User/src/bsp_Motor_Encoder.c **** 			Temp_Encoder->Max_Block_Num = 256;
+  84:User/src/bsp_Motor_Encoder.c **** 		}break;
+  85:User/src/bsp_Motor_Encoder.c **** 			 
+  86:User/src/bsp_Motor_Encoder.c ****        case M3508: {
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc5HsUmU.s 			page 3
+
+
+  87:User/src/bsp_Motor_Encoder.c ****            Temp_Encoder->lap_encoder = 8192;//编码器单圈码盘值
+  88:User/src/bsp_Motor_Encoder.c ****            Temp_Encoder->gear_Ratio = 19;   //3508减速比
+  89:User/src/bsp_Motor_Encoder.c ****            Temp_Encoder->Max_Block_Angle_Num = 10;
+  90:User/src/bsp_Motor_Encoder.c ****            Temp_Encoder->Max_Block_Num = 256;
+  91:User/src/bsp_Motor_Encoder.c ****        }break;
+  92:User/src/bsp_Motor_Encoder.c **** 
+  93:User/src/bsp_Motor_Encoder.c ****        case GM6020:{
+  94:User/src/bsp_Motor_Encoder.c ****            Temp_Encoder->lap_encoder = 8192;//编码器单圈码盘值
+  95:User/src/bsp_Motor_Encoder.c ****            Temp_Encoder->gear_Ratio = 1;   //减速比
+  96:User/src/bsp_Motor_Encoder.c ****        }break;
+  97:User/src/bsp_Motor_Encoder.c ****        default:
+  98:User/src/bsp_Motor_Encoder.c ****            break;
+  99:User/src/bsp_Motor_Encoder.c ****    }
+ 100:User/src/bsp_Motor_Encoder.c **** }
+ 101:User/src/bsp_Motor_Encoder.c **** 
+ 102:User/src/bsp_Motor_Encoder.c **** Encoder_t * Get_Chassis_motor_encoder_point (uint16_t CHASSIS_MOTOR_ENCODER, Encoder_Type_e Encoder
+ 103:User/src/bsp_Motor_Encoder.c **** {
+ 104:User/src/bsp_Motor_Encoder.c ****     switch(CHASSIS_MOTOR_ENCODER) {
+ 105:User/src/bsp_Motor_Encoder.c ****         case CHASSIS_MOTOR_RF_ENCODER: 
+ 106:User/src/bsp_Motor_Encoder.c ****             Encoder_Init(&CAN_Encoder[CHASSIS_MOTOR_RF_ENCODER],Encoder_Type, radius);
+ 107:User/src/bsp_Motor_Encoder.c ****             return &CAN_Encoder[CHASSIS_MOTOR_RF_ENCODER];
+ 108:User/src/bsp_Motor_Encoder.c ****             break;
+ 109:User/src/bsp_Motor_Encoder.c ****         case CHASSIS_MOTOR_RB_ENCODER:
+ 110:User/src/bsp_Motor_Encoder.c ****             Encoder_Init(&CAN_Encoder[CHASSIS_MOTOR_RB_ENCODER],Encoder_Type, radius);
+ 111:User/src/bsp_Motor_Encoder.c ****             return &CAN_Encoder[CHASSIS_MOTOR_RB_ENCODER];
+ 112:User/src/bsp_Motor_Encoder.c ****             break;
+ 113:User/src/bsp_Motor_Encoder.c ****         case CHASSIS_MOTOR_LB_ENCODER: 
+ 114:User/src/bsp_Motor_Encoder.c ****             Encoder_Init(&CAN_Encoder[CHASSIS_MOTOR_LB_ENCODER],Encoder_Type, radius);
+ 115:User/src/bsp_Motor_Encoder.c ****             return &CAN_Encoder[CHASSIS_MOTOR_LB_ENCODER];
+ 116:User/src/bsp_Motor_Encoder.c ****             break;
+ 117:User/src/bsp_Motor_Encoder.c ****         case CHASSIS_MOTOR_LF_ENCODER:
+ 118:User/src/bsp_Motor_Encoder.c ****             Encoder_Init(&CAN_Encoder[CHASSIS_MOTOR_LF_ENCODER],Encoder_Type, radius);
+ 119:User/src/bsp_Motor_Encoder.c ****             return &CAN_Encoder[CHASSIS_MOTOR_LF_ENCODER];
+ 120:User/src/bsp_Motor_Encoder.c ****             break;
+ 121:User/src/bsp_Motor_Encoder.c ****         case CHASSIS_MOTOR_FIRE_ENCODER: 
+ 122:User/src/bsp_Motor_Encoder.c ****             Encoder_Init(&CAN_Encoder[CHASSIS_MOTOR_FIRE_ENCODER],Encoder_Type, radius);
+ 123:User/src/bsp_Motor_Encoder.c ****             return &CAN_Encoder[CHASSIS_MOTOR_FIRE_ENCODER];
+ 124:User/src/bsp_Motor_Encoder.c ****             break;
+ 125:User/src/bsp_Motor_Encoder.c ****         default:
+ 126:User/src/bsp_Motor_Encoder.c ****             return NULL;
+ 127:User/src/bsp_Motor_Encoder.c ****             break;
+ 128:User/src/bsp_Motor_Encoder.c ****     }
+ 129:User/src/bsp_Motor_Encoder.c **** }
+ 130:User/src/bsp_Motor_Encoder.c **** 
+ 131:User/src/bsp_Motor_Encoder.c **** /*函数名称：CAN_DATA_Encoder_Deal
+ 132:User/src/bsp_Motor_Encoder.c ****  *函数参数：position 位置
+ 133:User/src/bsp_Motor_Encoder.c ****             rpm      圈数每分钟
+ 134:User/src/bsp_Motor_Encoder.c ****             Encoder  待处理的编码器
+ 135:User/src/bsp_Motor_Encoder.c ****  *函数返回：void
+ 136:User/src/bsp_Motor_Encoder.c ****  *函数功能：根据传入的位置和速度，处理结构体的相关数据
+ 137:User/src/bsp_Motor_Encoder.c ****  */
+ 138:User/src/bsp_Motor_Encoder.c **** void CAN_DATA_Encoder_Deal(int16_t position, int16_t rpm, Encoder_t * Encoder) {
+ 139:User/src/bsp_Motor_Encoder.c **** 
+ 140:User/src/bsp_Motor_Encoder.c ****    Encoder->position = position;    //未处理的Can原始码盘
+ 141:User/src/bsp_Motor_Encoder.c ****    /*速度处理*/
+ 142:User/src/bsp_Motor_Encoder.c ****    Encoder->Speed[1] = rpm;                                                   //mm转cm
+ 143:User/src/bsp_Motor_Encoder.c ****    Encoder->linear_speed[1] = (float)(rpm/Encoder->gear_Ratio) * PI * 2.0f * (Encoder->radius /10) 
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc5HsUmU.s 			page 4
+
+
+ 144:User/src/bsp_Motor_Encoder.c ****    //加速度计算
+ 145:User/src/bsp_Motor_Encoder.c ****    Encoder->AccSpeed = Encoder->Speed[1] - Encoder->Speed[0];
+ 146:User/src/bsp_Motor_Encoder.c ****    Encoder->Speed[0] = Encoder->Speed[1];
+ 147:User/src/bsp_Motor_Encoder.c ****    Encoder->Acc_linear_speed = Encoder->linear_speed[1] - Encoder->linear_speed[0];
+ 148:User/src/bsp_Motor_Encoder.c ****    Encoder->linear_speed[0] = Encoder->linear_speed[1];
+ 149:User/src/bsp_Motor_Encoder.c ****    //第一次进入初始化position
+ 150:User/src/bsp_Motor_Encoder.c ****    if (Encoder->Init_Flag == 0) {
+ 151:User/src/bsp_Motor_Encoder.c ****        Encoder->Init_Flag = 1;
+ 152:User/src/bsp_Motor_Encoder.c ****        Encoder->last_position = Encoder->position;
+ 153:User/src/bsp_Motor_Encoder.c ****        Encoder->Encode_Actual_Val = Encoder->position;
+ 154:User/src/bsp_Motor_Encoder.c ****    }
+ 155:User/src/bsp_Motor_Encoder.c **** 
+ 156:User/src/bsp_Motor_Encoder.c ****    //多圈码盘值，不做360度后归零处理
+ 157:User/src/bsp_Motor_Encoder.c ****    volatile int erro=angle_limiting_int16(Encoder->position - Encoder->last_position,Encoder->lap_e
+ 158:User/src/bsp_Motor_Encoder.c ****    
+ 159:User/src/bsp_Motor_Encoder.c ****    Encoder->Encode_Record_Val += erro;
+ 160:User/src/bsp_Motor_Encoder.c ****    //    用于360度的限幅（好像是超过360归零的，但是我不需要）
+ 161:User/src/bsp_Motor_Encoder.c ****    //    Encoder->Encode_Actual_Val = check_codevalue(Encoder->Encode_Actual_Val , radio, Encoder->
+ 162:User/src/bsp_Motor_Encoder.c **** 
+ 163:User/src/bsp_Motor_Encoder.c ****    Encoder->Encode_Actual_Val += erro;
+ 164:User/src/bsp_Motor_Encoder.c **** 
+ 165:User/src/bsp_Motor_Encoder.c ****    Encoder->last_position = Encoder->position;
+ 166:User/src/bsp_Motor_Encoder.c **** 
+ 167:User/src/bsp_Motor_Encoder.c ****    Encoder->Actual_Angle = (float)(Encoder->Encode_Actual_Val) / (Encoder->gear_Ratio * Encoder->la
+ 168:User/src/bsp_Motor_Encoder.c ****    Encoder->Record_Angle = (float)(Encoder->Encode_Record_Val) / (Encoder->gear_Ratio * Encoder->la
+ 169:User/src/bsp_Motor_Encoder.c **** 
+ 170:User/src/bsp_Motor_Encoder.c ****    //电机堵转检测
+ 171:User/src/bsp_Motor_Encoder.c ****    Encoder->State=Block_Detect(erro, Encoder);
+ 172:User/src/bsp_Motor_Encoder.c ****    erro = 0;
+ 173:User/src/bsp_Motor_Encoder.c **** }
+ 174:User/src/bsp_Motor_Encoder.c **** 
+ 175:User/src/bsp_Motor_Encoder.c **** 
+ 176:User/src/bsp_Motor_Encoder.c **** /**
+ 177:User/src/bsp_Motor_Encoder.c **** * 码盘值数值清零处理,注意，真实码盘会变为当前真实值，并不清0
+ 178:User/src/bsp_Motor_Encoder.c **** * @param Encoder
+ 179:User/src/bsp_Motor_Encoder.c **** */
+ 180:User/src/bsp_Motor_Encoder.c **** void EncoderValZero(Encoder_t *Encoder) {
+  30              		.loc 1 180 41 view -0
+  31              		.cfi_startproc
+  32              		@ args = 0, pretend = 0, frame = 0
+  33              		@ frame_needed = 0, uses_anonymous_args = 0
+  34              		@ link register save eliminated.
+ 181:User/src/bsp_Motor_Encoder.c ****    Encoder->Encode_Record_Val = 0;
+  35              		.loc 1 181 4 view .LVU1
+  36              		.loc 1 181 31 is_stmt 0 view .LVU2
+  37 0000 0023     		movs	r3, #0
+  38 0002 0360     		str	r3, [r0]
+ 182:User/src/bsp_Motor_Encoder.c ****    Encoder->Encode_Actual_Val = 0;
+  39              		.loc 1 182 4 is_stmt 1 view .LVU3
+  40              		.loc 1 182 31 is_stmt 0 view .LVU4
+  41 0004 4360     		str	r3, [r0, #4]
+ 183:User/src/bsp_Motor_Encoder.c ****    Encoder->Radian = 0;
+  42              		.loc 1 183 4 is_stmt 1 view .LVU5
+  43              		.loc 1 183 20 is_stmt 0 view .LVU6
+  44 0006 0022     		movs	r2, #0
+  45 0008 8261     		str	r2, [r0, #24]	@ float
+ 184:User/src/bsp_Motor_Encoder.c ****    Encoder->State = NORM;
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc5HsUmU.s 			page 5
+
+
+  46              		.loc 1 184 4 is_stmt 1 view .LVU7
+  47              		.loc 1 184 19 is_stmt 0 view .LVU8
+  48 000a 80F83430 		strb	r3, [r0, #52]
+ 185:User/src/bsp_Motor_Encoder.c ****    Encoder->Init_Flag = 0;
+  49              		.loc 1 185 4 is_stmt 1 view .LVU9
+  50              		.loc 1 185 23 is_stmt 0 view .LVU10
+  51 000e 80F82430 		strb	r3, [r0, #36]
+ 186:User/src/bsp_Motor_Encoder.c **** }
+  52              		.loc 1 186 1 view .LVU11
+  53 0012 7047     		bx	lr
+  54              		.cfi_endproc
+  55              	.LFE137:
+  57              		.section	.text.Encoder_Struct_Zero,"ax",%progbits
+  58              		.align	1
+  59              		.global	Encoder_Struct_Zero
+  60              		.syntax unified
+  61              		.thumb
+  62              		.thumb_func
+  64              	Encoder_Struct_Zero:
+  65              	.LVL1:
+  66              	.LFB138:
+ 187:User/src/bsp_Motor_Encoder.c **** 
+ 188:User/src/bsp_Motor_Encoder.c **** /**
+ 189:User/src/bsp_Motor_Encoder.c **** * 结构体清零
+ 190:User/src/bsp_Motor_Encoder.c **** * @param Encoder
+ 191:User/src/bsp_Motor_Encoder.c **** */
+ 192:User/src/bsp_Motor_Encoder.c **** void Encoder_Struct_Zero(Encoder_t *Encoder){
+  67              		.loc 1 192 45 is_stmt 1 view -0
+  68              		.cfi_startproc
+  69              		@ args = 0, pretend = 0, frame = 0
+  70              		@ frame_needed = 0, uses_anonymous_args = 0
+  71              		.loc 1 192 45 is_stmt 0 view .LVU13
+  72 0000 08B5     		push	{r3, lr}
+  73              	.LCFI0:
+  74              		.cfi_def_cfa_offset 8
+  75              		.cfi_offset 3, -8
+  76              		.cfi_offset 14, -4
+ 193:User/src/bsp_Motor_Encoder.c ****    memset((void *)Encoder, 0x0, sizeof(Encoder_t));
+  77              		.loc 1 193 4 is_stmt 1 view .LVU14
+  78 0002 4422     		movs	r2, #68
+  79 0004 0021     		movs	r1, #0
+  80 0006 FFF7FEFF 		bl	memset
+  81              	.LVL2:
+ 194:User/src/bsp_Motor_Encoder.c **** }
+  82              		.loc 1 194 1 is_stmt 0 view .LVU15
+  83 000a 08BD     		pop	{r3, pc}
+  84              		.cfi_endproc
+  85              	.LFE138:
+  87              		.section	.text.Encoder_Init,"ax",%progbits
+  88              		.align	1
+  89              		.global	Encoder_Init
+  90              		.syntax unified
+  91              		.thumb
+  92              		.thumb_func
+  94              	Encoder_Init:
+  95              	.LVL3:
+  96              	.LFB134:
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc5HsUmU.s 			page 6
+
+
+  72:User/src/bsp_Motor_Encoder.c ****    Encoder_Struct_Zero(Temp_Encoder);
+  97              		.loc 1 72 1 is_stmt 1 view -0
+  98              		.cfi_startproc
+  99              		@ args = 0, pretend = 0, frame = 0
+ 100              		@ frame_needed = 0, uses_anonymous_args = 0
+  72:User/src/bsp_Motor_Encoder.c ****    Encoder_Struct_Zero(Temp_Encoder);
+ 101              		.loc 1 72 1 is_stmt 0 view .LVU17
+ 102 0000 38B5     		push	{r3, r4, r5, lr}
+ 103              	.LCFI1:
+ 104              		.cfi_def_cfa_offset 16
+ 105              		.cfi_offset 3, -16
+ 106              		.cfi_offset 4, -12
+ 107              		.cfi_offset 5, -8
+ 108              		.cfi_offset 14, -4
+ 109 0002 2DED028B 		vpush.64	{d8}
+ 110              	.LCFI2:
+ 111              		.cfi_def_cfa_offset 24
+ 112              		.cfi_offset 80, -24
+ 113              		.cfi_offset 81, -20
+ 114 0006 0446     		mov	r4, r0
+ 115 0008 0D46     		mov	r5, r1
+ 116 000a 08EE102A 		vmov	s16, r2	@ int
+  73:User/src/bsp_Motor_Encoder.c ****    Temp_Encoder->radius = radius;
+ 117              		.loc 1 73 4 is_stmt 1 view .LVU18
+ 118 000e FFF7FEFF 		bl	Encoder_Struct_Zero
+ 119              	.LVL4:
+  74:User/src/bsp_Motor_Encoder.c ****    Temp_Encoder->Encoder_Type = Encoder_Type;
+ 120              		.loc 1 74 4 view .LVU19
+  74:User/src/bsp_Motor_Encoder.c ****    Temp_Encoder->Encoder_Type = Encoder_Type;
+ 121              		.loc 1 74 25 is_stmt 0 view .LVU20
+ 122 0012 B8EE488A 		vcvt.f32.u32	s16, s16
+ 123 0016 84ED028A 		vstr.32	s16, [r4, #8]
+  75:User/src/bsp_Motor_Encoder.c ****    Temp_Encoder->State = NORM;      //状态
+ 124              		.loc 1 75 4 is_stmt 1 view .LVU21
+  75:User/src/bsp_Motor_Encoder.c ****    Temp_Encoder->State = NORM;      //状态
+ 125              		.loc 1 75 31 is_stmt 0 view .LVU22
+ 126 001a 84F83250 		strb	r5, [r4, #50]
+  76:User/src/bsp_Motor_Encoder.c ****    Temp_Encoder->Block_Detect_Enable = 0;
+ 127              		.loc 1 76 4 is_stmt 1 view .LVU23
+  76:User/src/bsp_Motor_Encoder.c ****    Temp_Encoder->Block_Detect_Enable = 0;
+ 128              		.loc 1 76 24 is_stmt 0 view .LVU24
+ 129 001e 0023     		movs	r3, #0
+ 130 0020 84F83430 		strb	r3, [r4, #52]
+  77:User/src/bsp_Motor_Encoder.c ****    switch (Encoder_Type) {
+ 131              		.loc 1 77 4 is_stmt 1 view .LVU25
+  77:User/src/bsp_Motor_Encoder.c ****    switch (Encoder_Type) {
+ 132              		.loc 1 77 38 is_stmt 0 view .LVU26
+ 133 0024 84F83330 		strb	r3, [r4, #51]
+  78:User/src/bsp_Motor_Encoder.c ****         case M2006: {
+ 134              		.loc 1 78 4 is_stmt 1 view .LVU27
+ 135 0028 012D     		cmp	r5, #1
+ 136 002a 1BD0     		beq	.L5
+ 137 002c 022D     		cmp	r5, #2
+ 138 002e 03D0     		beq	.L6
+ 139 0030 6DB1     		cbz	r5, .L10
+ 140              	.L4:
+ 100:User/src/bsp_Motor_Encoder.c **** 
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc5HsUmU.s 			page 7
+
+
+ 141              		.loc 1 100 1 is_stmt 0 view .LVU28
+ 142 0032 BDEC028B 		vldm	sp!, {d8}
+ 143              	.LCFI3:
+ 144              		.cfi_remember_state
+ 145              		.cfi_restore 80
+ 146              		.cfi_restore 81
+ 147              		.cfi_def_cfa_offset 16
+ 148 0036 38BD     		pop	{r3, r4, r5, pc}
+ 149              	.LVL5:
+ 150              	.L6:
+ 151              	.LCFI4:
+ 152              		.cfi_restore_state
+  80:User/src/bsp_Motor_Encoder.c **** 			Temp_Encoder->gear_Ratio = 36;   //2006减速比
+ 153              		.loc 1 80 4 is_stmt 1 view .LVU29
+  80:User/src/bsp_Motor_Encoder.c **** 			Temp_Encoder->gear_Ratio = 36;   //2006减速比
+ 154              		.loc 1 80 30 is_stmt 0 view .LVU30
+ 155 0038 4FF40053 		mov	r3, #8192
+ 156 003c 2386     		strh	r3, [r4, #48]	@ movhi
+  81:User/src/bsp_Motor_Encoder.c **** 			Temp_Encoder->Max_Block_Angle_Num = 10;
+ 157              		.loc 1 81 4 is_stmt 1 view .LVU31
+  81:User/src/bsp_Motor_Encoder.c **** 			Temp_Encoder->Max_Block_Angle_Num = 10;
+ 158              		.loc 1 81 29 is_stmt 0 view .LVU32
+ 159 003e 2423     		movs	r3, #36
+ 160 0040 E386     		strh	r3, [r4, #54]	@ movhi
+  82:User/src/bsp_Motor_Encoder.c **** 			Temp_Encoder->Max_Block_Num = 256;
+ 161              		.loc 1 82 4 is_stmt 1 view .LVU33
+  82:User/src/bsp_Motor_Encoder.c **** 			Temp_Encoder->Max_Block_Num = 256;
+ 162              		.loc 1 82 38 is_stmt 0 view .LVU34
+ 163 0042 0A23     		movs	r3, #10
+ 164 0044 2387     		strh	r3, [r4, #56]	@ movhi
+  83:User/src/bsp_Motor_Encoder.c **** 		}break;
+ 165              		.loc 1 83 4 is_stmt 1 view .LVU35
+  83:User/src/bsp_Motor_Encoder.c **** 		}break;
+ 166              		.loc 1 83 32 is_stmt 0 view .LVU36
+ 167 0046 4FF48073 		mov	r3, #256
+ 168 004a 6387     		strh	r3, [r4, #58]	@ movhi
+  84:User/src/bsp_Motor_Encoder.c **** 			 
+ 169              		.loc 1 84 4 is_stmt 1 view .LVU37
+  84:User/src/bsp_Motor_Encoder.c **** 			 
+ 170              		.loc 1 84 3 is_stmt 0 view .LVU38
+ 171 004c F1E7     		b	.L4
+ 172              	.L10:
+  87:User/src/bsp_Motor_Encoder.c ****            Temp_Encoder->gear_Ratio = 19;   //3508减速比
+ 173              		.loc 1 87 12 is_stmt 1 view .LVU39
+  87:User/src/bsp_Motor_Encoder.c ****            Temp_Encoder->gear_Ratio = 19;   //3508减速比
+ 174              		.loc 1 87 38 is_stmt 0 view .LVU40
+ 175 004e 4FF40053 		mov	r3, #8192
+ 176 0052 2386     		strh	r3, [r4, #48]	@ movhi
+  88:User/src/bsp_Motor_Encoder.c ****            Temp_Encoder->Max_Block_Angle_Num = 10;
+ 177              		.loc 1 88 12 is_stmt 1 view .LVU41
+  88:User/src/bsp_Motor_Encoder.c ****            Temp_Encoder->Max_Block_Angle_Num = 10;
+ 178              		.loc 1 88 37 is_stmt 0 view .LVU42
+ 179 0054 1323     		movs	r3, #19
+ 180 0056 E386     		strh	r3, [r4, #54]	@ movhi
+  89:User/src/bsp_Motor_Encoder.c ****            Temp_Encoder->Max_Block_Num = 256;
+ 181              		.loc 1 89 12 is_stmt 1 view .LVU43
+  89:User/src/bsp_Motor_Encoder.c ****            Temp_Encoder->Max_Block_Num = 256;
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc5HsUmU.s 			page 8
+
+
+ 182              		.loc 1 89 46 is_stmt 0 view .LVU44
+ 183 0058 0A23     		movs	r3, #10
+ 184 005a 2387     		strh	r3, [r4, #56]	@ movhi
+  90:User/src/bsp_Motor_Encoder.c ****        }break;
+ 185              		.loc 1 90 12 is_stmt 1 view .LVU45
+  90:User/src/bsp_Motor_Encoder.c ****        }break;
+ 186              		.loc 1 90 40 is_stmt 0 view .LVU46
+ 187 005c 4FF48073 		mov	r3, #256
+ 188 0060 6387     		strh	r3, [r4, #58]	@ movhi
+  91:User/src/bsp_Motor_Encoder.c **** 
+ 189              		.loc 1 91 9 is_stmt 1 view .LVU47
+  91:User/src/bsp_Motor_Encoder.c **** 
+ 190              		.loc 1 91 8 is_stmt 0 view .LVU48
+ 191 0062 E6E7     		b	.L4
+ 192              	.L5:
+  94:User/src/bsp_Motor_Encoder.c ****            Temp_Encoder->gear_Ratio = 1;   //减速比
+ 193              		.loc 1 94 12 is_stmt 1 view .LVU49
+  94:User/src/bsp_Motor_Encoder.c ****            Temp_Encoder->gear_Ratio = 1;   //减速比
+ 194              		.loc 1 94 38 is_stmt 0 view .LVU50
+ 195 0064 4FF40053 		mov	r3, #8192
+ 196 0068 2386     		strh	r3, [r4, #48]	@ movhi
+  95:User/src/bsp_Motor_Encoder.c ****        }break;
+ 197              		.loc 1 95 12 is_stmt 1 view .LVU51
+  95:User/src/bsp_Motor_Encoder.c ****        }break;
+ 198              		.loc 1 95 37 is_stmt 0 view .LVU52
+ 199 006a 0123     		movs	r3, #1
+ 200 006c E386     		strh	r3, [r4, #54]	@ movhi
+  96:User/src/bsp_Motor_Encoder.c ****        default:
+ 201              		.loc 1 96 9 is_stmt 1 view .LVU53
+ 100:User/src/bsp_Motor_Encoder.c **** 
+ 202              		.loc 1 100 1 is_stmt 0 view .LVU54
+ 203 006e E0E7     		b	.L4
+ 204              		.cfi_endproc
+ 205              	.LFE134:
+ 207              		.section	.text.Get_Chassis_motor_encoder_point,"ax",%progbits
+ 208              		.align	1
+ 209              		.global	Get_Chassis_motor_encoder_point
+ 210              		.syntax unified
+ 211              		.thumb
+ 212              		.thumb_func
+ 214              	Get_Chassis_motor_encoder_point:
+ 215              	.LVL6:
+ 216              	.LFB135:
+ 103:User/src/bsp_Motor_Encoder.c ****     switch(CHASSIS_MOTOR_ENCODER) {
+ 217              		.loc 1 103 1 is_stmt 1 view -0
+ 218              		.cfi_startproc
+ 219              		@ args = 0, pretend = 0, frame = 0
+ 220              		@ frame_needed = 0, uses_anonymous_args = 0
+ 103:User/src/bsp_Motor_Encoder.c ****     switch(CHASSIS_MOTOR_ENCODER) {
+ 221              		.loc 1 103 1 is_stmt 0 view .LVU56
+ 222 0000 10B5     		push	{r4, lr}
+ 223              	.LCFI5:
+ 224              		.cfi_def_cfa_offset 8
+ 225              		.cfi_offset 4, -8
+ 226              		.cfi_offset 14, -4
+ 104:User/src/bsp_Motor_Encoder.c ****         case CHASSIS_MOTOR_RF_ENCODER: 
+ 227              		.loc 1 104 5 is_stmt 1 view .LVU57
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc5HsUmU.s 			page 9
+
+
+ 228 0002 0428     		cmp	r0, #4
+ 229 0004 22D8     		bhi	.L19
+ 230 0006 DFE800F0 		tbb	[pc, r0]
+ 231              	.L14:
+ 232 000a 03       		.byte	(.L18-.L14)/2
+ 233 000b 09       		.byte	(.L17-.L14)/2
+ 234 000c 0F       		.byte	(.L16-.L14)/2
+ 235 000d 15       		.byte	(.L15-.L14)/2
+ 236 000e 1B       		.byte	(.L13-.L14)/2
+ 237 000f 00       		.p2align 1
+ 238              	.L18:
+ 106:User/src/bsp_Motor_Encoder.c ****             return &CAN_Encoder[CHASSIS_MOTOR_RF_ENCODER];
+ 239              		.loc 1 106 13 view .LVU58
+ 240 0010 0F4C     		ldr	r4, .L21
+ 241 0012 2046     		mov	r0, r4
+ 242              	.LVL7:
+ 106:User/src/bsp_Motor_Encoder.c ****             return &CAN_Encoder[CHASSIS_MOTOR_RF_ENCODER];
+ 243              		.loc 1 106 13 is_stmt 0 view .LVU59
+ 244 0014 FFF7FEFF 		bl	Encoder_Init
+ 245              	.LVL8:
+ 107:User/src/bsp_Motor_Encoder.c ****             break;
+ 246              		.loc 1 107 13 is_stmt 1 view .LVU60
+ 107:User/src/bsp_Motor_Encoder.c ****             break;
+ 247              		.loc 1 107 20 is_stmt 0 view .LVU61
+ 248 0018 2046     		mov	r0, r4
+ 249              	.L11:
+ 129:User/src/bsp_Motor_Encoder.c **** 
+ 250              		.loc 1 129 1 view .LVU62
+ 251 001a 10BD     		pop	{r4, pc}
+ 252              	.LVL9:
+ 253              	.L17:
+ 108:User/src/bsp_Motor_Encoder.c ****         case CHASSIS_MOTOR_RB_ENCODER:
+ 254              		.loc 1 108 13 is_stmt 1 view .LVU63
+ 110:User/src/bsp_Motor_Encoder.c ****             return &CAN_Encoder[CHASSIS_MOTOR_RB_ENCODER];
+ 255              		.loc 1 110 13 view .LVU64
+ 256 001c 0D4C     		ldr	r4, .L21+4
+ 257 001e 2046     		mov	r0, r4
+ 258              	.LVL10:
+ 110:User/src/bsp_Motor_Encoder.c ****             return &CAN_Encoder[CHASSIS_MOTOR_RB_ENCODER];
+ 259              		.loc 1 110 13 is_stmt 0 view .LVU65
+ 260 0020 FFF7FEFF 		bl	Encoder_Init
+ 261              	.LVL11:
+ 111:User/src/bsp_Motor_Encoder.c ****             break;
+ 262              		.loc 1 111 13 is_stmt 1 view .LVU66
+ 111:User/src/bsp_Motor_Encoder.c ****             break;
+ 263              		.loc 1 111 20 is_stmt 0 view .LVU67
+ 264 0024 2046     		mov	r0, r4
+ 265 0026 F8E7     		b	.L11
+ 266              	.LVL12:
+ 267              	.L16:
+ 112:User/src/bsp_Motor_Encoder.c ****         case CHASSIS_MOTOR_LB_ENCODER: 
+ 268              		.loc 1 112 13 is_stmt 1 view .LVU68
+ 114:User/src/bsp_Motor_Encoder.c ****             return &CAN_Encoder[CHASSIS_MOTOR_LB_ENCODER];
+ 269              		.loc 1 114 13 view .LVU69
+ 270 0028 0B4C     		ldr	r4, .L21+8
+ 271 002a 2046     		mov	r0, r4
+ 272              	.LVL13:
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc5HsUmU.s 			page 10
+
+
+ 114:User/src/bsp_Motor_Encoder.c ****             return &CAN_Encoder[CHASSIS_MOTOR_LB_ENCODER];
+ 273              		.loc 1 114 13 is_stmt 0 view .LVU70
+ 274 002c FFF7FEFF 		bl	Encoder_Init
+ 275              	.LVL14:
+ 115:User/src/bsp_Motor_Encoder.c ****             break;
+ 276              		.loc 1 115 13 is_stmt 1 view .LVU71
+ 115:User/src/bsp_Motor_Encoder.c ****             break;
+ 277              		.loc 1 115 20 is_stmt 0 view .LVU72
+ 278 0030 2046     		mov	r0, r4
+ 279 0032 F2E7     		b	.L11
+ 280              	.LVL15:
+ 281              	.L15:
+ 116:User/src/bsp_Motor_Encoder.c ****         case CHASSIS_MOTOR_LF_ENCODER:
+ 282              		.loc 1 116 13 is_stmt 1 view .LVU73
+ 118:User/src/bsp_Motor_Encoder.c ****             return &CAN_Encoder[CHASSIS_MOTOR_LF_ENCODER];
+ 283              		.loc 1 118 13 view .LVU74
+ 284 0034 094C     		ldr	r4, .L21+12
+ 285 0036 2046     		mov	r0, r4
+ 286              	.LVL16:
+ 118:User/src/bsp_Motor_Encoder.c ****             return &CAN_Encoder[CHASSIS_MOTOR_LF_ENCODER];
+ 287              		.loc 1 118 13 is_stmt 0 view .LVU75
+ 288 0038 FFF7FEFF 		bl	Encoder_Init
+ 289              	.LVL17:
+ 119:User/src/bsp_Motor_Encoder.c ****             break;
+ 290              		.loc 1 119 13 is_stmt 1 view .LVU76
+ 119:User/src/bsp_Motor_Encoder.c ****             break;
+ 291              		.loc 1 119 20 is_stmt 0 view .LVU77
+ 292 003c 2046     		mov	r0, r4
+ 293 003e ECE7     		b	.L11
+ 294              	.LVL18:
+ 295              	.L13:
+ 120:User/src/bsp_Motor_Encoder.c ****         case CHASSIS_MOTOR_FIRE_ENCODER: 
+ 296              		.loc 1 120 13 is_stmt 1 view .LVU78
+ 122:User/src/bsp_Motor_Encoder.c ****             return &CAN_Encoder[CHASSIS_MOTOR_FIRE_ENCODER];
+ 297              		.loc 1 122 13 view .LVU79
+ 298 0040 074C     		ldr	r4, .L21+16
+ 299 0042 2046     		mov	r0, r4
+ 300              	.LVL19:
+ 122:User/src/bsp_Motor_Encoder.c ****             return &CAN_Encoder[CHASSIS_MOTOR_FIRE_ENCODER];
+ 301              		.loc 1 122 13 is_stmt 0 view .LVU80
+ 302 0044 FFF7FEFF 		bl	Encoder_Init
+ 303              	.LVL20:
+ 123:User/src/bsp_Motor_Encoder.c ****             break;
+ 304              		.loc 1 123 13 is_stmt 1 view .LVU81
+ 123:User/src/bsp_Motor_Encoder.c ****             break;
+ 305              		.loc 1 123 20 is_stmt 0 view .LVU82
+ 306 0048 2046     		mov	r0, r4
+ 307 004a E6E7     		b	.L11
+ 308              	.LVL21:
+ 309              	.L19:
+ 104:User/src/bsp_Motor_Encoder.c ****         case CHASSIS_MOTOR_RF_ENCODER: 
+ 310              		.loc 1 104 5 view .LVU83
+ 311 004c 0020     		movs	r0, #0
+ 312              	.LVL22:
+ 127:User/src/bsp_Motor_Encoder.c ****     }
+ 313              		.loc 1 127 13 is_stmt 1 view .LVU84
+ 314 004e E4E7     		b	.L11
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc5HsUmU.s 			page 11
+
+
+ 315              	.L22:
+ 316              		.align	2
+ 317              	.L21:
+ 318 0050 00000000 		.word	.LANCHOR0
+ 319 0054 44000000 		.word	.LANCHOR0+68
+ 320 0058 88000000 		.word	.LANCHOR0+136
+ 321 005c CC000000 		.word	.LANCHOR0+204
+ 322 0060 10010000 		.word	.LANCHOR0+272
+ 323              		.cfi_endproc
+ 324              	.LFE135:
+ 326              		.section	.text.Block_Detect,"ax",%progbits
+ 327              		.align	1
+ 328              		.global	Block_Detect
+ 329              		.syntax unified
+ 330              		.thumb
+ 331              		.thumb_func
+ 333              	Block_Detect:
+ 334              	.LVL23:
+ 335              	.LFB139:
+ 195:User/src/bsp_Motor_Encoder.c **** 
+ 196:User/src/bsp_Motor_Encoder.c **** /**
+ 197:User/src/bsp_Motor_Encoder.c **** * 堵转检测 TODO：还没测试，还没有考虑解堵转后
+ 198:User/src/bsp_Motor_Encoder.c **** * @param error 上一次和这次位置的差值
+ 199:User/src/bsp_Motor_Encoder.c **** * @param Encoder
+ 200:User/src/bsp_Motor_Encoder.c **** * @return
+ 201:User/src/bsp_Motor_Encoder.c **** */
+ 202:User/src/bsp_Motor_Encoder.c **** STATE_e Block_Detect(int16_t error, Encoder_t *Encoder ) {
+ 336              		.loc 1 202 58 view -0
+ 337              		.cfi_startproc
+ 338              		@ args = 0, pretend = 0, frame = 0
+ 339              		@ frame_needed = 0, uses_anonymous_args = 0
+ 340              		@ link register save eliminated.
+ 341              		.loc 1 202 58 is_stmt 0 view .LVU86
+ 342 0000 0346     		mov	r3, r0
+ 203:User/src/bsp_Motor_Encoder.c ****    //其他类型的编码器比如拉线，就不用考虑堵转
+ 204:User/src/bsp_Motor_Encoder.c ****    if(Encoder->Encoder_Type>=Type_End||Encoder->Block_Detect_Enable==0)return NORM;
+ 343              		.loc 1 204 4 is_stmt 1 view .LVU87
+ 344              		.loc 1 204 14 is_stmt 0 view .LVU88
+ 345 0002 91F83220 		ldrb	r2, [r1, #50]	@ zero_extendqisi2
+ 346              		.loc 1 204 6 view .LVU89
+ 347 0006 022A     		cmp	r2, #2
+ 348 0008 1AD8     		bhi	.L28
+ 349              		.loc 1 204 47 discriminator 2 view .LVU90
+ 350 000a 91F83300 		ldrb	r0, [r1, #51]	@ zero_extendqisi2
+ 351              	.LVL24:
+ 352              		.loc 1 204 38 discriminator 2 view .LVU91
+ 353 000e D0B1     		cbz	r0, .L24
+ 205:User/src/bsp_Motor_Encoder.c **** 
+ 206:User/src/bsp_Motor_Encoder.c ****    //绝对值小于Max_Block_Angle_Num堵转最大角度容忍值时计数器狂加
+ 207:User/src/bsp_Motor_Encoder.c ****    if (error > Encoder->Max_Block_Angle_Num) {
+ 354              		.loc 1 207 4 is_stmt 1 view .LVU92
+ 355              		.loc 1 207 23 is_stmt 0 view .LVU93
+ 356 0010 B1F93820 		ldrsh	r2, [r1, #56]
+ 357              		.loc 1 207 7 view .LVU94
+ 358 0014 9A42     		cmp	r2, r3
+ 359 0016 09DA     		bge	.L25
+ 208:User/src/bsp_Motor_Encoder.c ****        Encoder->Block_Count++;
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc5HsUmU.s 			page 12
+
+
+ 360              		.loc 1 208 8 is_stmt 1 view .LVU95
+ 361              		.loc 1 208 15 is_stmt 0 view .LVU96
+ 362 0018 CB6B     		ldr	r3, [r1, #60]
+ 363              		.loc 1 208 28 view .LVU97
+ 364 001a 0133     		adds	r3, r3, #1
+ 365 001c CB63     		str	r3, [r1, #60]
+ 366              	.L26:
+ 209:User/src/bsp_Motor_Encoder.c ****    } else if (error < -Encoder->Max_Block_Angle_Num) {
+ 210:User/src/bsp_Motor_Encoder.c ****        Encoder->Block_Count++;
+ 211:User/src/bsp_Motor_Encoder.c ****    } else {
+ 212:User/src/bsp_Motor_Encoder.c ****        Encoder->Block_Count = 0;
+ 213:User/src/bsp_Motor_Encoder.c ****    }
+ 214:User/src/bsp_Motor_Encoder.c **** 
+ 215:User/src/bsp_Motor_Encoder.c ****    //最后判断是不是堵转咯
+ 216:User/src/bsp_Motor_Encoder.c ****    if (Encoder->Block_Count > Encoder->Max_Block_Num)
+ 367              		.loc 1 216 4 is_stmt 1 view .LVU98
+ 368              		.loc 1 216 15 is_stmt 0 view .LVU99
+ 369 001e CA6B     		ldr	r2, [r1, #60]
+ 370              		.loc 1 216 38 view .LVU100
+ 371 0020 B1F93A30 		ldrsh	r3, [r1, #58]
+ 372              		.loc 1 216 7 view .LVU101
+ 373 0024 9A42     		cmp	r2, r3
+ 374 0026 0DDD     		ble	.L29
+ 217:User/src/bsp_Motor_Encoder.c ****        return BLOCK;
+ 375              		.loc 1 217 15 view .LVU102
+ 376 0028 0120     		movs	r0, #1
+ 377 002a 7047     		bx	lr
+ 378              	.L25:
+ 209:User/src/bsp_Motor_Encoder.c ****    } else if (error < -Encoder->Max_Block_Angle_Num) {
+ 379              		.loc 1 209 11 is_stmt 1 view .LVU103
+ 209:User/src/bsp_Motor_Encoder.c ****    } else if (error < -Encoder->Max_Block_Angle_Num) {
+ 380              		.loc 1 209 23 is_stmt 0 view .LVU104
+ 381 002c 5242     		rsbs	r2, r2, #0
+ 209:User/src/bsp_Motor_Encoder.c ****    } else if (error < -Encoder->Max_Block_Angle_Num) {
+ 382              		.loc 1 209 14 view .LVU105
+ 383 002e 9342     		cmp	r3, r2
+ 384 0030 03DA     		bge	.L27
+ 210:User/src/bsp_Motor_Encoder.c ****    } else {
+ 385              		.loc 1 210 8 is_stmt 1 view .LVU106
+ 210:User/src/bsp_Motor_Encoder.c ****    } else {
+ 386              		.loc 1 210 15 is_stmt 0 view .LVU107
+ 387 0032 CB6B     		ldr	r3, [r1, #60]
+ 210:User/src/bsp_Motor_Encoder.c ****    } else {
+ 388              		.loc 1 210 28 view .LVU108
+ 389 0034 0133     		adds	r3, r3, #1
+ 390 0036 CB63     		str	r3, [r1, #60]
+ 391 0038 F1E7     		b	.L26
+ 392              	.L27:
+ 212:User/src/bsp_Motor_Encoder.c ****    }
+ 393              		.loc 1 212 8 is_stmt 1 view .LVU109
+ 212:User/src/bsp_Motor_Encoder.c ****    }
+ 394              		.loc 1 212 29 is_stmt 0 view .LVU110
+ 395 003a 0023     		movs	r3, #0
+ 396 003c CB63     		str	r3, [r1, #60]
+ 397 003e EEE7     		b	.L26
+ 398              	.LVL25:
+ 399              	.L28:
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc5HsUmU.s 			page 13
+
+
+ 204:User/src/bsp_Motor_Encoder.c **** 
+ 400              		.loc 1 204 79 view .LVU111
+ 401 0040 0020     		movs	r0, #0
+ 402              	.LVL26:
+ 204:User/src/bsp_Motor_Encoder.c **** 
+ 403              		.loc 1 204 79 view .LVU112
+ 404 0042 7047     		bx	lr
+ 405              	.L29:
+ 218:User/src/bsp_Motor_Encoder.c ****    else
+ 219:User/src/bsp_Motor_Encoder.c ****        return NORM;
+ 406              		.loc 1 219 15 view .LVU113
+ 407 0044 0020     		movs	r0, #0
+ 408              	.L24:
+ 220:User/src/bsp_Motor_Encoder.c **** 
+ 221:User/src/bsp_Motor_Encoder.c **** }
+ 409              		.loc 1 221 1 view .LVU114
+ 410 0046 7047     		bx	lr
+ 411              		.cfi_endproc
+ 412              	.LFE139:
+ 414              		.section	.text.angle_limiting_int16,"ax",%progbits
+ 415              		.align	1
+ 416              		.global	angle_limiting_int16
+ 417              		.syntax unified
+ 418              		.thumb
+ 419              		.thumb_func
+ 421              	angle_limiting_int16:
+ 422              	.LVL27:
+ 423              	.LFB140:
+ 222:User/src/bsp_Motor_Encoder.c **** 
+ 223:User/src/bsp_Motor_Encoder.c **** //临角处理16位（对应角度正值）
+ 224:User/src/bsp_Motor_Encoder.c **** int16_t angle_limiting_int16(int16_t Angl_Err, int16_t lap_encoder) {
+ 424              		.loc 1 224 69 is_stmt 1 view -0
+ 425              		.cfi_startproc
+ 426              		@ args = 0, pretend = 0, frame = 0
+ 427              		@ frame_needed = 0, uses_anonymous_args = 0
+ 428              		@ link register save eliminated.
+ 225:User/src/bsp_Motor_Encoder.c ****    //|当前值 - 上一次值| > 编码器最大值/2 时说明向上溢出
+ 226:User/src/bsp_Motor_Encoder.c ****    if (Angl_Err < -(lap_encoder / 2))
+ 429              		.loc 1 226 4 view .LVU116
+ 430              		.loc 1 226 33 is_stmt 0 view .LVU117
+ 431 0000 01EBD172 		add	r2, r1, r1, lsr #31
+ 432 0004 5210     		asrs	r2, r2, #1
+ 433              		.loc 1 226 19 view .LVU118
+ 434 0006 5342     		rsbs	r3, r2, #0
+ 435              		.loc 1 226 7 view .LVU119
+ 436 0008 9842     		cmp	r0, r3
+ 437 000a 02DA     		bge	.L31
+ 227:User/src/bsp_Motor_Encoder.c ****    {
+ 228:User/src/bsp_Motor_Encoder.c ****        Angl_Err += (lap_encoder - 1);
+ 438              		.loc 1 228 8 is_stmt 1 view .LVU120
+ 439              		.loc 1 228 17 is_stmt 0 view .LVU121
+ 440 000c 0844     		add	r0, r0, r1
+ 441              	.LVL28:
+ 442              		.loc 1 228 17 view .LVU122
+ 443 000e 431E     		subs	r3, r0, #1
+ 444 0010 18B2     		sxth	r0, r3
+ 445              	.LVL29:
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc5HsUmU.s 			page 14
+
+
+ 446              	.L31:
+ 229:User/src/bsp_Motor_Encoder.c ****    }
+ 230:User/src/bsp_Motor_Encoder.c ****    if (Angl_Err > (lap_encoder / 2)) {
+ 447              		.loc 1 230 4 is_stmt 1 view .LVU123
+ 448              		.loc 1 230 7 is_stmt 0 view .LVU124
+ 449 0012 8242     		cmp	r2, r0
+ 450 0014 02DA     		bge	.L32
+ 231:User/src/bsp_Motor_Encoder.c ****        Angl_Err -= (lap_encoder - 1);
+ 451              		.loc 1 231 8 is_stmt 1 view .LVU125
+ 452              		.loc 1 231 17 is_stmt 0 view .LVU126
+ 453 0016 401A     		subs	r0, r0, r1
+ 454              	.LVL30:
+ 455              		.loc 1 231 17 view .LVU127
+ 456 0018 0130     		adds	r0, r0, #1
+ 457 001a 00B2     		sxth	r0, r0
+ 458              	.LVL31:
+ 459              	.L32:
+ 232:User/src/bsp_Motor_Encoder.c ****    }
+ 233:User/src/bsp_Motor_Encoder.c ****    return Angl_Err;
+ 460              		.loc 1 233 4 is_stmt 1 view .LVU128
+ 234:User/src/bsp_Motor_Encoder.c **** }
+ 461              		.loc 1 234 1 is_stmt 0 view .LVU129
+ 462 001c 7047     		bx	lr
+ 463              		.cfi_endproc
+ 464              	.LFE140:
+ 466              		.section	.text.CAN_DATA_Encoder_Deal,"ax",%progbits
+ 467              		.align	1
+ 468              		.global	CAN_DATA_Encoder_Deal
+ 469              		.syntax unified
+ 470              		.thumb
+ 471              		.thumb_func
+ 473              	CAN_DATA_Encoder_Deal:
+ 474              	.LVL32:
+ 475              	.LFB136:
+ 138:User/src/bsp_Motor_Encoder.c **** 
+ 476              		.loc 1 138 80 is_stmt 1 view -0
+ 477              		.cfi_startproc
+ 478              		@ args = 0, pretend = 0, frame = 8
+ 479              		@ frame_needed = 0, uses_anonymous_args = 0
+ 138:User/src/bsp_Motor_Encoder.c **** 
+ 480              		.loc 1 138 80 is_stmt 0 view .LVU131
+ 481 0000 F0B5     		push	{r4, r5, r6, r7, lr}
+ 482              	.LCFI6:
+ 483              		.cfi_def_cfa_offset 20
+ 484              		.cfi_offset 4, -20
+ 485              		.cfi_offset 5, -16
+ 486              		.cfi_offset 6, -12
+ 487              		.cfi_offset 7, -8
+ 488              		.cfi_offset 14, -4
+ 489 0002 83B0     		sub	sp, sp, #12
+ 490              	.LCFI7:
+ 491              		.cfi_def_cfa_offset 32
+ 492 0004 0646     		mov	r6, r0
+ 493 0006 1446     		mov	r4, r2
+ 140:User/src/bsp_Motor_Encoder.c ****    /*速度处理*/
+ 494              		.loc 1 140 4 is_stmt 1 view .LVU132
+ 140:User/src/bsp_Motor_Encoder.c ****    /*速度处理*/
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc5HsUmU.s 			page 15
+
+
+ 495              		.loc 1 140 22 is_stmt 0 view .LVU133
+ 496 0008 9085     		strh	r0, [r2, #44]	@ movhi
+ 142:User/src/bsp_Motor_Encoder.c ****    Encoder->linear_speed[1] = (float)(rpm/Encoder->gear_Ratio) * PI * 2.0f * (Encoder->radius /10) 
+ 497              		.loc 1 142 4 is_stmt 1 view .LVU134
+ 142:User/src/bsp_Motor_Encoder.c ****    Encoder->linear_speed[1] = (float)(rpm/Encoder->gear_Ratio) * PI * 2.0f * (Encoder->radius /10) 
+ 498              		.loc 1 142 22 is_stmt 0 view .LVU135
+ 499 000a 1185     		strh	r1, [r2, #40]	@ movhi
+ 143:User/src/bsp_Motor_Encoder.c ****    //加速度计算
+ 500              		.loc 1 143 4 is_stmt 1 view .LVU136
+ 143:User/src/bsp_Motor_Encoder.c ****    //加速度计算
+ 501              		.loc 1 143 50 is_stmt 0 view .LVU137
+ 502 000c B2F93650 		ldrsh	r5, [r2, #54]
+ 143:User/src/bsp_Motor_Encoder.c ****    //加速度计算
+ 503              		.loc 1 143 42 view .LVU138
+ 504 0010 91FBF5F3 		sdiv	r3, r1, r5
+ 505 0014 07EE903A 		vmov	s15, r3	@ int
+ 143:User/src/bsp_Motor_Encoder.c ****    //加速度计算
+ 506              		.loc 1 143 31 view .LVU139
+ 507 0018 F8EEE77A 		vcvt.f32.s32	s15, s15
+ 143:User/src/bsp_Motor_Encoder.c ****    //加速度计算
+ 508              		.loc 1 143 64 view .LVU140
+ 509 001c 9FED317A 		vldr.32	s14, .L36
+ 510 0020 67EE877A 		vmul.f32	s15, s15, s14
+ 143:User/src/bsp_Motor_Encoder.c ****    //加速度计算
+ 511              		.loc 1 143 69 view .LVU141
+ 512 0024 77EEA77A 		vadd.f32	s15, s15, s15
+ 143:User/src/bsp_Motor_Encoder.c ****    //加速度计算
+ 513              		.loc 1 143 86 view .LVU142
+ 514 0028 92ED026A 		vldr.32	s12, [r2, #8]
+ 143:User/src/bsp_Motor_Encoder.c ****    //加速度计算
+ 515              		.loc 1 143 95 view .LVU143
+ 516 002c F2EE046A 		vmov.f32	s13, #1.0e+1
+ 517 0030 86EE267A 		vdiv.f32	s14, s12, s13
+ 143:User/src/bsp_Motor_Encoder.c ****    //加速度计算
+ 518              		.loc 1 143 76 view .LVU144
+ 519 0034 67EE877A 		vmul.f32	s15, s15, s14
+ 143:User/src/bsp_Motor_Encoder.c ****    //加速度计算
+ 520              		.loc 1 143 100 view .LVU145
+ 521 0038 DFED2B6A 		vldr.32	s13, .L36+4
+ 522 003c 87EEA67A 		vdiv.f32	s14, s15, s13
+ 143:User/src/bsp_Motor_Encoder.c ****    //加速度计算
+ 523              		.loc 1 143 29 view .LVU146
+ 524 0040 82ED047A 		vstr.32	s14, [r2, #16]
+ 145:User/src/bsp_Motor_Encoder.c ****    Encoder->Speed[0] = Encoder->Speed[1];
+ 525              		.loc 1 145 4 is_stmt 1 view .LVU147
+ 145:User/src/bsp_Motor_Encoder.c ****    Encoder->Speed[0] = Encoder->Speed[1];
+ 526              		.loc 1 145 38 is_stmt 0 view .LVU148
+ 527 0044 8BB2     		uxth	r3, r1
+ 145:User/src/bsp_Motor_Encoder.c ****    Encoder->Speed[0] = Encoder->Speed[1];
+ 528              		.loc 1 145 58 view .LVU149
+ 529 0046 D28C     		ldrh	r2, [r2, #38]
+ 530              	.LVL33:
+ 145:User/src/bsp_Motor_Encoder.c ****    Encoder->Speed[0] = Encoder->Speed[1];
+ 531              		.loc 1 145 42 view .LVU150
+ 532 0048 9B1A     		subs	r3, r3, r2
+ 145:User/src/bsp_Motor_Encoder.c ****    Encoder->Speed[0] = Encoder->Speed[1];
+ 533              		.loc 1 145 22 view .LVU151
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc5HsUmU.s 			page 16
+
+
+ 534 004a 6385     		strh	r3, [r4, #42]	@ movhi
+ 146:User/src/bsp_Motor_Encoder.c ****    Encoder->Acc_linear_speed = Encoder->linear_speed[1] - Encoder->linear_speed[0];
+ 535              		.loc 1 146 4 is_stmt 1 view .LVU152
+ 146:User/src/bsp_Motor_Encoder.c ****    Encoder->Acc_linear_speed = Encoder->linear_speed[1] - Encoder->linear_speed[0];
+ 536              		.loc 1 146 22 is_stmt 0 view .LVU153
+ 537 004c E184     		strh	r1, [r4, #38]	@ movhi
+ 147:User/src/bsp_Motor_Encoder.c ****    Encoder->linear_speed[0] = Encoder->linear_speed[1];
+ 538              		.loc 1 147 4 is_stmt 1 view .LVU154
+ 147:User/src/bsp_Motor_Encoder.c ****    Encoder->linear_speed[0] = Encoder->linear_speed[1];
+ 539              		.loc 1 147 80 is_stmt 0 view .LVU155
+ 540 004e D4ED037A 		vldr.32	s15, [r4, #12]
+ 147:User/src/bsp_Motor_Encoder.c ****    Encoder->linear_speed[0] = Encoder->linear_speed[1];
+ 541              		.loc 1 147 57 view .LVU156
+ 542 0052 77EE677A 		vsub.f32	s15, s14, s15
+ 147:User/src/bsp_Motor_Encoder.c ****    Encoder->linear_speed[0] = Encoder->linear_speed[1];
+ 543              		.loc 1 147 30 view .LVU157
+ 544 0056 C4ED057A 		vstr.32	s15, [r4, #20]
+ 148:User/src/bsp_Motor_Encoder.c ****    //第一次进入初始化position
+ 545              		.loc 1 148 4 is_stmt 1 view .LVU158
+ 148:User/src/bsp_Motor_Encoder.c ****    //第一次进入初始化position
+ 546              		.loc 1 148 29 is_stmt 0 view .LVU159
+ 547 005a 84ED037A 		vstr.32	s14, [r4, #12]
+ 150:User/src/bsp_Motor_Encoder.c ****        Encoder->Init_Flag = 1;
+ 548              		.loc 1 150 4 is_stmt 1 view .LVU160
+ 150:User/src/bsp_Motor_Encoder.c ****        Encoder->Init_Flag = 1;
+ 549              		.loc 1 150 15 is_stmt 0 view .LVU161
+ 550 005e 94F82430 		ldrb	r3, [r4, #36]	@ zero_extendqisi2
+ 150:User/src/bsp_Motor_Encoder.c ****        Encoder->Init_Flag = 1;
+ 551              		.loc 1 150 7 view .LVU162
+ 552 0062 23B9     		cbnz	r3, .L34
+ 151:User/src/bsp_Motor_Encoder.c ****        Encoder->last_position = Encoder->position;
+ 553              		.loc 1 151 8 is_stmt 1 view .LVU163
+ 151:User/src/bsp_Motor_Encoder.c ****        Encoder->last_position = Encoder->position;
+ 554              		.loc 1 151 27 is_stmt 0 view .LVU164
+ 555 0064 0123     		movs	r3, #1
+ 556 0066 84F82430 		strb	r3, [r4, #36]
+ 152:User/src/bsp_Motor_Encoder.c ****        Encoder->Encode_Actual_Val = Encoder->position;
+ 557              		.loc 1 152 8 is_stmt 1 view .LVU165
+ 152:User/src/bsp_Motor_Encoder.c ****        Encoder->Encode_Actual_Val = Encoder->position;
+ 558              		.loc 1 152 31 is_stmt 0 view .LVU166
+ 559 006a E085     		strh	r0, [r4, #46]	@ movhi
+ 153:User/src/bsp_Motor_Encoder.c ****    }
+ 560              		.loc 1 153 8 is_stmt 1 view .LVU167
+ 153:User/src/bsp_Motor_Encoder.c ****    }
+ 561              		.loc 1 153 35 is_stmt 0 view .LVU168
+ 562 006c 6060     		str	r0, [r4, #4]
+ 563              	.L34:
+ 157:User/src/bsp_Motor_Encoder.c ****    
+ 564              		.loc 1 157 4 is_stmt 1 view .LVU169
+ 157:User/src/bsp_Motor_Encoder.c ****    
+ 565              		.loc 1 157 50 is_stmt 0 view .LVU170
+ 566 006e B0B2     		uxth	r0, r6
+ 567              	.LVL34:
+ 157:User/src/bsp_Motor_Encoder.c ****    
+ 568              		.loc 1 157 70 view .LVU171
+ 569 0070 E38D     		ldrh	r3, [r4, #46]
+ 157:User/src/bsp_Motor_Encoder.c ****    
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc5HsUmU.s 			page 17
+
+
+ 570              		.loc 1 157 61 view .LVU172
+ 571 0072 C01A     		subs	r0, r0, r3
+ 157:User/src/bsp_Motor_Encoder.c ****    
+ 572              		.loc 1 157 22 view .LVU173
+ 573 0074 B4F93070 		ldrsh	r7, [r4, #48]
+ 574 0078 3946     		mov	r1, r7
+ 575              	.LVL35:
+ 157:User/src/bsp_Motor_Encoder.c ****    
+ 576              		.loc 1 157 22 view .LVU174
+ 577 007a 00B2     		sxth	r0, r0
+ 578 007c FFF7FEFF 		bl	angle_limiting_int16
+ 579              	.LVL36:
+ 157:User/src/bsp_Motor_Encoder.c ****    
+ 580              		.loc 1 157 17 view .LVU175
+ 581 0080 0190     		str	r0, [sp, #4]
+ 159:User/src/bsp_Motor_Encoder.c ****    //    用于360度的限幅（好像是超过360归零的，但是我不需要）
+ 582              		.loc 1 159 4 is_stmt 1 view .LVU176
+ 583 0082 019B     		ldr	r3, [sp, #4]
+ 159:User/src/bsp_Motor_Encoder.c ****    //    用于360度的限幅（好像是超过360归零的，但是我不需要）
+ 584              		.loc 1 159 31 is_stmt 0 view .LVU177
+ 585 0084 2268     		ldr	r2, [r4]
+ 586 0086 1344     		add	r3, r3, r2
+ 587 0088 2360     		str	r3, [r4]
+ 163:User/src/bsp_Motor_Encoder.c **** 
+ 588              		.loc 1 163 4 is_stmt 1 view .LVU178
+ 589 008a 019A     		ldr	r2, [sp, #4]
+ 163:User/src/bsp_Motor_Encoder.c **** 
+ 590              		.loc 1 163 31 is_stmt 0 view .LVU179
+ 591 008c 6168     		ldr	r1, [r4, #4]
+ 592 008e 0A44     		add	r2, r2, r1
+ 593 0090 6260     		str	r2, [r4, #4]
+ 165:User/src/bsp_Motor_Encoder.c **** 
+ 594              		.loc 1 165 4 is_stmt 1 view .LVU180
+ 165:User/src/bsp_Motor_Encoder.c **** 
+ 595              		.loc 1 165 27 is_stmt 0 view .LVU181
+ 596 0092 E685     		strh	r6, [r4, #46]	@ movhi
+ 167:User/src/bsp_Motor_Encoder.c ****    Encoder->Record_Angle = (float)(Encoder->Encode_Record_Val) / (Encoder->gear_Ratio * Encoder->la
+ 597              		.loc 1 167 4 is_stmt 1 view .LVU182
+ 167:User/src/bsp_Motor_Encoder.c ****    Encoder->Record_Angle = (float)(Encoder->Encode_Record_Val) / (Encoder->gear_Ratio * Encoder->la
+ 598              		.loc 1 167 28 is_stmt 0 view .LVU183
+ 599 0094 07EE902A 		vmov	s15, r2	@ int
+ 600 0098 B8EEE77A 		vcvt.f32.s32	s14, s15
+ 167:User/src/bsp_Motor_Encoder.c ****    Encoder->Record_Angle = (float)(Encoder->Encode_Record_Val) / (Encoder->gear_Ratio * Encoder->la
+ 601              		.loc 1 167 87 view .LVU184
+ 602 009c 07FB05F5 		mul	r5, r7, r5
+ 167:User/src/bsp_Motor_Encoder.c ****    Encoder->Record_Angle = (float)(Encoder->Encode_Record_Val) / (Encoder->gear_Ratio * Encoder->la
+ 603              		.loc 1 167 64 view .LVU185
+ 604 00a0 07EE905A 		vmov	s15, r5	@ int
+ 605 00a4 F8EEE77A 		vcvt.f32.s32	s15, s15
+ 606 00a8 C7EE276A 		vdiv.f32	s13, s14, s15
+ 167:User/src/bsp_Motor_Encoder.c ****    Encoder->Record_Angle = (float)(Encoder->Encode_Record_Val) / (Encoder->gear_Ratio * Encoder->la
+ 607              		.loc 1 167 111 view .LVU186
+ 608 00ac 9FED0F6A 		vldr.32	s12, .L36+8
+ 609 00b0 26EE867A 		vmul.f32	s14, s13, s12
+ 167:User/src/bsp_Motor_Encoder.c ****    Encoder->Record_Angle = (float)(Encoder->Encode_Record_Val) / (Encoder->gear_Ratio * Encoder->la
+ 610              		.loc 1 167 26 view .LVU187
+ 611 00b4 84ED077A 		vstr.32	s14, [r4, #28]
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc5HsUmU.s 			page 18
+
+
+ 168:User/src/bsp_Motor_Encoder.c **** 
+ 612              		.loc 1 168 4 is_stmt 1 view .LVU188
+ 168:User/src/bsp_Motor_Encoder.c **** 
+ 613              		.loc 1 168 28 is_stmt 0 view .LVU189
+ 614 00b8 07EE103A 		vmov	s14, r3	@ int
+ 615 00bc B8EEC77A 		vcvt.f32.s32	s14, s14
+ 168:User/src/bsp_Motor_Encoder.c **** 
+ 616              		.loc 1 168 64 view .LVU190
+ 617 00c0 C7EE276A 		vdiv.f32	s13, s14, s15
+ 168:User/src/bsp_Motor_Encoder.c **** 
+ 618              		.loc 1 168 111 view .LVU191
+ 619 00c4 66EE867A 		vmul.f32	s15, s13, s12
+ 168:User/src/bsp_Motor_Encoder.c **** 
+ 620              		.loc 1 168 26 view .LVU192
+ 621 00c8 C4ED087A 		vstr.32	s15, [r4, #32]
+ 171:User/src/bsp_Motor_Encoder.c ****    erro = 0;
+ 622              		.loc 1 171 4 is_stmt 1 view .LVU193
+ 171:User/src/bsp_Motor_Encoder.c ****    erro = 0;
+ 623              		.loc 1 171 19 is_stmt 0 view .LVU194
+ 624 00cc 0198     		ldr	r0, [sp, #4]
+ 625 00ce 2146     		mov	r1, r4
+ 626 00d0 00B2     		sxth	r0, r0
+ 627 00d2 FFF7FEFF 		bl	Block_Detect
+ 628              	.LVL37:
+ 171:User/src/bsp_Motor_Encoder.c ****    erro = 0;
+ 629              		.loc 1 171 18 view .LVU195
+ 630 00d6 84F83400 		strb	r0, [r4, #52]
+ 172:User/src/bsp_Motor_Encoder.c **** }
+ 631              		.loc 1 172 4 is_stmt 1 view .LVU196
+ 172:User/src/bsp_Motor_Encoder.c **** }
+ 632              		.loc 1 172 9 is_stmt 0 view .LVU197
+ 633 00da 0023     		movs	r3, #0
+ 634 00dc 0193     		str	r3, [sp, #4]
+ 173:User/src/bsp_Motor_Encoder.c **** 
+ 635              		.loc 1 173 1 view .LVU198
+ 636 00de 03B0     		add	sp, sp, #12
+ 637              	.LCFI8:
+ 638              		.cfi_def_cfa_offset 20
+ 639              		@ sp needed
+ 640 00e0 F0BD     		pop	{r4, r5, r6, r7, pc}
+ 641              	.LVL38:
+ 642              	.L37:
+ 173:User/src/bsp_Motor_Encoder.c **** 
+ 643              		.loc 1 173 1 view .LVU199
+ 644 00e2 00BF     		.align	2
+ 645              	.L36:
+ 646 00e4 D00F4940 		.word	1078530000
+ 647 00e8 00007042 		.word	1114636288
+ 648 00ec 0000B443 		.word	1135869952
+ 649              		.cfi_endproc
+ 650              	.LFE136:
+ 652              		.section	.text.check_codevalue,"ax",%progbits
+ 653              		.align	1
+ 654              		.global	check_codevalue
+ 655              		.syntax unified
+ 656              		.thumb
+ 657              		.thumb_func
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc5HsUmU.s 			page 19
+
+
+ 659              	check_codevalue:
+ 660              	.LVL39:
+ 661              	.LFB141:
+ 235:User/src/bsp_Motor_Encoder.c **** 
+ 236:User/src/bsp_Motor_Encoder.c **** //过临界值复位码盘值 （限制于360度的码盘值循环 DJI电机）
+ 237:User/src/bsp_Motor_Encoder.c **** int32_t check_codevalue(int32_t value, int16_t gear_Ratio, int16_t lap_encoder) {
+ 662              		.loc 1 237 81 is_stmt 1 view -0
+ 663              		.cfi_startproc
+ 664              		@ args = 0, pretend = 0, frame = 0
+ 665              		@ frame_needed = 0, uses_anonymous_args = 0
+ 666              		@ link register save eliminated.
+ 238:User/src/bsp_Motor_Encoder.c ****    if (value > (gear_Ratio * lap_encoder) / 2) {
+ 667              		.loc 1 238 4 view .LVU201
+ 668              		.loc 1 238 28 is_stmt 0 view .LVU202
+ 669 0000 01FB02F2 		mul	r2, r1, r2
+ 670              	.LVL40:
+ 671              		.loc 1 238 43 view .LVU203
+ 672 0004 02EBD273 		add	r3, r2, r2, lsr #31
+ 673              		.loc 1 238 7 view .LVU204
+ 674 0008 B0EB630F 		cmp	r0, r3, asr #1
+ 675 000c 00DD     		ble	.L39
+ 239:User/src/bsp_Motor_Encoder.c ****        value = value - (gear_Ratio * lap_encoder);
+ 676              		.loc 1 239 8 is_stmt 1 view .LVU205
+ 677              		.loc 1 239 14 is_stmt 0 view .LVU206
+ 678 000e 801A     		subs	r0, r0, r2
+ 679              	.LVL41:
+ 680              	.L39:
+ 240:User/src/bsp_Motor_Encoder.c ****    }
+ 241:User/src/bsp_Motor_Encoder.c ****    if (value < (-(gear_Ratio * lap_encoder) / 2)) {
+ 681              		.loc 1 241 4 is_stmt 1 view .LVU207
+ 682              		.loc 1 241 45 is_stmt 0 view .LVU208
+ 683 0010 02EBD273 		add	r3, r2, r2, lsr #31
+ 684 0014 5B10     		asrs	r3, r3, #1
+ 685 0016 5B42     		rsbs	r3, r3, #0
+ 686              		.loc 1 241 7 view .LVU209
+ 687 0018 8342     		cmp	r3, r0
+ 688 001a 00DD     		ble	.L40
+ 242:User/src/bsp_Motor_Encoder.c ****        value = (gear_Ratio * lap_encoder) - value;
+ 689              		.loc 1 242 8 is_stmt 1 view .LVU210
+ 690              		.loc 1 242 14 is_stmt 0 view .LVU211
+ 691 001c 101A     		subs	r0, r2, r0
+ 692              	.LVL42:
+ 693              	.L40:
+ 243:User/src/bsp_Motor_Encoder.c ****    }
+ 244:User/src/bsp_Motor_Encoder.c ****    return value;
+ 694              		.loc 1 244 4 is_stmt 1 view .LVU212
+ 245:User/src/bsp_Motor_Encoder.c **** }
+ 695              		.loc 1 245 1 is_stmt 0 view .LVU213
+ 696 001e 7047     		bx	lr
+ 697              		.cfi_endproc
+ 698              	.LFE141:
+ 700              		.section	.text.Briter_Encoder_Code_Set,"ax",%progbits
+ 701              		.align	1
+ 702              		.global	Briter_Encoder_Code_Set
+ 703              		.syntax unified
+ 704              		.thumb
+ 705              		.thumb_func
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc5HsUmU.s 			page 20
+
+
+ 707              	Briter_Encoder_Code_Set:
+ 708              	.LVL43:
+ 709              	.LFB142:
+ 246:User/src/bsp_Motor_Encoder.c **** 
+ 247:User/src/bsp_Motor_Encoder.c **** 
+ 248:User/src/bsp_Motor_Encoder.c **** /********************布瑞特电子编码器部分********************/
+ 249:User/src/bsp_Motor_Encoder.c **** extern CAN_HandleTypeDef hcan1;
+ 250:User/src/bsp_Motor_Encoder.c **** void Briter_Encoder_Code_Set(uint8_t CAN_STD_ID, Briter_Encoder_Code_e code,uint32_t data);
+ 251:User/src/bsp_Motor_Encoder.c **** 
+ 252:User/src/bsp_Motor_Encoder.c **** uint8_t temp[8] = {0x04, 0x01, 0x01, 0x00};
+ 253:User/src/bsp_Motor_Encoder.c **** /**
+ 254:User/src/bsp_Motor_Encoder.c **** * 布瑞特电子编码器CAN协议设置（看手册吧）
+ 255:User/src/bsp_Motor_Encoder.c **** * @param CAN_STD_ID 编码器的CAN ID ,初始化为1
+ 256:User/src/bsp_Motor_Encoder.c **** * @param code 命令码
+ 257:User/src/bsp_Motor_Encoder.c **** * @param data 设置的数据
+ 258:User/src/bsp_Motor_Encoder.c **** */
+ 259:User/src/bsp_Motor_Encoder.c **** void Briter_Encoder_Code_Set(uint8_t CAN_STD_ID, Briter_Encoder_Code_e code,uint32_t data){
+ 710              		.loc 1 259 91 is_stmt 1 view -0
+ 711              		.cfi_startproc
+ 712              		@ args = 0, pretend = 0, frame = 32
+ 713              		@ frame_needed = 0, uses_anonymous_args = 0
+ 260:User/src/bsp_Motor_Encoder.c ****    switch (code) {
+ 714              		.loc 1 260 4 view .LVU215
+ 715 0000 0139     		subs	r1, r1, #1
+ 716              	.LVL44:
+ 717              		.loc 1 260 4 is_stmt 0 view .LVU216
+ 718 0002 0E29     		cmp	r1, #14
+ 719 0004 11D8     		bhi	.L42
+ 720 0006 DFE801F0 		tbb	[pc, r1]
+ 721              	.L44:
+ 722 000a 08       		.byte	(.L53-.L44)/2
+ 723 000b 26       		.byte	(.L52-.L44)/2
+ 724 000c 31       		.byte	(.L51-.L44)/2
+ 725 000d 3C       		.byte	(.L50-.L44)/2
+ 726 000e 4A       		.byte	(.L49-.L44)/2
+ 727 000f 56       		.byte	(.L48-.L44)/2
+ 728 0010 60       		.byte	(.L47-.L44)/2
+ 729 0011 10       		.byte	(.L42-.L44)/2
+ 730 0012 10       		.byte	(.L42-.L44)/2
+ 731 0013 10       		.byte	(.L42-.L44)/2
+ 732 0014 10       		.byte	(.L42-.L44)/2
+ 733 0015 6B       		.byte	(.L46-.L44)/2
+ 734 0016 75       		.byte	(.L45-.L44)/2
+ 735 0017 10       		.byte	(.L42-.L44)/2
+ 736 0018 82       		.byte	(.L43-.L44)/2
+ 737 0019 00       		.p2align 1
+ 738              	.L53:
+ 261:User/src/bsp_Motor_Encoder.c ****        case Read_Value:{
+ 262:User/src/bsp_Motor_Encoder.c ****            temp[0] = 0x04;
+ 739              		.loc 1 262 12 is_stmt 1 view .LVU217
+ 740              		.loc 1 262 20 is_stmt 0 view .LVU218
+ 741 001a 424B     		ldr	r3, .L61
+ 742 001c 0422     		movs	r2, #4
+ 743              	.LVL45:
+ 744              		.loc 1 262 20 view .LVU219
+ 745 001e 1A70     		strb	r2, [r3]
+ 263:User/src/bsp_Motor_Encoder.c ****            temp[1] = 0x01;
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc5HsUmU.s 			page 21
+
+
+ 746              		.loc 1 263 12 is_stmt 1 view .LVU220
+ 747              		.loc 1 263 20 is_stmt 0 view .LVU221
+ 748 0020 0122     		movs	r2, #1
+ 749 0022 5A70     		strb	r2, [r3, #1]
+ 264:User/src/bsp_Motor_Encoder.c ****            temp[2] = 0x01;
+ 750              		.loc 1 264 12 is_stmt 1 view .LVU222
+ 751              		.loc 1 264 20 is_stmt 0 view .LVU223
+ 752 0024 9A70     		strb	r2, [r3, #2]
+ 265:User/src/bsp_Motor_Encoder.c ****            temp[3] = 0x00;
+ 753              		.loc 1 265 12 is_stmt 1 view .LVU224
+ 754              		.loc 1 265 20 is_stmt 0 view .LVU225
+ 755 0026 0022     		movs	r2, #0
+ 756 0028 DA70     		strb	r2, [r3, #3]
+ 266:User/src/bsp_Motor_Encoder.c ****        } break;
+ 757              		.loc 1 266 10 is_stmt 1 view .LVU226
+ 758              	.L42:
+ 259:User/src/bsp_Motor_Encoder.c ****    switch (code) {
+ 759              		.loc 1 259 91 is_stmt 0 view .LVU227
+ 760 002a 00B5     		push	{lr}
+ 761              	.LCFI9:
+ 762              		.cfi_def_cfa_offset 4
+ 763              		.cfi_offset 14, -4
+ 764 002c 89B0     		sub	sp, sp, #36
+ 765              	.LCFI10:
+ 766              		.cfi_def_cfa_offset 40
+ 267:User/src/bsp_Motor_Encoder.c ****        case Set_Encoder_ID:{
+ 268:User/src/bsp_Motor_Encoder.c ****            if (data > 255 ) {
+ 269:User/src/bsp_Motor_Encoder.c ****                return ;
+ 270:User/src/bsp_Motor_Encoder.c ****            }
+ 271:User/src/bsp_Motor_Encoder.c ****            temp[0] = 0x04;
+ 272:User/src/bsp_Motor_Encoder.c ****            temp[1] = 0x01;
+ 273:User/src/bsp_Motor_Encoder.c ****            temp[2] = Set_Encoder_ID;
+ 274:User/src/bsp_Motor_Encoder.c ****            temp[3] = data;
+ 275:User/src/bsp_Motor_Encoder.c ****        } break;
+ 276:User/src/bsp_Motor_Encoder.c ****        case Set_Baud_Rate:{
+ 277:User/src/bsp_Motor_Encoder.c ****            if (data > 0x04 ) {
+ 278:User/src/bsp_Motor_Encoder.c ****                return ;
+ 279:User/src/bsp_Motor_Encoder.c ****            }
+ 280:User/src/bsp_Motor_Encoder.c ****            temp[0] = 0x04;
+ 281:User/src/bsp_Motor_Encoder.c ****            temp[1] = 0x01;
+ 282:User/src/bsp_Motor_Encoder.c ****            temp[2] = Set_Baud_Rate;
+ 283:User/src/bsp_Motor_Encoder.c ****            temp[3] = data;
+ 284:User/src/bsp_Motor_Encoder.c ****        } break;
+ 285:User/src/bsp_Motor_Encoder.c ****        case Set_Encoder_Mode:{
+ 286:User/src/bsp_Motor_Encoder.c ****            if (!(data==0xAA||data==0)) {
+ 287:User/src/bsp_Motor_Encoder.c ****                return ;
+ 288:User/src/bsp_Motor_Encoder.c ****            }
+ 289:User/src/bsp_Motor_Encoder.c ****            temp[0] = 0x04;
+ 290:User/src/bsp_Motor_Encoder.c ****            temp[1] = 0x01;
+ 291:User/src/bsp_Motor_Encoder.c ****            temp[2] = Set_Encoder_Mode;
+ 292:User/src/bsp_Motor_Encoder.c ****            temp[3] = data;
+ 293:User/src/bsp_Motor_Encoder.c ****        } break;
+ 294:User/src/bsp_Motor_Encoder.c ****        case Set_Auto_Return_Time:{
+ 295:User/src/bsp_Motor_Encoder.c ****            //TODO:也没测试,特别是这个高低位
+ 296:User/src/bsp_Motor_Encoder.c ****            temp[0] = 0x05;
+ 297:User/src/bsp_Motor_Encoder.c ****            temp[1] = 0x01;
+ 298:User/src/bsp_Motor_Encoder.c ****            temp[2] = Set_Auto_Return_Time;
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc5HsUmU.s 			page 22
+
+
+ 299:User/src/bsp_Motor_Encoder.c ****            temp[3] = (uint8_t)data;//低位
+ 300:User/src/bsp_Motor_Encoder.c ****            temp[4] = (uint8_t)data>>8;//高位
+ 301:User/src/bsp_Motor_Encoder.c ****        } break;
+ 302:User/src/bsp_Motor_Encoder.c ****        case Set_ZeroPoint:{
+ 303:User/src/bsp_Motor_Encoder.c ****            temp[0] = 0x04;
+ 304:User/src/bsp_Motor_Encoder.c ****            temp[1] = 0x01;
+ 305:User/src/bsp_Motor_Encoder.c ****            temp[2] = Set_ZeroPoint;
+ 306:User/src/bsp_Motor_Encoder.c ****            temp[3] = 0x00;
+ 307:User/src/bsp_Motor_Encoder.c ****        } break;
+ 308:User/src/bsp_Motor_Encoder.c ****        case Set_Direction:{
+ 309:User/src/bsp_Motor_Encoder.c ****            if (!(data == 0x01 || data == 0)) {
+ 310:User/src/bsp_Motor_Encoder.c ****                return;
+ 311:User/src/bsp_Motor_Encoder.c ****            }
+ 312:User/src/bsp_Motor_Encoder.c ****            temp[0] = 0x04;
+ 313:User/src/bsp_Motor_Encoder.c ****            temp[1] = 0x01;
+ 314:User/src/bsp_Motor_Encoder.c ****            temp[2] = Set_Direction;
+ 315:User/src/bsp_Motor_Encoder.c ****            temp[3] = data;
+ 316:User/src/bsp_Motor_Encoder.c ****        } break;
+ 317:User/src/bsp_Motor_Encoder.c ****        case Set_MidPoint:{
+ 318:User/src/bsp_Motor_Encoder.c ****            temp[0] = 0x04;
+ 319:User/src/bsp_Motor_Encoder.c ****            temp[1] = 0x01;
+ 320:User/src/bsp_Motor_Encoder.c ****            temp[2] = Set_MidPoint;
+ 321:User/src/bsp_Motor_Encoder.c ****            temp[3] = 0x00;
+ 322:User/src/bsp_Motor_Encoder.c ****        } break;
+ 323:User/src/bsp_Motor_Encoder.c ****        case Set_Current_Value:{
+ 324:User/src/bsp_Motor_Encoder.c ****            //TODO:还没测试
+ 325:User/src/bsp_Motor_Encoder.c ****            temp[0] = 0x07;
+ 326:User/src/bsp_Motor_Encoder.c ****            temp[1] = 0x01;
+ 327:User/src/bsp_Motor_Encoder.c ****            temp[2] = Set_Current_Value;
+ 328:User/src/bsp_Motor_Encoder.c ****            temp[3] = (uint8_t)data>>24;
+ 329:User/src/bsp_Motor_Encoder.c ****            temp[4] = (uint8_t)data>>16;
+ 330:User/src/bsp_Motor_Encoder.c ****            temp[5] = (uint8_t)data>>8;
+ 331:User/src/bsp_Motor_Encoder.c ****            temp[6] = (uint8_t)data;
+ 332:User/src/bsp_Motor_Encoder.c ****        } break;
+ 333:User/src/bsp_Motor_Encoder.c ****        case Set_Five_Loops:{
+ 334:User/src/bsp_Motor_Encoder.c ****            temp[0] = 0x04;
+ 335:User/src/bsp_Motor_Encoder.c ****            temp[1] = 0x01;
+ 336:User/src/bsp_Motor_Encoder.c ****            temp[2] = Set_Five_Loops;
+ 337:User/src/bsp_Motor_Encoder.c ****            temp[3] = 0x01;
+ 338:User/src/bsp_Motor_Encoder.c ****        } break;
+ 339:User/src/bsp_Motor_Encoder.c ****    }
+ 340:User/src/bsp_Motor_Encoder.c ****    uint32_t Tx_MailBox;//发送邮箱
+ 767              		.loc 1 340 4 is_stmt 1 view .LVU228
+ 341:User/src/bsp_Motor_Encoder.c ****    CAN_TxHeaderTypeDef Txmessage;
+ 768              		.loc 1 341 4 view .LVU229
+ 342:User/src/bsp_Motor_Encoder.c ****    Txmessage.StdId = CAN_STD_ID;
+ 769              		.loc 1 342 4 view .LVU230
+ 770              		.loc 1 342 20 is_stmt 0 view .LVU231
+ 771 002e 0190     		str	r0, [sp, #4]
+ 343:User/src/bsp_Motor_Encoder.c ****    Txmessage.IDE = CAN_ID_STD;
+ 772              		.loc 1 343 4 is_stmt 1 view .LVU232
+ 773              		.loc 1 343 18 is_stmt 0 view .LVU233
+ 774 0030 0023     		movs	r3, #0
+ 775 0032 0393     		str	r3, [sp, #12]
+ 344:User/src/bsp_Motor_Encoder.c ****    Txmessage.RTR = CAN_RTR_DATA;
+ 776              		.loc 1 344 4 is_stmt 1 view .LVU234
+ 777              		.loc 1 344 18 is_stmt 0 view .LVU235
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc5HsUmU.s 			page 23
+
+
+ 778 0034 0493     		str	r3, [sp, #16]
+ 345:User/src/bsp_Motor_Encoder.c ****    Txmessage.DLC = 8;
+ 779              		.loc 1 345 4 is_stmt 1 view .LVU236
+ 780              		.loc 1 345 18 is_stmt 0 view .LVU237
+ 781 0036 0823     		movs	r3, #8
+ 782 0038 0593     		str	r3, [sp, #20]
+ 346:User/src/bsp_Motor_Encoder.c ****    while (( HAL_CAN_GetTxMailboxesFreeLevel(&hcan1)) == 0);
+ 783              		.loc 1 346 4 is_stmt 1 view .LVU238
+ 784              	.LVL46:
+ 785              	.L56:
+ 786              		.loc 1 346 59 discriminator 1 view .LVU239
+ 787              		.loc 1 346 10 discriminator 1 view .LVU240
+ 788              		.loc 1 346 13 is_stmt 0 discriminator 1 view .LVU241
+ 789 003a 3B48     		ldr	r0, .L61+4
+ 790 003c FFF7FEFF 		bl	HAL_CAN_GetTxMailboxesFreeLevel
+ 791              	.LVL47:
+ 792              		.loc 1 346 10 discriminator 1 view .LVU242
+ 793 0040 0028     		cmp	r0, #0
+ 794 0042 FAD0     		beq	.L56
+ 347:User/src/bsp_Motor_Encoder.c ****    HAL_CAN_AddTxMessage(&hcan1, &Txmessage, temp, &Tx_MailBox);
+ 795              		.loc 1 347 4 is_stmt 1 view .LVU243
+ 796 0044 07AB     		add	r3, sp, #28
+ 797 0046 374A     		ldr	r2, .L61
+ 798 0048 01A9     		add	r1, sp, #4
+ 799 004a 3748     		ldr	r0, .L61+4
+ 800 004c FFF7FEFF 		bl	HAL_CAN_AddTxMessage
+ 801              	.LVL48:
+ 348:User/src/bsp_Motor_Encoder.c **** }
+ 802              		.loc 1 348 1 is_stmt 0 view .LVU244
+ 803 0050 09B0     		add	sp, sp, #36
+ 804              	.LCFI11:
+ 805              		.cfi_def_cfa_offset 4
+ 806              		@ sp needed
+ 807 0052 5DF804FB 		ldr	pc, [sp], #4
+ 808              	.LVL49:
+ 809              	.L52:
+ 810              	.LCFI12:
+ 811              		.cfi_def_cfa_offset 0
+ 812              		.cfi_restore 14
+ 268:User/src/bsp_Motor_Encoder.c ****                return ;
+ 813              		.loc 1 268 12 is_stmt 1 view .LVU245
+ 268:User/src/bsp_Motor_Encoder.c ****                return ;
+ 814              		.loc 1 268 15 is_stmt 0 view .LVU246
+ 815 0056 FF2A     		cmp	r2, #255
+ 816 0058 62D8     		bhi	.L59
+ 271:User/src/bsp_Motor_Encoder.c ****            temp[1] = 0x01;
+ 817              		.loc 1 271 12 is_stmt 1 view .LVU247
+ 271:User/src/bsp_Motor_Encoder.c ****            temp[1] = 0x01;
+ 818              		.loc 1 271 20 is_stmt 0 view .LVU248
+ 819 005a 324B     		ldr	r3, .L61
+ 820 005c 0421     		movs	r1, #4
+ 821 005e 1970     		strb	r1, [r3]
+ 272:User/src/bsp_Motor_Encoder.c ****            temp[2] = Set_Encoder_ID;
+ 822              		.loc 1 272 12 is_stmt 1 view .LVU249
+ 272:User/src/bsp_Motor_Encoder.c ****            temp[2] = Set_Encoder_ID;
+ 823              		.loc 1 272 20 is_stmt 0 view .LVU250
+ 824 0060 0121     		movs	r1, #1
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc5HsUmU.s 			page 24
+
+
+ 825 0062 5970     		strb	r1, [r3, #1]
+ 273:User/src/bsp_Motor_Encoder.c ****            temp[3] = data;
+ 826              		.loc 1 273 12 is_stmt 1 view .LVU251
+ 273:User/src/bsp_Motor_Encoder.c ****            temp[3] = data;
+ 827              		.loc 1 273 20 is_stmt 0 view .LVU252
+ 828 0064 0221     		movs	r1, #2
+ 829 0066 9970     		strb	r1, [r3, #2]
+ 274:User/src/bsp_Motor_Encoder.c ****        } break;
+ 830              		.loc 1 274 12 is_stmt 1 view .LVU253
+ 274:User/src/bsp_Motor_Encoder.c ****        } break;
+ 831              		.loc 1 274 20 is_stmt 0 view .LVU254
+ 832 0068 DA70     		strb	r2, [r3, #3]
+ 275:User/src/bsp_Motor_Encoder.c ****        case Set_Baud_Rate:{
+ 833              		.loc 1 275 10 is_stmt 1 view .LVU255
+ 275:User/src/bsp_Motor_Encoder.c ****        case Set_Baud_Rate:{
+ 834              		.loc 1 275 8 is_stmt 0 view .LVU256
+ 835 006a DEE7     		b	.L42
+ 836              	.L51:
+ 277:User/src/bsp_Motor_Encoder.c ****                return ;
+ 837              		.loc 1 277 12 is_stmt 1 view .LVU257
+ 277:User/src/bsp_Motor_Encoder.c ****                return ;
+ 838              		.loc 1 277 15 is_stmt 0 view .LVU258
+ 839 006c 042A     		cmp	r2, #4
+ 840 006e 57D8     		bhi	.L59
+ 280:User/src/bsp_Motor_Encoder.c ****            temp[1] = 0x01;
+ 841              		.loc 1 280 12 is_stmt 1 view .LVU259
+ 280:User/src/bsp_Motor_Encoder.c ****            temp[1] = 0x01;
+ 842              		.loc 1 280 20 is_stmt 0 view .LVU260
+ 843 0070 2C4B     		ldr	r3, .L61
+ 844 0072 0421     		movs	r1, #4
+ 845 0074 1970     		strb	r1, [r3]
+ 281:User/src/bsp_Motor_Encoder.c ****            temp[2] = Set_Baud_Rate;
+ 846              		.loc 1 281 12 is_stmt 1 view .LVU261
+ 281:User/src/bsp_Motor_Encoder.c ****            temp[2] = Set_Baud_Rate;
+ 847              		.loc 1 281 20 is_stmt 0 view .LVU262
+ 848 0076 0121     		movs	r1, #1
+ 849 0078 5970     		strb	r1, [r3, #1]
+ 282:User/src/bsp_Motor_Encoder.c ****            temp[3] = data;
+ 850              		.loc 1 282 12 is_stmt 1 view .LVU263
+ 282:User/src/bsp_Motor_Encoder.c ****            temp[3] = data;
+ 851              		.loc 1 282 20 is_stmt 0 view .LVU264
+ 852 007a 0321     		movs	r1, #3
+ 853 007c 9970     		strb	r1, [r3, #2]
+ 283:User/src/bsp_Motor_Encoder.c ****        } break;
+ 854              		.loc 1 283 12 is_stmt 1 view .LVU265
+ 283:User/src/bsp_Motor_Encoder.c ****        } break;
+ 855              		.loc 1 283 20 is_stmt 0 view .LVU266
+ 856 007e DA70     		strb	r2, [r3, #3]
+ 284:User/src/bsp_Motor_Encoder.c ****        case Set_Encoder_Mode:{
+ 857              		.loc 1 284 10 is_stmt 1 view .LVU267
+ 284:User/src/bsp_Motor_Encoder.c ****        case Set_Encoder_Mode:{
+ 858              		.loc 1 284 8 is_stmt 0 view .LVU268
+ 859 0080 D3E7     		b	.L42
+ 860              	.L50:
+ 286:User/src/bsp_Motor_Encoder.c ****                return ;
+ 861              		.loc 1 286 12 is_stmt 1 view .LVU269
+ 286:User/src/bsp_Motor_Encoder.c ****                return ;
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc5HsUmU.s 			page 25
+
+
+ 862              		.loc 1 286 15 is_stmt 0 view .LVU270
+ 863 0082 AA2A     		cmp	r2, #170
+ 864 0084 01D0     		beq	.L55
+ 286:User/src/bsp_Motor_Encoder.c ****                return ;
+ 865              		.loc 1 286 16 discriminator 1 view .LVU271
+ 866 0086 002A     		cmp	r2, #0
+ 867 0088 4AD1     		bne	.L59
+ 868              	.L55:
+ 289:User/src/bsp_Motor_Encoder.c ****            temp[1] = 0x01;
+ 869              		.loc 1 289 12 is_stmt 1 view .LVU272
+ 289:User/src/bsp_Motor_Encoder.c ****            temp[1] = 0x01;
+ 870              		.loc 1 289 20 is_stmt 0 view .LVU273
+ 871 008a 264B     		ldr	r3, .L61
+ 872 008c 0421     		movs	r1, #4
+ 873 008e 1970     		strb	r1, [r3]
+ 290:User/src/bsp_Motor_Encoder.c ****            temp[2] = Set_Encoder_Mode;
+ 874              		.loc 1 290 12 is_stmt 1 view .LVU274
+ 290:User/src/bsp_Motor_Encoder.c ****            temp[2] = Set_Encoder_Mode;
+ 875              		.loc 1 290 20 is_stmt 0 view .LVU275
+ 876 0090 4FF0010C 		mov	ip, #1
+ 877 0094 83F801C0 		strb	ip, [r3, #1]
+ 291:User/src/bsp_Motor_Encoder.c ****            temp[3] = data;
+ 878              		.loc 1 291 12 is_stmt 1 view .LVU276
+ 291:User/src/bsp_Motor_Encoder.c ****            temp[3] = data;
+ 879              		.loc 1 291 20 is_stmt 0 view .LVU277
+ 880 0098 9970     		strb	r1, [r3, #2]
+ 292:User/src/bsp_Motor_Encoder.c ****        } break;
+ 881              		.loc 1 292 12 is_stmt 1 view .LVU278
+ 292:User/src/bsp_Motor_Encoder.c ****        } break;
+ 882              		.loc 1 292 20 is_stmt 0 view .LVU279
+ 883 009a DA70     		strb	r2, [r3, #3]
+ 293:User/src/bsp_Motor_Encoder.c ****        case Set_Auto_Return_Time:{
+ 884              		.loc 1 293 10 is_stmt 1 view .LVU280
+ 293:User/src/bsp_Motor_Encoder.c ****        case Set_Auto_Return_Time:{
+ 885              		.loc 1 293 8 is_stmt 0 view .LVU281
+ 886 009c C5E7     		b	.L42
+ 887              	.L49:
+ 296:User/src/bsp_Motor_Encoder.c ****            temp[1] = 0x01;
+ 888              		.loc 1 296 12 is_stmt 1 view .LVU282
+ 296:User/src/bsp_Motor_Encoder.c ****            temp[1] = 0x01;
+ 889              		.loc 1 296 20 is_stmt 0 view .LVU283
+ 890 009e 214B     		ldr	r3, .L61
+ 891 00a0 0521     		movs	r1, #5
+ 892 00a2 1970     		strb	r1, [r3]
+ 297:User/src/bsp_Motor_Encoder.c ****            temp[2] = Set_Auto_Return_Time;
+ 893              		.loc 1 297 12 is_stmt 1 view .LVU284
+ 297:User/src/bsp_Motor_Encoder.c ****            temp[2] = Set_Auto_Return_Time;
+ 894              		.loc 1 297 20 is_stmt 0 view .LVU285
+ 895 00a4 4FF0010C 		mov	ip, #1
+ 896 00a8 83F801C0 		strb	ip, [r3, #1]
+ 298:User/src/bsp_Motor_Encoder.c ****            temp[3] = (uint8_t)data;//低位
+ 897              		.loc 1 298 12 is_stmt 1 view .LVU286
+ 298:User/src/bsp_Motor_Encoder.c ****            temp[3] = (uint8_t)data;//低位
+ 898              		.loc 1 298 20 is_stmt 0 view .LVU287
+ 899 00ac 9970     		strb	r1, [r3, #2]
+ 299:User/src/bsp_Motor_Encoder.c ****            temp[4] = (uint8_t)data>>8;//高位
+ 900              		.loc 1 299 12 is_stmt 1 view .LVU288
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc5HsUmU.s 			page 26
+
+
+ 299:User/src/bsp_Motor_Encoder.c ****            temp[4] = (uint8_t)data>>8;//高位
+ 901              		.loc 1 299 20 is_stmt 0 view .LVU289
+ 902 00ae DA70     		strb	r2, [r3, #3]
+ 300:User/src/bsp_Motor_Encoder.c ****        } break;
+ 903              		.loc 1 300 12 is_stmt 1 view .LVU290
+ 300:User/src/bsp_Motor_Encoder.c ****        } break;
+ 904              		.loc 1 300 20 is_stmt 0 view .LVU291
+ 905 00b0 0022     		movs	r2, #0
+ 906              	.LVL50:
+ 300:User/src/bsp_Motor_Encoder.c ****        } break;
+ 907              		.loc 1 300 20 view .LVU292
+ 908 00b2 1A71     		strb	r2, [r3, #4]
+ 301:User/src/bsp_Motor_Encoder.c ****        case Set_ZeroPoint:{
+ 909              		.loc 1 301 10 is_stmt 1 view .LVU293
+ 301:User/src/bsp_Motor_Encoder.c ****        case Set_ZeroPoint:{
+ 910              		.loc 1 301 8 is_stmt 0 view .LVU294
+ 911 00b4 B9E7     		b	.L42
+ 912              	.LVL51:
+ 913              	.L48:
+ 303:User/src/bsp_Motor_Encoder.c ****            temp[1] = 0x01;
+ 914              		.loc 1 303 12 is_stmt 1 view .LVU295
+ 303:User/src/bsp_Motor_Encoder.c ****            temp[1] = 0x01;
+ 915              		.loc 1 303 20 is_stmt 0 view .LVU296
+ 916 00b6 1B4B     		ldr	r3, .L61
+ 917 00b8 0422     		movs	r2, #4
+ 918              	.LVL52:
+ 303:User/src/bsp_Motor_Encoder.c ****            temp[1] = 0x01;
+ 919              		.loc 1 303 20 view .LVU297
+ 920 00ba 1A70     		strb	r2, [r3]
+ 304:User/src/bsp_Motor_Encoder.c ****            temp[2] = Set_ZeroPoint;
+ 921              		.loc 1 304 12 is_stmt 1 view .LVU298
+ 304:User/src/bsp_Motor_Encoder.c ****            temp[2] = Set_ZeroPoint;
+ 922              		.loc 1 304 20 is_stmt 0 view .LVU299
+ 923 00bc 0122     		movs	r2, #1
+ 924 00be 5A70     		strb	r2, [r3, #1]
+ 305:User/src/bsp_Motor_Encoder.c ****            temp[3] = 0x00;
+ 925              		.loc 1 305 12 is_stmt 1 view .LVU300
+ 305:User/src/bsp_Motor_Encoder.c ****            temp[3] = 0x00;
+ 926              		.loc 1 305 20 is_stmt 0 view .LVU301
+ 927 00c0 0622     		movs	r2, #6
+ 928 00c2 9A70     		strb	r2, [r3, #2]
+ 306:User/src/bsp_Motor_Encoder.c ****        } break;
+ 929              		.loc 1 306 12 is_stmt 1 view .LVU302
+ 306:User/src/bsp_Motor_Encoder.c ****        } break;
+ 930              		.loc 1 306 20 is_stmt 0 view .LVU303
+ 931 00c4 0022     		movs	r2, #0
+ 932 00c6 DA70     		strb	r2, [r3, #3]
+ 307:User/src/bsp_Motor_Encoder.c ****        case Set_Direction:{
+ 933              		.loc 1 307 10 is_stmt 1 view .LVU304
+ 307:User/src/bsp_Motor_Encoder.c ****        case Set_Direction:{
+ 934              		.loc 1 307 8 is_stmt 0 view .LVU305
+ 935 00c8 AFE7     		b	.L42
+ 936              	.LVL53:
+ 937              	.L47:
+ 309:User/src/bsp_Motor_Encoder.c ****                return;
+ 938              		.loc 1 309 12 is_stmt 1 view .LVU306
+ 309:User/src/bsp_Motor_Encoder.c ****                return;
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc5HsUmU.s 			page 27
+
+
+ 939              		.loc 1 309 15 is_stmt 0 view .LVU307
+ 940 00ca 012A     		cmp	r2, #1
+ 941 00cc 28D8     		bhi	.L59
+ 312:User/src/bsp_Motor_Encoder.c ****            temp[1] = 0x01;
+ 942              		.loc 1 312 12 is_stmt 1 view .LVU308
+ 312:User/src/bsp_Motor_Encoder.c ****            temp[1] = 0x01;
+ 943              		.loc 1 312 20 is_stmt 0 view .LVU309
+ 944 00ce 154B     		ldr	r3, .L61
+ 945 00d0 0421     		movs	r1, #4
+ 946 00d2 1970     		strb	r1, [r3]
+ 313:User/src/bsp_Motor_Encoder.c ****            temp[2] = Set_Direction;
+ 947              		.loc 1 313 12 is_stmt 1 view .LVU310
+ 313:User/src/bsp_Motor_Encoder.c ****            temp[2] = Set_Direction;
+ 948              		.loc 1 313 20 is_stmt 0 view .LVU311
+ 949 00d4 0121     		movs	r1, #1
+ 950 00d6 5970     		strb	r1, [r3, #1]
+ 314:User/src/bsp_Motor_Encoder.c ****            temp[3] = data;
+ 951              		.loc 1 314 12 is_stmt 1 view .LVU312
+ 314:User/src/bsp_Motor_Encoder.c ****            temp[3] = data;
+ 952              		.loc 1 314 20 is_stmt 0 view .LVU313
+ 953 00d8 0721     		movs	r1, #7
+ 954 00da 9970     		strb	r1, [r3, #2]
+ 315:User/src/bsp_Motor_Encoder.c ****        } break;
+ 955              		.loc 1 315 12 is_stmt 1 view .LVU314
+ 315:User/src/bsp_Motor_Encoder.c ****        } break;
+ 956              		.loc 1 315 20 is_stmt 0 view .LVU315
+ 957 00dc DA70     		strb	r2, [r3, #3]
+ 316:User/src/bsp_Motor_Encoder.c ****        case Set_MidPoint:{
+ 958              		.loc 1 316 10 is_stmt 1 view .LVU316
+ 316:User/src/bsp_Motor_Encoder.c ****        case Set_MidPoint:{
+ 959              		.loc 1 316 8 is_stmt 0 view .LVU317
+ 960 00de A4E7     		b	.L42
+ 961              	.L46:
+ 318:User/src/bsp_Motor_Encoder.c ****            temp[1] = 0x01;
+ 962              		.loc 1 318 12 is_stmt 1 view .LVU318
+ 318:User/src/bsp_Motor_Encoder.c ****            temp[1] = 0x01;
+ 963              		.loc 1 318 20 is_stmt 0 view .LVU319
+ 964 00e0 104B     		ldr	r3, .L61
+ 965 00e2 0422     		movs	r2, #4
+ 966              	.LVL54:
+ 318:User/src/bsp_Motor_Encoder.c ****            temp[1] = 0x01;
+ 967              		.loc 1 318 20 view .LVU320
+ 968 00e4 1A70     		strb	r2, [r3]
+ 319:User/src/bsp_Motor_Encoder.c ****            temp[2] = Set_MidPoint;
+ 969              		.loc 1 319 12 is_stmt 1 view .LVU321
+ 319:User/src/bsp_Motor_Encoder.c ****            temp[2] = Set_MidPoint;
+ 970              		.loc 1 319 20 is_stmt 0 view .LVU322
+ 971 00e6 0122     		movs	r2, #1
+ 972 00e8 5A70     		strb	r2, [r3, #1]
+ 320:User/src/bsp_Motor_Encoder.c ****            temp[3] = 0x00;
+ 973              		.loc 1 320 12 is_stmt 1 view .LVU323
+ 320:User/src/bsp_Motor_Encoder.c ****            temp[3] = 0x00;
+ 974              		.loc 1 320 20 is_stmt 0 view .LVU324
+ 975 00ea 0C22     		movs	r2, #12
+ 976 00ec 9A70     		strb	r2, [r3, #2]
+ 321:User/src/bsp_Motor_Encoder.c ****        } break;
+ 977              		.loc 1 321 12 is_stmt 1 view .LVU325
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc5HsUmU.s 			page 28
+
+
+ 321:User/src/bsp_Motor_Encoder.c ****        } break;
+ 978              		.loc 1 321 20 is_stmt 0 view .LVU326
+ 979 00ee 0022     		movs	r2, #0
+ 980 00f0 DA70     		strb	r2, [r3, #3]
+ 322:User/src/bsp_Motor_Encoder.c ****        case Set_Current_Value:{
+ 981              		.loc 1 322 10 is_stmt 1 view .LVU327
+ 322:User/src/bsp_Motor_Encoder.c ****        case Set_Current_Value:{
+ 982              		.loc 1 322 8 is_stmt 0 view .LVU328
+ 983 00f2 9AE7     		b	.L42
+ 984              	.LVL55:
+ 985              	.L45:
+ 325:User/src/bsp_Motor_Encoder.c ****            temp[1] = 0x01;
+ 986              		.loc 1 325 12 is_stmt 1 view .LVU329
+ 325:User/src/bsp_Motor_Encoder.c ****            temp[1] = 0x01;
+ 987              		.loc 1 325 20 is_stmt 0 view .LVU330
+ 988 00f4 0B4B     		ldr	r3, .L61
+ 989 00f6 0721     		movs	r1, #7
+ 990 00f8 1970     		strb	r1, [r3]
+ 326:User/src/bsp_Motor_Encoder.c ****            temp[2] = Set_Current_Value;
+ 991              		.loc 1 326 12 is_stmt 1 view .LVU331
+ 326:User/src/bsp_Motor_Encoder.c ****            temp[2] = Set_Current_Value;
+ 992              		.loc 1 326 20 is_stmt 0 view .LVU332
+ 993 00fa 0121     		movs	r1, #1
+ 994 00fc 5970     		strb	r1, [r3, #1]
+ 327:User/src/bsp_Motor_Encoder.c ****            temp[3] = (uint8_t)data>>24;
+ 995              		.loc 1 327 12 is_stmt 1 view .LVU333
+ 327:User/src/bsp_Motor_Encoder.c ****            temp[3] = (uint8_t)data>>24;
+ 996              		.loc 1 327 20 is_stmt 0 view .LVU334
+ 997 00fe 0D21     		movs	r1, #13
+ 998 0100 9970     		strb	r1, [r3, #2]
+ 328:User/src/bsp_Motor_Encoder.c ****            temp[4] = (uint8_t)data>>16;
+ 999              		.loc 1 328 12 is_stmt 1 view .LVU335
+ 328:User/src/bsp_Motor_Encoder.c ****            temp[4] = (uint8_t)data>>16;
+ 1000              		.loc 1 328 20 is_stmt 0 view .LVU336
+ 1001 0102 0021     		movs	r1, #0
+ 1002 0104 D970     		strb	r1, [r3, #3]
+ 329:User/src/bsp_Motor_Encoder.c ****            temp[5] = (uint8_t)data>>8;
+ 1003              		.loc 1 329 12 is_stmt 1 view .LVU337
+ 329:User/src/bsp_Motor_Encoder.c ****            temp[5] = (uint8_t)data>>8;
+ 1004              		.loc 1 329 20 is_stmt 0 view .LVU338
+ 1005 0106 1971     		strb	r1, [r3, #4]
+ 330:User/src/bsp_Motor_Encoder.c ****            temp[6] = (uint8_t)data;
+ 1006              		.loc 1 330 12 is_stmt 1 view .LVU339
+ 330:User/src/bsp_Motor_Encoder.c ****            temp[6] = (uint8_t)data;
+ 1007              		.loc 1 330 20 is_stmt 0 view .LVU340
+ 1008 0108 5971     		strb	r1, [r3, #5]
+ 331:User/src/bsp_Motor_Encoder.c ****        } break;
+ 1009              		.loc 1 331 12 is_stmt 1 view .LVU341
+ 331:User/src/bsp_Motor_Encoder.c ****        } break;
+ 1010              		.loc 1 331 20 is_stmt 0 view .LVU342
+ 1011 010a 9A71     		strb	r2, [r3, #6]
+ 332:User/src/bsp_Motor_Encoder.c ****        case Set_Five_Loops:{
+ 1012              		.loc 1 332 10 is_stmt 1 view .LVU343
+ 332:User/src/bsp_Motor_Encoder.c ****        case Set_Five_Loops:{
+ 1013              		.loc 1 332 8 is_stmt 0 view .LVU344
+ 1014 010c 8DE7     		b	.L42
+ 1015              	.L43:
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc5HsUmU.s 			page 29
+
+
+ 334:User/src/bsp_Motor_Encoder.c ****            temp[1] = 0x01;
+ 1016              		.loc 1 334 12 is_stmt 1 view .LVU345
+ 334:User/src/bsp_Motor_Encoder.c ****            temp[1] = 0x01;
+ 1017              		.loc 1 334 20 is_stmt 0 view .LVU346
+ 1018 010e 054B     		ldr	r3, .L61
+ 1019 0110 0422     		movs	r2, #4
+ 1020              	.LVL56:
+ 334:User/src/bsp_Motor_Encoder.c ****            temp[1] = 0x01;
+ 1021              		.loc 1 334 20 view .LVU347
+ 1022 0112 1A70     		strb	r2, [r3]
+ 335:User/src/bsp_Motor_Encoder.c ****            temp[2] = Set_Five_Loops;
+ 1023              		.loc 1 335 12 is_stmt 1 view .LVU348
+ 335:User/src/bsp_Motor_Encoder.c ****            temp[2] = Set_Five_Loops;
+ 1024              		.loc 1 335 20 is_stmt 0 view .LVU349
+ 1025 0114 0122     		movs	r2, #1
+ 1026 0116 5A70     		strb	r2, [r3, #1]
+ 336:User/src/bsp_Motor_Encoder.c ****            temp[3] = 0x01;
+ 1027              		.loc 1 336 12 is_stmt 1 view .LVU350
+ 336:User/src/bsp_Motor_Encoder.c ****            temp[3] = 0x01;
+ 1028              		.loc 1 336 20 is_stmt 0 view .LVU351
+ 1029 0118 0F21     		movs	r1, #15
+ 1030 011a 9970     		strb	r1, [r3, #2]
+ 337:User/src/bsp_Motor_Encoder.c ****        } break;
+ 1031              		.loc 1 337 12 is_stmt 1 view .LVU352
+ 337:User/src/bsp_Motor_Encoder.c ****        } break;
+ 1032              		.loc 1 337 20 is_stmt 0 view .LVU353
+ 1033 011c DA70     		strb	r2, [r3, #3]
+ 338:User/src/bsp_Motor_Encoder.c ****    }
+ 1034              		.loc 1 338 10 is_stmt 1 view .LVU354
+ 338:User/src/bsp_Motor_Encoder.c ****    }
+ 1035              		.loc 1 338 8 is_stmt 0 view .LVU355
+ 1036 011e 84E7     		b	.L42
+ 1037              	.LVL57:
+ 1038              	.L59:
+ 338:User/src/bsp_Motor_Encoder.c ****    }
+ 1039              		.loc 1 338 8 view .LVU356
+ 1040 0120 7047     		bx	lr
+ 1041              	.L62:
+ 1042 0122 00BF     		.align	2
+ 1043              	.L61:
+ 1044 0124 00000000 		.word	.LANCHOR1
+ 1045 0128 00000000 		.word	hcan1
+ 1046              		.cfi_endproc
+ 1047              	.LFE142:
+ 1049              		.global	temp
+ 1050              		.global	CAN_Encoder
+ 1051              		.global	pitch_encoder
+ 1052              		.global	yaw_encoder
+ 1053              		.section	.bss.CAN_Encoder,"aw",%nobits
+ 1054              		.align	2
+ 1055              		.set	.LANCHOR0,. + 0
+ 1058              	CAN_Encoder:
+ 1059 0000 00000000 		.space	340
+ 1059      00000000 
+ 1059      00000000 
+ 1059      00000000 
+ 1059      00000000 
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc5HsUmU.s 			page 30
+
+
+ 1060              		.section	.bss.pitch_encoder,"aw",%nobits
+ 1061              		.align	2
+ 1064              	pitch_encoder:
+ 1065 0000 00000000 		.space	68
+ 1065      00000000 
+ 1065      00000000 
+ 1065      00000000 
+ 1065      00000000 
+ 1066              		.section	.bss.yaw_encoder,"aw",%nobits
+ 1067              		.align	2
+ 1070              	yaw_encoder:
+ 1071 0000 00000000 		.space	68
+ 1071      00000000 
+ 1071      00000000 
+ 1071      00000000 
+ 1071      00000000 
+ 1072              		.section	.data.temp,"aw"
+ 1073              		.align	2
+ 1074              		.set	.LANCHOR1,. + 0
+ 1077              	temp:
+ 1078 0000 04010100 		.ascii	"\004\001\001\000\000"
+ 1078      00
+ 1079 0005 000000   		.space	3
+ 1080              		.text
+ 1081              	.Letext0:
+ 1082              		.file 2 "d:\\gcc-arm-none-eabi-10.3-2021.10\\arm-none-eabi\\include\\machine\\_default_types.h"
+ 1083              		.file 3 "d:\\gcc-arm-none-eabi-10.3-2021.10\\arm-none-eabi\\include\\sys\\_stdint.h"
+ 1084              		.file 4 "Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f407xx.h"
+ 1085              		.file 5 "Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h"
+ 1086              		.file 6 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_can.h"
+ 1087              		.file 7 "User/inc/struct_typedef.h"
+ 1088              		.file 8 "User/inc/bsp_Motor_Encoder.h"
+ 1089              		.file 9 "Core/Inc/can.h"
+ 1090              		.file 10 "<built-in>"
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc5HsUmU.s 			page 31
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 bsp_Motor_Encoder.c
+C:\Users\28212\AppData\Local\Temp\cc5HsUmU.s:20     .text.EncoderValZero:00000000 $t
+C:\Users\28212\AppData\Local\Temp\cc5HsUmU.s:26     .text.EncoderValZero:00000000 EncoderValZero
+C:\Users\28212\AppData\Local\Temp\cc5HsUmU.s:58     .text.Encoder_Struct_Zero:00000000 $t
+C:\Users\28212\AppData\Local\Temp\cc5HsUmU.s:64     .text.Encoder_Struct_Zero:00000000 Encoder_Struct_Zero
+C:\Users\28212\AppData\Local\Temp\cc5HsUmU.s:88     .text.Encoder_Init:00000000 $t
+C:\Users\28212\AppData\Local\Temp\cc5HsUmU.s:94     .text.Encoder_Init:00000000 Encoder_Init
+C:\Users\28212\AppData\Local\Temp\cc5HsUmU.s:208    .text.Get_Chassis_motor_encoder_point:00000000 $t
+C:\Users\28212\AppData\Local\Temp\cc5HsUmU.s:214    .text.Get_Chassis_motor_encoder_point:00000000 Get_Chassis_motor_encoder_point
+C:\Users\28212\AppData\Local\Temp\cc5HsUmU.s:232    .text.Get_Chassis_motor_encoder_point:0000000a $d
+C:\Users\28212\AppData\Local\Temp\cc5HsUmU.s:318    .text.Get_Chassis_motor_encoder_point:00000050 $d
+C:\Users\28212\AppData\Local\Temp\cc5HsUmU.s:327    .text.Block_Detect:00000000 $t
+C:\Users\28212\AppData\Local\Temp\cc5HsUmU.s:333    .text.Block_Detect:00000000 Block_Detect
+C:\Users\28212\AppData\Local\Temp\cc5HsUmU.s:415    .text.angle_limiting_int16:00000000 $t
+C:\Users\28212\AppData\Local\Temp\cc5HsUmU.s:421    .text.angle_limiting_int16:00000000 angle_limiting_int16
+C:\Users\28212\AppData\Local\Temp\cc5HsUmU.s:467    .text.CAN_DATA_Encoder_Deal:00000000 $t
+C:\Users\28212\AppData\Local\Temp\cc5HsUmU.s:473    .text.CAN_DATA_Encoder_Deal:00000000 CAN_DATA_Encoder_Deal
+C:\Users\28212\AppData\Local\Temp\cc5HsUmU.s:646    .text.CAN_DATA_Encoder_Deal:000000e4 $d
+C:\Users\28212\AppData\Local\Temp\cc5HsUmU.s:653    .text.check_codevalue:00000000 $t
+C:\Users\28212\AppData\Local\Temp\cc5HsUmU.s:659    .text.check_codevalue:00000000 check_codevalue
+C:\Users\28212\AppData\Local\Temp\cc5HsUmU.s:701    .text.Briter_Encoder_Code_Set:00000000 $t
+C:\Users\28212\AppData\Local\Temp\cc5HsUmU.s:707    .text.Briter_Encoder_Code_Set:00000000 Briter_Encoder_Code_Set
+C:\Users\28212\AppData\Local\Temp\cc5HsUmU.s:722    .text.Briter_Encoder_Code_Set:0000000a $d
+C:\Users\28212\AppData\Local\Temp\cc5HsUmU.s:1044   .text.Briter_Encoder_Code_Set:00000124 $d
+C:\Users\28212\AppData\Local\Temp\cc5HsUmU.s:1077   .data.temp:00000000 temp
+C:\Users\28212\AppData\Local\Temp\cc5HsUmU.s:1058   .bss.CAN_Encoder:00000000 CAN_Encoder
+C:\Users\28212\AppData\Local\Temp\cc5HsUmU.s:1064   .bss.pitch_encoder:00000000 pitch_encoder
+C:\Users\28212\AppData\Local\Temp\cc5HsUmU.s:1070   .bss.yaw_encoder:00000000 yaw_encoder
+C:\Users\28212\AppData\Local\Temp\cc5HsUmU.s:1054   .bss.CAN_Encoder:00000000 $d
+C:\Users\28212\AppData\Local\Temp\cc5HsUmU.s:1061   .bss.pitch_encoder:00000000 $d
+C:\Users\28212\AppData\Local\Temp\cc5HsUmU.s:1067   .bss.yaw_encoder:00000000 $d
+C:\Users\28212\AppData\Local\Temp\cc5HsUmU.s:1073   .data.temp:00000000 $d
+C:\Users\28212\AppData\Local\Temp\cc5HsUmU.s:237    .text.Get_Chassis_motor_encoder_point:0000000f $d
+C:\Users\28212\AppData\Local\Temp\cc5HsUmU.s:237    .text.Get_Chassis_motor_encoder_point:00000010 $t
+C:\Users\28212\AppData\Local\Temp\cc5HsUmU.s:737    .text.Briter_Encoder_Code_Set:00000019 $d
+C:\Users\28212\AppData\Local\Temp\cc5HsUmU.s:737    .text.Briter_Encoder_Code_Set:0000001a $t
+
+UNDEFINED SYMBOLS
+memset
+HAL_CAN_GetTxMailboxesFreeLevel
+HAL_CAN_AddTxMessage
+hcan1

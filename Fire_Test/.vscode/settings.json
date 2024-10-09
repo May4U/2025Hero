@@ -1,0 +1,13 @@
+{
+    "cortex-debug.armToolchainPath": "D:\\GCC-ARM-NONE-EABI-10.3-2021.10\\BIN",
+    "cortex-debug.openocdPath": "D:\\OPENOCD-20231002-0.12.0\\BIN\\OPENOCD.EXE",
+    "files.associations": {
+        "cybergear_motor.h": "c",
+        "dji_motor.h": "c",
+        "bsp_motor_encoder.h": "c",
+        "stdlib.h": "c",
+        "pid.h": "c",
+        "bsp_can.h": "c",
+        "can.h": "c"
+    }
+}

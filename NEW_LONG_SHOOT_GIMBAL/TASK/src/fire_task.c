@@ -69,6 +69,7 @@ void FIRE_TASK(void const *argument)
         Deal_Fire_Set_Rpm();//改变摩擦轮转速
         Send_Fire_Set_Rpm();//发送底盘摩擦轮设定转速
         Send_Fire_Motor_Speed(left_speed_up, right_speed_up, left_speed, right_speed);//发送底盘摩擦轮实际转速
+				//Send_Fire_Motor_Speed(4800, 4800, 4800, 4800);//发送底盘摩擦轮实际转速
         
         Gimbal_Fire_State_Set();
 		fire_behaviour_choose();
@@ -78,7 +79,7 @@ void FIRE_TASK(void const *argument)
         
 //        if (time % 2 ==0)   Send_Fire_Current();//500hz控制频率
         
-//		DJIMotor_Send(Fire.left_motor);
+		DJIMotor_Send(Fire.left_motor);
         taskEXIT_CRITICAL();              // 退出临界区
 
 

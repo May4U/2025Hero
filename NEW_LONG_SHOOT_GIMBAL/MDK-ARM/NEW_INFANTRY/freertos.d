@@ -1,7 +1,7 @@
 new_infantry\freertos.o: ../Core/Src/freertos.c
 new_infantry\freertos.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h
-new_infantry\freertos.o: D:\Keil5\ARM\ARMCC\Bin\..\include\stddef.h
-new_infantry\freertos.o: D:\Keil5\ARM\ARMCC\Bin\..\include\stdint.h
+new_infantry\freertos.o: C:\Program Files\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
+new_infantry\freertos.o: C:\Program Files\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 new_infantry\freertos.o: ../Core/Inc/FreeRTOSConfig.h
 new_infantry\freertos.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h
 new_infantry\freertos.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/portable.h
@@ -57,11 +57,11 @@ new_infantry\freertos.o: ../ACE-ECF/Application/inc/./IMU_Driver/BMI088Middlewar
 new_infantry\freertos.o: ../ACE-ECF/Application/inc/./IMU_Driver/kalman_filter.h
 new_infantry\freertos.o: ../Middlewares/ST/ARM/DSP/Inc/arm_math.h
 new_infantry\freertos.o: ../Drivers/CMSIS/Include/core_cm4.h
-new_infantry\freertos.o: D:\Keil5\ARM\ARMCC\Bin\..\include\string.h
-new_infantry\freertos.o: D:\Keil5\ARM\ARMCC\Bin\..\include\math.h
+new_infantry\freertos.o: C:\Program Files\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
+new_infantry\freertos.o: C:\Program Files\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
 new_infantry\freertos.o: ../ACE-ECF/Algorithm/inc/maths.h
 new_infantry\freertos.o: ../ACE-ECF/Algorithm/inc/struct_typedef.h
-new_infantry\freertos.o: D:\Keil5\ARM\ARMCC\Bin\..\include\stdlib.h
+new_infantry\freertos.o: C:\Program Files\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
 new_infantry\freertos.o: ../ACE-ECF/Application/inc/./IMU_Driver/QuaternionEKF.h
 new_infantry\freertos.o: ../ACE-ECF/Application/inc/./IMU_Driver/user_lib.h
 new_infantry\freertos.o: ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.h
@@ -71,17 +71,17 @@ new_infantry\freertos.o: ../Core/Inc/tim.h
 new_infantry\freertos.o: ../ACE-ECF/Application/inc/safe_task.h
 new_infantry\freertos.o: ../TASK/inc/fire_task.h
 new_infantry\freertos.o: ../VERSION/gimbal_struct_variables.h
-new_infantry\freertos.o: D:\Keil5\ARM\ARMCC\Bin\..\include\stdbool.h
+new_infantry\freertos.o: C:\Program Files\Keil_v5\ARM\ARMCC\Bin\..\include\stdbool.h
 new_infantry\freertos.o: ../ACE-ECF/Bsp/Inc/bsp_dr16.h
-new_infantry\freertos.o: D:\Keil5\ARM\ARMCC\Bin\..\include\stdio.h
+new_infantry\freertos.o: C:\Program Files\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
 new_infantry\freertos.o: ../Core/Inc/usart.h
 new_infantry\freertos.o: ../ACE-ECF/Bsp/Inc/ECF_BspConfig.h
 new_infantry\freertos.o: ../ACE-ECF/Bsp/Inc/bsp_referee.h
 new_infantry\freertos.o: ../ACE-ECF/Algorithm/inc/CRC.h
 new_infantry\freertos.o: ../ACE-ECF/Algorithm/inc/pid.h
 new_infantry\freertos.o: ../ACE-ECF/Algorithm/inc/fifo.h
-new_infantry\freertos.o: D:\Keil5\ARM\ARMCC\Bin\..\include\stdarg.h
-new_infantry\freertos.o: D:\Keil5\ARM\ARMCC\Bin\..\include\errno.h
+new_infantry\freertos.o: C:\Program Files\Keil_v5\ARM\ARMCC\Bin\..\include\stdarg.h
+new_infantry\freertos.o: C:\Program Files\Keil_v5\ARM\ARMCC\Bin\..\include\errno.h
 new_infantry\freertos.o: ../ACE-ECF/Algorithm/inc/linux_list.h
 new_infantry\freertos.o: ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.h
 new_infantry\freertos.o: ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.h

@@ -5,11 +5,11 @@
 <h2>Tool Versions:</h2>
 IDE-Version: μVision V5.40.0.0
 Copyright (C) 2024 ARM Ltd and ARM Germany GmbH. All rights reserved.
-License Information: JH L, Apple, LIC=QF82M-XRV2G-QDAKD-850HE-MV3YZ-UZ1WN
+License Information: Lann l, Apple, LIC=VGXG8-3MJUD-UHD8H-WDFZD-4XURN-GGUA5
  
 Tool Versions:
 Toolchain:       MDK-ARM Plus  Version: 5.40.0.3
-Toolchain Path:  D:\Keil5\ARM\ARMCC\Bin
+Toolchain Path:  C:\Program Files\Keil_v5\ARM\ARMCC\Bin
 C Compiler:      Armcc.exe V5.06 update 7 (build 960)
 Assembler:       Armasm.exe V5.06 update 7 (build 960)
 Linker/Locator:  ArmLink.exe V5.06 update 7 (build 960)
@@ -21,26 +21,255 @@ Target DLL:      Segger\JL2CM3.dll V2.99.44.0
 Dialog DLL:      TCM.DLL V1.56.4.0
  
 <h2>Project:</h2>
-D:\Documents\GitHub\2025Hero\NEW_LONG_SHOOT_GIMBAL\MDK-ARM\NEW_INFANTRY.uvprojx
-Project File Date:  09/30/2024
+D:\Documents\Github\2024Hero_real\NEW_LONG_SHOOT_GIMBAL\MDK-ARM\NEW_INFANTRY.uvprojx
+Project File Date:  10/09/2024
 
 <h2>Output:</h2>
-*** Using Compiler 'V5.06 update 7 (build 960)', folder: 'D:\Keil5\ARM\ARMCC\Bin'
+*** Using Compiler 'V5.06 update 7 (build 960)', folder: 'C:\Program Files\Keil_v5\ARM\ARMCC\Bin'
 Build target 'NEW_INFANTRY'
+compiling spi.c...
+compiling dma.c...
+compiling gpio.c...
+compiling tim.c...
+compiling can.c...
+assembling startup_stm32f407xx.s...
+compiling main.c...
+compiling freertos.c...
+../ACE-ECF/Application/inc/safe_task.h(35): warning:  #1-D: last line of file ends without a newline
+  #endif
+../ACE-ECF/Bsp/Inc/bsp_Motor_Encoder.h(22): warning:  #47-D: incompatible redefinition of macro "PI"  (declared at line 361 of "../Middlewares/ST/ARM/DSP/Inc/arm_math.h")
+  #define PI 3.14159f
+../ACE-ECF/Control/Inc/robot_cmd.h(154): warning:  #1295-D: Deprecated declaration get_fire_ready - give arg types
+  uint8_t get_fire_ready();
+../ACE-ECF/Control/Inc/robot_cmd.h(155): warning:  #1295-D: Deprecated declaration get_Gimbal_pitch_point - give arg types
+  fp32* get_Gimbal_pitch_point();
+../ACE-ECF/Control/Inc/robot_cmd.h(156): warning:  #1295-D: Deprecated declaration get_Gimbal_yaw_point - give arg types
+  fp32* get_Gimbal_yaw_point();
+../ACE-ECF/Control/Inc/robot_cmd.h(161): warning:  #1295-D: Deprecated declaration get_gimbal_behaviour_point - give arg types
+  Gimbal_Work_State_e* get_gimbal_behaviour_point();
+../Core/Src/freertos.c: 6 warnings, 0 errors
+compiling usart.c...
+compiling stm32f4xx_hal_msp.c...
+compiling stm32f4xx_hal_timebase_tim.c...
+compiling stm32f4xx_it.c...
+compiling usbd_desc.c...
+compiling usb_device.c...
+compiling usbd_cdc_if.c...
+compiling usbd_conf.c...
+compiling stm32f4xx_hal_pcd.c...
+compiling stm32f4xx_hal_pcd_ex.c...
+compiling stm32f4xx_ll_usb.c...
+compiling stm32f4xx_hal_rcc_ex.c...
+compiling stm32f4xx_hal_rcc.c...
+compiling stm32f4xx_hal_flash.c...
+compiling stm32f4xx_hal_flash_ex.c...
+compiling stm32f4xx_hal_flash_ramfunc.c...
+compiling stm32f4xx_hal_gpio.c...
+compiling stm32f4xx_hal_dma.c...
+compiling stm32f4xx_hal_dma_ex.c...
+compiling stm32f4xx_hal_pwr_ex.c...
+compiling stm32f4xx_hal_pwr.c...
+compiling stm32f4xx_hal.c...
+compiling stm32f4xx_hal_cortex.c...
+compiling stm32f4xx_hal_exti.c...
+compiling croutine.c...
+compiling event_groups.c...
+compiling list.c...
+compiling queue.c...
+compiling stream_buffer.c...
+compiling tasks.c...
+compiling timers.c...
+compiling stm32f4xx_hal_can.c...
+compiling stm32f4xx_hal_spi.c...
+compiling stm32f4xx_hal_tim_ex.c...
+compiling heap_4.c...
+compiling cmsis_os.c...
+compiling port.c...
+compiling stm32f4xx_hal_tim.c...
+compiling system_stm32f4xx.c...
+compiling safe_task.c...
+../ACE-ECF/Application/inc/safe_task.h(35): warning:  #1-D: last line of file ends without a newline
+  #endif
+..\ACE-ECF\Application\src\safe_task.c(222): warning:  #1-D: last line of file ends without a newline
+  }
+..\ACE-ECF\Application\src\safe_task.c: 2 warnings, 0 errors
+compiling stm32f4xx_hal_uart.c...
+compiling usbd_core.c...
+compiling usbd_ctlreq.c...
+compiling usbd_cdc.c...
+compiling usbd_ioreq.c...
+compiling imu_task.c...
+..\ACE-ECF\Application\src\imu_task.c(308): warning:  #1-D: last line of file ends without a newline
+  }
+..\ACE-ECF\Application\src\imu_task.c: 1 warning, 0 errors
+compiling fire_task.c...
+../ACE-ECF/Bsp/Inc/bsp_Motor_Encoder.h(22): warning:  #47-D: incompatible redefinition of macro "PI"  (declared at line 361 of "../Middlewares/ST/ARM/DSP/Inc/arm_math.h")
+  #define PI 3.14159f
+../ACE-ECF/Control/Inc/robot_cmd.h(154): warning:  #1295-D: Deprecated declaration get_fire_ready - give arg types
+  uint8_t get_fire_ready();
+../ACE-ECF/Control/Inc/robot_cmd.h(155): warning:  #1295-D: Deprecated declaration get_Gimbal_pitch_point - give arg types
+  fp32* get_Gimbal_pitch_point();
+../ACE-ECF/Control/Inc/robot_cmd.h(156): warning:  #1295-D: Deprecated declaration get_Gimbal_yaw_point - give arg types
+  fp32* get_Gimbal_yaw_point();
+../ACE-ECF/Control/Inc/robot_cmd.h(161): warning:  #1295-D: Deprecated declaration get_gimbal_behaviour_point - give arg types
+  Gimbal_Work_State_e* get_gimbal_behaviour_point();
+..\TASK\src\fire_task.c(168): warning:  #1-D: last line of file ends without a newline
+  }
+..\TASK\src\fire_task.c: 6 warnings, 0 errors
+compiling gimbal_task.c...
+../ACE-ECF/Bsp/Inc/bsp_Motor_Encoder.h(22): warning:  #47-D: incompatible redefinition of macro "PI"  (declared at line 361 of "../Middlewares/ST/ARM/DSP/Inc/arm_math.h")
+  #define PI 3.14159f
+../ACE-ECF/Control/Inc/robot_cmd.h(154): warning:  #1295-D: Deprecated declaration get_fire_ready - give arg types
+  uint8_t get_fire_ready();
+../ACE-ECF/Control/Inc/robot_cmd.h(155): warning:  #1295-D: Deprecated declaration get_Gimbal_pitch_point - give arg types
+  fp32* get_Gimbal_pitch_point();
+../ACE-ECF/Control/Inc/robot_cmd.h(156): warning:  #1295-D: Deprecated declaration get_Gimbal_yaw_point - give arg types
+  fp32* get_Gimbal_yaw_point();
+../ACE-ECF/Control/Inc/robot_cmd.h(161): warning:  #1295-D: Deprecated declaration get_gimbal_behaviour_point - give arg types
+  Gimbal_Work_State_e* get_gimbal_behaviour_point();
+../ACE-ECF/Application/inc/safe_task.h(35): warning:  #1-D: last line of file ends without a newline
+  #endif
+../TASK/inc/music_task.h(2): warning:  #1-D: last line of file ends without a newline
+  void music(void);
+../TASK/inc/rgb.h(70): warning:  #1-D: last line of file ends without a newline
+  #endif
+..\TASK\src\gimbal_task.c(32): warning:  #1295-D: Deprecated declaration Gimbal_Work - give arg types
+  static void Gimbal_Work();
+..\TASK\src\gimbal_task.c(33): warning:  #1295-D: Deprecated declaration Gimbal_Init - give arg types
+  static void Gimbal_Init();
+..\TASK\src\gimbal_task.c(34): warning:  #1295-D: Deprecated declaration Gimbal_Not_Work - give arg types
+  static void Gimbal_Not_Work();
+..\TASK\src\gimbal_task.c(513): warning:  #550-D: variable "last_Photo_Motor_encoder"  was set but never used
+      static int64_t last_Photo_Motor_encoder = 0;
+..\TASK\src\gimbal_task.c: 12 warnings, 0 errors
+compiling virtual_task.c...
+../ACE-ECF/Control/Inc/robot_cmd.h(154): warning:  #1295-D: Deprecated declaration get_fire_ready - give arg types
+  uint8_t get_fire_ready();
+../ACE-ECF/Control/Inc/robot_cmd.h(155): warning:  #1295-D: Deprecated declaration get_Gimbal_pitch_point - give arg types
+  fp32* get_Gimbal_pitch_point();
+../ACE-ECF/Control/Inc/robot_cmd.h(156): warning:  #1295-D: Deprecated declaration get_Gimbal_yaw_point - give arg types
+  fp32* get_Gimbal_yaw_point();
+../ACE-ECF/Control/Inc/robot_cmd.h(161): warning:  #1295-D: Deprecated declaration get_gimbal_behaviour_point - give arg types
+  Gimbal_Work_State_e* get_gimbal_behaviour_point();
+..\TASK\src\virtual_task.c(282): warning:  #188-D: enumerated type mixed with another type
+    virtual_task_init_p->armor_num = 0;
+..\TASK\src\virtual_task.c(500): warning:  #1-D: last line of file ends without a newline
+  #endif
+..\TASK\src\virtual_task.c: 6 warnings, 0 errors
+compiling DJI_Motor.c...
+..\ACE-ECF\Control\Src\DJI_Motor.c(457): warning:  #1-D: last line of file ends without a newline
+  }
+..\ACE-ECF\Control\Src\DJI_Motor.c(61): warning:  #177-D: variable "DJI_Motor_Rx_Data"  was declared but never referenced
+  static uint8_t  DJI_Motor_Rx_Data[8];    							//接受数据的数组
+..\ACE-ECF\Control\Src\DJI_Motor.c: 2 warnings, 0 errors
+compiling Cybergear_Motor.c...
+compiling music_task.c...
+../TASK/inc/music_task.h(2): warning:  #1-D: last line of file ends without a newline
+  void music(void);
+..\TASK\src\music_task.c: 1 warning, 0 errors
+compiling CRC.c...
+compiling bsp_dr16.c...
+compiling robot_cmd.c...
+../ACE-ECF/Control/Inc/robot_cmd.h(154): warning:  #1295-D: Deprecated declaration get_fire_ready - give arg types
+  uint8_t get_fire_ready();
+../ACE-ECF/Control/Inc/robot_cmd.h(155): warning:  #1295-D: Deprecated declaration get_Gimbal_pitch_point - give arg types
+  fp32* get_Gimbal_pitch_point();
+../ACE-ECF/Control/Inc/robot_cmd.h(156): warning:  #1295-D: Deprecated declaration get_Gimbal_yaw_point - give arg types
+  fp32* get_Gimbal_yaw_point();
+../ACE-ECF/Control/Inc/robot_cmd.h(161): warning:  #1295-D: Deprecated declaration get_gimbal_behaviour_point - give arg types
+  Gimbal_Work_State_e* get_gimbal_behaviour_point();
+../ACE-ECF/Application/inc/safe_task.h(35): warning:  #1-D: last line of file ends without a newline
+  #endif
+..\ACE-ECF\Control\Src\robot_cmd.c(647): warning:  #177-D: variable "p"  was declared but never referenced
+      static fp32 p = 0;
+..\ACE-ECF\Control\Src\robot_cmd.c(778): warning:  #550-D: variable "Last_Gimbal_Work_State"  was set but never used
+      static Gimbal_Work_State_e Last_Gimbal_Work_State = MANUAL;
+..\ACE-ECF\Control\Src\robot_cmd.c(891): warning:  #188-D: enumerated type mixed with another type
+      return Gimbal_CMD.Gimbal_Work_State == AUTO_ATTACK? 1 : 0;
+..\ACE-ECF\Control\Src\robot_cmd.c(895): warning:  #188-D: enumerated type mixed with another type
+      return Gimbal_CMD.Gimbal_Work_State == AUTO_Delay_Fire? 1 : 0;
+..\ACE-ECF\Control\Src\robot_cmd.c(251): warning:  #550-D: variable "ins"  was set but never used
+  static const INS_t       *ins;
+..\ACE-ECF\Control\Src\robot_cmd.c: 10 warnings, 0 errors
+compiling bsp_can.c...
+../ACE-ECF/Control/Inc/robot_cmd.h(154): warning:  #1295-D: Deprecated declaration get_fire_ready - give arg types
+  uint8_t get_fire_ready();
+../ACE-ECF/Control/Inc/robot_cmd.h(155): warning:  #1295-D: Deprecated declaration get_Gimbal_pitch_point - give arg types
+  fp32* get_Gimbal_pitch_point();
+../ACE-ECF/Control/Inc/robot_cmd.h(156): warning:  #1295-D: Deprecated declaration get_Gimbal_yaw_point - give arg types
+  fp32* get_Gimbal_yaw_point();
+../ACE-ECF/Control/Inc/robot_cmd.h(161): warning:  #1295-D: Deprecated declaration get_gimbal_behaviour_point - give arg types
+  Gimbal_Work_State_e* get_gimbal_behaviour_point();
+..\ACE-ECF\Bsp\Src\bsp_can.c: 4 warnings, 0 errors
+compiling filter.c...
+compiling maths.c...
+..\ACE-ECF\Algorithm\src\maths.c(228): warning:  #1-D: last line of file ends without a newline
+  }
+..\ACE-ECF\Algorithm\src\maths.c: 1 warning, 0 errors
+compiling pid.c...
+compiling bsp_Motor_Encoder.c...
+..\ACE-ECF\Bsp\Src\bsp_Motor_Encoder.c(108): warning:  #111-D: statement is unreachable
+              break;
+..\ACE-ECF\Bsp\Src\bsp_Motor_Encoder.c(112): warning:  #111-D: statement is unreachable
+              break;
+..\ACE-ECF\Bsp\Src\bsp_Motor_Encoder.c(116): warning:  #111-D: statement is unreachable
+              break;
+..\ACE-ECF\Bsp\Src\bsp_Motor_Encoder.c(120): warning:  #111-D: statement is unreachable
+              break;
+..\ACE-ECF\Bsp\Src\bsp_Motor_Encoder.c(124): warning:  #111-D: statement is unreachable
+              break;
+..\ACE-ECF\Bsp\Src\bsp_Motor_Encoder.c(127): warning:  #111-D: statement is unreachable
+              break;
+..\ACE-ECF\Bsp\Src\bsp_Motor_Encoder.c: 6 warnings, 0 errors
+compiling bsp_buzzer.c...
+compiling bsp_referee.c...
+compiling fifo.c...
+compiling lqr.c...
+compiling BMI088driver.c...
+compiling BMI088Middleware.c...
+compiling Ou_VisionPro.c...
+../ACE-ECF/Control/Inc/robot_cmd.h(154): warning:  #1295-D: Deprecated declaration get_fire_ready - give arg types
+  uint8_t get_fire_ready();
+../ACE-ECF/Control/Inc/robot_cmd.h(155): warning:  #1295-D: Deprecated declaration get_Gimbal_pitch_point - give arg types
+  fp32* get_Gimbal_pitch_point();
+../ACE-ECF/Control/Inc/robot_cmd.h(156): warning:  #1295-D: Deprecated declaration get_Gimbal_yaw_point - give arg types
+  fp32* get_Gimbal_yaw_point();
+../ACE-ECF/Control/Inc/robot_cmd.h(161): warning:  #1295-D: Deprecated declaration get_gimbal_behaviour_point - give arg types
+  Gimbal_Work_State_e* get_gimbal_behaviour_point();
+..\VERSION\Ou_VisionPro.c(75): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+          dz = 0.3 * (z - z_actual);
+..\VERSION\Ou_VisionPro.c(77): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+          if (fabsf(dz) < 0.00001)
+..\VERSION\Ou_VisionPro.c(435): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+              float tmp_yaw = auto_control_p->yaw + i * PI / 2.0;
+..\VERSION\Ou_VisionPro.c(253): warning:  #177-D: variable "n"  was declared but never referenced
+      int i = 0, n = 0, tem = 0;
+..\VERSION\Ou_VisionPro.c(253): warning:  #177-D: variable "tem"  was declared but never referenced
+      int i = 0, n = 0, tem = 0;
+..\VERSION\Ou_VisionPro.c(692): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+      float Temp_Y = V_y * t - 0.5 * G * t * t;       // 涓嶈�冭檻绌烘皵闃诲姏鐨勫寑鍑忛�熻繍鍔?
+..\VERSION\Ou_VisionPro.c(720): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+              Temp_Y = V_y * t - 0.5 * G * t * t; // 涓嶈�冭檻绌烘皵闃诲姏鐨勫寑鍑忛�熻繍鍔?
+..\VERSION\Ou_VisionPro.c(738): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+              Temp_Y = V_y * t - 0.5 * G * t * t; // 涓嶈�冭檻绌烘皵闃诲姏鐨勫寑鍑忛�熻繍鍔?
+..\VERSION\Ou_VisionPro.c: 12 warnings, 0 errors
+compiling kalman_filter.c...
+compiling QuaternionEKF.c...
+compiling bsp_PWM.c...
+compiling bsp_dwt.c...
+compiling user_lib.c...
 linking...
-NEW_INFANTRY\NEW_INFANTRY.axf: Error: L6200E: Symbol float_min_distance multiply defined (by user_lib.o and maths.o).
-Not enough information to list image symbols.
-Not enough information to list load addresses in the image map.
-Finished: 2 information, 0 warning and 1 error messages.
-"NEW_INFANTRY\NEW_INFANTRY.axf" - 1 Error(s), 0 Warning(s).
+Program Size: Code=77976 RO-data=7896 RW-data=3664 ZI-data=57112  
+FromELF: creating hex file...
+"NEW_INFANTRY\NEW_INFANTRY.axf" - 0 Error(s), 69 Warning(s).
 
 <h2>Software Packages used:</h2>
 
 Package Vendor: ARM
-                https://www.keil.com/pack/ARM.CMSIS.6.1.0.pack
-                ARM::CMSIS@6.1.0
+                http://www.keil.com/pack/ARM.CMSIS.5.9.0.pack
+                ARM::CMSIS@5.9.0
                 CMSIS (Common Microcontroller Software Interface Standard)
-   * Component: CORE Version: 6.1.0
+   * Component: CORE Version: 5.6.0
 
 Package Vendor: Keil
                 https://www.keil.com/pack/Keil.STM32F4xx_DFP.2.17.1.pack
@@ -49,15 +278,14 @@ Package Vendor: Keil
 
 <h2>Collection of Component include folders:</h2>
   ./RTE/_NEW_INFANTRY
-  D:/Keil5/ARM/Packs/ARM/CMSIS/6.1.0/CMSIS/Core/Include
-  D:/Keil5/ARM/Packs/Keil/STM32F4xx_DFP/2.17.1/Drivers/CMSIS/Device/ST/STM32F4xx/Include
+  C:/Program Files/ARM/Packs/ARM/CMSIS/5.9.0/CMSIS/Core/Include
+  C:/Program Files/ARM/Packs/Keil/STM32F4xx_DFP/2.17.1/Drivers/CMSIS/Device/ST/STM32F4xx/Include
 
 <h2>Collection of Component Files used:</h2>
 
-   * Component: ARM::CMSIS:CORE@6.1.0
+   * Component: ARM::CMSIS:CORE@5.6.0
       Include file:  CMSIS/Core/Include/tz_context.h
-Target not created.
-Build Time Elapsed:  00:00:01
+Build Time Elapsed:  00:02:27
 </pre>
 </body>
 </html>

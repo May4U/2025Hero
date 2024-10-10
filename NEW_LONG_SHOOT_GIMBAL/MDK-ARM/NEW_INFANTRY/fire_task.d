@@ -9,7 +9,7 @@ new_infantry\fire_task.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.
 new_infantry\fire_task.o: ../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h
 new_infantry\fire_task.o: ../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f407xx.h
 new_infantry\fire_task.o: ../Drivers/CMSIS/Include/core_cm4.h
-new_infantry\fire_task.o: D:\Keil5\ARM\ARMCC\Bin\..\include\stdint.h
+new_infantry\fire_task.o: C:\Program Files\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 new_infantry\fire_task.o: ../Drivers/CMSIS/Include/cmsis_version.h
 new_infantry\fire_task.o: ../Drivers/CMSIS/Include/cmsis_compiler.h
 new_infantry\fire_task.o: ../Drivers/CMSIS/Include/cmsis_armcc.h
@@ -17,7 +17,7 @@ new_infantry\fire_task.o: ../Drivers/CMSIS/Include/mpu_armv7.h
 new_infantry\fire_task.o: ../Drivers/CMSIS/Device/ST/STM32F4xx/Include/system_stm32f4xx.h
 new_infantry\fire_task.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h
 new_infantry\fire_task.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy/stm32_hal_legacy.h
-new_infantry\fire_task.o: D:\Keil5\ARM\ARMCC\Bin\..\include\stddef.h
+new_infantry\fire_task.o: C:\Program Files\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
 new_infantry\fire_task.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc_ex.h
 new_infantry\fire_task.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_gpio.h
 new_infantry\fire_task.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_gpio_ex.h
@@ -39,20 +39,20 @@ new_infantry\fire_task.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pcd.
 new_infantry\fire_task.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_usb.h
 new_infantry\fire_task.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pcd_ex.h
 new_infantry\fire_task.o: ../ACE-ECF/Algorithm/inc/struct_typedef.h
-new_infantry\fire_task.o: D:\Keil5\ARM\ARMCC\Bin\..\include\stdbool.h
+new_infantry\fire_task.o: C:\Program Files\Keil_v5\ARM\ARMCC\Bin\..\include\stdbool.h
 new_infantry\fire_task.o: ../ACE-ECF/Bsp/Inc/bsp_dr16.h
-new_infantry\fire_task.o: D:\Keil5\ARM\ARMCC\Bin\..\include\stdio.h
+new_infantry\fire_task.o: C:\Program Files\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
 new_infantry\fire_task.o: ../Core/Inc/usart.h
 new_infantry\fire_task.o: ../ACE-ECF/Bsp/Inc/ECF_BspConfig.h
 new_infantry\fire_task.o: ../ACE-ECF/Bsp/Inc/bsp_referee.h
 new_infantry\fire_task.o: ../ACE-ECF/Algorithm/inc/CRC.h
-new_infantry\fire_task.o: D:\Keil5\ARM\ARMCC\Bin\..\include\string.h
+new_infantry\fire_task.o: C:\Program Files\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
 new_infantry\fire_task.o: ../ACE-ECF/Algorithm/inc/pid.h
 new_infantry\fire_task.o: ../ACE-ECF/Algorithm/inc/fifo.h
-new_infantry\fire_task.o: D:\Keil5\ARM\ARMCC\Bin\..\include\stdlib.h
-new_infantry\fire_task.o: D:\Keil5\ARM\ARMCC\Bin\..\include\stdarg.h
-new_infantry\fire_task.o: D:\Keil5\ARM\ARMCC\Bin\..\include\math.h
-new_infantry\fire_task.o: D:\Keil5\ARM\ARMCC\Bin\..\include\errno.h
+new_infantry\fire_task.o: C:\Program Files\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
+new_infantry\fire_task.o: C:\Program Files\Keil_v5\ARM\ARMCC\Bin\..\include\stdarg.h
+new_infantry\fire_task.o: C:\Program Files\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
+new_infantry\fire_task.o: C:\Program Files\Keil_v5\ARM\ARMCC\Bin\..\include\errno.h
 new_infantry\fire_task.o: ../ACE-ECF/Algorithm/inc/linux_list.h
 new_infantry\fire_task.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h
 new_infantry\fire_task.o: ../Core/Inc/FreeRTOSConfig.h

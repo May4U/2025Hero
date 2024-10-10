@@ -71,31 +71,22 @@ int16_t right_speed = 0;
 
 void fire_task_init(void)
 {
-	memset(&Fire, 0, sizeof(Fire_t));
-	// 获得拨弹指针
-    Fire.left_motor  = DJIMotor_Init(1,3,true,M3508,30);
-    Fire.right_motor = DJIMotor_Init(1,2,false,M3508,30);
+    memset(&Fire, 0, sizeof(Fire_t));
+	  // 获得拨弹指针
+    Fire.left_motor  = DJIMotor_Init(1,2,false,M3508,30);
+    Fire.right_motor = DJIMotor_Init(1,4,true,M3508,30);
 
     Fire.left_motor->Using_PID = Speed_PID;
     Fire.right_motor->Using_PID = Speed_PID;
     
     PidInit(&Fire.left_motor->Speed_PID,1.0f,0,0,Output_Limit|StepIn);
- 	PidInitMode(&Fire.left_motor->Speed_PID,Output_Limit,16000,0);//输出限幅模式设置
+ 	  PidInitMode(&Fire.left_motor->Speed_PID,Output_Limit,16000,0);//输出限幅模式设置
     PidInitMode(&Fire.left_motor->Speed_PID,StepIn,10,0);//过大的加减速会导致发射机构超电流断电
     PidInit(&Fire.right_motor->Speed_PID,1.0f,0,0,Output_Limit|StepIn);
- 	PidInitMode(&Fire.right_motor->Speed_PID,Output_Limit,16000,0);//输出限幅模式设置
+ 	  PidInitMode(&Fire.right_motor->Speed_PID,Output_Limit,16000,0);//输出限幅模式设置
     PidInitMode(&Fire.right_motor->Speed_PID,StepIn,10,0);//逐渐减速，实测发现最大速度减速会导致发射机构超电流断电
 }
 
-void fire_pid_calculate(void)
-{
-    Fire.left_motor->current_input = motor_speed_control(&Fire.left_motor->Speed_PID,
-                                                          Fire.left_motor->set_speed,
-                                                          Fire.left_motor->Motor_Information.speed);
-    Fire.right_motor->current_input = motor_speed_control(&Fire.right_motor->Speed_PID,
-                                                          Fire.right_motor->set_speed,
-                                                          Fire.right_motor->Motor_Information.speed);
-}
 
 void fire_behaviour_choose(void)
 {
@@ -115,6 +106,16 @@ void fire_behaviour_choose(void)
     // }
     DJIMotor_Set_val(Fire.left_motor, 4800);
     DJIMotor_Set_val(Fire.right_motor, 4800);
+}
+
+void fire_pid_calculate(void)
+{
+    Fire.left_motor->current_input = motor_speed_control(&Fire.left_motor->Speed_PID,
+                                                          Fire.left_motor->set_speed,
+                                                          Fire.left_motor->Motor_Information.speed);
+    Fire.right_motor->current_input = motor_speed_control(&Fire.right_motor->Speed_PID,
+                                                          Fire.right_motor->set_speed,
+                                                          Fire.right_motor->Motor_Information.speed);
 }
 
 
@@ -152,22 +153,26 @@ int main(void)
   MX_CAN1_Init();
   MX_CAN2_Init();
   /* USER CODE BEGIN 2 */
-
+  ECF_CAN_Init();
+  //DWT_Init(168);
+  fire_task_init();
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    /* USER CODE END WHILE */
-
-    /* USER CODE BEGIN 3 */
-    left_speed = -Fire.left_motor->Motor_Information.speed;
-    right_speed = Fire.right_motor->Motor_Information.speed;
+    left_speed = Fire.left_motor->Motor_Information.speed;
+    right_speed = -Fire.right_motor->Motor_Information.speed;
     fire_behaviour_choose();
 		fire_pid_calculate();
     DJIMotor_Send(Fire.left_motor);
+    // DJMotor_Send_only_one(Fire.left_motor);
+    // DJMotor_Send_only_one(Fire.right_motor);
     HAL_Delay(1);
+    /* USER CODE END WHILE */
+
+    /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
 }

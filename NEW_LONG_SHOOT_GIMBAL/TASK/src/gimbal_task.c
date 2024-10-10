@@ -216,7 +216,7 @@ void GIMBAL_TASK(void const * argument)
         
         
         if (time % 2 == 0)    
-            Send_Photo_Current();
+//            Send_Photo_Current();
         
         DJMotor_Send_only_one(Gimbal.YAW_Motor);
         MI_motor_controlmode(Gimbal.PITCH_Motor, Pitch_output_torque, 0, 0, 0, 0);
@@ -354,7 +354,7 @@ void Motor_Choice_Lock_Type(void)
     }
 }
 
-#define PITCH_TORQUE_LIMIT 8
+float PITCH_TORQUE_LIMIT =  8;
 void Pitch_Calc(void)
 {
     if (Gimbal.Gimbal_CMD->Pitch_Lock_type == ENCODER)//Ëøµç»ú

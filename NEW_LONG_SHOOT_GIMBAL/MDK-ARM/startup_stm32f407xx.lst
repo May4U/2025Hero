@@ -849,11 +849,11 @@ interwork --depend=new_infantry\startup_stm32f407xx.d -onew_infantry\startup_st
 ARM Macro Assembler    Page 14 
 
 
-m32f407xx.o -I..\Core\Inc -I../Core/Inc -I.\RTE\_NEW_INFANTRY -ID:\Keil5\ARM\Pa
-cks\ARM\CMSIS\6.1.0\CMSIS\Core\Include -ID:\Keil5\ARM\Packs\Keil\STM32F4xx_DFP\
-2.17.1\Drivers\CMSIS\Device\ST\STM32F4xx\Include --predefine="__UVISION_VERSION
- SETA 540" --predefine="STM32F407xx SETA 1" --predefine="_RTE_ SETA 1" --list=s
-tartup_stm32f407xx.lst startup_stm32f407xx.s
+m32f407xx.o -I..\Core\Inc -I../Core/Inc -I.\RTE\_NEW_INFANTRY -I"C:\Program Fil
+es\ARM\Packs\ARM\CMSIS\5.9.0\CMSIS\Core\Include" -I"C:\Program Files\ARM\Packs\
+Keil\STM32F4xx_DFP\2.17.1\Drivers\CMSIS\Device\ST\STM32F4xx\Include" --predefin
+e="__UVISION_VERSION SETA 540" --predefine="STM32F407xx SETA 1" --predefine="_R
+TE_ SETA 1" --list=startup_stm32f407xx.lst startup_stm32f407xx.s
 
 
 

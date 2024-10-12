@@ -57,6 +57,8 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define fire_set_Pin GPIO_PIN_15
+#define fire_set_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
 

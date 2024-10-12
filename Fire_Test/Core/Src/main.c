@@ -68,6 +68,7 @@ typedef struct{
 Fire_t Fire;
 int16_t left_speed = 0;
 int16_t right_speed = 0;
+uint8_t fire_set = 0;
 
 void fire_task_init(void)
 {
@@ -79,12 +80,12 @@ void fire_task_init(void)
     Fire.left_motor->Using_PID = Speed_PID;
     Fire.right_motor->Using_PID = Speed_PID;
     
-    PidInit(&Fire.left_motor->Speed_PID,1.0f,0,0,Output_Limit|StepIn);
+    PidInit(&Fire.left_motor->Speed_PID,1.45f,0,0,Output_Limit|StepIn);
  	  PidInitMode(&Fire.left_motor->Speed_PID,Output_Limit,16000,0);//输出限幅模式设置
-    PidInitMode(&Fire.left_motor->Speed_PID,StepIn,10,0);//过大的加减速会导致发射机构超电流断电
+    PidInitMode(&Fire.left_motor->Speed_PID,StepIn,10,0);//过大的加减�?�会导致发射机构超电流断�?
     PidInit(&Fire.right_motor->Speed_PID,1.0f,0,0,Output_Limit|StepIn);
  	  PidInitMode(&Fire.right_motor->Speed_PID,Output_Limit,16000,0);//输出限幅模式设置
-    PidInitMode(&Fire.right_motor->Speed_PID,StepIn,10,0);//逐渐减速，实测发现最大速度减速会导致发射机构超电流断电
+    PidInitMode(&Fire.right_motor->Speed_PID,StepIn,10,0);//逐渐减�?�，实测发现�?大�?�度减�?�会导致发射机构超电流断�?
 }
 
 
@@ -104,8 +105,18 @@ void fire_behaviour_choose(void)
     //     DJIMotor_Set_val(Fire.left_motor,    Fire.Gimbal_CMD->Fire_Set_Rpm);
     //     DJIMotor_Set_val(Fire.right_motor,   Fire.Gimbal_CMD->Fire_Set_Rpm);
     // }
-    DJIMotor_Set_val(Fire.left_motor, 4800);
-    DJIMotor_Set_val(Fire.right_motor, 4800);
+    fire_set = HAL_GPIO_ReadPin(fire_set_GPIO_Port, fire_set_Pin);
+    if(fire_set == 1)
+    {
+      DJIMotor_Set_val(Fire.left_motor, 0);
+      DJIMotor_Set_val(Fire.right_motor, 0);
+    }
+    else
+    {
+      DJIMotor_Set_val(Fire.left_motor, 4800);
+      DJIMotor_Set_val(Fire.right_motor, 4800);
+    }
+    
 }
 
 void fire_pid_calculate(void)

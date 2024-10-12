@@ -9,7 +9,7 @@
 #include <stdbool.h>
 Robot_cmd_t Robot_cmd;
 
-/*µ×ÅÌÔË¶¯ËùÐèµÄ¸÷ÖÖÊý¾Ý*/
+/*ï¿½ï¿½ï¿½ï¿½ï¿½Ë¶ï¿½ï¿½ï¿½ï¿½ï¿½Ä¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½*/
 static const REFEREE_t   *referee_cmd;
 static const RC_ctrl_t   *RC_ctrl;  
 fp32         Difference_Angle_between_Chassis_Gimbal;
@@ -18,7 +18,7 @@ static pid_parameter_t   chassis_follow_gambal_speed;
 
 
 /**
-  *@brief ·µ»Øµ×ÅÌÔË¶¯ÃüÁîÊý¾ÝÖ¸Õë
+  *@brief ï¿½ï¿½ï¿½Øµï¿½ï¿½ï¿½ï¿½Ë¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½
   */
 Robot_cmd_t* get_Robot_cmd_point(void)
 {
@@ -28,7 +28,7 @@ Robot_cmd_t* get_Robot_cmd_point(void)
 }
 
 /**
-  *@brief »ñÈ¡µ×ÅÌÔË¶¯ÃüÁîËùÐèµÄ¸÷ÖÖÊý¾ÝÖ¸Õë
+  *@brief ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½Ë¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½
   */
 void CMD_Init(void)
 {
@@ -40,28 +40,28 @@ void CMD_Init(void)
 void Mode_Set(void)
 {
     static Chassis_Mode_t last_Chassis_Mode = NO_FOLLOW;
-    static Chassis_Mode_t RC_Chassis_Mode = NO_FOLLOW;//Ä£Ê½Êý¾Ý£¬ÓÃÓÚÅÐ¶ÏÓÐÎÞ×´Ì¬¸Ä±ä
+    static Chassis_Mode_t RC_Chassis_Mode = NO_FOLLOW;//Ä£Ê½ï¿½ï¿½ï¿½Ý£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð¶ï¿½ï¿½ï¿½ï¿½ï¿½×´Ì¬ï¿½Ä±ï¿½
     
-    if (RC_ctrl->rc.s2 == RC_SW_DOWN){//Ò£¿ØÆ÷×ó²à¿ª¹Ø×´Ì¬Îª[ÏÂ]
-        Robot_cmd.Chassis_Mode = NO_FORCE;//ÎÞÐÐ¶¯Ä£Ê½
+    if (RC_ctrl->rc.s2 == RC_SW_DOWN){//Ò£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½à¿ªï¿½ï¿½×´Ì¬Îª[ï¿½ï¿½]
+        Robot_cmd.Chassis_Mode = NO_FORCE;//ï¿½ï¿½ï¿½Ð¶ï¿½Ä£Ê½
         return;
     }
-    switch(RC_ctrl->rc.s1)//Ò£¿Ø×ó²à¿ª¹Ø
+    switch(RC_ctrl->rc.s1)//Ò£ï¿½ï¿½ï¿½ï¿½à¿ªï¿½ï¿½
     {
-        case RC_SW_DOWN://Ò£¿ØÆ÷×ó²à¿ª¹Ø×´Ì¬Îª[ÏÂ]
-            RC_Chassis_Mode = NO_FOLLOW;//µ×ÅÌ²»¸úËæÔÆÌ¨
+        case RC_SW_DOWN://Ò£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½à¿ªï¿½ï¿½×´Ì¬Îª[ï¿½ï¿½]
+            RC_Chassis_Mode = NO_FOLLOW;//ï¿½ï¿½ï¿½Ì²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ì¨
             break;
-        case RC_SW_MID://Ò£¿ØÆ÷×ó²à¿ª¹Ø×´Ì¬Îª[ÖÐ]
-            RC_Chassis_Mode = FOLLOW;//µ×ÅÌ¸úËæÔÆÌ¨
+        case RC_SW_MID://Ò£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½à¿ªï¿½ï¿½×´Ì¬Îª[ï¿½ï¿½]
+            RC_Chassis_Mode = FOLLOW;//ï¿½ï¿½ï¿½Ì¸ï¿½ï¿½ï¿½ï¿½ï¿½Ì¨
             break;
-        case RC_SW_UP://Ò£¿ØÆ÷×ó²à¿ª¹Ø×´Ì¬Îª[ÉÏ]
-            RC_Chassis_Mode = SPIN;//µ×ÅÌÐ¡ÍÓÂÝÄ£Ê½
+        case RC_SW_UP://Ò£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½à¿ªï¿½ï¿½×´Ì¬Îª[ï¿½ï¿½]
+            RC_Chassis_Mode = SPIN;//ï¿½ï¿½ï¿½ï¿½Ð¡ï¿½ï¿½ï¿½ï¿½Ä£Ê½
             break;
-        default://É¶Ä£Ê½¶¼Ã»¸ø£¬·ÀÖ¹³ö´í£¬ÎÞÐÐ¶¯Ä£Ê½
+        default://É¶Ä£Ê½ï¿½ï¿½Ã»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð¶ï¿½Ä£Ê½
             RC_Chassis_Mode = NO_FORCE;
             break;
     }
-    //¼ì²âµ½¸Ä±äºóÔÙÉèÖÃRobot_cmd.Chassis_Mode£¬±ÜÃâÓÃ¼üÅÌÉèÖÃµÄÄ£Ê½Êý¾ÝÔÚËÉ¿ª°´¼üºó±»ÊÖ±úµÄÔ­ÏÈÄ£Ê½Êý¾Ý¸²¸Ç
+    //ï¿½ï¿½âµ½ï¿½Ä±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Robot_cmd.Chassis_Modeï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ãµï¿½Ä£Ê½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É¿ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö±ï¿½ï¿½ï¿½Ô­ï¿½ï¿½Ä£Ê½ï¿½ï¿½ï¿½Ý¸ï¿½ï¿½ï¿½
     if(last_Chassis_Mode != RC_Chassis_Mode)
     {
         Robot_cmd.Chassis_Mode = RC_Chassis_Mode;
@@ -102,7 +102,7 @@ static void FOLLOW_Mode()
 
 static void SPIN_Mode()
 {
-    //¸ù¾ÝÓ¢ÐÛµÈ¼¶Ñ¡Ôñ×ÔÐýËÙ¶È
+    //ï¿½ï¿½ï¿½ï¿½Ó¢ï¿½ÛµÈ¼ï¿½Ñ¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ù¶ï¿½
 	switch(referee_cmd->Robot_Status.robot_level)
 	{
 		case 1:
@@ -124,7 +124,7 @@ static void SPIN_Mode()
                                     -Robot_cmd.Speed_set.gambal_x * sin_calculate(Difference_Angle_between_Chassis_Gimbal);
 }
 /**
-  *@note ÐèÒª×¢ÒâµÄÊÇËÙ¶ÈÉè¶¨ÎªÂÖ×ÓµÄÏò³µÍ·Ç°µÄÏßËÙ¶È,Êµ¼Ê×ó²àµç»úÆ«ÖÃ°²×°ÐèÒªµçÁ÷È¡·´£¬ÔÚºóÐøµÄµçÁ÷¼ÆËãÖÐ´¦Àí
+  *@note ï¿½ï¿½Òª×¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ù¶ï¿½ï¿½è¶¨Îªï¿½ï¿½ï¿½Óµï¿½ï¿½ï¿½Í·Ç°ï¿½ï¿½ï¿½ï¿½ï¿½Ù¶ï¿½,Êµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ«ï¿½Ã°ï¿½×°ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½Úºï¿½ï¿½ï¿½ï¿½Äµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð´ï¿½ï¿½ï¿½
   */
 /*
   LF  /   \  RF
@@ -134,28 +134,28 @@ static void SPIN_Mode()
 */
 void Speed_Set(void)
 {
-    //ÏòÇ°ÎªYÖáÕýÏò£¬ÏòÓÒÎªXÖáÕýÏò
-    //ÔÆÌ¨×ø±êÏµ
+    //ï¿½ï¿½Ç°ÎªYï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÎªXï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    //ï¿½ï¿½Ì¨ï¿½ï¿½ï¿½ï¿½Ïµ
     Robot_cmd.Speed_set.gambal_x =  ((RC_ctrl->rc.ch[0] ) + (-RC_ctrl->kb.bit.A + RC_ctrl->kb.bit.D) * 660 ) * K_FULL_SPEED_SET;
     Robot_cmd.Speed_set.gambal_y = -((RC_ctrl->rc.ch[1] ) + (-RC_ctrl->kb.bit.S + RC_ctrl->kb.bit.W) * 660 ) * K_FULL_SPEED_SET;
-    //ÔÆÌ¨×ø±êÏµËÙ¶È·Ö½âµ½µ×ÅÌ×ø±êÏµ
+    //ï¿½ï¿½Ì¨ï¿½ï¿½ï¿½ï¿½Ïµï¿½Ù¶È·Ö½âµ½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ïµ
     switch(Robot_cmd.Chassis_Mode)
 	{
         case NO_FOLLOW:
-			NO_FOLLOW_Mode();//µ×ÅÌ²»¸úËæÔÆÌ¨
+			NO_FOLLOW_Mode();//ï¿½ï¿½ï¿½Ì²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ì¨
 			break;
         case FOLLOW:
-			FOLLOW_Mode();//µ×ÅÌ¸úËæÔÆÌ¨
+			FOLLOW_Mode();//ï¿½ï¿½ï¿½Ì¸ï¿½ï¿½ï¿½ï¿½ï¿½Ì¨
 			break;
 		case SPIN:
-			SPIN_Mode();  //µ×ÅÌ×ÔÐý
+			SPIN_Mode();  //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 			break;			
 		case NO_FORCE:
-			NO_FORCE_Mode();//²»¶¯
+			NO_FORCE_Mode();//ï¿½ï¿½ï¿½ï¿½
 			break;
 	}
-    //ÂóÂÖ½âËã
-//    ÕâÒ»°æ×ó²àµÄµç»úÊýÖµÈ¡·´
+    //ï¿½ï¿½ï¿½Ö½ï¿½ï¿½ï¿½
+//    ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½Äµï¿½ï¿½ï¿½ï¿½ÖµÈ¡ï¿½ï¿½
 //    Robot_cmd.Speed_set.LF_motor = -Robot_cmd.Speed_set.chassis_x - Robot_cmd.Speed_set.chassis_y - Robot_cmd.Speed_set.chassis_z * LF_CENTER;
 //    Robot_cmd.Speed_set.RF_motor = -Robot_cmd.Speed_set.chassis_x + Robot_cmd.Speed_set.chassis_y - Robot_cmd.Speed_set.chassis_z * RF_CENTER;
 //	  Robot_cmd.Speed_set.LB_motor =  Robot_cmd.Speed_set.chassis_x - Robot_cmd.Speed_set.chassis_y - Robot_cmd.Speed_set.chassis_z * LB_CENTER;
@@ -168,13 +168,13 @@ void Speed_Set(void)
 
 void State_Set(void)
 {
-    Robot_cmd.Chassis_State = SPEED;  // Ä¬ÈÏ²»Ëø³µ
+    Robot_cmd.Chassis_State = SPEED;  // Ä¬ï¿½Ï²ï¿½ï¿½ï¿½ï¿½ï¿½
     if ( Robot_cmd.Chassis_Mode == FOLLOW || Robot_cmd.Chassis_Mode == NO_FOLLOW )
     {
-        //Ò¡¸ËËÙ¶ÈËÀÇøÏÞÖÆ
+        //Ò¡ï¿½ï¿½ï¿½Ù¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         if ( abs(Robot_cmd.Speed_set.chassis_x) > SPEED_DEADBAND || abs(Robot_cmd.Speed_set.chassis_y) > SPEED_DEADBAND )
             return;
-        //ÍÓÂÝÒÇ¼ÓËÙ¶È¼ì²â£¬ÕâÑù×ö·ÀÖ¹¸ßËÙÏÂÒ£¿ØÍ»È»»ØÕýµ¼ÖÂÖ±½ÓÉ²³µËøËÀ
+        //ï¿½ï¿½ï¿½ï¿½ï¿½Ç¼ï¿½ï¿½Ù¶È¼ï¿½â£¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò£ï¿½ï¿½Í»È»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö±ï¿½ï¿½É²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         if( abs(ins->E_Accel[X]) >= 0.1f || abs(ins->E_Accel[Y]) >= 0.1f) 
             return;
         
@@ -193,26 +193,26 @@ void Chassis_cmd_set(void)
 void Fire_Set(void)
 {
     static bool rc_4_reset = true;
-    if (Robot_cmd.Fire_State == On_Fire ||  Robot_cmd.Fire_State == On_Empty)  return;//·ÀÖ¹´ò¶Ï²¦µ¯ÅÌ¶¯×÷
+    if (Robot_cmd.Fire_State == On_Fire ||  Robot_cmd.Fire_State == On_Empty)  return;//ï¿½ï¿½Ö¹ï¿½ï¿½Ï²ï¿½ï¿½ï¿½ï¿½Ì¶ï¿½ï¿½ï¿½
 
-    switch(RC_ctrl->rc.s2){//Ò£¿ØÓÒ²à¿ª¹Ø
-        case RC_SW_DOWN://¿ª¹Ø×´Ì¬Îª[ÏÂ]
-            Robot_cmd.Fire_State = NO_Fire_FORCE;//¹ØÄ¦²ÁÂÖ
+    switch(RC_ctrl->rc.s2){//Ò£ï¿½ï¿½ï¿½Ò²à¿ªï¿½ï¿½
+        case RC_SW_DOWN://ï¿½ï¿½ï¿½ï¿½×´Ì¬Îª[ï¿½ï¿½]
+            Robot_cmd.Fire_State = NO_Fire_FORCE;//ï¿½ï¿½Ä¦ï¿½ï¿½ï¿½ï¿½
             break;
-        case RC_SW_MID://¿ª¹Ø×´Ì¬Îª[ÖÐ]
-            Robot_cmd.Fire_State = Ready_Fire;   //¿ªÄ¦²ÁÂÖ
+        case RC_SW_MID://ï¿½ï¿½ï¿½ï¿½×´Ì¬Îª[ï¿½ï¿½]
+            Robot_cmd.Fire_State = Ready_Fire;   //ï¿½ï¿½Ä¦ï¿½ï¿½ï¿½ï¿½
             break;
-        case RC_SW_UP: //¿ª¹Ø×´Ì¬Îª[ÉÏ]
-            Robot_cmd.Fire_State = Ready_Fire;   //¿ªÄ¦²ÁÂÖ
+        case RC_SW_UP: //ï¿½ï¿½ï¿½ï¿½×´Ì¬Îª[ï¿½ï¿½]
+            Robot_cmd.Fire_State = Ready_Fire;   //ï¿½ï¿½Ä¦ï¿½ï¿½ï¿½ï¿½
             break;
         default:
-            Robot_cmd.Fire_State = NO_Fire_FORCE;//¹ØÄ¦²ÁÂÖ
+            Robot_cmd.Fire_State = NO_Fire_FORCE;//ï¿½ï¿½Ä¦ï¿½ï¿½ï¿½ï¿½
             break;
         }
-    //²¦¸Ë»ØÕý
+    //ï¿½ï¿½ï¿½Ë»ï¿½ï¿½ï¿½
     if ((RC_ctrl->rc.ch[4] > -200 &&  RC_ctrl->rc.ch[4] <200)|| RC_ctrl->mouse.press_l == 1)    rc_4_reset = true;
     
-    if (rc_4_reset == false)    return;//·ÀÖ¹Á¬·¢
+    if (rc_4_reset == false)    return;//ï¿½ï¿½Ö¹ï¿½ï¿½ï¿½ï¿½
     if (Robot_cmd.Fire_State == Ready_Fire && (RC_ctrl->rc.ch[4] >= 650 || RC_ctrl->mouse.press_l == 1))
     {
         rc_4_reset = false;
@@ -247,27 +247,27 @@ Gimbal_CMD_t    Gimbal_CMD;
     hz = 0;\
 }
 
-/*ÎÄ¼þÄÚË½ÃÜ±äÁ¿*/
+/*ï¿½Ä¼ï¿½ï¿½ï¿½Ë½ï¿½Ü±ï¿½ï¿½ï¿½*/
 static const INS_t       *ins;
 
 // float calc_can_fire_time(float FIRE_DELAY_MS, float now_in_place_time, float fly_time, gimbal_auto_control_t *auto_control_p);
 // uint8_t JudgeCanFire(float now_in_place_time, float *next_in_place_time);
 
 /*
-·¢ËÍ¸øµ×ÅÌ
-·¢ËÍ¸øµ×ÅÌ
-·¢ËÍ¸øµ×ÅÌ
-·¢ËÍ¸øµ×ÅÌ
-·¢ËÍ¸øµ×ÅÌ
-·¢ËÍ¸øµ×ÅÌ
-·¢ËÍ¸øµ×ÅÌ
-·¢ËÍ¸øµ×ÅÌ
+ï¿½ï¿½ï¿½Í¸ï¿½ï¿½ï¿½ï¿½ï¿½
+ï¿½ï¿½ï¿½Í¸ï¿½ï¿½ï¿½ï¿½ï¿½
+ï¿½ï¿½ï¿½Í¸ï¿½ï¿½ï¿½ï¿½ï¿½
+ï¿½ï¿½ï¿½Í¸ï¿½ï¿½ï¿½ï¿½ï¿½
+ï¿½ï¿½ï¿½Í¸ï¿½ï¿½ï¿½ï¿½ï¿½
+ï¿½ï¿½ï¿½Í¸ï¿½ï¿½ï¿½ï¿½ï¿½
+ï¿½ï¿½ï¿½Í¸ï¿½ï¿½ï¿½ï¿½ï¿½
+ï¿½ï¿½ï¿½Í¸ï¿½ï¿½ï¿½ï¿½ï¿½
 */
 
 
 /**
-  *@brief ×ª·¢Í¼´«Ò£¿ØÐÅÏ¢¸øµ×ÅÌ
-  *@note  Í¨Ñ¶×Übit 48+8N+(29+8N)/4 = 85.25bit 36hz   3069bps
+  *@brief ×ªï¿½ï¿½Í¼ï¿½ï¿½Ò£ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+  *@note  Í¨Ñ¶ï¿½ï¿½bit 48+8N+(29+8N)/4 = 85.25bit 36hz   3069bps
   */
 void  Send_TC_to_Chassis(void)
 {
@@ -285,18 +285,18 @@ void  Send_TC_to_Chassis(void)
     CAN2_Tx_Data[2] = 0;
 	CAN2_Tx_Data[2] |= (Gimbal_CMD.rc_ctl->mouse.press_l);
     CAN2_Tx_Data[2] |= (Gimbal_CMD.rc_ctl->mouse.press_r<<1);
-	HAL_CAN_AddTxMessage(&hcan2, &CAN2_Txmessage, CAN2_Tx_Data, &send_mail_box);			//½«Ò»¶ÎÊý¾ÝÍ¨¹ý CAN ×ÜÏß·¢ËÍ
+	HAL_CAN_AddTxMessage(&hcan2, &CAN2_Txmessage, CAN2_Tx_Data, &send_mail_box);			//ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¨ï¿½ï¿½ CAN ï¿½ï¿½ï¿½ß·ï¿½ï¿½ï¿½
 }
 
 /**
-  *@brief ·¢ËÍ¸øµ×ÅÌÄ¦²ÁÂÖÒÔ¼°ÊÓ¾õÐÅÏ¢
-  *@note Í¨Ñ¶×Übit 48+8N+(29+8N)/4 = 65.25bit  90hz   
+  *@brief ï¿½ï¿½ï¿½Í¸ï¿½ï¿½ï¿½ï¿½ï¿½Ä¦ï¿½ï¿½ï¿½ï¿½ï¿½Ô¼ï¿½ï¿½Ó¾ï¿½ï¿½ï¿½Ï¢
+  *@note Í¨Ñ¶ï¿½ï¿½bit 48+8N+(29+8N)/4 = 65.25bit  90hz   
                    48+8N+(29+8N)/4 = 105.25bit 10hz   
                    6,925 bps
-  *@parm lock_state ×ÔÃéÊ¶±ð×´Ì¬
-  *@parm fire_flag  ×ÔÃé¿ª»ð
-  *@parm fire_ready Ä¦²ÁÂÖ×´Ì¬
-  *@parm open_auto  ×ÔÃé¿ªÆô
+  *@parm lock_state ï¿½ï¿½ï¿½ï¿½Ê¶ï¿½ï¿½×´Ì¬
+  *@parm fire_flag  ï¿½ï¿½ï¿½é¿ªï¿½ï¿½
+  *@parm fire_ready Ä¦ï¿½ï¿½ï¿½ï¿½×´Ì¬
+  *@parm open_auto  ï¿½ï¿½ï¿½é¿ªï¿½ï¿½
   */
 void Send_Chassis_vision_fire_static(uint8_t lock_flag, uint8_t fire_flag, uint8_t fire_ready, uint8_t open_auto, fp32 Pitch_Angle, uint8_t encoder_lock)
 {
@@ -313,7 +313,7 @@ void Send_Chassis_vision_fire_static(uint8_t lock_flag, uint8_t fire_flag, uint8
     Can_Tx_Data[0] |= (encoder_lock << 4);
     
     if (send_time == 9)
-    {//Ã¿Ê®´Î·¢ËÍÒ»´ÎPÖá½Ç¶È
+    {//Ã¿Ê®ï¿½Î·ï¿½ï¿½ï¿½Ò»ï¿½ï¿½Pï¿½ï¿½Ç¶ï¿½
         send_time = 0;
         union float_to_uint8_t{
             float f;
@@ -343,8 +343,8 @@ void Send_Chassis_vision_fire_static(uint8_t lock_flag, uint8_t fire_flag, uint8
 
 
 /**
-  *@brief ×ª·¢Ô¤ÅÐÊ±¼äÒÔ¼°pitchÖá²¹³¥
-  *@note  Í¨Ñ¶×Übit 48+8N+(29+8N)/4 = 135.25bit
+  *@brief ×ªï¿½ï¿½Ô¤ï¿½ï¿½Ê±ï¿½ï¿½ï¿½Ô¼ï¿½pitchï¿½á²¹ï¿½ï¿½
+  *@note  Í¨Ñ¶ï¿½ï¿½bit 48+8N+(29+8N)/4 = 135.25bit
   */
 // void  Send_Fire_Auto_Delay_And_Pitch_compensate_to_Chassis(void)
 // {
@@ -383,12 +383,12 @@ void Send_Chassis_vision_fire_static(uint8_t lock_flag, uint8_t fire_flag, uint8
 // 	CAN2_Txmessage.IDE		= CAN_ID_STD;
 // 	CAN2_Txmessage.RTR	  = CAN_RTR_DATA;
 // 	CAN2_Txmessage.DLC 		= 0x08;
-// 	HAL_CAN_AddTxMessage(&hcan2, &CAN2_Txmessage, CAN2_Tx_Data, &send_mail_box);			//½«Ò»¶ÎÊý¾ÝÍ¨¹ý CAN ×ÜÏß·¢ËÍ
+// 	HAL_CAN_AddTxMessage(&hcan2, &CAN2_Txmessage, CAN2_Tx_Data, &send_mail_box);			//ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¨ï¿½ï¿½ CAN ï¿½ï¿½ï¿½ß·ï¿½ï¿½ï¿½
 // }
 
 /**
-  *@brief ×ª·¢Ä¦²ÁÂÖ×ªËÙ
-  *@note  Í¨Ñ¶×Übit 48+8N+(29+8N)/4 = 135.25bit 10hz
+  *@brief ×ªï¿½ï¿½Ä¦ï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½
+  *@note  Í¨Ñ¶ï¿½ï¿½bit 48+8N+(29+8N)/4 = 135.25bit 10hz
   */
 void Send_Fire_Motor_Speed(uint16_t LF, uint16_t RF, uint16_t LB, uint16_t RB)
 {
@@ -455,7 +455,7 @@ void Send_Chassis_Move(void)
 }
 #endif
 
-//dr16µôÏß×ªÍ¼´«¿ØÖÆÇ°ÏÈÇåÁãÒ£¿ØÊý¾Ý
+//dr16ï¿½ï¿½ï¿½ï¿½×ªÍ¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 uint8_t first_disconnect_clear_rc = 0;
 void dr16_online(void){Gimbal_CMD.Control_State = Chassis_RC;first_disconnect_clear_rc = 1;}
 void dr16_disconnect(void)
@@ -479,44 +479,44 @@ void dr16_disconnect(void)
 }
 
 /*
-½ÓÊÕ´¦Àí»Øµ÷º¯Êý
-½ÓÊÕ´¦Àí»Øµ÷º¯Êý
-½ÓÊÕ´¦Àí»Øµ÷º¯Êý
-½ÓÊÕ´¦Àí»Øµ÷º¯Êý
-½ÓÊÕ´¦Àí»Øµ÷º¯Êý
-½ÓÊÕ´¦Àí»Øµ÷º¯Êý
-½ÓÊÕ´¦Àí»Øµ÷º¯Êý
-½ÓÊÕ´¦Àí»Øµ÷º¯Êý
-½ÓÊÕ´¦Àí»Øµ÷º¯Êý
-½ÓÊÕ´¦Àí»Øµ÷º¯Êý
+ï¿½ï¿½ï¿½Õ´ï¿½ï¿½ï¿½ï¿½Øµï¿½ï¿½ï¿½ï¿½ï¿½
+ï¿½ï¿½ï¿½Õ´ï¿½ï¿½ï¿½ï¿½Øµï¿½ï¿½ï¿½ï¿½ï¿½
+ï¿½ï¿½ï¿½Õ´ï¿½ï¿½ï¿½ï¿½Øµï¿½ï¿½ï¿½ï¿½ï¿½
+ï¿½ï¿½ï¿½Õ´ï¿½ï¿½ï¿½ï¿½Øµï¿½ï¿½ï¿½ï¿½ï¿½
+ï¿½ï¿½ï¿½Õ´ï¿½ï¿½ï¿½ï¿½Øµï¿½ï¿½ï¿½ï¿½ï¿½
+ï¿½ï¿½ï¿½Õ´ï¿½ï¿½ï¿½ï¿½Øµï¿½ï¿½ï¿½ï¿½ï¿½
+ï¿½ï¿½ï¿½Õ´ï¿½ï¿½ï¿½ï¿½Øµï¿½ï¿½ï¿½ï¿½ï¿½
+ï¿½ï¿½ï¿½Õ´ï¿½ï¿½ï¿½ï¿½Øµï¿½ï¿½ï¿½ï¿½ï¿½
+ï¿½ï¿½ï¿½Õ´ï¿½ï¿½ï¿½ï¿½Øµï¿½ï¿½ï¿½ï¿½ï¿½
+ï¿½ï¿½ï¿½Õ´ï¿½ï¿½ï¿½ï¿½Øµï¿½ï¿½ï¿½ï¿½ï¿½
 */
 
 
 /**
-  *@brief ½ÓÊÕdr16ÐÅÏ¢
+  *@brief ï¿½ï¿½ï¿½ï¿½dr16ï¿½ï¿½Ï¢
   */
 safe_task_t *Dr16_Safe;
 void Deal_Dr16_form_chassis(CAN_RxHeaderTypeDef *CAN_Rxmessage, uint8_t *Rx_Data)
 {
     Safe_Task_online_ptr_(Dr16_Safe);
-    //                               ÌáÈ¡Î»ÓÚbit3-bit1µÄ¸ß3Î»    ÌáÈ¡Î»ÓÚbit8-bit1µÄµÍ8Î»
+    //                               ï¿½ï¿½È¡Î»ï¿½ï¿½bit3-bit1ï¿½Ä¸ï¿½3Î»    ï¿½ï¿½È¡Î»ï¿½ï¿½bit8-bit1ï¿½Äµï¿½8Î»
     Gimbal_CMD.rc_ctl->rc.ch[0] = (((Rx_Data[1] & 0x07) << 8) | Rx_Data[0]) - 660;
-    //                               ÌáÈ¡Î»ÓÚbit6-bit1µÄ¸ß6Î»    ÌáÈ¡Î»ÓÚbit8-bit4µÄµÍ5Î»
+    //                               ï¿½ï¿½È¡Î»ï¿½ï¿½bit6-bit1ï¿½Ä¸ï¿½6Î»    ï¿½ï¿½È¡Î»ï¿½ï¿½bit8-bit4ï¿½Äµï¿½5Î»
     Gimbal_CMD.rc_ctl->rc.ch[1] = (((Rx_Data[2] & 0x3F) << 5) | (Rx_Data[1] >> 3)) - 660;
-    //                            ÌáÈ¡Î»ÓÚbit8-bit7µÄ¸ß2Î»
+    //                            ï¿½ï¿½È¡Î»ï¿½ï¿½bit8-bit7ï¿½Ä¸ï¿½2Î»
     Gimbal_CMD.rc_ctl->rc.s2    = Rx_Data[2] >> 6;
-    //                               ÌáÈ¡Î»ÓÚbit3-bit1µÄ¸ß3Î»    ÌáÈ¡Î»ÓÚbit8-bit1µÄµÍ8Î»
+    //                               ï¿½ï¿½È¡Î»ï¿½ï¿½bit3-bit1ï¿½Ä¸ï¿½3Î»    ï¿½ï¿½È¡Î»ï¿½ï¿½bit8-bit1ï¿½Äµï¿½8Î»
     Gimbal_CMD.rc_ctl->mouse.x  = (((Rx_Data[4] & 0x07) << 8) | Rx_Data[3]) - 660;
-    //                               ÌáÈ¡Î»ÓÚbit6-bit1µÄ¸ß6Î»    ÌáÈ¡Î»ÓÚbit8-bit4µÄµÍ5Î»
+    //                               ï¿½ï¿½È¡Î»ï¿½ï¿½bit6-bit1ï¿½Ä¸ï¿½6Î»    ï¿½ï¿½È¡Î»ï¿½ï¿½bit8-bit4ï¿½Äµï¿½5Î»
     Gimbal_CMD.rc_ctl->mouse.y  = (((Rx_Data[5] & 0x3F) << 5) | (Rx_Data[4] >> 3)) - 660;
-    //                                   ÌáÈ¡bit7
+    //                                   ï¿½ï¿½È¡bit7
     Gimbal_CMD.rc_ctl->mouse.press_r = ((Rx_Data[5] & 0x40) >> 6);
-    //                                  ÌáÈ¡bit8
+    //                                  ï¿½ï¿½È¡bit8
     uint8_t RC_Mouse_Fire_Set               = (Rx_Data[5]  >> 8);
-    //                               ÌáÈ¡Î»ÓÚbit3-bit1µÄ¸ß3Î»      ÌáÈ¡Î»ÓÚbit8-bit1µÄµÍ8Î»
+    //                               ï¿½ï¿½È¡Î»ï¿½ï¿½bit3-bit1ï¿½Ä¸ï¿½3Î»      ï¿½ï¿½È¡Î»ï¿½ï¿½bit8-bit1ï¿½Äµï¿½8Î»
     Gimbal_CMD.rc_ctl->kb.key_code = ((Rx_Data[7] << 8) | Rx_Data[6]);
     
-    //Ò£¿ØÖµ×óÉÏ²¦¸ËºÍÊó±ê×ó¼ü¹²ÓÃÒ»¸öbit
+    //Ò£ï¿½ï¿½Öµï¿½ï¿½ï¿½Ï²ï¿½ï¿½Ëºï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½bit
     if (RC_Mouse_Fire_Set == 1)
     {
         Gimbal_CMD.rc_ctl->mouse.press_l = 1;
@@ -529,22 +529,22 @@ void Deal_Dr16_form_chassis(CAN_RxHeaderTypeDef *CAN_Rxmessage, uint8_t *Rx_Data
 }
 
 /**
-  *@brief ½ÓÊÕ´¦Àí²¢×ª·¢Í¼´«ÐÅÏ¢
-  *@brief Ö»ÓÐµ±µ×ÅÌdr16µôÏßÊ±²Å»áÊ¹ÓÃÍ¼´«ÏßÂ·
+  *@brief ï¿½ï¿½ï¿½Õ´ï¿½ï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½Í¼ï¿½ï¿½ï¿½ï¿½Ï¢
+  *@brief Ö»ï¿½Ðµï¿½ï¿½ï¿½ï¿½ï¿½dr16ï¿½ï¿½ï¿½ï¿½Ê±ï¿½Å»ï¿½Ê¹ï¿½ï¿½Í¼ï¿½ï¿½ï¿½ï¿½Â·
   */
 extern uint8_t TCreceive_Flag;
 void Gimbal_Deal_TLcontrol(void)
 {
     if (Gimbal_CMD.Control_State == Gimbal_TC && TCreceive_Flag == 1)
     {
-        memcpy(&Gimbal_CMD.rc_ctl->mouse.x, &Gimbal_CMD.referee_cmd->Remote_control, 10);//°áÔËÍ¼´«Êý¾Ýµ½Ò£¿ØÆ÷½á¹¹Ìå
+        memcpy(&Gimbal_CMD.rc_ctl->mouse.x, &Gimbal_CMD.referee_cmd->Remote_control, 10);//ï¿½ï¿½ï¿½ï¿½Í¼ï¿½ï¿½ï¿½ï¿½ï¿½Ýµï¿½Ò£ï¿½ï¿½ï¿½ï¿½ï¿½á¹¹ï¿½ï¿½
         TCreceive_Flag--;
         Send_TC_to_Chassis();
     }
 }
 
 /**
-  *@note ½ÓÊÕcan2 Yawµç»úµÄ½Ç¶È²îÖµ
+  *@note ï¿½ï¿½ï¿½ï¿½can2 Yawï¿½ï¿½ï¿½ï¿½Ä½Ç¶È²ï¿½Öµ
   */
 int16_t zero = 3917;
 fp32 Difference_Angle_between_Chassis_Gimbal = 0;
@@ -556,7 +556,7 @@ void Deal_Gimbal_Chassis_Angle_between(CAN_RxHeaderTypeDef *CAN_Rxmessage, uint8
 
 }
 /**
-  *@brief ½ÓÊÕÉäËÙÐÅÏ¢
+  *@brief ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢
   */
 void Deal_Shoot_Speed_form_chassis(CAN_RxHeaderTypeDef *CAN_Rxmessage, uint8_t *Rx_Data)
 {
@@ -573,7 +573,7 @@ void Deal_Shoot_Speed_form_chassis(CAN_RxHeaderTypeDef *CAN_Rxmessage, uint8_t *
 }
 
 /**
-  *@brief ½ÓÊÕµ×ÅÌ·¢ËÍµÄPÖáÊÇ·ñ¿ÉÒÔÌá¸ßÑö½Ç
+  *@brief ï¿½ï¿½ï¿½Õµï¿½ï¿½Ì·ï¿½ï¿½Íµï¿½Pï¿½ï¿½ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
   */
 safe_task_t *Deal_Pitch_Limit_More_Safe;
 void Deal_Pitch_Limit_More(CAN_RxHeaderTypeDef *CAN_Rxmessage, uint8_t *Rx_Data)
@@ -591,7 +591,7 @@ void CMD_Init(void)
     
     Dr16_Safe = Safe_task_add("Dr16_From_Chassis_Safe", 60, dr16_disconnect, dr16_online);
     Deal_Pitch_Limit_More_Safe = Safe_task_add("Deal_Pitch_Limit_More_Safe", 500, Deal_Pitch_Limit_More_disconnect, Deal_Pitch_Limit_More_online);
-    //×¢²áÁ½¸öCAN½ÓÊÕÖÐ¶Ï£¬´¦Àíµ×ÅÌ×ª·¢µÄdr16ÏûÏ¢
+    //×¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½CANï¿½ï¿½ï¿½ï¿½ï¿½Ð¶Ï£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½ï¿½ï¿½dr16ï¿½ï¿½Ï¢
     ECF_CAN_Rx_Callback_Register(Bsp_Can2, Bsp_Stdid, 0x01,  Deal_Dr16_form_chassis);
     ECF_CAN_Rx_Callback_Register(Bsp_Can2, Bsp_Stdid, 0x404, Deal_Shoot_Speed_form_chassis);
     ECF_CAN_Rx_Callback_Register(Bsp_Can2, Bsp_Stdid, 0x666, Deal_Pitch_Limit_More);
@@ -605,7 +605,7 @@ void CMD_Init(void)
     //     Gimbal_CMD.Vision_control = get_auto_control_point();
     // #endif
     Gimbal_CMD.rc_ctl = RC_Get_RC_Pointer();
-    Gimbal_CMD.rc_ctl->rc.s2 = RC_SW_DOWN;//·ÀÖ¹µ×ÅÌ°åÎ´ÔËÐÐ×ª·¢
+    Gimbal_CMD.rc_ctl->rc.s2 = RC_SW_DOWN;//ï¿½ï¿½Ö¹ï¿½ï¿½ï¿½Ì°ï¿½Î´ï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½
     
     Gimbal_CMD.referee_cmd = Get_referee_Address();
     Gimbal_CMD.Pitch_Lock_type = IMU;
@@ -615,7 +615,7 @@ void CMD_Init(void)
     Gimbal_CMD.Fire_Open = 0;
     Gimbal_CMD.Pitch_Limit_Max_Flag = 0;
     Gimbal_CMD.Pitch_Motor_down_encoder = 0;
-    Gimbal_CMD.Fire_Set_Rpm = 4800;
+    Gimbal_CMD.Fire_Set_Rpm = 5000;
     ins = get_imu_control_point();
 
 }
@@ -714,19 +714,19 @@ void Gimbal_Work_State_Set(void)
     static Gimbal_Work_State_e Last_RC_Gimbal_Work_State = MANUAL;
     static Gimbal_Work_State_e RC_Gimbal_Work_State = MANUAL;
 
-    switch(Gimbal_CMD.rc_ctl->rc.s2)//Ò£¿ØÓÒ²à¿ª¹Ø
+    switch(Gimbal_CMD.rc_ctl->rc.s2)//Ò£ï¿½ï¿½ï¿½Ò²à¿ªï¿½ï¿½
     {
-        case RC_SW_DOWN://¿ª¹Ø×´Ì¬Îª[ÏÂ]
-            RC_Gimbal_Work_State =  MANUAL;//ÊÖ¶¯²Ù×÷;
+        case RC_SW_DOWN://ï¿½ï¿½ï¿½ï¿½×´Ì¬Îª[ï¿½ï¿½]
+            RC_Gimbal_Work_State =  MANUAL;//ï¿½Ö¶ï¿½ï¿½ï¿½ï¿½ï¿½;
             break;
-        case RC_SW_MID://¿ª¹Ø×´Ì¬Îª[ÖÐ]
-            RC_Gimbal_Work_State =  MANUAL;//ÊÖ¶¯²Ù×÷;
+        case RC_SW_MID://ï¿½ï¿½ï¿½ï¿½×´Ì¬Îª[ï¿½ï¿½]
+            RC_Gimbal_Work_State =  MANUAL;//ï¿½Ö¶ï¿½ï¿½ï¿½ï¿½ï¿½;
             break;
-        case RC_SW_UP: //¿ª¹Ø×´Ì¬Îª[ÉÏ]
-            RC_Gimbal_Work_State =  LONG_SHOOT;//µõÉä;
+        case RC_SW_UP: //ï¿½ï¿½ï¿½ï¿½×´Ì¬Îª[ï¿½ï¿½]
+            RC_Gimbal_Work_State =  LONG_SHOOT;//ï¿½ï¿½ï¿½ï¿½;
             break;
         default:
-            RC_Gimbal_Work_State =  MANUAL;//ÊÖ¶¯²Ù×÷;
+            RC_Gimbal_Work_State =  MANUAL;//ï¿½Ö¶ï¿½ï¿½ï¿½ï¿½ï¿½;
             break;
     }
     if (Last_RC_Gimbal_Work_State != RC_Gimbal_Work_State)
@@ -737,11 +737,11 @@ void Gimbal_Work_State_Set(void)
     
     // if (Gimbal_CMD.rc_ctl->mouse.press_r == 1)  
     // {
-    //     if (auto_control_p->armor_num != 0) Gimbal_CMD.Gimbal_Work_State = AUTO_ATTACK;//Êó±êÓÒ¼üÇ¿ÖÆ¿ªÆô×ÔÃé
-    //     else                                Gimbal_CMD.Gimbal_Work_State = LONG_SHOOT;//ÎÞ×ÔÃéÊ¶±ðÔòÎªËøµç»ú
+    //     if (auto_control_p->armor_num != 0) Gimbal_CMD.Gimbal_Work_State = AUTO_ATTACK;//ï¿½ï¿½ï¿½ï¿½Ò¼ï¿½Ç¿ï¿½Æ¿ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    //     else                                Gimbal_CMD.Gimbal_Work_State = LONG_SHOOT;//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¶ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½ï¿½ï¿½ï¿½
     // }
     // else
-    //     Gimbal_CMD.Gimbal_Work_State = RC_Gimbal_Work_State;//»Ø¹éÔ­ÏÈÄ£Ê½
+    //     Gimbal_CMD.Gimbal_Work_State = RC_Gimbal_Work_State;//ï¿½Ø¹ï¿½Ô­ï¿½ï¿½Ä£Ê½
 }
 fp32 now_time_ms;
 
@@ -773,27 +773,27 @@ void Gimbal_CMD_Set(fp32 Pitch_Up_Angle_Limit, fp32 Pitch_Down_Angle_Limit, fp32
     Gimbal_Work_State_Set();
     uint8_t manual_fire_delay_flag = 0;
     
-    if (Gimbal_CMD.rc_ctl->rc.ch[0] == 48)  Gimbal_CMD.rc_ctl->rc.ch[0] = 0;//Dr16¼ä½Ó³é·ç£¿ÆÁ±Î´ËÊý×Ö
+    if (Gimbal_CMD.rc_ctl->rc.ch[0] == 48)  Gimbal_CMD.rc_ctl->rc.ch[0] = 0;//Dr16ï¿½ï¿½Ó³ï¿½ç£¿ï¿½ï¿½ï¿½Î´ï¿½ï¿½ï¿½ï¿½ï¿½
     
     static Gimbal_Work_State_e Last_Gimbal_Work_State = MANUAL;
     switch(Gimbal_CMD.Gimbal_Work_State)
-    {//ÔÆÌ¨²Ù¿Ø×´Ì¬
-        case MANUAL://ÊÖ¶¯²Ù×÷,ÔÆÌ¨½Ç¶ÈÓÉ²Ù×÷ÊÖ¸Ä±ä
+    {//ï¿½ï¿½Ì¨ï¿½Ù¿ï¿½×´Ì¬
+        case MANUAL://ï¿½Ö¶ï¿½ï¿½ï¿½ï¿½ï¿½,ï¿½ï¿½Ì¨ï¿½Ç¶ï¿½ï¿½É²ï¿½ï¿½ï¿½ï¿½Ö¸Ä±ï¿½
             Last_Gimbal_Work_State = MANUAL;
             Gimbal_Angle_Set(-Gimbal_CMD.rc_ctl->mouse.y * MOUSE_PITCH_SPEED, -Gimbal_CMD.rc_ctl->mouse.x * MOUSE_YAW_SPEED);
             Gimbal_Angle_Set(Gimbal_CMD.rc_ctl->rc.ch[1] * debug_RC_PITCH_SPEED, -Gimbal_CMD.rc_ctl->rc.ch[0] * debug_RC_YAW_SPEED);
             break;
-        case LONG_SHOOT://¿ªÇ°ÉÚÕ¾£¬ÊÖ²Ù£¬ÂýËÙ²ÎÊý
+        case LONG_SHOOT://ï¿½ï¿½Ç°ï¿½ï¿½Õ¾ï¿½ï¿½ï¿½Ö²Ù£ï¿½ï¿½ï¿½ï¿½Ù²ï¿½ï¿½ï¿½
           
             Last_Gimbal_Work_State = LONG_SHOOT;
             Gimbal_Angle_Set(-Gimbal_CMD.rc_ctl->mouse.y * 0.0002f, -Gimbal_CMD.rc_ctl->mouse.x * 0.0002f);
             Gimbal_Angle_Set(Gimbal_CMD.rc_ctl->rc.ch[1] *  0.00001f , -Gimbal_CMD.rc_ctl->rc.ch[0] * 0.00001f);
             break;
        
-        // case AUTO_ATTACK://×ÔÃé
+        // case AUTO_ATTACK://ï¿½ï¿½ï¿½ï¿½
         //     Gimbal_Angle_Set(-Gimbal_CMD.rc_ctl->mouse.y * MOUSE_PITCH_SPEED, -Gimbal_CMD.rc_ctl->mouse.x * MOUSE_YAW_SPEED);
         //     Gimbal_Angle_Set(Gimbal_CMD.rc_ctl->rc.ch[1] * RC_PITCH_SPEED, -Gimbal_CMD.rc_ctl->rc.ch[0] * RC_YAW_SPEED);
-        //     //ÊÓ¾õÊ¶±ðµ½£¬×ÔÃé½Ç¶È
+        //     //ï¿½Ó¾ï¿½Ê¶ï¿½ðµ½£ï¿½ï¿½ï¿½ï¿½ï¿½Ç¶ï¿½
         //     if (auto_control_p->armor_num != 0)
         //     {
         //         Gimbal_CMD.Pitch_Set_IMU = *Gimbal_CMD.AUTO_Pitch_Angle_Set_IMU;
@@ -806,26 +806,26 @@ void Gimbal_CMD_Set(fp32 Pitch_Up_Angle_Limit, fp32 Pitch_Down_Angle_Limit, fp32
             Gimbal_Angle_Set(Gimbal_CMD.rc_ctl->rc.ch[1] * RC_PITCH_SPEED, -Gimbal_CMD.rc_ctl->rc.ch[0] * RC_YAW_SPEED);
     }
     
-    //¸©Ñö½ÇÏÞÎ»
+    //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î»
     if (Gimbal_CMD.Pitch_Lock_type == IMU)  
         value_limit(Gimbal_CMD.Pitch_Set_IMU, Pitch_Down_Angle_Limit, Pitch_Up_Angle_Limit);
     if (Gimbal_CMD.Pitch_Lock_type == ENCODER)
     #ifdef Using_MI_Motor_Init
-        value_limit(Gimbal_CMD.Pitch_Set_Encoder, Gimbal_CMD.Pitch_Motor_down_encoder-PITCH_ANGLE_RANGE, Gimbal_CMD.Pitch_Motor_down_encoder);//µç»úÏòÉÏÌ§±àÂëÖµ¼õÐ¡
+        value_limit(Gimbal_CMD.Pitch_Set_Encoder, Gimbal_CMD.Pitch_Motor_down_encoder-PITCH_ANGLE_RANGE, Gimbal_CMD.Pitch_Motor_down_encoder);//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ì§ï¿½ï¿½ï¿½ï¿½Öµï¿½ï¿½Ð¡
     #else
-        value_limit(Gimbal_CMD.Pitch_Set_Encoder, PITCH_MOTOR_UP_MIN_ACTUAL_ANGLE, PITCH_MOTOR_DOWN_MAX_ACTUAL_ANGLE);//µç»úÏòÉÏÌ§±àÂëÖµ¼õÐ¡
+        value_limit(Gimbal_CMD.Pitch_Set_Encoder, PITCH_MOTOR_UP_MIN_ACTUAL_ANGLE, PITCH_MOTOR_DOWN_MAX_ACTUAL_ANGLE);//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ì§ï¿½ï¿½ï¿½ï¿½Öµï¿½ï¿½Ð¡
     #endif
-    //·¢ËÍ×ÔÃéÐÅÏ¢¸øµ×ÅÌ
-    // Send_Chassis_vision_fire_static(auto_control_p->armor_num != 0? 1 : 0,//×ÔÃéÊÇ·ñÊ¶±ðµ½
-    //                                 Gimbal_CMD.Gimbal_Work_State == AUTO_Delay_Fire? manual_fire_delay_flag : auto_control_p->fire_flag,//×Ô¶¯¿ª»ð·¢ËÍµÄ¿ª»ðÖ¸Áî
-    //                                 Gimbal_CMD.Fire_Open,//ÊÇ·ñ¿ªÆôÄ¦²ÁÂÖ
-    //                                (Gimbal_CMD.Gimbal_Work_State == MANUAL || Gimbal_CMD.Gimbal_Work_State == LONG_SHOOT)?0:1,//ÊÖ´ò£¿
+    //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    // Send_Chassis_vision_fire_static(auto_control_p->armor_num != 0? 1 : 0,//ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½Ê¶ï¿½ï¿½
+    //                                 Gimbal_CMD.Gimbal_Work_State == AUTO_Delay_Fire? manual_fire_delay_flag : auto_control_p->fire_flag,//ï¿½Ô¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÍµÄ¿ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½
+    //                                 Gimbal_CMD.Fire_Open,//ï¿½Ç·ï¿½ï¿½ï¿½Ä¦ï¿½ï¿½ï¿½ï¿½
+    //                                (Gimbal_CMD.Gimbal_Work_State == MANUAL || Gimbal_CMD.Gimbal_Work_State == LONG_SHOOT)?0:1,//ï¿½Ö´ï¿½
     //                                 Gimbal_CMD.Pitch_Lock_type == ENCODER? Pitch_encoder_Angle:Pitch_Angle,
     //                                 Gimbal_CMD.Pitch_Lock_type == ENCODER? 1:0);
-    Send_Chassis_vision_fire_static(0,//×ÔÃéÊÇ·ñÊ¶±ðµ½
-                                    Gimbal_CMD.Gimbal_Work_State == manual_fire_delay_flag,//×Ô¶¯¿ª»ð·¢ËÍµÄ¿ª»ðÖ¸Áî
-                                    Gimbal_CMD.Fire_Open,//ÊÇ·ñ¿ªÆôÄ¦²ÁÂÖ
-                                   (Gimbal_CMD.Gimbal_Work_State == MANUAL || Gimbal_CMD.Gimbal_Work_State == LONG_SHOOT)?0:1,//ÊÖ´ò£¿
+    Send_Chassis_vision_fire_static(0,//ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½Ê¶ï¿½ï¿½
+                                    Gimbal_CMD.Gimbal_Work_State == manual_fire_delay_flag,//ï¿½Ô¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÍµÄ¿ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½
+                                    Gimbal_CMD.Fire_Open,//ï¿½Ç·ï¿½ï¿½ï¿½Ä¦ï¿½ï¿½ï¿½ï¿½
+                                   (Gimbal_CMD.Gimbal_Work_State == MANUAL || Gimbal_CMD.Gimbal_Work_State == LONG_SHOOT)?0:1,//ï¿½Ö´ï¿½
                                     Gimbal_CMD.Pitch_Lock_type == ENCODER? Pitch_encoder_Angle:Pitch_Angle,
                                     Gimbal_CMD.Pitch_Lock_type == ENCODER? 1:0);
 }
@@ -836,7 +836,7 @@ void Gimbal_Fire_State_Set(void)
     if (Gimbal_CMD.rc_ctl->kb.bit.F == 1 || Gimbal_CMD.rc_ctl->rc.s2 == RC_SW_UP || Gimbal_CMD.rc_ctl->rc.s2 == RC_SW_MID)
         Gimbal_CMD.Fire_Ready = 1;
     
-    if (Gimbal_CMD.rc_ctl->rc.s2 == RC_SW_DOWN && first_down == 1)//Ê×´Î²¦ÏÂÊ±¹Ø±ÕÄ¦²ÁÂÖ£¬¿ÉÒÔ·ÀÖ¹¿ª¹Ø´òÏÂÇé¿öÏÂ£¬°´F¿ªÆôÄ¦²ÁÂÖ±»²¦¸Ë¸²¸Ç¹Ø±Õ
+    if (Gimbal_CMD.rc_ctl->rc.s2 == RC_SW_DOWN && first_down == 1)//ï¿½×´Î²ï¿½ï¿½ï¿½Ê±ï¿½Ø±ï¿½Ä¦ï¿½ï¿½ï¿½Ö£ï¿½ï¿½ï¿½ï¿½Ô·ï¿½Ö¹ï¿½ï¿½ï¿½Ø´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â£ï¿½ï¿½ï¿½Fï¿½ï¿½ï¿½ï¿½Ä¦ï¿½ï¿½ï¿½Ö±ï¿½ï¿½ï¿½ï¿½Ë¸ï¿½ï¿½Ç¹Ø±ï¿½
     {
         first_down = 0;
         Gimbal_CMD.Fire_Ready = 0;
@@ -849,7 +849,7 @@ void Gimbal_Fire_State_Set(void)
 const Gimbal_CMD_t* Get_Gimbal_CMD_point(void)
 {
     // while(Get_Virtual_task_init_falg() == 0)
-    //     vTaskDelay(1);//µÈ´ýÊÓ¾õÈÎÎñ³õÊ¼»¯
+    //     vTaskDelay(1);//ï¿½È´ï¿½ï¿½Ó¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¼ï¿½ï¿½
     
     static uint8_t init_flag = 0;
     if (init_flag++ == 0)   CMD_Init();
@@ -869,7 +869,7 @@ void Set_Pitch_Motor_down_encoder(fp32 Pitch_Motor_down_encoder)
     Gimbal_CMD.Pitch_Motor_down_encoder = Pitch_Motor_down_encoder;
 }
 
-//ÕâÈý¸ö¸øÊÓ¾õÈÎÎñÓÃµÄ
+//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ãµï¿½
 fp32* get_Gimbal_pitch_point()
 {
     return &Gimbal_CMD.Pitch_Set_IMU;
@@ -902,18 +902,18 @@ Gimbal_Work_State_e get_open_auto_delay_control(void)
 }
 
 /**
-  *@brief ¼ÆËãºÏÊÊµÄ·¢µ¯Ê±¼äÓë·¢µ¯ÑÓ³Ù
-  *@parm  µ¥Î»ms
+  *@brief ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÊµÄ·ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ë·¢ï¿½ï¿½ï¿½Ó³ï¿½
+  *@parm  ï¿½ï¿½Î»ms
   */
 #define ROTATE_TIME_MS 833 //ms 833.333
 // float calc_can_fire_time(float FIRE_DELAY_MS, float now_in_place_time, float fly_time, gimbal_auto_control_t *auto_control_p)
 // {
 //     if (fly_time == 0)  return 0;
 //     int64_t increat_time = ROTATE_TIME_MS;
-//     float next_in_place_time = now_in_place_time + ROTATE_TIME_MS;//ÏÂÒ»´Î×ªµ½ÖÐÐÄµÄÊ±¼ä´Á
+//     float next_in_place_time = now_in_place_time + ROTATE_TIME_MS;//ï¿½ï¿½Ò»ï¿½ï¿½×ªï¿½ï¿½ï¿½ï¿½ï¿½Äµï¿½Ê±ï¿½ï¿½ï¿½
     
 //     while ((FIRE_DELAY_MS + fly_time) > increat_time)
-//     {   //·¢µ¯Ê±¼ä£«·ÉÐÐÊ±¼ä³¬¹ýÏÂÒ»¿é×°¼×°å×ªµ½Î»µÄÊ±¼ä£¬Òò´ËÓ¦¸ÃÔ¤ÅÐÏÂÏÂ¿é×°¼×°åµ½Î»Ê±¼ä
+//     {   //ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ä£«ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ä³¬ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½×°ï¿½×°ï¿½×ªï¿½ï¿½Î»ï¿½ï¿½Ê±ï¿½ä£¬ï¿½ï¿½ï¿½Ó¦ï¿½ï¿½Ô¤ï¿½ï¿½ï¿½ï¿½ï¿½Â¿ï¿½×°ï¿½×°åµ½Î»Ê±ï¿½ï¿½
 //         next_in_place_time += ROTATE_TIME_MS;
 //         increat_time += ROTATE_TIME_MS;
 //     }
@@ -923,9 +923,9 @@ Gimbal_Work_State_e get_open_auto_delay_control(void)
 //     return  can_fire_time;
 // }
 /**
-  *@brief ÅÐ¶ÏÊÇ·ñ·ûºÏ¿ª»ðÊµ¼Ê
-  *@note  Èç¹û·ûºÏÇåÁãÔ¤¼ÆÏÂÒ»´Îµ½Î»Ê±¼ä
-  *@reval 0 ·¢»ðÊ±»úÎ´µ½ | 1 ·¢»ðÊ±»úÒÑµ½ | 2 ·¢»ðÊ±»úÒÑ¹ý | 3 ´«²Î´íÎó
+  *@brief ï¿½Ð¶ï¿½ï¿½Ç·ï¿½ï¿½ï¿½Ï¿ï¿½ï¿½ï¿½Êµï¿½ï¿½
+  *@note  ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô¤ï¿½ï¿½ï¿½ï¿½Ò»ï¿½Îµï¿½Î»Ê±ï¿½ï¿½
+  *@reval 0 ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½Î´ï¿½ï¿½ | 1 ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½Ñµï¿½ | 2 ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½Ñ¹ï¿½ | 3 ï¿½ï¿½ï¿½Î´ï¿½ï¿½ï¿½
   */
 // float fla = 20;
 // uint8_t JudgeCanFire(float now_in_place_time, float *next_in_place_time)

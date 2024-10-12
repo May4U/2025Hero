@@ -60,7 +60,7 @@ void FIRE_TASK(void const *argument)
 	{
         time ++;
         if (time > 1000)    time = 0;
-                taskENTER_CRITICAL();         // ½øÈëÁÙ½çÇø
+                taskENTER_CRITICAL();         // ï¿½ï¿½ï¿½ï¿½ï¿½Ù½ï¿½ï¿½ï¿½
         
         left_speed = Fire.left_motor->Motor_Information.speed;
         right_speed = -Fire.right_motor->Motor_Information.speed;
@@ -68,21 +68,21 @@ void FIRE_TASK(void const *argument)
         right_speed_up = -Fire.right_motor_up->Motor_Information.speed;
         speed_error = left_speed - right_speed;
         
-        Deal_Fire_Set_Rpm();//¸Ä±äÄ¦²ÁÂÖ×ªËÙ
-        Send_Fire_Set_Rpm();//·¢ËÍµ×ÅÌÄ¦²ÁÂÖÉè¶¨×ªËÙ
-        Send_Fire_Motor_Speed(left_speed_up, right_speed_up, left_speed, right_speed);//·¢ËÍµ×ÅÌÄ¦²ÁÂÖÊµ¼Ê×ªËÙ
-				//Send_Fire_Motor_Speed(4800, 4800, 4800, 4800);//·¢ËÍµ×ÅÌÄ¦²ÁÂÖÊµ¼Ê×ªËÙ
+        Deal_Fire_Set_Rpm();//ï¿½Ä±ï¿½Ä¦ï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½
+        Send_Fire_Set_Rpm();//ï¿½ï¿½ï¿½Íµï¿½ï¿½ï¿½Ä¦ï¿½ï¿½ï¿½ï¿½ï¿½è¶¨×ªï¿½ï¿½
+        Send_Fire_Motor_Speed(left_speed_up, right_speed_up, left_speed, right_speed);//ï¿½ï¿½ï¿½Íµï¿½ï¿½ï¿½Ä¦ï¿½ï¿½ï¿½ï¿½Êµï¿½ï¿½×ªï¿½ï¿½
+				//Send_Fire_Motor_Speed(4800, 4800, 4800, 4800);//ï¿½ï¿½ï¿½Íµï¿½ï¿½ï¿½Ä¦ï¿½ï¿½ï¿½ï¿½Êµï¿½ï¿½×ªï¿½ï¿½
         
         Gimbal_Fire_State_Set();
 		fire_behaviour_choose();
 		fire_pid_calculate();
         
-        Shoot_Check();//·¢Éä¼ì²é£¬·¢µ¯ÑÓ³ÙÐ£×¼
+        Shoot_Check();//ï¿½ï¿½ï¿½ï¿½ï¿½é£¬ï¿½ï¿½ï¿½ï¿½ï¿½Ó³ï¿½Ð£×¼
         
-//        if (time % 2 ==0)   Send_Fire_Current();//500hz¿ØÖÆÆµÂÊ
+//        if (time % 2 ==0)   Send_Fire_Current();//500hzï¿½ï¿½ï¿½ï¿½Æµï¿½ï¿½
         
 		DJIMotor_Send(Fire.left_motor);
-        taskEXIT_CRITICAL();              // ÍË³öÁÙ½çÇø
+        taskEXIT_CRITICAL();              // ï¿½Ë³ï¿½ï¿½Ù½ï¿½ï¿½ï¿½
 
 
         
@@ -93,7 +93,7 @@ void FIRE_TASK(void const *argument)
 void fire_task_init(void)
 {
 	memset(&Fire, 0, sizeof(Fire_t));
-	// »ñµÃ²¦µ¯Ö¸Õë
+	// ï¿½ï¿½Ã²ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½
     Fire.left_motor_up = DJIMotor_Init(1,2,false,M3508,30);
     Fire.right_motor_up = DJIMotor_Init(1,4,true,M3508,30);
     Fire.left_motor  = DJIMotor_Init(1,1,false,M3508,30);
@@ -105,21 +105,21 @@ void fire_task_init(void)
     Fire.right_motor->Using_PID = Speed_PID;
     
     PidInit(&Fire.left_motor->Speed_PID,1.0f,0,0,Output_Limit|StepIn|Integral_Limit);
- 	PidInitMode(&Fire.left_motor->Speed_PID,Output_Limit,16000,0);//Êä³öÏÞ·ùÄ£Ê½ÉèÖÃ
-    PidInitMode(&Fire.left_motor->Speed_PID,StepIn,10,0);//¹ý´óµÄ¼Ó¼õËÙ»áµ¼ÖÂ·¢Éä»ú¹¹³¬µçÁ÷¶Ïµç
+ 	PidInitMode(&Fire.left_motor->Speed_PID,Output_Limit,16000,0);//ï¿½ï¿½ï¿½ï¿½Þ·ï¿½Ä£Ê½ï¿½ï¿½ï¿½ï¿½
+    PidInitMode(&Fire.left_motor->Speed_PID,StepIn,10,0);//ï¿½ï¿½ï¿½ï¿½Ä¼Ó¼ï¿½ï¿½Ù»áµ¼ï¿½Â·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ïµï¿½
     PidInitMode(&Fire.left_motor->Speed_PID,Integral_Limit,1000,0);
 
     PidInit(&Fire.right_motor->Speed_PID,2.75f,0,0,Output_Limit|StepIn|Integral_Limit);
- 	PidInitMode(&Fire.right_motor->Speed_PID,Output_Limit,16000,0);//Êä³öÏÞ·ùÄ£Ê½ÉèÖÃ
-    PidInitMode(&Fire.right_motor->Speed_PID,StepIn,10,0);//Öð½¥¼õËÙ£¬Êµ²â·¢ÏÖ×î´óËÙ¶È¼õËÙ»áµ¼ÖÂ·¢Éä»ú¹¹³¬µçÁ÷¶Ïµç
+ 	PidInitMode(&Fire.right_motor->Speed_PID,Output_Limit,16000,0);//ï¿½ï¿½ï¿½ï¿½Þ·ï¿½Ä£Ê½ï¿½ï¿½ï¿½ï¿½
+    PidInitMode(&Fire.right_motor->Speed_PID,StepIn,10,0);//ï¿½ð½¥¼ï¿½ï¿½Ù£ï¿½Êµï¿½â·¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ù¶È¼ï¿½ï¿½Ù»áµ¼ï¿½Â·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ïµï¿½
     PidInitMode(&Fire.left_motor->Speed_PID,Integral_Limit,1000,0);
 
-    PidInit(&Fire.left_motor_up->Speed_PID,1.0f,0,0,Output_Limit|StepIn);
- 	PidInitMode(&Fire.left_motor_up->Speed_PID,Output_Limit,16000,0);//Êä³öÏÞ·ùÄ£Ê½ÉèÖÃ
-    PidInitMode(&Fire.left_motor_up->Speed_PID,StepIn,10,0);//¹ý´óµÄ¼Ó¼õËÙ»áµ¼ÖÂ·¢Éä»ú¹¹³¬µçÁ÷¶Ïµç
+    PidInit(&Fire.left_motor_up->Speed_PID,1.55f,0,0,Output_Limit|StepIn);
+ 	PidInitMode(&Fire.left_motor_up->Speed_PID,Output_Limit,16000,0);//ï¿½ï¿½ï¿½ï¿½Þ·ï¿½Ä£Ê½ï¿½ï¿½ï¿½ï¿½
+    PidInitMode(&Fire.left_motor_up->Speed_PID,StepIn,10,0);//ï¿½ï¿½ï¿½ï¿½Ä¼Ó¼ï¿½ï¿½Ù»áµ¼ï¿½Â·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ïµï¿½
     PidInit(&Fire.right_motor_up->Speed_PID,1.0f,0,0,Output_Limit|StepIn);
- 	PidInitMode(&Fire.right_motor_up->Speed_PID,Output_Limit,16000,0);//Êä³öÏÞ·ùÄ£Ê½ÉèÖÃ
-    PidInitMode(&Fire.right_motor_up->Speed_PID,StepIn,10,0);//Öð½¥¼õËÙ£¬Êµ²â·¢ÏÖ×î´óËÙ¶È¼õËÙ»áµ¼ÖÂ·¢Éä»ú¹¹³¬µçÁ÷¶Ïµç
+ 	PidInitMode(&Fire.right_motor_up->Speed_PID,Output_Limit,16000,0);//ï¿½ï¿½ï¿½ï¿½Þ·ï¿½Ä£Ê½ï¿½ï¿½ï¿½ï¿½
+    PidInitMode(&Fire.right_motor_up->Speed_PID,StepIn,10,0);//ï¿½ð½¥¼ï¿½ï¿½Ù£ï¿½Êµï¿½â·¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ù¶È¼ï¿½ï¿½Ù»áµ¼ï¿½Â·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ïµï¿½
     
 	Fire.Gimbal_CMD = Get_Gimbal_CMD_point();
 }

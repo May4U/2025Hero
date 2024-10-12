@@ -1,0 +1,36 @@
+
+
+GraphedExpression="left_speed", DisplayFormat=DISPLAY_FORMAT_DEC, Color=#e56a6f
+GraphedExpression="right_speed", DisplayFormat=DISPLAY_FORMAT_DEC, Color=#35792b
+GraphedExpression="left_speed_up", Color=#769dda
+GraphedExpression="right_speed_up", DisplayFormat=DISPLAY_FORMAT_DEC, Color=#b14f0d
+OpenDocument="startup_stm32f407xx.s", FilePath="D:/Documents/Github/2025Hero/MakeVersion/Double_Cheese_Burger V0.1/startup_stm32f407xx.s", Line=54
+OpenDocument="gimbal_task.c", FilePath="D:/Documents/GitHub/2025Hero/MakeVersion/Double_Cheese_Burger V0.1/TASK/src/gimbal_task.c", Line=52
+OpenDocument="tasks.c", FilePath="D:/Documents/GitHub/2025Hero/MakeVersion/Double_Cheese_Burger V0.1/Middlewares/Third_Party/FreeRTOS/Source/tasks.c", Line=3424
+OpenDocument="fire_task.c", FilePath="D:/Documents/Github/2025Hero/MakeVersion/Double_Cheese_Burger V0.1/TASK/src/fire_task.c", Line=53
+OpenDocument="main.c", FilePath="D:/Documents/GitHub/2025Hero/MakeVersion/Double_Cheese_Burger V0.1/Core/Src/main.c", Line=71
+OpenToolbar="Debug", Floating=0, x=0, y=0
+OpenWindow="Registers 1", DockArea=RIGHT, x=0, y=1, w=376, h=240, TabPos=2, TopOfStack=0, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0, FilteredItems=[], RefreshRate=1
+OpenWindow="Source Files", DockArea=LEFT, x=0, y=0, w=205, h=386, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0
+OpenWindow="Disassembly", DockArea=RIGHT, x=0, y=0, w=376, h=129, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0
+OpenWindow="Watched Data 1", DockArea=RIGHT, x=0, y=1, w=376, h=240, TabPos=0, TopOfStack=1, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0
+OpenWindow="Data Sampling", DockArea=RIGHT, x=0, y=1, w=376, h=240, TabPos=1, TopOfStack=0, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0, VisibleTab=1, UniformSampleSpacing=0
+OpenWindow="Timeline", DockArea=BOTTOM, x=0, y=0, w=1368, h=420, TabPos=0, TopOfStack=1, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=1, DataPaneShown=1, PowerPaneShown=0, CodePaneShown=0, PinCursor="Cursor Movable", TimePerDiv="500 s / Div", TimeStampFormat="Time", DataGraphDrawAsPoints=0, DataGraphLegendShown=1, DataGraphUniformSampleSpacing=0, DataGraphLegendPosition="966;216", DataGraphShowNamesAtCursor=0, PowerGraphDrawAsPoints=0, PowerGraphLegendShown=0, PowerGraphAvgFilterTime=Off, PowerGraphAvgFilterLen=Off, PowerGraphUniformSampleSpacing=0, PowerGraphLegendPosition="1171;5", CodeGraphLegendShown=0, CodeGraphLegendPosition="1185;0"
+OpenWindow="Console", DockArea=BOTTOM, x=0, y=0, w=1368, h=420, TabPos=1, TopOfStack=0, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0
+SmartViewPlugin="", Page="", Toolbar="Hidden", Window="SmartView 1"
+TableHeader="Data Sampling Setup", SortCol="Expression", SortOrder="ASCENDING", VisibleCols=["Expression";"Type";"Value";"Min";"Max";"Average";"# Changes";"Min. Change";"Max. Change"], ColWidths=[100;100;100;100;100;100;100;102;102]
+TableHeader="Data Sampling Table", SortCol="None", SortOrder="ASCENDING", VisibleCols=["Index";"Time";" left_speed";" right_speed";" left_speed_up";" right_speed_up"], ColWidths=[100;100;100;100;100;100]
+TableHeader="Watched Data 1", SortCol="Expression", SortOrder="ASCENDING", VisibleCols=["Expression";"Value";"Location";"Refresh"], ColWidths=[174;165;158;100]
+TableHeader="Registers 1", SortCol="Name", SortOrder="ASCENDING", VisibleCols=["Name";"Value";"Description"], ColWidths=[103;183;259]
+TableHeader="Source Files", SortCol="File", SortOrder="ASCENDING", VisibleCols=["File";"Status";"Size";"#Insts";"Path"], ColWidths=[506;146;114;146;994]
+TableHeader="Power Sampling", SortCol="None", SortOrder="ASCENDING", VisibleCols=["Index";"Time";"Ch 0"], ColWidths=[100;100;100]
+TableHeader="RegisterSelectionDialog", SortCol="None", SortOrder="ASCENDING", VisibleCols=[], ColWidths=[]
+TableHeader="TargetExceptionDialog", SortCol="Name", SortOrder="ASCENDING", VisibleCols=["Name";"Value";"Address";"Description"], ColWidths=[200;100;100;359]
+WatchedExpression="Fire", RefreshRate=5, Window=Watched Data 1
+WatchedExpression="left_speed", RefreshRate=5, Window=Watched Data 1
+WatchedExpression="right_speed", RefreshRate=5, Window=Watched Data 1
+WatchedExpression="left_speed_up", RefreshRate=5, Window=Watched Data 1
+WatchedExpression="right_speed_up", RefreshRate=5, Window=Watched Data 1
+WatchedExpression="k_pitch_lqr", RefreshRate=5, Window=Watched Data 1
+WatchedExpression="k_yaw_lqr", RefreshRate=5, Window=Watched Data 1
+WatchedExpression="Gimbal", RefreshRate=5, Window=Watched Data 1

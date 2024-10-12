@@ -1,0 +1,1844 @@
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccwMxdym.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.arch armv7e-m
+   3              		.fpu fpv4-sp-d16
+   4              		.eabi_attribute 27, 1
+   5              		.eabi_attribute 28, 1
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.file	"bsp_dr16.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.RC_abs,"ax",%progbits
+  20              		.align	1
+  21              		.syntax unified
+  22              		.thumb
+  23              		.thumb_func
+  25              	RC_abs:
+  26              	.LVL0:
+  27              	.LFB145:
+  28              		.file 1 "ACE-ECF/Bsp/Src/bsp_dr16.c"
+   1:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+   2:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+   3:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+   4:ACE-ECF/Bsp/Src/bsp_dr16.c **** /**
+   5:ACE-ECF/Bsp/Src/bsp_dr16.c **** *****************************东莞理工学院ACE实验室*****************************
+   6:ACE-ECF/Bsp/Src/bsp_dr16.c **** * @file 		remote_control.c
+   7:ACE-ECF/Bsp/Src/bsp_dr16.c **** *
+   8:ACE-ECF/Bsp/Src/bsp_dr16.c **** * @brief 		包括遥控器初始化，遥控器数据获取，遥控器通讯协议的解析
+   9:ACE-ECF/Bsp/Src/bsp_dr16.c **** *
+  10:ACE-ECF/Bsp/Src/bsp_dr16.c **** * @note  		遥控器数据接收采用串口加DMA的模式
+  11:ACE-ECF/Bsp/Src/bsp_dr16.c **** * @history              全新升级，支持hal库
+  12:ACE-ECF/Bsp/Src/bsp_dr16.c **** *
+  13:ACE-ECF/Bsp/Src/bsp_dr16.c **** @verbatim
+  14:ACE-ECF/Bsp/Src/bsp_dr16.c **** ==============================================================================
+  15:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+  16:ACE-ECF/Bsp/Src/bsp_dr16.c **** //bool_t (*data_is_error_fun)(void); 数值错误判断函数 -> bool_t  RC_Check_Data_IS_ERROR(voi
+  17:ACE-ECF/Bsp/Src/bsp_dr16.c **** //void (*solve_lost_fun)(void);      问题解决处理函数 -> void RC_Restart(UART_HandleTypeDef
+  18:ACE-ECF/Bsp/Src/bsp_dr16.c **** //void (*solve_data_error_fun)(void); //数值错误处理函数 -> void RC_DataReload(void);
+  19:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+  20:ACE-ECF/Bsp/Src/bsp_dr16.c **** ==============================================================================
+  21:ACE-ECF/Bsp/Src/bsp_dr16.c **** @endverbatim
+  22:ACE-ECF/Bsp/Src/bsp_dr16.c **** *****************************东莞理工学院ACE实验室******************************/
+  23:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+  24:ACE-ECF/Bsp/Src/bsp_dr16.c **** #include "bsp_dr16.h"
+  25:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+  26:ACE-ECF/Bsp/Src/bsp_dr16.c **** #if DR16_LOST_DETECT_ENABLE
+  27:ACE-ECF/Bsp/Src/bsp_dr16.c **** #include "freertos.h"
+  28:ACE-ECF/Bsp/Src/bsp_dr16.c **** #include "queue.h"
+  29:ACE-ECF/Bsp/Src/bsp_dr16.c **** #include "semphr.h"
+  30:ACE-ECF/Bsp/Src/bsp_dr16.c **** #include "task.h"
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccwMxdym.s 			page 2
+
+
+  31:ACE-ECF/Bsp/Src/bsp_dr16.c **** #include "timers.h"
+  32:ACE-ECF/Bsp/Src/bsp_dr16.c **** #endif
+  33:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+  34:ACE-ECF/Bsp/Src/bsp_dr16.c **** #define Sbus_RX_Buffer_Num 36
+  35:ACE-ECF/Bsp/Src/bsp_dr16.c **** #define RC_FRAME_LENGTH 18
+  36:ACE-ECF/Bsp/Src/bsp_dr16.c **** #define RC_CHANNAL_ERROR_VALUE 700  //遥控出错上限
+  37:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+  38:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+  39:ACE-ECF/Bsp/Src/bsp_dr16.c **** static TickType_t RCLostTime = 0;
+  40:ACE-ECF/Bsp/Src/bsp_dr16.c **** uint8_t dr16_Recive_flag = 0;
+  41:ACE-ECF/Bsp/Src/bsp_dr16.c **** // 遥控器数据结构体变量
+  42:ACE-ECF/Bsp/Src/bsp_dr16.c **** RC_ctrl_t rc_ctl;
+  43:ACE-ECF/Bsp/Src/bsp_dr16.c **** // 接收数据缓存，有两个缓冲区，每一缓冲区有18个字节（8*18=144），为防�
+  44:ACE-ECF/Bsp/Src/bsp_dr16.c **** uint8_t Sbus_RX_Buffer[2][Sbus_RX_Buffer_Num];
+  45:ACE-ECF/Bsp/Src/bsp_dr16.c **** // 接收中断额外执行的回调函数，提供给safe任务的接口，防止include层次混�
+  46:ACE-ECF/Bsp/Src/bsp_dr16.c **** void (*Dr16RxCallBack)(void) = NULL;
+  47:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+  48:ACE-ECF/Bsp/Src/bsp_dr16.c **** #if DR16_LOST_DETECT_ENABLE
+  49:ACE-ECF/Bsp/Src/bsp_dr16.c **** uint32_t chassis_rc_lost_time(void)
+  50:ACE-ECF/Bsp/Src/bsp_dr16.c **** {
+  51:ACE-ECF/Bsp/Src/bsp_dr16.c ****     return RCLostTime;
+  52:ACE-ECF/Bsp/Src/bsp_dr16.c **** }
+  53:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+  54:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+  55:ACE-ECF/Bsp/Src/bsp_dr16.c **** void rc_lost_time_refresh()
+  56:ACE-ECF/Bsp/Src/bsp_dr16.c **** {
+  57:ACE-ECF/Bsp/Src/bsp_dr16.c ****     /* 当接收到数据时，；刷新失联倒计时   xTaskGetTickCountFromISR  xTaskGetTickCou
+  58:ACE-ECF/Bsp/Src/bsp_dr16.c ****     RCLostTime = xTaskGetTickCount() + REMOTE_LOST_TIME;
+  59:ACE-ECF/Bsp/Src/bsp_dr16.c **** }
+  60:ACE-ECF/Bsp/Src/bsp_dr16.c **** #endif
+  61:ACE-ECF/Bsp/Src/bsp_dr16.c **** /**
+  62:ACE-ECF/Bsp/Src/bsp_dr16.c ****  * @brief      遥控器数据死区限制
+  63:ACE-ECF/Bsp/Src/bsp_dr16.c ****  * @param[in]  input
+  64:ACE-ECF/Bsp/Src/bsp_dr16.c ****  * @param[in]  dealine
+  65:ACE-ECF/Bsp/Src/bsp_dr16.c ****  * @retval
+  66:ACE-ECF/Bsp/Src/bsp_dr16.c ****  */
+  67:ACE-ECF/Bsp/Src/bsp_dr16.c **** int16_t rc_deadline_limit(int16_t input, int16_t dealine)
+  68:ACE-ECF/Bsp/Src/bsp_dr16.c **** {
+  69:ACE-ECF/Bsp/Src/bsp_dr16.c ****     if (input > dealine || input < -dealine)
+  70:ACE-ECF/Bsp/Src/bsp_dr16.c ****     {
+  71:ACE-ECF/Bsp/Src/bsp_dr16.c ****         return input;
+  72:ACE-ECF/Bsp/Src/bsp_dr16.c ****     }
+  73:ACE-ECF/Bsp/Src/bsp_dr16.c ****     else
+  74:ACE-ECF/Bsp/Src/bsp_dr16.c ****     {
+  75:ACE-ECF/Bsp/Src/bsp_dr16.c ****         return 0;
+  76:ACE-ECF/Bsp/Src/bsp_dr16.c ****     }
+  77:ACE-ECF/Bsp/Src/bsp_dr16.c **** }
+  78:ACE-ECF/Bsp/Src/bsp_dr16.c **** /************************** Dongguan-University of Technology*-ACE**************************
+  79:ACE-ECF/Bsp/Src/bsp_dr16.c ****  * @brief 获取遥控器数据指针
+  80:ACE-ECF/Bsp/Src/bsp_dr16.c ****  *
+  81:ACE-ECF/Bsp/Src/bsp_dr16.c ****  * @return const RC_ctrl_t*
+  82:ACE-ECF/Bsp/Src/bsp_dr16.c ****  ************************** Dongguan-University of Technology*-ACE***************************/
+  83:ACE-ECF/Bsp/Src/bsp_dr16.c **** RC_ctrl_t *RC_Get_RC_Pointer(void) { return &rc_ctl; }
+  84:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+  85:ACE-ECF/Bsp/Src/bsp_dr16.c **** /************************** Dongguan-University of Technology*-ACE**************************
+  86:ACE-ECF/Bsp/Src/bsp_dr16.c ****  * @brief简介 遥控器初始化函数
+  87:ACE-ECF/Bsp/Src/bsp_dr16.c ****  *      dma双缓冲接收遥控器发来的数据，数据帧为18字节
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccwMxdym.s 			page 3
+
+
+  88:ACE-ECF/Bsp/Src/bsp_dr16.c ****  *      有机会就试试fifo无锁队列
+  89:ACE-ECF/Bsp/Src/bsp_dr16.c ****  * @param入参 huart huart指针
+  90:ACE-ECF/Bsp/Src/bsp_dr16.c ****  * @param入参 Rx1_Buff 缓冲区1基地址
+  91:ACE-ECF/Bsp/Src/bsp_dr16.c ****  * @param入参 Rx2_Buff 缓冲区2基地址
+  92:ACE-ECF/Bsp/Src/bsp_dr16.c ****  * @param入参 Data_Buff_Lenth 数据长度
+  93:ACE-ECF/Bsp/Src/bsp_dr16.c ****  ************************** Dongguan-University of Technology*-ACE************************** */
+  94:ACE-ECF/Bsp/Src/bsp_dr16.c **** void RC_Init(UART_HandleTypeDef *huart, uint8_t *Rx1_Buff, uint8_t *Rx2_Buff,
+  95:ACE-ECF/Bsp/Src/bsp_dr16.c ****              uint16_t Data_Buff_Lenth) {
+  96:ACE-ECF/Bsp/Src/bsp_dr16.c ****     // 使能DMA串口接收
+  97:ACE-ECF/Bsp/Src/bsp_dr16.c ****     SET_BIT(huart->Instance->CR3, USART_CR3_DMAR);
+  98:ACE-ECF/Bsp/Src/bsp_dr16.c ****     // 使能空闲中断
+  99:ACE-ECF/Bsp/Src/bsp_dr16.c ****     __HAL_UART_ENABLE_IT(huart, UART_IT_IDLE);
+ 100:ACE-ECF/Bsp/Src/bsp_dr16.c ****     //    //设置DMA传输，将串口1的数据搬运到recvive_buff中
+ 101:ACE-ECF/Bsp/Src/bsp_dr16.c ****     //    HAL_UART_Receive_DMA(&huart1, sbus_rx_buf[0], 36 );
+ 102:ACE-ECF/Bsp/Src/bsp_dr16.c ****     // 失效DMA
+ 103:ACE-ECF/Bsp/Src/bsp_dr16.c ****     __HAL_DMA_DISABLE(huart->hdmarx);
+ 104:ACE-ECF/Bsp/Src/bsp_dr16.c ****     while (huart->hdmarx->Instance->CR & DMA_SxCR_EN) {
+ 105:ACE-ECF/Bsp/Src/bsp_dr16.c ****     __HAL_DMA_DISABLE(huart->hdmarx);
+ 106:ACE-ECF/Bsp/Src/bsp_dr16.c ****     }
+ 107:ACE-ECF/Bsp/Src/bsp_dr16.c ****     huart->hdmarx->Instance->PAR = (uint32_t) & (huart->Instance->DR);
+ 108:ACE-ECF/Bsp/Src/bsp_dr16.c ****     // 内存缓冲区1
+ 109:ACE-ECF/Bsp/Src/bsp_dr16.c ****     huart->hdmarx->Instance->M0AR = (uint32_t)(Rx1_Buff);
+ 110:ACE-ECF/Bsp/Src/bsp_dr16.c ****     // 内存缓冲区2
+ 111:ACE-ECF/Bsp/Src/bsp_dr16.c ****     huart->hdmarx->Instance->M1AR = (uint32_t)(Rx2_Buff);
+ 112:ACE-ECF/Bsp/Src/bsp_dr16.c ****     // 数据长度
+ 113:ACE-ECF/Bsp/Src/bsp_dr16.c ****     huart->hdmarx->Instance->NDTR = Data_Buff_Lenth;
+ 114:ACE-ECF/Bsp/Src/bsp_dr16.c ****     // 使能双缓冲区
+ 115:ACE-ECF/Bsp/Src/bsp_dr16.c ****     SET_BIT(huart->hdmarx->Instance->CR, DMA_SxCR_DBM);
+ 116:ACE-ECF/Bsp/Src/bsp_dr16.c ****     // 使能DMA
+ 117:ACE-ECF/Bsp/Src/bsp_dr16.c ****     __HAL_DMA_ENABLE(huart->hdmarx);
+ 118:ACE-ECF/Bsp/Src/bsp_dr16.c **** }
+ 119:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 120:ACE-ECF/Bsp/Src/bsp_dr16.c **** /************************** Dongguan-University of Technology*-ACE**************************
+ 121:ACE-ECF/Bsp/Src/bsp_dr16.c ****  * @brief 遥控器原始数据协议解析
+ 122:ACE-ECF/Bsp/Src/bsp_dr16.c ****  *
+ 123:ACE-ECF/Bsp/Src/bsp_dr16.c ****  * @param pData 原始数据数组sbus
+ 124:ACE-ECF/Bsp/Src/bsp_dr16.c ****  * @param RC_CTRL 遥控器统一结构体
+ 125:ACE-ECF/Bsp/Src/bsp_dr16.c ****  * @return int
+ 126:ACE-ECF/Bsp/Src/bsp_dr16.c ****  ************************** Dongguan-University of Technology*-ACE***************************/
+ 127:ACE-ECF/Bsp/Src/bsp_dr16.c **** int RC_DataProcess(volatile const uint8_t *pData, RC_ctrl_t *RC_CTRL) {
+ 128:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 129:ACE-ECF/Bsp/Src/bsp_dr16.c **** #if DR16_LOST_DETECT_ENABLE
+ 130:ACE-ECF/Bsp/Src/bsp_dr16.c ****     rc_lost_time_refresh();
+ 131:ACE-ECF/Bsp/Src/bsp_dr16.c **** #endif
+ 132:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 133:ACE-ECF/Bsp/Src/bsp_dr16.c ****     RC_CTRL->rc.ch[0] = ((int16_t)pData[0] | ((int16_t)pData[1] << 8)) & 0x07FF;        //!< Channe
+ 134:ACE-ECF/Bsp/Src/bsp_dr16.c ****     RC_CTRL->rc.ch[1] = (((int16_t)pData[1] >> 3) | ((int16_t)pData[2] << 5)) & 0x07FF; //!< Channe
+ 135:ACE-ECF/Bsp/Src/bsp_dr16.c ****     RC_CTRL->rc.ch[2] = (((int16_t)pData[2] >> 6) | ((int16_t)pData[3] << 2) |          //!< Channe
+ 136:ACE-ECF/Bsp/Src/bsp_dr16.c ****                          ((int16_t)pData[4] << 10)) & 0x07FF;
+ 137:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 138:ACE-ECF/Bsp/Src/bsp_dr16.c ****     RC_CTRL->rc.ch[3] = (((int16_t)pData[4] >> 1) | ((int16_t)pData[5] << 7)) & 0x07FF; //!< Channe
+ 139:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 140:ACE-ECF/Bsp/Src/bsp_dr16.c ****     RC_CTRL->rc.s1 = ((pData[5] >> 4) & 0x000C) >> 2;                  //!< Switch left
+ 141:ACE-ECF/Bsp/Src/bsp_dr16.c ****     RC_CTRL->rc.s2 = ((pData[5] >> 4) & 0x0003);                       //!< Switch right
+ 142:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 143:ACE-ECF/Bsp/Src/bsp_dr16.c ****     RC_CTRL->mouse.x = ((int16_t)pData[6]) | ((int16_t)pData[7] << 8);   //!< Mouse X axis
+ 144:ACE-ECF/Bsp/Src/bsp_dr16.c ****     RC_CTRL->mouse.y = ((int16_t)pData[8]) | ((int16_t)pData[9] << 8);   //!< Mouse Y axis
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccwMxdym.s 			page 4
+
+
+ 145:ACE-ECF/Bsp/Src/bsp_dr16.c ****     RC_CTRL->mouse.z = ((int16_t)pData[10]) | ((int16_t)pData[11] << 8); //!< Mouse Z axis
+ 146:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 147:ACE-ECF/Bsp/Src/bsp_dr16.c ****     RC_CTRL->mouse.press_l = pData[12]; //!< Mouse Left Is Press ?
+ 148:ACE-ECF/Bsp/Src/bsp_dr16.c ****     RC_CTRL->mouse.press_r = pData[13]; //!< Mouse Right Is Press ?
+ 149:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 150:ACE-ECF/Bsp/Src/bsp_dr16.c ****     RC_CTRL->kb.key_code = pData[14] | (pData[15] << 8);              //!< KeyBoard value
+ 151:ACE-ECF/Bsp/Src/bsp_dr16.c ****     RC_CTRL->rc.ch[4] = ((int16_t)pData[16]) | ((int16_t)pData[17] << 8); //左上角滑轮
+ 152:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 153:ACE-ECF/Bsp/Src/bsp_dr16.c ****     RC_CTRL->rc.ch[0] -= RC_CH_VALUE_OFFSET;
+ 154:ACE-ECF/Bsp/Src/bsp_dr16.c ****     RC_CTRL->rc.ch[1] -= RC_CH_VALUE_OFFSET;
+ 155:ACE-ECF/Bsp/Src/bsp_dr16.c ****     RC_CTRL->rc.ch[2] -= RC_CH_VALUE_OFFSET;
+ 156:ACE-ECF/Bsp/Src/bsp_dr16.c ****     RC_CTRL->rc.ch[3] -= RC_CH_VALUE_OFFSET;
+ 157:ACE-ECF/Bsp/Src/bsp_dr16.c ****     RC_CTRL->rc.ch[4] -= RC_CH_VALUE_OFFSET;
+ 158:ACE-ECF/Bsp/Src/bsp_dr16.c **** 		
+ 159:ACE-ECF/Bsp/Src/bsp_dr16.c **** 		RC_CTRL->rc.ch[0] = rc_deadline_limit(RC_CTRL->rc.ch[0], 5); //死区限制
+ 160:ACE-ECF/Bsp/Src/bsp_dr16.c ****     RC_CTRL->rc.ch[1] = rc_deadline_limit(RC_CTRL->rc.ch[1], 5); //死区限制
+ 161:ACE-ECF/Bsp/Src/bsp_dr16.c ****     RC_CTRL->rc.ch[2] = rc_deadline_limit(RC_CTRL->rc.ch[2], 5); //死区限制
+ 162:ACE-ECF/Bsp/Src/bsp_dr16.c ****     RC_CTRL->rc.ch[3] = rc_deadline_limit(RC_CTRL->rc.ch[3], 5); //死区限制
+ 163:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 164:ACE-ECF/Bsp/Src/bsp_dr16.c ****     return 0;
+ 165:ACE-ECF/Bsp/Src/bsp_dr16.c **** }
+ 166:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 167:ACE-ECF/Bsp/Src/bsp_dr16.c **** // 将变量拉出来看看(debug用)
+ 168:ACE-ECF/Bsp/Src/bsp_dr16.c **** static uint16_t this_time_rx_len = 0;
+ 169:ACE-ECF/Bsp/Src/bsp_dr16.c **** /************************** Dongguan-University of Technology*-ACE**************************
+ 170:ACE-ECF/Bsp/Src/bsp_dr16.c ****  * @brief 自定义的一个串口中断，加在stm32f4xx_it.c的用户自定义串口中断里了
+ 171:ACE-ECF/Bsp/Src/bsp_dr16.c ****  *
+ 172:ACE-ECF/Bsp/Src/bsp_dr16.c ****  * @param huart
+ 173:ACE-ECF/Bsp/Src/bsp_dr16.c ****  ************************** Dongguan-University of Technology*-ACE***************************/
+ 174:ACE-ECF/Bsp/Src/bsp_dr16.c **** void RC_UART_IRQHandler(UART_HandleTypeDef *huart) {
+ 175:ACE-ECF/Bsp/Src/bsp_dr16.c ****     if (huart->Instance->SR & UART_FLAG_RXNE) // 接收到数据
+ 176:ACE-ECF/Bsp/Src/bsp_dr16.c ****                       // //SR寄存器是状态寄存器，若其与UART_FLAG_RXNE（00010100）与
+ 177:ACE-ECF/Bsp/Src/bsp_dr16.c ****     {
+ 178:ACE-ECF/Bsp/Src/bsp_dr16.c ****     __HAL_UART_CLEAR_PEFLAG(huart);
+ 179:ACE-ECF/Bsp/Src/bsp_dr16.c ****     } else if (huart->Instance->SR & UART_FLAG_IDLE) // 串口处于空闲状态  （UART_FLAG_IDLE
+ 180:ACE-ECF/Bsp/Src/bsp_dr16.c ****                              // 0：未检测到空闲线路 1：检测到空闲线路）
+ 181:ACE-ECF/Bsp/Src/bsp_dr16.c ****     { // 在空闲中断里判断数据帧的传送是否正确
+ 182:ACE-ECF/Bsp/Src/bsp_dr16.c ****     // 当串口开始接收数据后，检测到1字节数据的时间内没有数据发送，则�
+ 183:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 184:ACE-ECF/Bsp/Src/bsp_dr16.c ****     __HAL_UART_CLEAR_PEFLAG(huart);
+ 185:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 186:ACE-ECF/Bsp/Src/bsp_dr16.c ****     if ((huart->hdmarx->Instance->CR & DMA_SxCR_CT) == RESET) {
+ 187:ACE-ECF/Bsp/Src/bsp_dr16.c ****       /* Current memory buffer used is Memory 0 */
+ 188:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 189:ACE-ECF/Bsp/Src/bsp_dr16.c ****       // disable DMA
+ 190:ACE-ECF/Bsp/Src/bsp_dr16.c ****       // 失效DMA
+ 191:ACE-ECF/Bsp/Src/bsp_dr16.c ****       __HAL_DMA_DISABLE(huart->hdmarx);
+ 192:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 193:ACE-ECF/Bsp/Src/bsp_dr16.c ****       // get receive data length, length = set_data_length - remain_length
+ 194:ACE-ECF/Bsp/Src/bsp_dr16.c ****       // 获取接收数据长度,长度 = 设定长度 - 剩余长度
+ 195:ACE-ECF/Bsp/Src/bsp_dr16.c ****       this_time_rx_len = Sbus_RX_Buffer_Num - huart->hdmarx->Instance->NDTR;
+ 196:ACE-ECF/Bsp/Src/bsp_dr16.c ****       // reset set_data_lenght
+ 197:ACE-ECF/Bsp/Src/bsp_dr16.c ****       // 重新设定数据长度
+ 198:ACE-ECF/Bsp/Src/bsp_dr16.c ****       huart->hdmarx->Instance->NDTR = Sbus_RX_Buffer_Num;
+ 199:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 200:ACE-ECF/Bsp/Src/bsp_dr16.c ****       // set memory buffer 1
+ 201:ACE-ECF/Bsp/Src/bsp_dr16.c ****       // 设定缓冲区1
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccwMxdym.s 			page 5
+
+
+ 202:ACE-ECF/Bsp/Src/bsp_dr16.c ****       huart->hdmarx->Instance->CR |= DMA_SxCR_CT;
+ 203:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 204:ACE-ECF/Bsp/Src/bsp_dr16.c ****       // enable DMA
+ 205:ACE-ECF/Bsp/Src/bsp_dr16.c ****       // 使能DMA
+ 206:ACE-ECF/Bsp/Src/bsp_dr16.c ****       __HAL_DMA_ENABLE(huart->hdmarx);
+ 207:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 208:ACE-ECF/Bsp/Src/bsp_dr16.c ****       if (this_time_rx_len == RC_FRAME_LENGTH) {
+ 209:ACE-ECF/Bsp/Src/bsp_dr16.c ****         RC_DataProcess(Sbus_RX_Buffer[0], &rc_ctl);
+ 210:ACE-ECF/Bsp/Src/bsp_dr16.c ****       }
+ 211:ACE-ECF/Bsp/Src/bsp_dr16.c ****     } else {
+ 212:ACE-ECF/Bsp/Src/bsp_dr16.c ****       /* Current memory buffer used is Memory 1 */
+ 213:ACE-ECF/Bsp/Src/bsp_dr16.c ****       // disable DMA
+ 214:ACE-ECF/Bsp/Src/bsp_dr16.c ****       // 失效DMA
+ 215:ACE-ECF/Bsp/Src/bsp_dr16.c ****       __HAL_DMA_DISABLE(huart->hdmarx);
+ 216:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 217:ACE-ECF/Bsp/Src/bsp_dr16.c ****       // get receive data length, length = set_data_length - remain_length
+ 218:ACE-ECF/Bsp/Src/bsp_dr16.c ****       // 获取接收数据长度,长度 = 设定长度 - 剩余长度
+ 219:ACE-ECF/Bsp/Src/bsp_dr16.c ****       this_time_rx_len = Sbus_RX_Buffer_Num - huart->hdmarx->Instance->NDTR;
+ 220:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 221:ACE-ECF/Bsp/Src/bsp_dr16.c ****       // reset set_data_lenght
+ 222:ACE-ECF/Bsp/Src/bsp_dr16.c ****       // 重新设定数据长度
+ 223:ACE-ECF/Bsp/Src/bsp_dr16.c ****       huart->hdmarx->Instance->NDTR = Sbus_RX_Buffer_Num;
+ 224:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 225:ACE-ECF/Bsp/Src/bsp_dr16.c ****       // set memory buffer 0
+ 226:ACE-ECF/Bsp/Src/bsp_dr16.c ****       // 设定缓冲区0
+ 227:ACE-ECF/Bsp/Src/bsp_dr16.c ****       huart->hdmarx->Instance->CR &= ~(DMA_SxCR_CT);
+ 228:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 229:ACE-ECF/Bsp/Src/bsp_dr16.c ****       // enable DMA
+ 230:ACE-ECF/Bsp/Src/bsp_dr16.c ****       // 使能DMA
+ 231:ACE-ECF/Bsp/Src/bsp_dr16.c ****       __HAL_DMA_ENABLE(huart->hdmarx);
+ 232:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 233:ACE-ECF/Bsp/Src/bsp_dr16.c ****       if (this_time_rx_len == RC_FRAME_LENGTH) {
+ 234:ACE-ECF/Bsp/Src/bsp_dr16.c ****         // 处理遥控器数据
+ 235:ACE-ECF/Bsp/Src/bsp_dr16.c ****         RC_DataProcess(Sbus_RX_Buffer[1], &rc_ctl);
+ 236:ACE-ECF/Bsp/Src/bsp_dr16.c ****       }
+ 237:ACE-ECF/Bsp/Src/bsp_dr16.c ****     }
+ 238:ACE-ECF/Bsp/Src/bsp_dr16.c ****   }
+ 239:ACE-ECF/Bsp/Src/bsp_dr16.c **** }
+ 240:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 241:ACE-ECF/Bsp/Src/bsp_dr16.c **** /************************** Dongguan-University of Technology*-ACE**************************
+ 242:ACE-ECF/Bsp/Src/bsp_dr16.c ****  * @brief 遥控器绝对值处理
+ 243:ACE-ECF/Bsp/Src/bsp_dr16.c ****  *
+ 244:ACE-ECF/Bsp/Src/bsp_dr16.c ****  * @param num
+ 245:ACE-ECF/Bsp/Src/bsp_dr16.c ****  * @return int16_t
+ 246:ACE-ECF/Bsp/Src/bsp_dr16.c ****  ************************** Dongguan-University of Technology*-ACE***************************/
+ 247:ACE-ECF/Bsp/Src/bsp_dr16.c **** static int16_t RC_abs(int16_t num) {
+  29              		.loc 1 247 36 view -0
+  30              		.cfi_startproc
+  31              		@ args = 0, pretend = 0, frame = 0
+  32              		@ frame_needed = 0, uses_anonymous_args = 0
+  33              		@ link register save eliminated.
+ 248:ACE-ECF/Bsp/Src/bsp_dr16.c ****   if (num < 0)
+  34              		.loc 1 248 3 view .LVU1
+  35              		.loc 1 248 6 is_stmt 0 view .LVU2
+  36 0000 0028     		cmp	r0, #0
+  37              	.LVL1:
+  38              		.loc 1 248 6 view .LVU3
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccwMxdym.s 			page 6
+
+
+  39 0002 00DB     		blt	.L3
+  40              	.L2:
+ 249:ACE-ECF/Bsp/Src/bsp_dr16.c ****     return -num;
+ 250:ACE-ECF/Bsp/Src/bsp_dr16.c ****   else
+ 251:ACE-ECF/Bsp/Src/bsp_dr16.c ****     return num;
+ 252:ACE-ECF/Bsp/Src/bsp_dr16.c **** }
+  41              		.loc 1 252 1 view .LVU4
+  42 0004 7047     		bx	lr
+  43              	.L3:
+ 249:ACE-ECF/Bsp/Src/bsp_dr16.c ****     return -num;
+  44              		.loc 1 249 5 is_stmt 1 view .LVU5
+ 249:ACE-ECF/Bsp/Src/bsp_dr16.c ****     return -num;
+  45              		.loc 1 249 12 is_stmt 0 view .LVU6
+  46 0006 4042     		rsbs	r0, r0, #0
+  47 0008 00B2     		sxth	r0, r0
+  48 000a FBE7     		b	.L2
+  49              		.cfi_endproc
+  50              	.LFE145:
+  52              		.section	.text.chassis_rc_lost_time,"ax",%progbits
+  53              		.align	1
+  54              		.global	chassis_rc_lost_time
+  55              		.syntax unified
+  56              		.thumb
+  57              		.thumb_func
+  59              	chassis_rc_lost_time:
+  60              	.LFB138:
+  50:ACE-ECF/Bsp/Src/bsp_dr16.c ****     return RCLostTime;
+  61              		.loc 1 50 1 is_stmt 1 view -0
+  62              		.cfi_startproc
+  63              		@ args = 0, pretend = 0, frame = 0
+  64              		@ frame_needed = 0, uses_anonymous_args = 0
+  65              		@ link register save eliminated.
+  51:ACE-ECF/Bsp/Src/bsp_dr16.c **** }
+  66              		.loc 1 51 5 view .LVU8
+  52:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+  67              		.loc 1 52 1 is_stmt 0 view .LVU9
+  68 0000 014B     		ldr	r3, .L5
+  69 0002 1868     		ldr	r0, [r3]
+  70 0004 7047     		bx	lr
+  71              	.L6:
+  72 0006 00BF     		.align	2
+  73              	.L5:
+  74 0008 00000000 		.word	.LANCHOR0
+  75              		.cfi_endproc
+  76              	.LFE138:
+  78              		.section	.text.rc_lost_time_refresh,"ax",%progbits
+  79              		.align	1
+  80              		.global	rc_lost_time_refresh
+  81              		.syntax unified
+  82              		.thumb
+  83              		.thumb_func
+  85              	rc_lost_time_refresh:
+  86              	.LFB139:
+  56:ACE-ECF/Bsp/Src/bsp_dr16.c ****     /* 当接收到数据时，；刷新失联倒计时   xTaskGetTickCountFromISR  xTaskGetTickCou
+  87              		.loc 1 56 1 is_stmt 1 view -0
+  88              		.cfi_startproc
+  89              		@ args = 0, pretend = 0, frame = 0
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccwMxdym.s 			page 7
+
+
+  90              		@ frame_needed = 0, uses_anonymous_args = 0
+  91 0000 08B5     		push	{r3, lr}
+  92              	.LCFI0:
+  93              		.cfi_def_cfa_offset 8
+  94              		.cfi_offset 3, -8
+  95              		.cfi_offset 14, -4
+  58:ACE-ECF/Bsp/Src/bsp_dr16.c **** }
+  96              		.loc 1 58 5 view .LVU11
+  58:ACE-ECF/Bsp/Src/bsp_dr16.c **** }
+  97              		.loc 1 58 18 is_stmt 0 view .LVU12
+  98 0002 FFF7FEFF 		bl	xTaskGetTickCount
+  99              	.LVL2:
+  58:ACE-ECF/Bsp/Src/bsp_dr16.c **** }
+ 100              		.loc 1 58 38 view .LVU13
+ 101 0006 3230     		adds	r0, r0, #50
+  58:ACE-ECF/Bsp/Src/bsp_dr16.c **** }
+ 102              		.loc 1 58 16 view .LVU14
+ 103 0008 014B     		ldr	r3, .L9
+ 104 000a 1860     		str	r0, [r3]
+  59:ACE-ECF/Bsp/Src/bsp_dr16.c **** #endif
+ 105              		.loc 1 59 1 view .LVU15
+ 106 000c 08BD     		pop	{r3, pc}
+ 107              	.L10:
+ 108 000e 00BF     		.align	2
+ 109              	.L9:
+ 110 0010 00000000 		.word	.LANCHOR0
+ 111              		.cfi_endproc
+ 112              	.LFE139:
+ 114              		.section	.text.rc_deadline_limit,"ax",%progbits
+ 115              		.align	1
+ 116              		.global	rc_deadline_limit
+ 117              		.syntax unified
+ 118              		.thumb
+ 119              		.thumb_func
+ 121              	rc_deadline_limit:
+ 122              	.LVL3:
+ 123              	.LFB140:
+  68:ACE-ECF/Bsp/Src/bsp_dr16.c ****     if (input > dealine || input < -dealine)
+ 124              		.loc 1 68 1 is_stmt 1 view -0
+ 125              		.cfi_startproc
+ 126              		@ args = 0, pretend = 0, frame = 0
+ 127              		@ frame_needed = 0, uses_anonymous_args = 0
+ 128              		@ link register save eliminated.
+  69:ACE-ECF/Bsp/Src/bsp_dr16.c ****     {
+ 129              		.loc 1 69 5 view .LVU17
+  69:ACE-ECF/Bsp/Src/bsp_dr16.c ****     {
+ 130              		.loc 1 69 8 is_stmt 0 view .LVU18
+ 131 0000 8842     		cmp	r0, r1
+ 132 0002 03DC     		bgt	.L12
+  69:ACE-ECF/Bsp/Src/bsp_dr16.c ****     {
+ 133              		.loc 1 69 36 discriminator 1 view .LVU19
+ 134 0004 4942     		rsbs	r1, r1, #0
+ 135              	.LVL4:
+  69:ACE-ECF/Bsp/Src/bsp_dr16.c ****     {
+ 136              		.loc 1 69 25 discriminator 1 view .LVU20
+ 137 0006 8842     		cmp	r0, r1
+ 138 0008 00DB     		blt	.L12
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccwMxdym.s 			page 8
+
+
+  75:ACE-ECF/Bsp/Src/bsp_dr16.c ****     }
+ 139              		.loc 1 75 16 view .LVU21
+ 140 000a 0020     		movs	r0, #0
+ 141              	.LVL5:
+ 142              	.L12:
+  77:ACE-ECF/Bsp/Src/bsp_dr16.c **** /************************** Dongguan-University of Technology*-ACE**************************
+ 143              		.loc 1 77 1 view .LVU22
+ 144 000c 7047     		bx	lr
+ 145              		.cfi_endproc
+ 146              	.LFE140:
+ 148              		.section	.text.RC_Get_RC_Pointer,"ax",%progbits
+ 149              		.align	1
+ 150              		.global	RC_Get_RC_Pointer
+ 151              		.syntax unified
+ 152              		.thumb
+ 153              		.thumb_func
+ 155              	RC_Get_RC_Pointer:
+ 156              	.LFB141:
+  83:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 157              		.loc 1 83 36 is_stmt 1 view -0
+ 158              		.cfi_startproc
+ 159              		@ args = 0, pretend = 0, frame = 0
+ 160              		@ frame_needed = 0, uses_anonymous_args = 0
+ 161              		@ link register save eliminated.
+  83:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 162              		.loc 1 83 38 view .LVU24
+  83:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 163              		.loc 1 83 54 is_stmt 0 view .LVU25
+ 164 0000 0048     		ldr	r0, .L15
+ 165 0002 7047     		bx	lr
+ 166              	.L16:
+ 167              		.align	2
+ 168              	.L15:
+ 169 0004 00000000 		.word	.LANCHOR1
+ 170              		.cfi_endproc
+ 171              	.LFE141:
+ 173              		.section	.text.RC_Init,"ax",%progbits
+ 174              		.align	1
+ 175              		.global	RC_Init
+ 176              		.syntax unified
+ 177              		.thumb
+ 178              		.thumb_func
+ 180              	RC_Init:
+ 181              	.LVL6:
+ 182              	.LFB142:
+  95:ACE-ECF/Bsp/Src/bsp_dr16.c ****     // 使能DMA串口接收
+ 183              		.loc 1 95 40 is_stmt 1 view -0
+ 184              		.cfi_startproc
+ 185              		@ args = 0, pretend = 0, frame = 0
+ 186              		@ frame_needed = 0, uses_anonymous_args = 0
+ 187              		@ link register save eliminated.
+  95:ACE-ECF/Bsp/Src/bsp_dr16.c ****     // 使能DMA串口接收
+ 188              		.loc 1 95 40 is_stmt 0 view .LVU27
+ 189 0000 30B4     		push	{r4, r5}
+ 190              	.LCFI1:
+ 191              		.cfi_def_cfa_offset 8
+ 192              		.cfi_offset 4, -8
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccwMxdym.s 			page 9
+
+
+ 193              		.cfi_offset 5, -4
+  97:ACE-ECF/Bsp/Src/bsp_dr16.c ****     // 使能空闲中断
+ 194              		.loc 1 97 5 is_stmt 1 view .LVU28
+ 195 0002 0568     		ldr	r5, [r0]
+ 196 0004 6C69     		ldr	r4, [r5, #20]
+ 197 0006 44F04004 		orr	r4, r4, #64
+ 198 000a 6C61     		str	r4, [r5, #20]
+  99:ACE-ECF/Bsp/Src/bsp_dr16.c ****     //    //设置DMA传输，将串口1的数据搬运到recvive_buff中
+ 199              		.loc 1 99 5 view .LVU29
+ 200 000c 0568     		ldr	r5, [r0]
+ 201 000e EC68     		ldr	r4, [r5, #12]
+ 202 0010 44F01004 		orr	r4, r4, #16
+ 203 0014 EC60     		str	r4, [r5, #12]
+ 103:ACE-ECF/Bsp/Src/bsp_dr16.c ****     while (huart->hdmarx->Instance->CR & DMA_SxCR_EN) {
+ 204              		.loc 1 103 5 view .LVU30
+ 205 0016 846B     		ldr	r4, [r0, #56]
+ 206 0018 2568     		ldr	r5, [r4]
+ 207 001a 2C68     		ldr	r4, [r5]
+ 208 001c 24F00104 		bic	r4, r4, #1
+ 209 0020 2C60     		str	r4, [r5]
+ 104:ACE-ECF/Bsp/Src/bsp_dr16.c ****     __HAL_DMA_DISABLE(huart->hdmarx);
+ 210              		.loc 1 104 5 view .LVU31
+ 104:ACE-ECF/Bsp/Src/bsp_dr16.c ****     __HAL_DMA_DISABLE(huart->hdmarx);
+ 211              		.loc 1 104 11 is_stmt 0 view .LVU32
+ 212 0022 03E0     		b	.L18
+ 213              	.L19:
+ 105:ACE-ECF/Bsp/Src/bsp_dr16.c ****     }
+ 214              		.loc 1 105 5 is_stmt 1 view .LVU33
+ 215 0024 2568     		ldr	r5, [r4]
+ 216 0026 25F00105 		bic	r5, r5, #1
+ 217 002a 2560     		str	r5, [r4]
+ 218              	.L18:
+ 104:ACE-ECF/Bsp/Src/bsp_dr16.c ****     __HAL_DMA_DISABLE(huart->hdmarx);
+ 219              		.loc 1 104 11 view .LVU34
+ 104:ACE-ECF/Bsp/Src/bsp_dr16.c ****     __HAL_DMA_DISABLE(huart->hdmarx);
+ 220              		.loc 1 104 17 is_stmt 0 view .LVU35
+ 221 002c 846B     		ldr	r4, [r0, #56]
+ 104:ACE-ECF/Bsp/Src/bsp_dr16.c ****     __HAL_DMA_DISABLE(huart->hdmarx);
+ 222              		.loc 1 104 25 view .LVU36
+ 223 002e 2468     		ldr	r4, [r4]
+ 104:ACE-ECF/Bsp/Src/bsp_dr16.c ****     __HAL_DMA_DISABLE(huart->hdmarx);
+ 224              		.loc 1 104 35 view .LVU37
+ 225 0030 2568     		ldr	r5, [r4]
+ 104:ACE-ECF/Bsp/Src/bsp_dr16.c ****     __HAL_DMA_DISABLE(huart->hdmarx);
+ 226              		.loc 1 104 11 view .LVU38
+ 227 0032 15F0010F 		tst	r5, #1
+ 228 0036 F5D1     		bne	.L19
+ 107:ACE-ECF/Bsp/Src/bsp_dr16.c ****     // 内存缓冲区1
+ 229              		.loc 1 107 5 is_stmt 1 view .LVU39
+ 107:ACE-ECF/Bsp/Src/bsp_dr16.c ****     // 内存缓冲区1
+ 230              		.loc 1 107 55 is_stmt 0 view .LVU40
+ 231 0038 0568     		ldr	r5, [r0]
+ 107:ACE-ECF/Bsp/Src/bsp_dr16.c ****     // 内存缓冲区1
+ 232              		.loc 1 107 47 view .LVU41
+ 233 003a 0435     		adds	r5, r5, #4
+ 107:ACE-ECF/Bsp/Src/bsp_dr16.c ****     // 内存缓冲区1
+ 234              		.loc 1 107 34 view .LVU42
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccwMxdym.s 			page 10
+
+
+ 235 003c A560     		str	r5, [r4, #8]
+ 109:ACE-ECF/Bsp/Src/bsp_dr16.c ****     // 内存缓冲区2
+ 236              		.loc 1 109 5 is_stmt 1 view .LVU43
+ 109:ACE-ECF/Bsp/Src/bsp_dr16.c ****     // 内存缓冲区2
+ 237              		.loc 1 109 10 is_stmt 0 view .LVU44
+ 238 003e 846B     		ldr	r4, [r0, #56]
+ 109:ACE-ECF/Bsp/Src/bsp_dr16.c ****     // 内存缓冲区2
+ 239              		.loc 1 109 18 view .LVU45
+ 240 0040 2468     		ldr	r4, [r4]
+ 109:ACE-ECF/Bsp/Src/bsp_dr16.c ****     // 内存缓冲区2
+ 241              		.loc 1 109 35 view .LVU46
+ 242 0042 E160     		str	r1, [r4, #12]
+ 111:ACE-ECF/Bsp/Src/bsp_dr16.c ****     // 数据长度
+ 243              		.loc 1 111 5 is_stmt 1 view .LVU47
+ 111:ACE-ECF/Bsp/Src/bsp_dr16.c ****     // 数据长度
+ 244              		.loc 1 111 10 is_stmt 0 view .LVU48
+ 245 0044 816B     		ldr	r1, [r0, #56]
+ 246              	.LVL7:
+ 111:ACE-ECF/Bsp/Src/bsp_dr16.c ****     // 数据长度
+ 247              		.loc 1 111 18 view .LVU49
+ 248 0046 0968     		ldr	r1, [r1]
+ 111:ACE-ECF/Bsp/Src/bsp_dr16.c ****     // 数据长度
+ 249              		.loc 1 111 35 view .LVU50
+ 250 0048 0A61     		str	r2, [r1, #16]
+ 251              	.LVL8:
+ 113:ACE-ECF/Bsp/Src/bsp_dr16.c ****     // 使能双缓冲区
+ 252              		.loc 1 113 5 is_stmt 1 view .LVU51
+ 113:ACE-ECF/Bsp/Src/bsp_dr16.c ****     // 使能双缓冲区
+ 253              		.loc 1 113 10 is_stmt 0 view .LVU52
+ 254 004a 826B     		ldr	r2, [r0, #56]
+ 255              	.LVL9:
+ 113:ACE-ECF/Bsp/Src/bsp_dr16.c ****     // 使能双缓冲区
+ 256              		.loc 1 113 18 view .LVU53
+ 257 004c 1268     		ldr	r2, [r2]
+ 113:ACE-ECF/Bsp/Src/bsp_dr16.c ****     // 使能双缓冲区
+ 258              		.loc 1 113 35 view .LVU54
+ 259 004e 5360     		str	r3, [r2, #4]
+ 260              	.LVL10:
+ 115:ACE-ECF/Bsp/Src/bsp_dr16.c ****     // 使能DMA
+ 261              		.loc 1 115 5 is_stmt 1 view .LVU55
+ 262 0050 836B     		ldr	r3, [r0, #56]
+ 263              	.LVL11:
+ 115:ACE-ECF/Bsp/Src/bsp_dr16.c ****     // 使能DMA
+ 264              		.loc 1 115 5 is_stmt 0 view .LVU56
+ 265 0052 1A68     		ldr	r2, [r3]
+ 266 0054 1368     		ldr	r3, [r2]
+ 267 0056 43F48023 		orr	r3, r3, #262144
+ 268 005a 1360     		str	r3, [r2]
+ 117:ACE-ECF/Bsp/Src/bsp_dr16.c **** }
+ 269              		.loc 1 117 5 is_stmt 1 view .LVU57
+ 270 005c 836B     		ldr	r3, [r0, #56]
+ 271 005e 1A68     		ldr	r2, [r3]
+ 272 0060 1368     		ldr	r3, [r2]
+ 273 0062 43F00103 		orr	r3, r3, #1
+ 274 0066 1360     		str	r3, [r2]
+ 118:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 275              		.loc 1 118 1 is_stmt 0 view .LVU58
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccwMxdym.s 			page 11
+
+
+ 276 0068 30BC     		pop	{r4, r5}
+ 277              	.LCFI2:
+ 278              		.cfi_restore 5
+ 279              		.cfi_restore 4
+ 280              		.cfi_def_cfa_offset 0
+ 281 006a 7047     		bx	lr
+ 282              		.cfi_endproc
+ 283              	.LFE142:
+ 285              		.section	.text.RC_DataProcess,"ax",%progbits
+ 286              		.align	1
+ 287              		.global	RC_DataProcess
+ 288              		.syntax unified
+ 289              		.thumb
+ 290              		.thumb_func
+ 292              	RC_DataProcess:
+ 293              	.LVL12:
+ 294              	.LFB143:
+ 127:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 295              		.loc 1 127 71 is_stmt 1 view -0
+ 296              		.cfi_startproc
+ 297              		@ args = 0, pretend = 0, frame = 0
+ 298              		@ frame_needed = 0, uses_anonymous_args = 0
+ 127:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 299              		.loc 1 127 71 is_stmt 0 view .LVU60
+ 300 0000 F8B5     		push	{r3, r4, r5, r6, r7, lr}
+ 301              	.LCFI3:
+ 302              		.cfi_def_cfa_offset 24
+ 303              		.cfi_offset 3, -24
+ 304              		.cfi_offset 4, -20
+ 305              		.cfi_offset 5, -16
+ 306              		.cfi_offset 6, -12
+ 307              		.cfi_offset 7, -8
+ 308              		.cfi_offset 14, -4
+ 309 0002 0446     		mov	r4, r0
+ 310 0004 0D46     		mov	r5, r1
+ 130:ACE-ECF/Bsp/Src/bsp_dr16.c **** #endif
+ 311              		.loc 1 130 5 is_stmt 1 view .LVU61
+ 312 0006 FFF7FEFF 		bl	rc_lost_time_refresh
+ 313              	.LVL13:
+ 133:ACE-ECF/Bsp/Src/bsp_dr16.c ****     RC_CTRL->rc.ch[1] = (((int16_t)pData[1] >> 3) | ((int16_t)pData[2] << 5)) & 0x07FF; //!< Channe
+ 314              		.loc 1 133 5 view .LVU62
+ 133:ACE-ECF/Bsp/Src/bsp_dr16.c ****     RC_CTRL->rc.ch[1] = (((int16_t)pData[1] >> 3) | ((int16_t)pData[2] << 5)) & 0x07FF; //!< Channe
+ 315              		.loc 1 133 40 is_stmt 0 view .LVU63
+ 316 000a 2078     		ldrb	r0, [r4]	@ zero_extendqisi2
+ 133:ACE-ECF/Bsp/Src/bsp_dr16.c ****     RC_CTRL->rc.ch[1] = (((int16_t)pData[1] >> 3) | ((int16_t)pData[2] << 5)) & 0x07FF; //!< Channe
+ 317              		.loc 1 133 61 view .LVU64
+ 318 000c 6378     		ldrb	r3, [r4, #1]	@ zero_extendqisi2
+ 133:ACE-ECF/Bsp/Src/bsp_dr16.c ****     RC_CTRL->rc.ch[1] = (((int16_t)pData[1] >> 3) | ((int16_t)pData[2] << 5)) & 0x07FF; //!< Channe
+ 319              		.loc 1 133 44 view .LVU65
+ 320 000e 40EA0320 		orr	r0, r0, r3, lsl #8
+ 133:ACE-ECF/Bsp/Src/bsp_dr16.c ****     RC_CTRL->rc.ch[1] = (((int16_t)pData[1] >> 3) | ((int16_t)pData[2] << 5)) & 0x07FF; //!< Channe
+ 321              		.loc 1 133 72 view .LVU66
+ 322 0012 C0F30A00 		ubfx	r0, r0, #0, #11
+ 133:ACE-ECF/Bsp/Src/bsp_dr16.c ****     RC_CTRL->rc.ch[1] = (((int16_t)pData[1] >> 3) | ((int16_t)pData[2] << 5)) & 0x07FF; //!< Channe
+ 323              		.loc 1 133 23 view .LVU67
+ 324 0016 2880     		strh	r0, [r5]	@ movhi
+ 134:ACE-ECF/Bsp/Src/bsp_dr16.c ****     RC_CTRL->rc.ch[2] = (((int16_t)pData[2] >> 6) | ((int16_t)pData[3] << 2) |          //!< Channe
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccwMxdym.s 			page 12
+
+
+ 325              		.loc 1 134 5 is_stmt 1 view .LVU68
+ 134:ACE-ECF/Bsp/Src/bsp_dr16.c ****     RC_CTRL->rc.ch[2] = (((int16_t)pData[2] >> 6) | ((int16_t)pData[3] << 2) |          //!< Channe
+ 326              		.loc 1 134 41 is_stmt 0 view .LVU69
+ 327 0018 94F801C0 		ldrb	ip, [r4, #1]	@ zero_extendqisi2
+ 134:ACE-ECF/Bsp/Src/bsp_dr16.c ****     RC_CTRL->rc.ch[2] = (((int16_t)pData[2] >> 6) | ((int16_t)pData[3] << 2) |          //!< Channe
+ 328              		.loc 1 134 68 view .LVU70
+ 329 001c A378     		ldrb	r3, [r4, #2]	@ zero_extendqisi2
+ 134:ACE-ECF/Bsp/Src/bsp_dr16.c ****     RC_CTRL->rc.ch[2] = (((int16_t)pData[2] >> 6) | ((int16_t)pData[3] << 2) |          //!< Channe
+ 330              		.loc 1 134 51 view .LVU71
+ 331 001e 4FEADC0C 		lsr	ip, ip, #3
+ 332 0022 4CEA431C 		orr	ip, ip, r3, lsl #5
+ 134:ACE-ECF/Bsp/Src/bsp_dr16.c ****     RC_CTRL->rc.ch[2] = (((int16_t)pData[2] >> 6) | ((int16_t)pData[3] << 2) |          //!< Channe
+ 333              		.loc 1 134 79 view .LVU72
+ 334 0026 CCF30A0C 		ubfx	ip, ip, #0, #11
+ 134:ACE-ECF/Bsp/Src/bsp_dr16.c ****     RC_CTRL->rc.ch[2] = (((int16_t)pData[2] >> 6) | ((int16_t)pData[3] << 2) |          //!< Channe
+ 335              		.loc 1 134 23 view .LVU73
+ 336 002a A5F802C0 		strh	ip, [r5, #2]	@ movhi
+ 135:ACE-ECF/Bsp/Src/bsp_dr16.c ****                          ((int16_t)pData[4] << 10)) & 0x07FF;
+ 337              		.loc 1 135 5 is_stmt 1 view .LVU74
+ 135:ACE-ECF/Bsp/Src/bsp_dr16.c ****                          ((int16_t)pData[4] << 10)) & 0x07FF;
+ 338              		.loc 1 135 41 is_stmt 0 view .LVU75
+ 339 002e A378     		ldrb	r3, [r4, #2]	@ zero_extendqisi2
+ 135:ACE-ECF/Bsp/Src/bsp_dr16.c ****                          ((int16_t)pData[4] << 10)) & 0x07FF;
+ 340              		.loc 1 135 68 view .LVU76
+ 341 0030 E278     		ldrb	r2, [r4, #3]	@ zero_extendqisi2
+ 135:ACE-ECF/Bsp/Src/bsp_dr16.c ****                          ((int16_t)pData[4] << 10)) & 0x07FF;
+ 342              		.loc 1 135 51 view .LVU77
+ 343 0032 9B09     		lsrs	r3, r3, #6
+ 344 0034 43EA8203 		orr	r3, r3, r2, lsl #2
+ 136:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 345              		.loc 1 136 41 view .LVU78
+ 346 0038 2279     		ldrb	r2, [r4, #4]	@ zero_extendqisi2
+ 135:ACE-ECF/Bsp/Src/bsp_dr16.c ****                          ((int16_t)pData[4] << 10)) & 0x07FF;
+ 347              		.loc 1 135 78 view .LVU79
+ 348 003a 43EA8223 		orr	r3, r3, r2, lsl #10
+ 136:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 349              		.loc 1 136 53 view .LVU80
+ 350 003e C3F30A03 		ubfx	r3, r3, #0, #11
+ 135:ACE-ECF/Bsp/Src/bsp_dr16.c ****                          ((int16_t)pData[4] << 10)) & 0x07FF;
+ 351              		.loc 1 135 23 view .LVU81
+ 352 0042 AB80     		strh	r3, [r5, #4]	@ movhi
+ 138:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 353              		.loc 1 138 5 is_stmt 1 view .LVU82
+ 138:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 354              		.loc 1 138 41 is_stmt 0 view .LVU83
+ 355 0044 2179     		ldrb	r1, [r4, #4]	@ zero_extendqisi2
+ 138:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 356              		.loc 1 138 68 view .LVU84
+ 357 0046 6279     		ldrb	r2, [r4, #5]	@ zero_extendqisi2
+ 138:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 358              		.loc 1 138 51 view .LVU85
+ 359 0048 4908     		lsrs	r1, r1, #1
+ 360 004a 41EAC211 		orr	r1, r1, r2, lsl #7
+ 138:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 361              		.loc 1 138 79 view .LVU86
+ 362 004e C1F30A01 		ubfx	r1, r1, #0, #11
+ 138:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccwMxdym.s 			page 13
+
+
+ 363              		.loc 1 138 23 view .LVU87
+ 364 0052 E980     		strh	r1, [r5, #6]	@ movhi
+ 140:ACE-ECF/Bsp/Src/bsp_dr16.c ****     RC_CTRL->rc.s2 = ((pData[5] >> 4) & 0x0003);                       //!< Switch right
+ 365              		.loc 1 140 5 is_stmt 1 view .LVU88
+ 140:ACE-ECF/Bsp/Src/bsp_dr16.c ****     RC_CTRL->rc.s2 = ((pData[5] >> 4) & 0x0003);                       //!< Switch right
+ 366              		.loc 1 140 29 is_stmt 0 view .LVU89
+ 367 0054 6279     		ldrb	r2, [r4, #5]	@ zero_extendqisi2
+ 140:ACE-ECF/Bsp/Src/bsp_dr16.c ****     RC_CTRL->rc.s2 = ((pData[5] >> 4) & 0x0003);                       //!< Switch right
+ 368              		.loc 1 140 49 view .LVU90
+ 369 0056 9209     		lsrs	r2, r2, #6
+ 140:ACE-ECF/Bsp/Src/bsp_dr16.c ****     RC_CTRL->rc.s2 = ((pData[5] >> 4) & 0x0003);                       //!< Switch right
+ 370              		.loc 1 140 20 view .LVU91
+ 371 0058 AA72     		strb	r2, [r5, #10]
+ 141:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 372              		.loc 1 141 5 is_stmt 1 view .LVU92
+ 141:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 373              		.loc 1 141 29 is_stmt 0 view .LVU93
+ 374 005a 6279     		ldrb	r2, [r4, #5]	@ zero_extendqisi2
+ 141:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 375              		.loc 1 141 39 view .LVU94
+ 376 005c C2F30112 		ubfx	r2, r2, #4, #2
+ 141:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 377              		.loc 1 141 20 view .LVU95
+ 378 0060 EA72     		strb	r2, [r5, #11]
+ 143:ACE-ECF/Bsp/Src/bsp_dr16.c ****     RC_CTRL->mouse.y = ((int16_t)pData[8]) | ((int16_t)pData[9] << 8);   //!< Mouse Y axis
+ 379              		.loc 1 143 5 is_stmt 1 view .LVU96
+ 143:ACE-ECF/Bsp/Src/bsp_dr16.c ****     RC_CTRL->mouse.y = ((int16_t)pData[8]) | ((int16_t)pData[9] << 8);   //!< Mouse Y axis
+ 380              		.loc 1 143 39 is_stmt 0 view .LVU97
+ 381 0062 A279     		ldrb	r2, [r4, #6]	@ zero_extendqisi2
+ 143:ACE-ECF/Bsp/Src/bsp_dr16.c ****     RC_CTRL->mouse.y = ((int16_t)pData[8]) | ((int16_t)pData[9] << 8);   //!< Mouse Y axis
+ 382              		.loc 1 143 61 view .LVU98
+ 383 0064 E679     		ldrb	r6, [r4, #7]	@ zero_extendqisi2
+ 143:ACE-ECF/Bsp/Src/bsp_dr16.c ****     RC_CTRL->mouse.y = ((int16_t)pData[8]) | ((int16_t)pData[9] << 8);   //!< Mouse Y axis
+ 384              		.loc 1 143 44 view .LVU99
+ 385 0066 42EA0622 		orr	r2, r2, r6, lsl #8
+ 143:ACE-ECF/Bsp/Src/bsp_dr16.c ****     RC_CTRL->mouse.y = ((int16_t)pData[8]) | ((int16_t)pData[9] << 8);   //!< Mouse Y axis
+ 386              		.loc 1 143 22 view .LVU100
+ 387 006a AA81     		strh	r2, [r5, #12]	@ movhi
+ 144:ACE-ECF/Bsp/Src/bsp_dr16.c ****     RC_CTRL->mouse.z = ((int16_t)pData[10]) | ((int16_t)pData[11] << 8); //!< Mouse Z axis
+ 388              		.loc 1 144 5 is_stmt 1 view .LVU101
+ 144:ACE-ECF/Bsp/Src/bsp_dr16.c ****     RC_CTRL->mouse.z = ((int16_t)pData[10]) | ((int16_t)pData[11] << 8); //!< Mouse Z axis
+ 389              		.loc 1 144 39 is_stmt 0 view .LVU102
+ 390 006c 227A     		ldrb	r2, [r4, #8]	@ zero_extendqisi2
+ 144:ACE-ECF/Bsp/Src/bsp_dr16.c ****     RC_CTRL->mouse.z = ((int16_t)pData[10]) | ((int16_t)pData[11] << 8); //!< Mouse Z axis
+ 391              		.loc 1 144 61 view .LVU103
+ 392 006e 667A     		ldrb	r6, [r4, #9]	@ zero_extendqisi2
+ 144:ACE-ECF/Bsp/Src/bsp_dr16.c ****     RC_CTRL->mouse.z = ((int16_t)pData[10]) | ((int16_t)pData[11] << 8); //!< Mouse Z axis
+ 393              		.loc 1 144 44 view .LVU104
+ 394 0070 42EA0622 		orr	r2, r2, r6, lsl #8
+ 144:ACE-ECF/Bsp/Src/bsp_dr16.c ****     RC_CTRL->mouse.z = ((int16_t)pData[10]) | ((int16_t)pData[11] << 8); //!< Mouse Z axis
+ 395              		.loc 1 144 22 view .LVU105
+ 396 0074 EA81     		strh	r2, [r5, #14]	@ movhi
+ 145:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 397              		.loc 1 145 5 is_stmt 1 view .LVU106
+ 145:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 398              		.loc 1 145 39 is_stmt 0 view .LVU107
+ 399 0076 A27A     		ldrb	r2, [r4, #10]	@ zero_extendqisi2
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccwMxdym.s 			page 14
+
+
+ 145:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 400              		.loc 1 145 62 view .LVU108
+ 401 0078 E67A     		ldrb	r6, [r4, #11]	@ zero_extendqisi2
+ 145:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 402              		.loc 1 145 45 view .LVU109
+ 403 007a 42EA0622 		orr	r2, r2, r6, lsl #8
+ 145:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 404              		.loc 1 145 22 view .LVU110
+ 405 007e 2A82     		strh	r2, [r5, #16]	@ movhi
+ 147:ACE-ECF/Bsp/Src/bsp_dr16.c ****     RC_CTRL->mouse.press_r = pData[13]; //!< Mouse Right Is Press ?
+ 406              		.loc 1 147 5 is_stmt 1 view .LVU111
+ 147:ACE-ECF/Bsp/Src/bsp_dr16.c ****     RC_CTRL->mouse.press_r = pData[13]; //!< Mouse Right Is Press ?
+ 407              		.loc 1 147 28 is_stmt 0 view .LVU112
+ 408 0080 227B     		ldrb	r2, [r4, #12]	@ zero_extendqisi2
+ 409 0082 AA74     		strb	r2, [r5, #18]
+ 148:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 410              		.loc 1 148 5 is_stmt 1 view .LVU113
+ 148:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 411              		.loc 1 148 28 is_stmt 0 view .LVU114
+ 412 0084 627B     		ldrb	r2, [r4, #13]	@ zero_extendqisi2
+ 413 0086 EA74     		strb	r2, [r5, #19]
+ 150:ACE-ECF/Bsp/Src/bsp_dr16.c ****     RC_CTRL->rc.ch[4] = ((int16_t)pData[16]) | ((int16_t)pData[17] << 8); //左上角滑轮
+ 414              		.loc 1 150 5 is_stmt 1 view .LVU115
+ 150:ACE-ECF/Bsp/Src/bsp_dr16.c ****     RC_CTRL->rc.ch[4] = ((int16_t)pData[16]) | ((int16_t)pData[17] << 8); //左上角滑轮
+ 415              		.loc 1 150 33 is_stmt 0 view .LVU116
+ 416 0088 A27B     		ldrb	r2, [r4, #14]	@ zero_extendqisi2
+ 150:ACE-ECF/Bsp/Src/bsp_dr16.c ****     RC_CTRL->rc.ch[4] = ((int16_t)pData[16]) | ((int16_t)pData[17] << 8); //左上角滑轮
+ 417              		.loc 1 150 46 view .LVU117
+ 418 008a E67B     		ldrb	r6, [r4, #15]	@ zero_extendqisi2
+ 150:ACE-ECF/Bsp/Src/bsp_dr16.c ****     RC_CTRL->rc.ch[4] = ((int16_t)pData[16]) | ((int16_t)pData[17] << 8); //左上角滑轮
+ 419              		.loc 1 150 38 view .LVU118
+ 420 008c 42EA0622 		orr	r2, r2, r6, lsl #8
+ 150:ACE-ECF/Bsp/Src/bsp_dr16.c ****     RC_CTRL->rc.ch[4] = ((int16_t)pData[16]) | ((int16_t)pData[17] << 8); //左上角滑轮
+ 421              		.loc 1 150 26 view .LVU119
+ 422 0090 AA82     		strh	r2, [r5, #20]	@ movhi
+ 151:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 423              		.loc 1 151 5 is_stmt 1 view .LVU120
+ 151:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 424              		.loc 1 151 40 is_stmt 0 view .LVU121
+ 425 0092 227C     		ldrb	r2, [r4, #16]	@ zero_extendqisi2
+ 151:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 426              		.loc 1 151 63 view .LVU122
+ 427 0094 647C     		ldrb	r4, [r4, #17]	@ zero_extendqisi2
+ 428              	.LVL14:
+ 151:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 429              		.loc 1 151 46 view .LVU123
+ 430 0096 42EA0422 		orr	r2, r2, r4, lsl #8
+ 431 009a 12B2     		sxth	r2, r2
+ 151:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 432              		.loc 1 151 23 view .LVU124
+ 433 009c 2A81     		strh	r2, [r5, #8]	@ movhi
+ 153:ACE-ECF/Bsp/Src/bsp_dr16.c ****     RC_CTRL->rc.ch[1] -= RC_CH_VALUE_OFFSET;
+ 434              		.loc 1 153 5 is_stmt 1 view .LVU125
+ 153:ACE-ECF/Bsp/Src/bsp_dr16.c ****     RC_CTRL->rc.ch[1] -= RC_CH_VALUE_OFFSET;
+ 435              		.loc 1 153 23 is_stmt 0 view .LVU126
+ 436 009e A0F58060 		sub	r0, r0, #1024
+ 437 00a2 00B2     		sxth	r0, r0
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccwMxdym.s 			page 15
+
+
+ 438 00a4 2880     		strh	r0, [r5]	@ movhi
+ 154:ACE-ECF/Bsp/Src/bsp_dr16.c ****     RC_CTRL->rc.ch[2] -= RC_CH_VALUE_OFFSET;
+ 439              		.loc 1 154 5 is_stmt 1 view .LVU127
+ 154:ACE-ECF/Bsp/Src/bsp_dr16.c ****     RC_CTRL->rc.ch[2] -= RC_CH_VALUE_OFFSET;
+ 440              		.loc 1 154 23 is_stmt 0 view .LVU128
+ 441 00a6 ACF5806C 		sub	ip, ip, #1024
+ 442 00aa 0FFA8CF6 		sxth	r6, ip
+ 443 00ae 6E80     		strh	r6, [r5, #2]	@ movhi
+ 155:ACE-ECF/Bsp/Src/bsp_dr16.c ****     RC_CTRL->rc.ch[3] -= RC_CH_VALUE_OFFSET;
+ 444              		.loc 1 155 5 is_stmt 1 view .LVU129
+ 155:ACE-ECF/Bsp/Src/bsp_dr16.c ****     RC_CTRL->rc.ch[3] -= RC_CH_VALUE_OFFSET;
+ 445              		.loc 1 155 23 is_stmt 0 view .LVU130
+ 446 00b0 A3F58063 		sub	r3, r3, #1024
+ 447 00b4 1FB2     		sxth	r7, r3
+ 448 00b6 AF80     		strh	r7, [r5, #4]	@ movhi
+ 156:ACE-ECF/Bsp/Src/bsp_dr16.c ****     RC_CTRL->rc.ch[4] -= RC_CH_VALUE_OFFSET;
+ 449              		.loc 1 156 5 is_stmt 1 view .LVU131
+ 156:ACE-ECF/Bsp/Src/bsp_dr16.c ****     RC_CTRL->rc.ch[4] -= RC_CH_VALUE_OFFSET;
+ 450              		.loc 1 156 23 is_stmt 0 view .LVU132
+ 451 00b8 A1F58064 		sub	r4, r1, #1024
+ 452 00bc 24B2     		sxth	r4, r4
+ 453 00be EC80     		strh	r4, [r5, #6]	@ movhi
+ 157:ACE-ECF/Bsp/Src/bsp_dr16.c **** 		
+ 454              		.loc 1 157 5 is_stmt 1 view .LVU133
+ 157:ACE-ECF/Bsp/Src/bsp_dr16.c **** 		
+ 455              		.loc 1 157 23 is_stmt 0 view .LVU134
+ 456 00c0 A2F58062 		sub	r2, r2, #1024
+ 457 00c4 2A81     		strh	r2, [r5, #8]	@ movhi
+ 159:ACE-ECF/Bsp/Src/bsp_dr16.c ****     RC_CTRL->rc.ch[1] = rc_deadline_limit(RC_CTRL->rc.ch[1], 5); //死区限制
+ 458              		.loc 1 159 3 is_stmt 1 view .LVU135
+ 159:ACE-ECF/Bsp/Src/bsp_dr16.c ****     RC_CTRL->rc.ch[1] = rc_deadline_limit(RC_CTRL->rc.ch[1], 5); //死区限制
+ 459              		.loc 1 159 23 is_stmt 0 view .LVU136
+ 460 00c6 0521     		movs	r1, #5
+ 461 00c8 FFF7FEFF 		bl	rc_deadline_limit
+ 462              	.LVL15:
+ 159:ACE-ECF/Bsp/Src/bsp_dr16.c ****     RC_CTRL->rc.ch[1] = rc_deadline_limit(RC_CTRL->rc.ch[1], 5); //死区限制
+ 463              		.loc 1 159 21 view .LVU137
+ 464 00cc 2880     		strh	r0, [r5]	@ movhi
+ 160:ACE-ECF/Bsp/Src/bsp_dr16.c ****     RC_CTRL->rc.ch[2] = rc_deadline_limit(RC_CTRL->rc.ch[2], 5); //死区限制
+ 465              		.loc 1 160 5 is_stmt 1 view .LVU138
+ 160:ACE-ECF/Bsp/Src/bsp_dr16.c ****     RC_CTRL->rc.ch[2] = rc_deadline_limit(RC_CTRL->rc.ch[2], 5); //死区限制
+ 466              		.loc 1 160 25 is_stmt 0 view .LVU139
+ 467 00ce 0521     		movs	r1, #5
+ 468 00d0 3046     		mov	r0, r6
+ 469 00d2 FFF7FEFF 		bl	rc_deadline_limit
+ 470              	.LVL16:
+ 160:ACE-ECF/Bsp/Src/bsp_dr16.c ****     RC_CTRL->rc.ch[2] = rc_deadline_limit(RC_CTRL->rc.ch[2], 5); //死区限制
+ 471              		.loc 1 160 23 view .LVU140
+ 472 00d6 6880     		strh	r0, [r5, #2]	@ movhi
+ 161:ACE-ECF/Bsp/Src/bsp_dr16.c ****     RC_CTRL->rc.ch[3] = rc_deadline_limit(RC_CTRL->rc.ch[3], 5); //死区限制
+ 473              		.loc 1 161 5 is_stmt 1 view .LVU141
+ 161:ACE-ECF/Bsp/Src/bsp_dr16.c ****     RC_CTRL->rc.ch[3] = rc_deadline_limit(RC_CTRL->rc.ch[3], 5); //死区限制
+ 474              		.loc 1 161 25 is_stmt 0 view .LVU142
+ 475 00d8 0521     		movs	r1, #5
+ 476 00da 3846     		mov	r0, r7
+ 477 00dc FFF7FEFF 		bl	rc_deadline_limit
+ 478              	.LVL17:
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccwMxdym.s 			page 16
+
+
+ 161:ACE-ECF/Bsp/Src/bsp_dr16.c ****     RC_CTRL->rc.ch[3] = rc_deadline_limit(RC_CTRL->rc.ch[3], 5); //死区限制
+ 479              		.loc 1 161 23 view .LVU143
+ 480 00e0 A880     		strh	r0, [r5, #4]	@ movhi
+ 162:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 481              		.loc 1 162 5 is_stmt 1 view .LVU144
+ 162:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 482              		.loc 1 162 25 is_stmt 0 view .LVU145
+ 483 00e2 0521     		movs	r1, #5
+ 484 00e4 2046     		mov	r0, r4
+ 485 00e6 FFF7FEFF 		bl	rc_deadline_limit
+ 486              	.LVL18:
+ 162:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 487              		.loc 1 162 23 view .LVU146
+ 488 00ea E880     		strh	r0, [r5, #6]	@ movhi
+ 164:ACE-ECF/Bsp/Src/bsp_dr16.c **** }
+ 489              		.loc 1 164 5 is_stmt 1 view .LVU147
+ 165:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 490              		.loc 1 165 1 is_stmt 0 view .LVU148
+ 491 00ec 0020     		movs	r0, #0
+ 492 00ee F8BD     		pop	{r3, r4, r5, r6, r7, pc}
+ 165:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 493              		.loc 1 165 1 view .LVU149
+ 494              		.cfi_endproc
+ 495              	.LFE143:
+ 497              		.section	.text.RC_UART_IRQHandler,"ax",%progbits
+ 498              		.align	1
+ 499              		.global	RC_UART_IRQHandler
+ 500              		.syntax unified
+ 501              		.thumb
+ 502              		.thumb_func
+ 504              	RC_UART_IRQHandler:
+ 505              	.LVL19:
+ 506              	.LFB144:
+ 174:ACE-ECF/Bsp/Src/bsp_dr16.c ****     if (huart->Instance->SR & UART_FLAG_RXNE) // 接收到数据
+ 507              		.loc 1 174 52 is_stmt 1 view -0
+ 508              		.cfi_startproc
+ 509              		@ args = 0, pretend = 0, frame = 8
+ 510              		@ frame_needed = 0, uses_anonymous_args = 0
+ 174:ACE-ECF/Bsp/Src/bsp_dr16.c ****     if (huart->Instance->SR & UART_FLAG_RXNE) // 接收到数据
+ 511              		.loc 1 174 52 is_stmt 0 view .LVU151
+ 512 0000 00B5     		push	{lr}
+ 513              	.LCFI4:
+ 514              		.cfi_def_cfa_offset 4
+ 515              		.cfi_offset 14, -4
+ 516 0002 83B0     		sub	sp, sp, #12
+ 517              	.LCFI5:
+ 518              		.cfi_def_cfa_offset 16
+ 175:ACE-ECF/Bsp/Src/bsp_dr16.c ****                       // //SR寄存器是状态寄存器，若其与UART_FLAG_RXNE（00010100）与
+ 519              		.loc 1 175 5 is_stmt 1 view .LVU152
+ 175:ACE-ECF/Bsp/Src/bsp_dr16.c ****                       // //SR寄存器是状态寄存器，若其与UART_FLAG_RXNE（00010100）与
+ 520              		.loc 1 175 14 is_stmt 0 view .LVU153
+ 521 0004 0368     		ldr	r3, [r0]
+ 175:ACE-ECF/Bsp/Src/bsp_dr16.c ****                       // //SR寄存器是状态寄存器，若其与UART_FLAG_RXNE（00010100）与
+ 522              		.loc 1 175 24 view .LVU154
+ 523 0006 1A68     		ldr	r2, [r3]
+ 175:ACE-ECF/Bsp/Src/bsp_dr16.c ****                       // //SR寄存器是状态寄存器，若其与UART_FLAG_RXNE（00010100）与
+ 524              		.loc 1 175 8 view .LVU155
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccwMxdym.s 			page 17
+
+
+ 525 0008 12F0200F 		tst	r2, #32
+ 526 000c 09D0     		beq	.L24
+ 178:ACE-ECF/Bsp/Src/bsp_dr16.c ****     } else if (huart->Instance->SR & UART_FLAG_IDLE) // 串口处于空闲状态  （UART_FLAG_IDLE
+ 527              		.loc 1 178 5 is_stmt 1 view .LVU156
+ 528              	.LBB2:
+ 178:ACE-ECF/Bsp/Src/bsp_dr16.c ****     } else if (huart->Instance->SR & UART_FLAG_IDLE) // 串口处于空闲状态  （UART_FLAG_IDLE
+ 529              		.loc 1 178 5 view .LVU157
+ 530 000e 0022     		movs	r2, #0
+ 531 0010 0092     		str	r2, [sp]
+ 178:ACE-ECF/Bsp/Src/bsp_dr16.c ****     } else if (huart->Instance->SR & UART_FLAG_IDLE) // 串口处于空闲状态  （UART_FLAG_IDLE
+ 532              		.loc 1 178 5 view .LVU158
+ 533 0012 1A68     		ldr	r2, [r3]
+ 534 0014 0092     		str	r2, [sp]
+ 178:ACE-ECF/Bsp/Src/bsp_dr16.c ****     } else if (huart->Instance->SR & UART_FLAG_IDLE) // 串口处于空闲状态  （UART_FLAG_IDLE
+ 535              		.loc 1 178 5 view .LVU159
+ 536 0016 5B68     		ldr	r3, [r3, #4]
+ 537 0018 0093     		str	r3, [sp]
+ 178:ACE-ECF/Bsp/Src/bsp_dr16.c ****     } else if (huart->Instance->SR & UART_FLAG_IDLE) // 串口处于空闲状态  （UART_FLAG_IDLE
+ 538              		.loc 1 178 5 view .LVU160
+ 539 001a 009B     		ldr	r3, [sp]
+ 540              	.LBE2:
+ 178:ACE-ECF/Bsp/Src/bsp_dr16.c ****     } else if (huart->Instance->SR & UART_FLAG_IDLE) // 串口处于空闲状态  （UART_FLAG_IDLE
+ 541              		.loc 1 178 5 view .LVU161
+ 542              	.LVL20:
+ 543              	.L23:
+ 239:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 544              		.loc 1 239 1 is_stmt 0 view .LVU162
+ 545 001c 03B0     		add	sp, sp, #12
+ 546              	.LCFI6:
+ 547              		.cfi_remember_state
+ 548              		.cfi_def_cfa_offset 4
+ 549              		@ sp needed
+ 550 001e 5DF804FB 		ldr	pc, [sp], #4
+ 551              	.LVL21:
+ 552              	.L24:
+ 553              	.LCFI7:
+ 554              		.cfi_restore_state
+ 179:ACE-ECF/Bsp/Src/bsp_dr16.c ****                              // 0：未检测到空闲线路 1：检测到空闲线路）
+ 555              		.loc 1 179 12 is_stmt 1 view .LVU163
+ 179:ACE-ECF/Bsp/Src/bsp_dr16.c ****                              // 0：未检测到空闲线路 1：检测到空闲线路）
+ 556              		.loc 1 179 31 is_stmt 0 view .LVU164
+ 557 0022 1A68     		ldr	r2, [r3]
+ 179:ACE-ECF/Bsp/Src/bsp_dr16.c ****                              // 0：未检测到空闲线路 1：检测到空闲线路）
+ 558              		.loc 1 179 15 view .LVU165
+ 559 0024 12F0100F 		tst	r2, #16
+ 560 0028 F8D0     		beq	.L23
+ 184:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 561              		.loc 1 184 5 is_stmt 1 view .LVU166
+ 562              	.LBB3:
+ 184:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 563              		.loc 1 184 5 view .LVU167
+ 564 002a 0022     		movs	r2, #0
+ 565 002c 0192     		str	r2, [sp, #4]
+ 184:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 566              		.loc 1 184 5 view .LVU168
+ 567 002e 1A68     		ldr	r2, [r3]
+ 568 0030 0192     		str	r2, [sp, #4]
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccwMxdym.s 			page 18
+
+
+ 184:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 569              		.loc 1 184 5 view .LVU169
+ 570 0032 5B68     		ldr	r3, [r3, #4]
+ 571 0034 0193     		str	r3, [sp, #4]
+ 184:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 572              		.loc 1 184 5 view .LVU170
+ 573 0036 019B     		ldr	r3, [sp, #4]
+ 574              	.LBE3:
+ 184:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 575              		.loc 1 184 5 view .LVU171
+ 186:ACE-ECF/Bsp/Src/bsp_dr16.c ****       /* Current memory buffer used is Memory 0 */
+ 576              		.loc 1 186 5 view .LVU172
+ 186:ACE-ECF/Bsp/Src/bsp_dr16.c ****       /* Current memory buffer used is Memory 0 */
+ 577              		.loc 1 186 15 is_stmt 0 view .LVU173
+ 578 0038 836B     		ldr	r3, [r0, #56]
+ 186:ACE-ECF/Bsp/Src/bsp_dr16.c ****       /* Current memory buffer used is Memory 0 */
+ 579              		.loc 1 186 23 view .LVU174
+ 580 003a 1B68     		ldr	r3, [r3]
+ 186:ACE-ECF/Bsp/Src/bsp_dr16.c ****       /* Current memory buffer used is Memory 0 */
+ 581              		.loc 1 186 33 view .LVU175
+ 582 003c 1A68     		ldr	r2, [r3]
+ 186:ACE-ECF/Bsp/Src/bsp_dr16.c ****       /* Current memory buffer used is Memory 0 */
+ 583              		.loc 1 186 8 view .LVU176
+ 584 003e 12F4002F 		tst	r2, #524288
+ 585 0042 20D1     		bne	.L26
+ 191:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 586              		.loc 1 191 7 is_stmt 1 view .LVU177
+ 587 0044 1A68     		ldr	r2, [r3]
+ 588 0046 22F00102 		bic	r2, r2, #1
+ 589 004a 1A60     		str	r2, [r3]
+ 195:ACE-ECF/Bsp/Src/bsp_dr16.c ****       // reset set_data_lenght
+ 590              		.loc 1 195 7 view .LVU178
+ 195:ACE-ECF/Bsp/Src/bsp_dr16.c ****       // reset set_data_lenght
+ 591              		.loc 1 195 52 is_stmt 0 view .LVU179
+ 592 004c 836B     		ldr	r3, [r0, #56]
+ 195:ACE-ECF/Bsp/Src/bsp_dr16.c ****       // reset set_data_lenght
+ 593              		.loc 1 195 60 view .LVU180
+ 594 004e 1A68     		ldr	r2, [r3]
+ 195:ACE-ECF/Bsp/Src/bsp_dr16.c ****       // reset set_data_lenght
+ 595              		.loc 1 195 70 view .LVU181
+ 596 0050 5368     		ldr	r3, [r2, #4]
+ 195:ACE-ECF/Bsp/Src/bsp_dr16.c ****       // reset set_data_lenght
+ 597              		.loc 1 195 45 view .LVU182
+ 598 0052 C3F12403 		rsb	r3, r3, #36
+ 599 0056 9BB2     		uxth	r3, r3
+ 195:ACE-ECF/Bsp/Src/bsp_dr16.c ****       // reset set_data_lenght
+ 600              		.loc 1 195 24 view .LVU183
+ 601 0058 1B49     		ldr	r1, .L28
+ 602 005a 0B80     		strh	r3, [r1]	@ movhi
+ 198:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 603              		.loc 1 198 7 is_stmt 1 view .LVU184
+ 198:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 604              		.loc 1 198 37 is_stmt 0 view .LVU185
+ 605 005c 2421     		movs	r1, #36
+ 606 005e 5160     		str	r1, [r2, #4]
+ 202:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 607              		.loc 1 202 7 is_stmt 1 view .LVU186
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccwMxdym.s 			page 19
+
+
+ 202:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 608              		.loc 1 202 12 is_stmt 0 view .LVU187
+ 609 0060 826B     		ldr	r2, [r0, #56]
+ 202:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 610              		.loc 1 202 20 view .LVU188
+ 611 0062 1168     		ldr	r1, [r2]
+ 202:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 612              		.loc 1 202 35 view .LVU189
+ 613 0064 0A68     		ldr	r2, [r1]
+ 614 0066 42F40022 		orr	r2, r2, #524288
+ 615 006a 0A60     		str	r2, [r1]
+ 206:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 616              		.loc 1 206 7 is_stmt 1 view .LVU190
+ 617 006c 826B     		ldr	r2, [r0, #56]
+ 618 006e 1168     		ldr	r1, [r2]
+ 619 0070 0A68     		ldr	r2, [r1]
+ 620 0072 42F00102 		orr	r2, r2, #1
+ 621 0076 0A60     		str	r2, [r1]
+ 208:ACE-ECF/Bsp/Src/bsp_dr16.c ****         RC_DataProcess(Sbus_RX_Buffer[0], &rc_ctl);
+ 622              		.loc 1 208 7 view .LVU191
+ 208:ACE-ECF/Bsp/Src/bsp_dr16.c ****         RC_DataProcess(Sbus_RX_Buffer[0], &rc_ctl);
+ 623              		.loc 1 208 10 is_stmt 0 view .LVU192
+ 624 0078 122B     		cmp	r3, #18
+ 625 007a CFD1     		bne	.L23
+ 209:ACE-ECF/Bsp/Src/bsp_dr16.c ****       }
+ 626              		.loc 1 209 9 is_stmt 1 view .LVU193
+ 627 007c 1349     		ldr	r1, .L28+4
+ 628 007e 1448     		ldr	r0, .L28+8
+ 629              	.LVL22:
+ 209:ACE-ECF/Bsp/Src/bsp_dr16.c ****       }
+ 630              		.loc 1 209 9 is_stmt 0 view .LVU194
+ 631 0080 FFF7FEFF 		bl	RC_DataProcess
+ 632              	.LVL23:
+ 633 0084 CAE7     		b	.L23
+ 634              	.LVL24:
+ 635              	.L26:
+ 215:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 636              		.loc 1 215 7 is_stmt 1 view .LVU195
+ 637 0086 1A68     		ldr	r2, [r3]
+ 638 0088 22F00102 		bic	r2, r2, #1
+ 639 008c 1A60     		str	r2, [r3]
+ 219:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 640              		.loc 1 219 7 view .LVU196
+ 219:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 641              		.loc 1 219 52 is_stmt 0 view .LVU197
+ 642 008e 836B     		ldr	r3, [r0, #56]
+ 219:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 643              		.loc 1 219 60 view .LVU198
+ 644 0090 1A68     		ldr	r2, [r3]
+ 219:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 645              		.loc 1 219 70 view .LVU199
+ 646 0092 5368     		ldr	r3, [r2, #4]
+ 219:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 647              		.loc 1 219 45 view .LVU200
+ 648 0094 C3F12403 		rsb	r3, r3, #36
+ 649 0098 9BB2     		uxth	r3, r3
+ 219:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccwMxdym.s 			page 20
+
+
+ 650              		.loc 1 219 24 view .LVU201
+ 651 009a 0B49     		ldr	r1, .L28
+ 652 009c 0B80     		strh	r3, [r1]	@ movhi
+ 223:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 653              		.loc 1 223 7 is_stmt 1 view .LVU202
+ 223:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 654              		.loc 1 223 37 is_stmt 0 view .LVU203
+ 655 009e 2421     		movs	r1, #36
+ 656 00a0 5160     		str	r1, [r2, #4]
+ 227:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 657              		.loc 1 227 7 is_stmt 1 view .LVU204
+ 227:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 658              		.loc 1 227 12 is_stmt 0 view .LVU205
+ 659 00a2 826B     		ldr	r2, [r0, #56]
+ 227:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 660              		.loc 1 227 20 view .LVU206
+ 661 00a4 1168     		ldr	r1, [r2]
+ 227:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 662              		.loc 1 227 35 view .LVU207
+ 663 00a6 0A68     		ldr	r2, [r1]
+ 664 00a8 22F40022 		bic	r2, r2, #524288
+ 665 00ac 0A60     		str	r2, [r1]
+ 231:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 666              		.loc 1 231 7 is_stmt 1 view .LVU208
+ 667 00ae 826B     		ldr	r2, [r0, #56]
+ 668 00b0 1168     		ldr	r1, [r2]
+ 669 00b2 0A68     		ldr	r2, [r1]
+ 670 00b4 42F00102 		orr	r2, r2, #1
+ 671 00b8 0A60     		str	r2, [r1]
+ 233:ACE-ECF/Bsp/Src/bsp_dr16.c ****         // 处理遥控器数据
+ 672              		.loc 1 233 7 view .LVU209
+ 233:ACE-ECF/Bsp/Src/bsp_dr16.c ****         // 处理遥控器数据
+ 673              		.loc 1 233 10 is_stmt 0 view .LVU210
+ 674 00ba 122B     		cmp	r3, #18
+ 675 00bc AED1     		bne	.L23
+ 235:ACE-ECF/Bsp/Src/bsp_dr16.c ****       }
+ 676              		.loc 1 235 9 is_stmt 1 view .LVU211
+ 677 00be 0349     		ldr	r1, .L28+4
+ 678 00c0 0448     		ldr	r0, .L28+12
+ 679              	.LVL25:
+ 235:ACE-ECF/Bsp/Src/bsp_dr16.c ****       }
+ 680              		.loc 1 235 9 is_stmt 0 view .LVU212
+ 681 00c2 FFF7FEFF 		bl	RC_DataProcess
+ 682              	.LVL26:
+ 239:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 683              		.loc 1 239 1 view .LVU213
+ 684 00c6 A9E7     		b	.L23
+ 685              	.L29:
+ 686              		.align	2
+ 687              	.L28:
+ 688 00c8 00000000 		.word	.LANCHOR2
+ 689 00cc 00000000 		.word	.LANCHOR1
+ 690 00d0 00000000 		.word	.LANCHOR3
+ 691 00d4 24000000 		.word	.LANCHOR3+36
+ 692              		.cfi_endproc
+ 693              	.LFE144:
+ 695              		.section	.text.RC_Restart,"ax",%progbits
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccwMxdym.s 			page 21
+
+
+ 696              		.align	1
+ 697              		.global	RC_Restart
+ 698              		.syntax unified
+ 699              		.thumb
+ 700              		.thumb_func
+ 702              	RC_Restart:
+ 703              	.LVL27:
+ 704              	.LFB146:
+ 253:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 254:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 255:ACE-ECF/Bsp/Src/bsp_dr16.c **** /************************** Dongguan-University of Technology*-ACE**************************
+ 256:ACE-ECF/Bsp/Src/bsp_dr16.c ****  * @brief 重启遥控器
+ 257:ACE-ECF/Bsp/Src/bsp_dr16.c ****  *
+ 258:ACE-ECF/Bsp/Src/bsp_dr16.c ****  * @param入参 dma_buf_num
+ 259:ACE-ECF/Bsp/Src/bsp_dr16.c ****  ************************** Dongguan-University of Technology*-ACE***************************/
+ 260:ACE-ECF/Bsp/Src/bsp_dr16.c **** void RC_Restart(UART_HandleTypeDef *huart, uint16_t dma_buf_num) {
+ 705              		.loc 1 260 66 is_stmt 1 view -0
+ 706              		.cfi_startproc
+ 707              		@ args = 0, pretend = 0, frame = 0
+ 708              		@ frame_needed = 0, uses_anonymous_args = 0
+ 709              		@ link register save eliminated.
+ 261:ACE-ECF/Bsp/Src/bsp_dr16.c ****     __HAL_UART_DISABLE(huart);
+ 710              		.loc 1 261 5 view .LVU215
+ 711 0000 0268     		ldr	r2, [r0]
+ 712 0002 D368     		ldr	r3, [r2, #12]
+ 713 0004 23F40053 		bic	r3, r3, #8192
+ 714 0008 D360     		str	r3, [r2, #12]
+ 262:ACE-ECF/Bsp/Src/bsp_dr16.c ****     __HAL_DMA_DISABLE(huart->hdmarx);
+ 715              		.loc 1 262 5 view .LVU216
+ 716 000a 836B     		ldr	r3, [r0, #56]
+ 717 000c 1A68     		ldr	r2, [r3]
+ 718 000e 1368     		ldr	r3, [r2]
+ 719 0010 23F00103 		bic	r3, r3, #1
+ 720 0014 1360     		str	r3, [r2]
+ 263:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 264:ACE-ECF/Bsp/Src/bsp_dr16.c ****     huart->hdmarx->Instance->NDTR = dma_buf_num; // 重新写入长度
+ 721              		.loc 1 264 5 view .LVU217
+ 722              		.loc 1 264 10 is_stmt 0 view .LVU218
+ 723 0016 836B     		ldr	r3, [r0, #56]
+ 724              		.loc 1 264 18 view .LVU219
+ 725 0018 1B68     		ldr	r3, [r3]
+ 726              		.loc 1 264 35 view .LVU220
+ 727 001a 5960     		str	r1, [r3, #4]
+ 265:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 266:ACE-ECF/Bsp/Src/bsp_dr16.c ****     __HAL_UART_ENABLE(huart);
+ 728              		.loc 1 266 5 is_stmt 1 view .LVU221
+ 729 001c 0268     		ldr	r2, [r0]
+ 730 001e D368     		ldr	r3, [r2, #12]
+ 731 0020 43F40053 		orr	r3, r3, #8192
+ 732 0024 D360     		str	r3, [r2, #12]
+ 267:ACE-ECF/Bsp/Src/bsp_dr16.c ****     __HAL_DMA_ENABLE(huart->hdmarx);
+ 733              		.loc 1 267 5 view .LVU222
+ 734 0026 836B     		ldr	r3, [r0, #56]
+ 735 0028 1A68     		ldr	r2, [r3]
+ 736 002a 1368     		ldr	r3, [r2]
+ 737 002c 43F00103 		orr	r3, r3, #1
+ 738 0030 1360     		str	r3, [r2]
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccwMxdym.s 			page 22
+
+
+ 268:ACE-ECF/Bsp/Src/bsp_dr16.c **** }
+ 739              		.loc 1 268 1 is_stmt 0 view .LVU223
+ 740 0032 7047     		bx	lr
+ 741              		.cfi_endproc
+ 742              	.LFE146:
+ 744              		.section	.text.RC_DataReload,"ax",%progbits
+ 745              		.align	1
+ 746              		.global	RC_DataReload
+ 747              		.syntax unified
+ 748              		.thumb
+ 749              		.thumb_func
+ 751              	RC_DataReload:
+ 752              	.LFB147:
+ 269:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 270:ACE-ECF/Bsp/Src/bsp_dr16.c **** /************************** Dongguan-University of Technology*-ACE**************************
+ 271:ACE-ECF/Bsp/Src/bsp_dr16.c ****  * @brief 遥控数据清零
+ 272:ACE-ECF/Bsp/Src/bsp_dr16.c ****  *
+ 273:ACE-ECF/Bsp/Src/bsp_dr16.c ****  ************************** Dongguan-University of Technology*-ACE***************************/
+ 274:ACE-ECF/Bsp/Src/bsp_dr16.c **** void RC_DataReload(void) {
+ 753              		.loc 1 274 26 is_stmt 1 view -0
+ 754              		.cfi_startproc
+ 755              		@ args = 0, pretend = 0, frame = 0
+ 756              		@ frame_needed = 0, uses_anonymous_args = 0
+ 757              		@ link register save eliminated.
+ 275:ACE-ECF/Bsp/Src/bsp_dr16.c ****     rc_ctl.rc.ch[0] = 0;
+ 758              		.loc 1 275 5 view .LVU225
+ 759              		.loc 1 275 21 is_stmt 0 view .LVU226
+ 760 0000 064B     		ldr	r3, .L32
+ 761 0002 0022     		movs	r2, #0
+ 762 0004 1A80     		strh	r2, [r3]	@ movhi
+ 276:ACE-ECF/Bsp/Src/bsp_dr16.c ****     rc_ctl.rc.ch[1] = 0;
+ 763              		.loc 1 276 5 is_stmt 1 view .LVU227
+ 764              		.loc 1 276 21 is_stmt 0 view .LVU228
+ 765 0006 5A80     		strh	r2, [r3, #2]	@ movhi
+ 277:ACE-ECF/Bsp/Src/bsp_dr16.c ****     rc_ctl.rc.ch[2] = 0;
+ 766              		.loc 1 277 5 is_stmt 1 view .LVU229
+ 767              		.loc 1 277 21 is_stmt 0 view .LVU230
+ 768 0008 9A80     		strh	r2, [r3, #4]	@ movhi
+ 278:ACE-ECF/Bsp/Src/bsp_dr16.c ****     rc_ctl.rc.ch[3] = 0;
+ 769              		.loc 1 278 5 is_stmt 1 view .LVU231
+ 770              		.loc 1 278 21 is_stmt 0 view .LVU232
+ 771 000a DA80     		strh	r2, [r3, #6]	@ movhi
+ 279:ACE-ECF/Bsp/Src/bsp_dr16.c ****     rc_ctl.rc.ch[4] = 0;
+ 772              		.loc 1 279 5 is_stmt 1 view .LVU233
+ 773              		.loc 1 279 21 is_stmt 0 view .LVU234
+ 774 000c 1A81     		strh	r2, [r3, #8]	@ movhi
+ 280:ACE-ECF/Bsp/Src/bsp_dr16.c ****     rc_ctl.mouse.x = 0;
+ 775              		.loc 1 280 5 is_stmt 1 view .LVU235
+ 776              		.loc 1 280 20 is_stmt 0 view .LVU236
+ 777 000e 9A81     		strh	r2, [r3, #12]	@ movhi
+ 281:ACE-ECF/Bsp/Src/bsp_dr16.c ****     rc_ctl.mouse.y = 0;
+ 778              		.loc 1 281 5 is_stmt 1 view .LVU237
+ 779              		.loc 1 281 20 is_stmt 0 view .LVU238
+ 780 0010 DA81     		strh	r2, [r3, #14]	@ movhi
+ 282:ACE-ECF/Bsp/Src/bsp_dr16.c ****     rc_ctl.mouse.z = 0;
+ 781              		.loc 1 282 5 is_stmt 1 view .LVU239
+ 782              		.loc 1 282 20 is_stmt 0 view .LVU240
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccwMxdym.s 			page 23
+
+
+ 783 0012 1A82     		strh	r2, [r3, #16]	@ movhi
+ 283:ACE-ECF/Bsp/Src/bsp_dr16.c ****     rc_ctl.mouse.press_l = 0;
+ 784              		.loc 1 283 5 is_stmt 1 view .LVU241
+ 785              		.loc 1 283 26 is_stmt 0 view .LVU242
+ 786 0014 9A74     		strb	r2, [r3, #18]
+ 284:ACE-ECF/Bsp/Src/bsp_dr16.c ****     rc_ctl.mouse.press_r = 0;
+ 787              		.loc 1 284 5 is_stmt 1 view .LVU243
+ 788              		.loc 1 284 26 is_stmt 0 view .LVU244
+ 789 0016 DA74     		strb	r2, [r3, #19]
+ 285:ACE-ECF/Bsp/Src/bsp_dr16.c ****     rc_ctl.kb.key_code  = 0;
+ 790              		.loc 1 285 5 is_stmt 1 view .LVU245
+ 791              		.loc 1 285 25 is_stmt 0 view .LVU246
+ 792 0018 9A82     		strh	r2, [r3, #20]	@ movhi
+ 286:ACE-ECF/Bsp/Src/bsp_dr16.c **** }
+ 793              		.loc 1 286 1 view .LVU247
+ 794 001a 7047     		bx	lr
+ 795              	.L33:
+ 796              		.align	2
+ 797              	.L32:
+ 798 001c 00000000 		.word	.LANCHOR1
+ 799              		.cfi_endproc
+ 800              	.LFE147:
+ 802              		.section	.text.RC_Check_Data_IS_ERROR,"ax",%progbits
+ 803              		.align	1
+ 804              		.global	RC_Check_Data_IS_ERROR
+ 805              		.syntax unified
+ 806              		.thumb
+ 807              		.thumb_func
+ 809              	RC_Check_Data_IS_ERROR:
+ 810              	.LFB148:
+ 287:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 288:ACE-ECF/Bsp/Src/bsp_dr16.c **** /************************** Dongguan-University of Technology*-ACE**************************
+ 289:ACE-ECF/Bsp/Src/bsp_dr16.c ****  * @brief 判断遥控器是否出错，采用go to 语句统一将错误数据归零
+ 290:ACE-ECF/Bsp/Src/bsp_dr16.c ****  *
+ 291:ACE-ECF/Bsp/Src/bsp_dr16.c ****  * @return uint8_t
+ 292:ACE-ECF/Bsp/Src/bsp_dr16.c **** ************************** Dongguan-University of Technology*-ACE***************************/
+ 293:ACE-ECF/Bsp/Src/bsp_dr16.c **** bool_t RC_Check_Data_IS_ERROR(void) {
+ 811              		.loc 1 293 37 is_stmt 1 view -0
+ 812              		.cfi_startproc
+ 813              		@ args = 0, pretend = 0, frame = 0
+ 814              		@ frame_needed = 0, uses_anonymous_args = 0
+ 815 0000 08B5     		push	{r3, lr}
+ 816              	.LCFI8:
+ 817              		.cfi_def_cfa_offset 8
+ 818              		.cfi_offset 3, -8
+ 819              		.cfi_offset 14, -4
+ 294:ACE-ECF/Bsp/Src/bsp_dr16.c ****     if (RC_abs(rc_ctl.rc.ch[0]) > RC_CHANNAL_ERROR_VALUE) {
+ 820              		.loc 1 294 5 view .LVU249
+ 821              		.loc 1 294 9 is_stmt 0 view .LVU250
+ 822 0002 1D4B     		ldr	r3, .L39
+ 823 0004 B3F90000 		ldrsh	r0, [r3]
+ 824 0008 FFF7FEFF 		bl	RC_abs
+ 825              	.LVL28:
+ 826              		.loc 1 294 8 view .LVU251
+ 827 000c B0F52F7F 		cmp	r0, #700
+ 828 0010 1FDC     		bgt	.L35
+ 295:ACE-ECF/Bsp/Src/bsp_dr16.c ****         goto error;
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccwMxdym.s 			page 24
+
+
+ 296:ACE-ECF/Bsp/Src/bsp_dr16.c ****     }
+ 297:ACE-ECF/Bsp/Src/bsp_dr16.c ****     if (RC_abs(rc_ctl.rc.ch[1]) > RC_CHANNAL_ERROR_VALUE) {
+ 829              		.loc 1 297 5 is_stmt 1 view .LVU252
+ 830              		.loc 1 297 9 is_stmt 0 view .LVU253
+ 831 0012 194B     		ldr	r3, .L39
+ 832 0014 B3F90200 		ldrsh	r0, [r3, #2]
+ 833 0018 FFF7FEFF 		bl	RC_abs
+ 834              	.LVL29:
+ 835              		.loc 1 297 8 view .LVU254
+ 836 001c B0F52F7F 		cmp	r0, #700
+ 837 0020 17DC     		bgt	.L35
+ 298:ACE-ECF/Bsp/Src/bsp_dr16.c ****         goto error;
+ 299:ACE-ECF/Bsp/Src/bsp_dr16.c ****     }
+ 300:ACE-ECF/Bsp/Src/bsp_dr16.c ****     if (RC_abs(rc_ctl.rc.ch[2]) > RC_CHANNAL_ERROR_VALUE) {
+ 838              		.loc 1 300 5 is_stmt 1 view .LVU255
+ 839              		.loc 1 300 9 is_stmt 0 view .LVU256
+ 840 0022 154B     		ldr	r3, .L39
+ 841 0024 B3F90400 		ldrsh	r0, [r3, #4]
+ 842 0028 FFF7FEFF 		bl	RC_abs
+ 843              	.LVL30:
+ 844              		.loc 1 300 8 view .LVU257
+ 845 002c B0F52F7F 		cmp	r0, #700
+ 846 0030 0FDC     		bgt	.L35
+ 301:ACE-ECF/Bsp/Src/bsp_dr16.c ****         goto error;
+ 302:ACE-ECF/Bsp/Src/bsp_dr16.c ****     }
+ 303:ACE-ECF/Bsp/Src/bsp_dr16.c ****     if (RC_abs(rc_ctl.rc.ch[4]) > RC_CHANNAL_ERROR_VALUE) {
+ 847              		.loc 1 303 5 is_stmt 1 view .LVU258
+ 848              		.loc 1 303 9 is_stmt 0 view .LVU259
+ 849 0032 114B     		ldr	r3, .L39
+ 850 0034 B3F90800 		ldrsh	r0, [r3, #8]
+ 851 0038 FFF7FEFF 		bl	RC_abs
+ 852              	.LVL31:
+ 853              		.loc 1 303 8 view .LVU260
+ 854 003c B0F52F7F 		cmp	r0, #700
+ 855 0040 07DC     		bgt	.L35
+ 304:ACE-ECF/Bsp/Src/bsp_dr16.c ****         goto error;
+ 305:ACE-ECF/Bsp/Src/bsp_dr16.c ****     }
+ 306:ACE-ECF/Bsp/Src/bsp_dr16.c ****     if (rc_ctl.rc.s1 == 0) {
+ 856              		.loc 1 306 5 is_stmt 1 view .LVU261
+ 857              		.loc 1 306 18 is_stmt 0 view .LVU262
+ 858 0042 0D4B     		ldr	r3, .L39
+ 859 0044 9B7A     		ldrb	r3, [r3, #10]	@ zero_extendqisi2
+ 860              		.loc 1 306 8 view .LVU263
+ 861 0046 23B1     		cbz	r3, .L35
+ 307:ACE-ECF/Bsp/Src/bsp_dr16.c ****         goto error;
+ 308:ACE-ECF/Bsp/Src/bsp_dr16.c ****     }
+ 309:ACE-ECF/Bsp/Src/bsp_dr16.c ****     if (rc_ctl.rc.s2 == 0) {
+ 862              		.loc 1 309 5 is_stmt 1 view .LVU264
+ 863              		.loc 1 309 18 is_stmt 0 view .LVU265
+ 864 0048 0B4B     		ldr	r3, .L39
+ 865 004a DB7A     		ldrb	r3, [r3, #11]	@ zero_extendqisi2
+ 866              		.loc 1 309 8 view .LVU266
+ 867 004c 0BB1     		cbz	r3, .L35
+ 310:ACE-ECF/Bsp/Src/bsp_dr16.c ****         goto error;
+ 311:ACE-ECF/Bsp/Src/bsp_dr16.c ****     }
+ 312:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 313:ACE-ECF/Bsp/Src/bsp_dr16.c ****     return 0;
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccwMxdym.s 			page 25
+
+
+ 868              		.loc 1 313 12 view .LVU267
+ 869 004e 0020     		movs	r0, #0
+ 870 0050 10E0     		b	.L36
+ 871              	.L35:
+ 314:ACE-ECF/Bsp/Src/bsp_dr16.c **** error:
+ 315:ACE-ECF/Bsp/Src/bsp_dr16.c ****     rc_ctl.rc.ch[0] = 0;
+ 872              		.loc 1 315 5 is_stmt 1 view .LVU268
+ 873              		.loc 1 315 21 is_stmt 0 view .LVU269
+ 874 0052 094B     		ldr	r3, .L39
+ 875 0054 0022     		movs	r2, #0
+ 876 0056 1A80     		strh	r2, [r3]	@ movhi
+ 316:ACE-ECF/Bsp/Src/bsp_dr16.c ****     rc_ctl.rc.ch[1] = 0;
+ 877              		.loc 1 316 5 is_stmt 1 view .LVU270
+ 878              		.loc 1 316 21 is_stmt 0 view .LVU271
+ 879 0058 5A80     		strh	r2, [r3, #2]	@ movhi
+ 317:ACE-ECF/Bsp/Src/bsp_dr16.c ****     rc_ctl.rc.ch[2] = 0;
+ 880              		.loc 1 317 5 is_stmt 1 view .LVU272
+ 881              		.loc 1 317 21 is_stmt 0 view .LVU273
+ 882 005a 9A80     		strh	r2, [r3, #4]	@ movhi
+ 318:ACE-ECF/Bsp/Src/bsp_dr16.c ****     rc_ctl.rc.ch[3] = 0;
+ 883              		.loc 1 318 5 is_stmt 1 view .LVU274
+ 884              		.loc 1 318 21 is_stmt 0 view .LVU275
+ 885 005c DA80     		strh	r2, [r3, #6]	@ movhi
+ 319:ACE-ECF/Bsp/Src/bsp_dr16.c ****     rc_ctl.rc.ch[4] = 0;
+ 886              		.loc 1 319 5 is_stmt 1 view .LVU276
+ 887              		.loc 1 319 21 is_stmt 0 view .LVU277
+ 888 005e 1A81     		strh	r2, [r3, #8]	@ movhi
+ 320:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 321:ACE-ECF/Bsp/Src/bsp_dr16.c ****     rc_ctl.rc.s1 = RC_SW_DOWN;
+ 889              		.loc 1 321 5 is_stmt 1 view .LVU278
+ 890              		.loc 1 321 18 is_stmt 0 view .LVU279
+ 891 0060 0221     		movs	r1, #2
+ 892 0062 9972     		strb	r1, [r3, #10]
+ 322:ACE-ECF/Bsp/Src/bsp_dr16.c ****     rc_ctl.rc.s2 = RC_SW_DOWN;
+ 893              		.loc 1 322 5 is_stmt 1 view .LVU280
+ 894              		.loc 1 322 18 is_stmt 0 view .LVU281
+ 895 0064 D972     		strb	r1, [r3, #11]
+ 323:ACE-ECF/Bsp/Src/bsp_dr16.c ****     rc_ctl.mouse.x = 0;
+ 896              		.loc 1 323 5 is_stmt 1 view .LVU282
+ 897              		.loc 1 323 20 is_stmt 0 view .LVU283
+ 898 0066 9A81     		strh	r2, [r3, #12]	@ movhi
+ 324:ACE-ECF/Bsp/Src/bsp_dr16.c ****     rc_ctl.mouse.y = 0;
+ 899              		.loc 1 324 5 is_stmt 1 view .LVU284
+ 900              		.loc 1 324 20 is_stmt 0 view .LVU285
+ 901 0068 DA81     		strh	r2, [r3, #14]	@ movhi
+ 325:ACE-ECF/Bsp/Src/bsp_dr16.c ****     rc_ctl.mouse.z = 0;
+ 902              		.loc 1 325 5 is_stmt 1 view .LVU286
+ 903              		.loc 1 325 20 is_stmt 0 view .LVU287
+ 904 006a 1A82     		strh	r2, [r3, #16]	@ movhi
+ 326:ACE-ECF/Bsp/Src/bsp_dr16.c ****     rc_ctl.mouse.press_l = 0;
+ 905              		.loc 1 326 5 is_stmt 1 view .LVU288
+ 906              		.loc 1 326 26 is_stmt 0 view .LVU289
+ 907 006c 9A74     		strb	r2, [r3, #18]
+ 327:ACE-ECF/Bsp/Src/bsp_dr16.c ****     rc_ctl.mouse.press_r = 0;
+ 908              		.loc 1 327 5 is_stmt 1 view .LVU290
+ 909              		.loc 1 327 26 is_stmt 0 view .LVU291
+ 910 006e DA74     		strb	r2, [r3, #19]
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccwMxdym.s 			page 26
+
+
+ 328:ACE-ECF/Bsp/Src/bsp_dr16.c ****     rc_ctl.kb.key_code = 0;
+ 911              		.loc 1 328 5 is_stmt 1 view .LVU292
+ 912              		.loc 1 328 24 is_stmt 0 view .LVU293
+ 913 0070 9A82     		strh	r2, [r3, #20]	@ movhi
+ 329:ACE-ECF/Bsp/Src/bsp_dr16.c ****     return 1;
+ 914              		.loc 1 329 5 is_stmt 1 view .LVU294
+ 915              		.loc 1 329 12 is_stmt 0 view .LVU295
+ 916 0072 0120     		movs	r0, #1
+ 917              	.L36:
+ 330:ACE-ECF/Bsp/Src/bsp_dr16.c **** }
+ 918              		.loc 1 330 1 view .LVU296
+ 919 0074 08BD     		pop	{r3, pc}
+ 920              	.L40:
+ 921 0076 00BF     		.align	2
+ 922              	.L39:
+ 923 0078 00000000 		.word	.LANCHOR1
+ 924              		.cfi_endproc
+ 925              	.LFE148:
+ 927              		.section	.text.Disconnect_callBack,"ax",%progbits
+ 928              		.align	1
+ 929              		.global	Disconnect_callBack
+ 930              		.syntax unified
+ 931              		.thumb
+ 932              		.thumb_func
+ 934              	Disconnect_callBack:
+ 935              	.LFB149:
+ 331:ACE-ECF/Bsp/Src/bsp_dr16.c **** uint8_t DIS = 0;
+ 332:ACE-ECF/Bsp/Src/bsp_dr16.c **** void Disconnect_callBack(void)
+ 333:ACE-ECF/Bsp/Src/bsp_dr16.c **** {
+ 936              		.loc 1 333 1 is_stmt 1 view -0
+ 937              		.cfi_startproc
+ 938              		@ args = 0, pretend = 0, frame = 0
+ 939              		@ frame_needed = 0, uses_anonymous_args = 0
+ 940              		@ link register save eliminated.
+ 334:ACE-ECF/Bsp/Src/bsp_dr16.c ****     DIS++;
+ 941              		.loc 1 334 5 view .LVU298
+ 942              		.loc 1 334 8 is_stmt 0 view .LVU299
+ 943 0000 024A     		ldr	r2, .L42
+ 944 0002 1378     		ldrb	r3, [r2]	@ zero_extendqisi2
+ 945 0004 0133     		adds	r3, r3, #1
+ 946 0006 1370     		strb	r3, [r2]
+ 335:ACE-ECF/Bsp/Src/bsp_dr16.c **** }
+ 947              		.loc 1 335 1 view .LVU300
+ 948 0008 7047     		bx	lr
+ 949              	.L43:
+ 950 000a 00BF     		.align	2
+ 951              	.L42:
+ 952 000c 00000000 		.word	.LANCHOR4
+ 953              		.cfi_endproc
+ 954              	.LFE149:
+ 956              		.section	.text.Online_callback,"ax",%progbits
+ 957              		.align	1
+ 958              		.global	Online_callback
+ 959              		.syntax unified
+ 960              		.thumb
+ 961              		.thumb_func
+ 963              	Online_callback:
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccwMxdym.s 			page 27
+
+
+ 964              	.LFB150:
+ 336:ACE-ECF/Bsp/Src/bsp_dr16.c **** void Online_callback(void){};
+ 965              		.loc 1 336 27 is_stmt 1 view -0
+ 966              		.cfi_startproc
+ 967              		@ args = 0, pretend = 0, frame = 0
+ 968              		@ frame_needed = 0, uses_anonymous_args = 0
+ 969              		@ link register save eliminated.
+ 970              		.loc 1 336 28 view .LVU302
+ 971 0000 7047     		bx	lr
+ 972              		.cfi_endproc
+ 973              	.LFE150:
+ 975              		.section	.text.ECF_RC_Init,"ax",%progbits
+ 976              		.align	1
+ 977              		.global	ECF_RC_Init
+ 978              		.syntax unified
+ 979              		.thumb
+ 980              		.thumb_func
+ 982              	ECF_RC_Init:
+ 983              	.LFB151:
+ 337:ACE-ECF/Bsp/Src/bsp_dr16.c **** uint8_t det = 0;
+ 338:ACE-ECF/Bsp/Src/bsp_dr16.c **** 
+ 339:ACE-ECF/Bsp/Src/bsp_dr16.c **** /************************** Dongguan-University of Technology*-ACE**************************
+ 340:ACE-ECF/Bsp/Src/bsp_dr16.c ****  * @brief ECF版本遥控器初始化，默认C板
+ 341:ACE-ECF/Bsp/Src/bsp_dr16.c ****  *
+ 342:ACE-ECF/Bsp/Src/bsp_dr16.c ****  ************************** Dongguan-   University of Technology*-ACE***************************/
+ 343:ACE-ECF/Bsp/Src/bsp_dr16.c **** void ECF_RC_Init(void) {
+ 984              		.loc 1 343 24 view -0
+ 985              		.cfi_startproc
+ 986              		@ args = 0, pretend = 0, frame = 0
+ 987              		@ frame_needed = 0, uses_anonymous_args = 0
+ 988 0000 08B5     		push	{r3, lr}
+ 989              	.LCFI9:
+ 990              		.cfi_def_cfa_offset 8
+ 991              		.cfi_offset 3, -8
+ 992              		.cfi_offset 14, -4
+ 344:ACE-ECF/Bsp/Src/bsp_dr16.c ****     RC_Init(&CONFIG_DR16_USART_HANDLE, Sbus_RX_Buffer[0], Sbus_RX_Buffer[1], Sbus_RX_Buffer_Num);
+ 993              		.loc 1 344 5 view .LVU304
+ 994 0002 0349     		ldr	r1, .L47
+ 995 0004 2423     		movs	r3, #36
+ 996 0006 CA18     		adds	r2, r1, r3
+ 997 0008 0248     		ldr	r0, .L47+4
+ 998 000a FFF7FEFF 		bl	RC_Init
+ 999              	.LVL32:
+ 345:ACE-ECF/Bsp/Src/bsp_dr16.c **** }
+ 1000              		.loc 1 345 1 is_stmt 0 view .LVU305
+ 1001 000e 08BD     		pop	{r3, pc}
+ 1002              	.L48:
+ 1003              		.align	2
+ 1004              	.L47:
+ 1005 0010 00000000 		.word	.LANCHOR3
+ 1006 0014 00000000 		.word	huart6
+ 1007              		.cfi_endproc
+ 1008              	.LFE151:
+ 1010              		.section	.text.Dr16RxCallBack_Init,"ax",%progbits
+ 1011              		.align	1
+ 1012              		.global	Dr16RxCallBack_Init
+ 1013              		.syntax unified
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccwMxdym.s 			page 28
+
+
+ 1014              		.thumb
+ 1015              		.thumb_func
+ 1017              	Dr16RxCallBack_Init:
+ 1018              	.LVL33:
+ 1019              	.LFB152:
+ 346:ACE-ECF/Bsp/Src/bsp_dr16.c **** void Dr16RxCallBack_Init(void (*callbackFunction)(void))
+ 347:ACE-ECF/Bsp/Src/bsp_dr16.c **** {
+ 1020              		.loc 1 347 1 is_stmt 1 view -0
+ 1021              		.cfi_startproc
+ 1022              		@ args = 0, pretend = 0, frame = 0
+ 1023              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1024              		@ link register save eliminated.
+ 348:ACE-ECF/Bsp/Src/bsp_dr16.c ****     Dr16RxCallBack = callbackFunction;
+ 1025              		.loc 1 348 5 view .LVU307
+ 1026              		.loc 1 348 20 is_stmt 0 view .LVU308
+ 1027 0000 014B     		ldr	r3, .L50
+ 1028 0002 1860     		str	r0, [r3]
+ 349:ACE-ECF/Bsp/Src/bsp_dr16.c **** }
+ 1029              		.loc 1 349 1 view .LVU309
+ 1030 0004 7047     		bx	lr
+ 1031              	.L51:
+ 1032 0006 00BF     		.align	2
+ 1033              	.L50:
+ 1034 0008 00000000 		.word	.LANCHOR5
+ 1035              		.cfi_endproc
+ 1036              	.LFE152:
+ 1038              		.section	.text.ECF_RC_UART_Handler,"ax",%progbits
+ 1039              		.align	1
+ 1040              		.global	ECF_RC_UART_Handler
+ 1041              		.syntax unified
+ 1042              		.thumb
+ 1043              		.thumb_func
+ 1045              	ECF_RC_UART_Handler:
+ 1046              	.LFB153:
+ 350:ACE-ECF/Bsp/Src/bsp_dr16.c **** /************************** Dongguan-University of Technology*-ACE**************************
+ 351:ACE-ECF/Bsp/Src/bsp_dr16.c ****  * @brief ECF版本遥控器中断服务函数，记得扔it中断里（建议在HAL库清楚标志
+ 352:ACE-ECF/Bsp/Src/bsp_dr16.c ****  *
+ 353:ACE-ECF/Bsp/Src/bsp_dr16.c ****  ************************** Dongguan-   University of Technology*-ACE***************************/
+ 354:ACE-ECF/Bsp/Src/bsp_dr16.c **** void ECF_RC_UART_Handler(void){
+ 1047              		.loc 1 354 31 is_stmt 1 view -0
+ 1048              		.cfi_startproc
+ 1049              		@ args = 0, pretend = 0, frame = 0
+ 1050              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1051 0000 08B5     		push	{r3, lr}
+ 1052              	.LCFI10:
+ 1053              		.cfi_def_cfa_offset 8
+ 1054              		.cfi_offset 3, -8
+ 1055              		.cfi_offset 14, -4
+ 355:ACE-ECF/Bsp/Src/bsp_dr16.c ****     dr16_Recive_flag = 1;
+ 1056              		.loc 1 355 5 view .LVU311
+ 1057              		.loc 1 355 22 is_stmt 0 view .LVU312
+ 1058 0002 054B     		ldr	r3, .L55
+ 1059 0004 0122     		movs	r2, #1
+ 1060 0006 1A70     		strb	r2, [r3]
+ 356:ACE-ECF/Bsp/Src/bsp_dr16.c ****     RC_UART_IRQHandler(&CONFIG_DR16_USART_HANDLE);
+ 1061              		.loc 1 356 5 is_stmt 1 view .LVU313
+ 1062 0008 0448     		ldr	r0, .L55+4
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccwMxdym.s 			page 29
+
+
+ 1063 000a FFF7FEFF 		bl	RC_UART_IRQHandler
+ 1064              	.LVL34:
+ 357:ACE-ECF/Bsp/Src/bsp_dr16.c ****     if (Dr16RxCallBack != NULL) Dr16RxCallBack();
+ 1065              		.loc 1 357 5 view .LVU314
+ 1066              		.loc 1 357 24 is_stmt 0 view .LVU315
+ 1067 000e 044B     		ldr	r3, .L55+8
+ 1068 0010 1B68     		ldr	r3, [r3]
+ 1069              		.loc 1 357 8 view .LVU316
+ 1070 0012 03B1     		cbz	r3, .L52
+ 1071              		.loc 1 357 33 is_stmt 1 discriminator 1 view .LVU317
+ 1072 0014 9847     		blx	r3
+ 1073              	.LVL35:
+ 1074              	.L52:
+ 358:ACE-ECF/Bsp/Src/bsp_dr16.c **** }
+ 1075              		.loc 1 358 1 is_stmt 0 view .LVU318
+ 1076 0016 08BD     		pop	{r3, pc}
+ 1077              	.L56:
+ 1078              		.align	2
+ 1079              	.L55:
+ 1080 0018 00000000 		.word	.LANCHOR6
+ 1081 001c 00000000 		.word	huart6
+ 1082 0020 00000000 		.word	.LANCHOR5
+ 1083              		.cfi_endproc
+ 1084              	.LFE153:
+ 1086              		.global	det
+ 1087              		.global	DIS
+ 1088              		.global	Dr16RxCallBack
+ 1089              		.global	Sbus_RX_Buffer
+ 1090              		.global	rc_ctl
+ 1091              		.global	dr16_Recive_flag
+ 1092              		.section	.bss.DIS,"aw",%nobits
+ 1093              		.set	.LANCHOR4,. + 0
+ 1096              	DIS:
+ 1097 0000 00       		.space	1
+ 1098              		.section	.bss.Dr16RxCallBack,"aw",%nobits
+ 1099              		.align	2
+ 1100              		.set	.LANCHOR5,. + 0
+ 1103              	Dr16RxCallBack:
+ 1104 0000 00000000 		.space	4
+ 1105              		.section	.bss.RCLostTime,"aw",%nobits
+ 1106              		.align	2
+ 1107              		.set	.LANCHOR0,. + 0
+ 1110              	RCLostTime:
+ 1111 0000 00000000 		.space	4
+ 1112              		.section	.bss.Sbus_RX_Buffer,"aw",%nobits
+ 1113              		.align	2
+ 1114              		.set	.LANCHOR3,. + 0
+ 1117              	Sbus_RX_Buffer:
+ 1118 0000 00000000 		.space	72
+ 1118      00000000 
+ 1118      00000000 
+ 1118      00000000 
+ 1118      00000000 
+ 1119              		.section	.bss.det,"aw",%nobits
+ 1122              	det:
+ 1123 0000 00       		.space	1
+ 1124              		.section	.bss.dr16_Recive_flag,"aw",%nobits
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccwMxdym.s 			page 30
+
+
+ 1125              		.set	.LANCHOR6,. + 0
+ 1128              	dr16_Recive_flag:
+ 1129 0000 00       		.space	1
+ 1130              		.section	.bss.rc_ctl,"aw",%nobits
+ 1131              		.align	2
+ 1132              		.set	.LANCHOR1,. + 0
+ 1135              	rc_ctl:
+ 1136 0000 00000000 		.space	24
+ 1136      00000000 
+ 1136      00000000 
+ 1136      00000000 
+ 1136      00000000 
+ 1137              		.section	.bss.this_time_rx_len,"aw",%nobits
+ 1138              		.align	1
+ 1139              		.set	.LANCHOR2,. + 0
+ 1142              	this_time_rx_len:
+ 1143 0000 0000     		.space	2
+ 1144              		.text
+ 1145              	.Letext0:
+ 1146              		.file 2 "d:\\gcc-arm-none-eabi-10.3-2021.10\\arm-none-eabi\\include\\machine\\_default_types.h"
+ 1147              		.file 3 "d:\\gcc-arm-none-eabi-10.3-2021.10\\arm-none-eabi\\include\\sys\\_stdint.h"
+ 1148              		.file 4 "Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f407xx.h"
+ 1149              		.file 5 "Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h"
+ 1150              		.file 6 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h"
+ 1151              		.file 7 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_dma.h"
+ 1152              		.file 8 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h"
+ 1153              		.file 9 "ACE-ECF/Algorithm/inc/struct_typedef.h"
+ 1154              		.file 10 "ACE-ECF/Bsp/Inc/bsp_dr16.h"
+ 1155              		.file 11 "Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/portmacro.h"
+ 1156              		.file 12 "Core/Inc/usart.h"
+ 1157              		.file 13 "Middlewares/Third_Party/FreeRTOS/Source/include/task.h"
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccwMxdym.s 			page 31
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 bsp_dr16.c
+C:\Users\28212\AppData\Local\Temp\ccwMxdym.s:20     .text.RC_abs:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccwMxdym.s:25     .text.RC_abs:00000000 RC_abs
+C:\Users\28212\AppData\Local\Temp\ccwMxdym.s:53     .text.chassis_rc_lost_time:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccwMxdym.s:59     .text.chassis_rc_lost_time:00000000 chassis_rc_lost_time
+C:\Users\28212\AppData\Local\Temp\ccwMxdym.s:74     .text.chassis_rc_lost_time:00000008 $d
+C:\Users\28212\AppData\Local\Temp\ccwMxdym.s:79     .text.rc_lost_time_refresh:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccwMxdym.s:85     .text.rc_lost_time_refresh:00000000 rc_lost_time_refresh
+C:\Users\28212\AppData\Local\Temp\ccwMxdym.s:110    .text.rc_lost_time_refresh:00000010 $d
+C:\Users\28212\AppData\Local\Temp\ccwMxdym.s:115    .text.rc_deadline_limit:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccwMxdym.s:121    .text.rc_deadline_limit:00000000 rc_deadline_limit
+C:\Users\28212\AppData\Local\Temp\ccwMxdym.s:149    .text.RC_Get_RC_Pointer:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccwMxdym.s:155    .text.RC_Get_RC_Pointer:00000000 RC_Get_RC_Pointer
+C:\Users\28212\AppData\Local\Temp\ccwMxdym.s:169    .text.RC_Get_RC_Pointer:00000004 $d
+C:\Users\28212\AppData\Local\Temp\ccwMxdym.s:174    .text.RC_Init:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccwMxdym.s:180    .text.RC_Init:00000000 RC_Init
+C:\Users\28212\AppData\Local\Temp\ccwMxdym.s:286    .text.RC_DataProcess:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccwMxdym.s:292    .text.RC_DataProcess:00000000 RC_DataProcess
+C:\Users\28212\AppData\Local\Temp\ccwMxdym.s:498    .text.RC_UART_IRQHandler:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccwMxdym.s:504    .text.RC_UART_IRQHandler:00000000 RC_UART_IRQHandler
+C:\Users\28212\AppData\Local\Temp\ccwMxdym.s:688    .text.RC_UART_IRQHandler:000000c8 $d
+C:\Users\28212\AppData\Local\Temp\ccwMxdym.s:696    .text.RC_Restart:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccwMxdym.s:702    .text.RC_Restart:00000000 RC_Restart
+C:\Users\28212\AppData\Local\Temp\ccwMxdym.s:745    .text.RC_DataReload:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccwMxdym.s:751    .text.RC_DataReload:00000000 RC_DataReload
+C:\Users\28212\AppData\Local\Temp\ccwMxdym.s:798    .text.RC_DataReload:0000001c $d
+C:\Users\28212\AppData\Local\Temp\ccwMxdym.s:803    .text.RC_Check_Data_IS_ERROR:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccwMxdym.s:809    .text.RC_Check_Data_IS_ERROR:00000000 RC_Check_Data_IS_ERROR
+C:\Users\28212\AppData\Local\Temp\ccwMxdym.s:923    .text.RC_Check_Data_IS_ERROR:00000078 $d
+C:\Users\28212\AppData\Local\Temp\ccwMxdym.s:928    .text.Disconnect_callBack:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccwMxdym.s:934    .text.Disconnect_callBack:00000000 Disconnect_callBack
+C:\Users\28212\AppData\Local\Temp\ccwMxdym.s:952    .text.Disconnect_callBack:0000000c $d
+C:\Users\28212\AppData\Local\Temp\ccwMxdym.s:957    .text.Online_callback:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccwMxdym.s:963    .text.Online_callback:00000000 Online_callback
+C:\Users\28212\AppData\Local\Temp\ccwMxdym.s:976    .text.ECF_RC_Init:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccwMxdym.s:982    .text.ECF_RC_Init:00000000 ECF_RC_Init
+C:\Users\28212\AppData\Local\Temp\ccwMxdym.s:1005   .text.ECF_RC_Init:00000010 $d
+C:\Users\28212\AppData\Local\Temp\ccwMxdym.s:1011   .text.Dr16RxCallBack_Init:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccwMxdym.s:1017   .text.Dr16RxCallBack_Init:00000000 Dr16RxCallBack_Init
+C:\Users\28212\AppData\Local\Temp\ccwMxdym.s:1034   .text.Dr16RxCallBack_Init:00000008 $d
+C:\Users\28212\AppData\Local\Temp\ccwMxdym.s:1039   .text.ECF_RC_UART_Handler:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccwMxdym.s:1045   .text.ECF_RC_UART_Handler:00000000 ECF_RC_UART_Handler
+C:\Users\28212\AppData\Local\Temp\ccwMxdym.s:1080   .text.ECF_RC_UART_Handler:00000018 $d
+C:\Users\28212\AppData\Local\Temp\ccwMxdym.s:1122   .bss.det:00000000 det
+C:\Users\28212\AppData\Local\Temp\ccwMxdym.s:1096   .bss.DIS:00000000 DIS
+C:\Users\28212\AppData\Local\Temp\ccwMxdym.s:1103   .bss.Dr16RxCallBack:00000000 Dr16RxCallBack
+C:\Users\28212\AppData\Local\Temp\ccwMxdym.s:1117   .bss.Sbus_RX_Buffer:00000000 Sbus_RX_Buffer
+C:\Users\28212\AppData\Local\Temp\ccwMxdym.s:1135   .bss.rc_ctl:00000000 rc_ctl
+C:\Users\28212\AppData\Local\Temp\ccwMxdym.s:1128   .bss.dr16_Recive_flag:00000000 dr16_Recive_flag
+C:\Users\28212\AppData\Local\Temp\ccwMxdym.s:1097   .bss.DIS:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccwMxdym.s:1099   .bss.Dr16RxCallBack:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccwMxdym.s:1106   .bss.RCLostTime:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccwMxdym.s:1110   .bss.RCLostTime:00000000 RCLostTime
+C:\Users\28212\AppData\Local\Temp\ccwMxdym.s:1113   .bss.Sbus_RX_Buffer:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccwMxdym.s:1123   .bss.det:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccwMxdym.s:1129   .bss.dr16_Recive_flag:00000000 $d
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccwMxdym.s 			page 32
+
+
+C:\Users\28212\AppData\Local\Temp\ccwMxdym.s:1131   .bss.rc_ctl:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccwMxdym.s:1138   .bss.this_time_rx_len:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccwMxdym.s:1142   .bss.this_time_rx_len:00000000 this_time_rx_len
+
+UNDEFINED SYMBOLS
+xTaskGetTickCount
+huart6

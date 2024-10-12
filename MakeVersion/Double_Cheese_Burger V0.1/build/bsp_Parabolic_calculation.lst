@@ -1,0 +1,1692 @@
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.arch armv7e-m
+   3              		.fpu fpv4-sp-d16
+   4              		.eabi_attribute 27, 1
+   5              		.eabi_attribute 28, 1
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.file	"bsp_Parabolic_calculation.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.global	__aeabi_dcmpge
+  20              		.section	.text.abs_d,"ax",%progbits
+  21              		.align	1
+  22              		.global	abs_d
+  23              		.syntax unified
+  24              		.thumb
+  25              		.thumb_func
+  27              	abs_d:
+  28              	.LVL0:
+  29              	.LFB130:
+  30              		.file 1 "ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c"
+   1:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** #include <struct_typedef.h>
+   2:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** #include "bsp_Parabolic_calculation.h"
+   3:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** //#include "arm_math.h"
+   4:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** #include "maths.h"
+   5:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** #include "bsp_dwt.h"
+   6:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** 
+   7:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** #define m 0.041f//kg
+   8:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** #define e 2.71828183f//×ÔÈ»Êýe
+   9:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** #define Vo 15//  m/s
+  10:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** #define G 9.8f
+  11:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** #ifndef PI
+  12:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****   #define PI               3.14159265358979f
+  13:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** #endif
+  14:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** 
+  15:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** 
+  16:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** 
+  17:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** #if  PLAN == PLAN_A
+  18:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     #define k 0.001f//¿ÕÆø×èÁ¦ÏµÊý
+  19:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     /**
+  20:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****       *@brief ¼ÆËã42mmµ¯Íè·ÉÐÐÊ±¼ä
+  21:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****       *@param Distance  Ë®Æ½¾àÀë
+  22:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****       *@param cos       Ñö½ÇÓàÏÒÖµ
+  23:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****       */
+  24:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     float fly_time(float Distance, float cos)
+  25:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     {
+  26:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****         float time = m/(k*Vo*cos)*(pow(e,k/m*Distance)-1);
+  27:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****         return time;
+  28:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     }
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 2
+
+
+  29:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** #elif PLAN == PLAN_B
+  30:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     #define k_1 0.1f// CpS/2m
+  31:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** #endif
+  32:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** double abs_d(double NUM)
+  33:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** {
+  31              		.loc 1 33 1 view -0
+  32              		.cfi_startproc
+  33              		@ args = 0, pretend = 0, frame = 0
+  34              		@ frame_needed = 0, uses_anonymous_args = 0
+  35              		.loc 1 33 1 is_stmt 0 view .LVU1
+  36 0000 38B5     		push	{r3, r4, r5, lr}
+  37              	.LCFI0:
+  38              		.cfi_def_cfa_offset 16
+  39              		.cfi_offset 3, -16
+  40              		.cfi_offset 4, -12
+  41              		.cfi_offset 5, -8
+  42              		.cfi_offset 14, -4
+  43 0002 55EC104B 		vmov	r4, r5, d0
+  34:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     return NUM>=0?NUM:-NUM;
+  44              		.loc 1 34 5 is_stmt 1 view .LVU2
+  45              		.loc 1 34 22 is_stmt 0 view .LVU3
+  46 0006 0022     		movs	r2, #0
+  47 0008 0023     		movs	r3, #0
+  48 000a 10EE100A 		vmov	r0, s0	@ int
+  49 000e 2946     		mov	r1, r5
+  50 0010 FFF7FEFF 		bl	__aeabi_dcmpge
+  51              	.LVL1:
+  52              		.loc 1 34 22 view .LVU4
+  53 0014 10B1     		cbz	r0, .L4
+  54              	.L2:
+  35:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** }
+  55              		.loc 1 35 1 discriminator 4 view .LVU5
+  56 0016 45EC104B 		vmov	d0, r4, r5
+  57 001a 38BD     		pop	{r3, r4, r5, pc}
+  58              	.LVL2:
+  59              	.L4:
+  34:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     return NUM>=0?NUM:-NUM;
+  60              		.loc 1 34 22 discriminator 2 view .LVU6
+  61 001c 05F10043 		add	r3, r5, #-2147483648
+  62 0020 1D46     		mov	r5, r3
+  63 0022 F8E7     		b	.L2
+  64              		.cfi_endproc
+  65              	.LFE130:
+  67              		.section	.text.abs_f,"ax",%progbits
+  68              		.align	1
+  69              		.global	abs_f
+  70              		.syntax unified
+  71              		.thumb
+  72              		.thumb_func
+  74              	abs_f:
+  75              	.LVL3:
+  76              	.LFB131:
+  36:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** float abs_f(float NUM)
+  37:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** {
+  77              		.loc 1 37 1 is_stmt 1 view -0
+  78              		.cfi_startproc
+  79              		@ args = 0, pretend = 0, frame = 0
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 3
+
+
+  80              		@ frame_needed = 0, uses_anonymous_args = 0
+  81              		@ link register save eliminated.
+  38:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     return NUM>=0?NUM:-NUM;
+  82              		.loc 1 38 5 view .LVU8
+  83              		.loc 1 38 22 is_stmt 0 view .LVU9
+  84 0000 B5EEC00A 		vcmpe.f32	s0, #0
+  85 0004 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+  86 0008 00DB     		blt	.L7
+  87              	.LVL4:
+  88              	.L6:
+  39:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** }
+  89              		.loc 1 39 1 discriminator 4 view .LVU10
+  90 000a 7047     		bx	lr
+  91              	.LVL5:
+  92              	.L7:
+  38:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     return NUM>=0?NUM:-NUM;
+  93              		.loc 1 38 22 discriminator 2 view .LVU11
+  94 000c B1EE400A 		vneg.f32	s0, s0
+  95              	.LVL6:
+  38:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     return NUM>=0?NUM:-NUM;
+  96              		.loc 1 38 22 discriminator 2 view .LVU12
+  97 0010 FBE7     		b	.L6
+  98              		.cfi_endproc
+  99              	.LFE131:
+ 101              		.section	.text.cos_Y_X,"ax",%progbits
+ 102              		.align	1
+ 103              		.global	cos_Y_X
+ 104              		.syntax unified
+ 105              		.thumb
+ 106              		.thumb_func
+ 108              	cos_Y_X:
+ 109              	.LVL7:
+ 110              	.LFB132:
+  40:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** /*
+  41:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     Z /| Y
+  42:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     /__|
+  43:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****       X
+  44:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** */
+  45:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** float s;
+  46:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** float cos_Y_X(float Y, float X)
+  47:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** {
+ 111              		.loc 1 47 1 is_stmt 1 view -0
+ 112              		.cfi_startproc
+ 113              		@ args = 0, pretend = 0, frame = 0
+ 114              		@ frame_needed = 0, uses_anonymous_args = 0
+ 115              		.loc 1 47 1 is_stmt 0 view .LVU14
+ 116 0000 08B5     		push	{r3, lr}
+ 117              	.LCFI1:
+ 118              		.cfi_def_cfa_offset 8
+ 119              		.cfi_offset 3, -8
+ 120              		.cfi_offset 14, -4
+ 121 0002 2DED028B 		vpush.64	{d8}
+ 122              	.LCFI2:
+ 123              		.cfi_def_cfa_offset 16
+ 124              		.cfi_offset 80, -16
+ 125              		.cfi_offset 81, -12
+ 126 0006 B0EE608A 		vmov.f32	s16, s1
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 4
+
+
+  48:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     if (X == 0 && Y == 0) return 0;
+ 127              		.loc 1 48 5 is_stmt 1 view .LVU15
+ 128              		.loc 1 48 8 is_stmt 0 view .LVU16
+ 129 000a F5EE400A 		vcmp.f32	s1, #0
+ 130 000e F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 131 0012 04D1     		bne	.L9
+ 132              		.loc 1 48 16 discriminator 1 view .LVU17
+ 133 0014 B5EE400A 		vcmp.f32	s0, #0
+ 134 0018 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 135 001c 11D0     		beq	.L11
+ 136              	.L9:
+  49:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     float root;
+ 137              		.loc 1 49 5 is_stmt 1 view .LVU18
+  50:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     s = X*X+Y*Y;
+ 138              		.loc 1 50 5 view .LVU19
+ 139              		.loc 1 50 10 is_stmt 0 view .LVU20
+ 140 001e 68EE087A 		vmul.f32	s15, s16, s16
+ 141              		.loc 1 50 14 view .LVU21
+ 142 0022 20EE000A 		vmul.f32	s0, s0, s0
+ 143              	.LVL8:
+ 144              		.loc 1 50 12 view .LVU22
+ 145 0026 37EE800A 		vadd.f32	s0, s15, s0
+ 146              		.loc 1 50 7 view .LVU23
+ 147 002a 074B     		ldr	r3, .L13
+ 148 002c 83ED000A 		vstr.32	s0, [r3]
+  51:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     root = sqrtf(s);
+ 149              		.loc 1 51 5 is_stmt 1 view .LVU24
+ 150              		.loc 1 51 12 is_stmt 0 view .LVU25
+ 151 0030 FFF7FEFF 		bl	sqrtf
+ 152              	.LVL9:
+ 153              		.loc 1 51 12 view .LVU26
+ 154 0034 F0EE407A 		vmov.f32	s15, s0
+ 155              	.LVL10:
+  52:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     //arm_sqrt_f32(X*X+Y*Y,&root);
+  53:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     return X/root;
+ 156              		.loc 1 53 5 is_stmt 1 view .LVU27
+ 157              		.loc 1 53 13 is_stmt 0 view .LVU28
+ 158 0038 88EE270A 		vdiv.f32	s0, s16, s15
+ 159              	.LVL11:
+ 160              	.L8:
+  54:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** }
+ 161              		.loc 1 54 1 view .LVU29
+ 162 003c BDEC028B 		vldm	sp!, {d8}
+ 163              	.LCFI3:
+ 164              		.cfi_remember_state
+ 165              		.cfi_restore 80
+ 166              		.cfi_restore 81
+ 167              		.cfi_def_cfa_offset 8
+ 168              	.LVL12:
+ 169              		.loc 1 54 1 view .LVU30
+ 170 0040 08BD     		pop	{r3, pc}
+ 171              	.LVL13:
+ 172              	.L11:
+ 173              	.LCFI4:
+ 174              		.cfi_restore_state
+  48:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     float root;
+ 175              		.loc 1 48 34 view .LVU31
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 5
+
+
+ 176 0042 9FED020A 		vldr.32	s0, .L13+4
+ 177              	.LVL14:
+  48:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     float root;
+ 178              		.loc 1 48 34 view .LVU32
+ 179 0046 F9E7     		b	.L8
+ 180              	.L14:
+ 181              		.align	2
+ 182              	.L13:
+ 183 0048 00000000 		.word	.LANCHOR0
+ 184 004c 00000000 		.word	0
+ 185              		.cfi_endproc
+ 186              	.LFE132:
+ 188              		.global	__aeabi_f2d
+ 189              		.global	__aeabi_ddiv
+ 190              		.global	__aeabi_d2f
+ 191              		.section	.text.sin_Y_X,"ax",%progbits
+ 192              		.align	1
+ 193              		.global	sin_Y_X
+ 194              		.syntax unified
+ 195              		.thumb
+ 196              		.thumb_func
+ 198              	sin_Y_X:
+ 199              	.LVL15:
+ 200              	.LFB133:
+  55:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** double root;
+  56:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** float sin_Y_X(float Y, float X)
+  57:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** {
+ 201              		.loc 1 57 1 is_stmt 1 view -0
+ 202              		.cfi_startproc
+ 203              		@ args = 0, pretend = 0, frame = 0
+ 204              		@ frame_needed = 0, uses_anonymous_args = 0
+ 205              		.loc 1 57 1 is_stmt 0 view .LVU34
+ 206 0000 38B5     		push	{r3, r4, r5, lr}
+ 207              	.LCFI5:
+ 208              		.cfi_def_cfa_offset 16
+ 209              		.cfi_offset 3, -16
+ 210              		.cfi_offset 4, -12
+ 211              		.cfi_offset 5, -8
+ 212              		.cfi_offset 14, -4
+ 213 0002 2DED028B 		vpush.64	{d8}
+ 214              	.LCFI6:
+ 215              		.cfi_def_cfa_offset 24
+ 216              		.cfi_offset 80, -24
+ 217              		.cfi_offset 81, -20
+ 218 0006 B0EE408A 		vmov.f32	s16, s0
+  58:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     if (X == 0 && Y == 0) return 0;
+ 219              		.loc 1 58 5 is_stmt 1 view .LVU35
+ 220              		.loc 1 58 8 is_stmt 0 view .LVU36
+ 221 000a F5EE400A 		vcmp.f32	s1, #0
+ 222 000e F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 223 0012 04D1     		bne	.L16
+ 224              		.loc 1 58 16 discriminator 1 view .LVU37
+ 225 0014 B5EE400A 		vcmp.f32	s0, #0
+ 226 0018 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 227 001c 21D0     		beq	.L18
+ 228              	.L16:
+  59:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     double s = X*X+Y*Y;
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 6
+
+
+ 229              		.loc 1 59 5 is_stmt 1 view .LVU38
+ 230              		.loc 1 59 17 is_stmt 0 view .LVU39
+ 231 001e 60EEA00A 		vmul.f32	s1, s1, s1
+ 232              	.LVL16:
+ 233              		.loc 1 59 21 view .LVU40
+ 234 0022 68EE087A 		vmul.f32	s15, s16, s16
+ 235              		.loc 1 59 12 view .LVU41
+ 236 0026 70EEA77A 		vadd.f32	s15, s1, s15
+ 237 002a 17EE900A 		vmov	r0, s15
+ 238 002e FFF7FEFF 		bl	__aeabi_f2d
+ 239              	.LVL17:
+  60:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     root = sqrt(s);
+ 240              		.loc 1 60 5 is_stmt 1 view .LVU42
+ 241              		.loc 1 60 12 is_stmt 0 view .LVU43
+ 242 0032 41EC100B 		vmov	d0, r0, r1
+ 243 0036 FFF7FEFF 		bl	sqrt
+ 244              	.LVL18:
+ 245              		.loc 1 60 12 view .LVU44
+ 246 003a 55EC104B 		vmov	r4, r5, d0
+ 247              		.loc 1 60 10 view .LVU45
+ 248 003e 0A4B     		ldr	r3, .L20
+ 249 0040 83ED000B 		vstr.64	d0, [r3]
+  61:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     //arm_sqrt_f32(X*X+Y*Y,&root);
+  62:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     return Y/root;
+ 250              		.loc 1 62 5 is_stmt 1 view .LVU46
+ 251              		.loc 1 62 13 is_stmt 0 view .LVU47
+ 252 0044 18EE100A 		vmov	r0, s16
+ 253 0048 FFF7FEFF 		bl	__aeabi_f2d
+ 254              	.LVL19:
+ 255 004c 2246     		mov	r2, r4
+ 256 004e 2B46     		mov	r3, r5
+ 257 0050 FFF7FEFF 		bl	__aeabi_ddiv
+ 258              	.LVL20:
+ 259 0054 FFF7FEFF 		bl	__aeabi_d2f
+ 260              	.LVL21:
+ 261 0058 00EE100A 		vmov	s0, r0
+ 262              	.L15:
+  63:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** }
+ 263              		.loc 1 63 1 view .LVU48
+ 264 005c BDEC028B 		vldm	sp!, {d8}
+ 265              	.LCFI7:
+ 266              		.cfi_remember_state
+ 267              		.cfi_restore 80
+ 268              		.cfi_restore 81
+ 269              		.cfi_def_cfa_offset 16
+ 270              	.LVL22:
+ 271              		.loc 1 63 1 view .LVU49
+ 272 0060 38BD     		pop	{r3, r4, r5, pc}
+ 273              	.LVL23:
+ 274              	.L18:
+ 275              	.LCFI8:
+ 276              		.cfi_restore_state
+  58:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     double s = X*X+Y*Y;
+ 277              		.loc 1 58 34 view .LVU50
+ 278 0062 9FED020A 		vldr.32	s0, .L20+4
+ 279              	.LVL24:
+  58:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     double s = X*X+Y*Y;
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 7
+
+
+ 280              		.loc 1 58 34 view .LVU51
+ 281 0066 F9E7     		b	.L15
+ 282              	.L21:
+ 283              		.align	2
+ 284              	.L20:
+ 285 0068 00000000 		.word	.LANCHOR1
+ 286 006c 00000000 		.word	0
+ 287              		.cfi_endproc
+ 288              	.LFE133:
+ 290              		.global	__aeabi_dmul
+ 291              		.global	__aeabi_dsub
+ 292              		.section	.text.Calc_Pitch_Angle,"ax",%progbits
+ 293              		.align	1
+ 294              		.global	Calc_Pitch_Angle
+ 295              		.syntax unified
+ 296              		.thumb
+ 297              		.thumb_func
+ 299              	Calc_Pitch_Angle:
+ 300              	.LVL25:
+ 301              	.LFB134:
+  64:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** /**
+  65:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****   *@brief ÏòÇ°µü´úÇóÑö½Ç
+  66:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****   *@param Y ÊúÖ±¾àÀë
+  67:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****   *@param X Ë®Æ½¾àÀë
+  68:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****   */
+  69:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** float Calc_Pitch_Angle(float Y_, float X_, float *Fly_time)
+  70:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** {
+ 302              		.loc 1 70 1 is_stmt 1 view -0
+ 303              		.cfi_startproc
+ 304              		@ args = 0, pretend = 0, frame = 0
+ 305              		@ frame_needed = 0, uses_anonymous_args = 0
+ 306              		.loc 1 70 1 is_stmt 0 view .LVU53
+ 307 0000 2DE9F843 		push	{r3, r4, r5, r6, r7, r8, r9, lr}
+ 308              	.LCFI9:
+ 309              		.cfi_def_cfa_offset 32
+ 310              		.cfi_offset 3, -32
+ 311              		.cfi_offset 4, -28
+ 312              		.cfi_offset 5, -24
+ 313              		.cfi_offset 6, -20
+ 314              		.cfi_offset 7, -16
+ 315              		.cfi_offset 8, -12
+ 316              		.cfi_offset 9, -8
+ 317              		.cfi_offset 14, -4
+ 318 0004 2DED088B 		vpush.64	{d8, d9, d10, d11}
+ 319              	.LCFI10:
+ 320              		.cfi_def_cfa_offset 64
+ 321              		.cfi_offset 80, -64
+ 322              		.cfi_offset 81, -60
+ 323              		.cfi_offset 82, -56
+ 324              		.cfi_offset 83, -52
+ 325              		.cfi_offset 84, -48
+ 326              		.cfi_offset 85, -44
+ 327              		.cfi_offset 86, -40
+ 328              		.cfi_offset 87, -36
+  71:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     if (Y_ == 0 || X_ == 0) return 0;
+ 329              		.loc 1 71 5 is_stmt 1 view .LVU54
+ 330              		.loc 1 71 8 is_stmt 0 view .LVU55
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 8
+
+
+ 331 0008 B5EE400A 		vcmp.f32	s0, #0
+ 332 000c F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 333 0010 00F06F81 		beq	.L34
+ 334 0014 F0EE409A 		vmov.f32	s19, s0
+ 335 0018 B0EE608A 		vmov.f32	s16, s1
+ 336 001c 0546     		mov	r5, r0
+ 337              		.loc 1 71 17 discriminator 2 view .LVU56
+ 338 001e F5EE400A 		vcmp.f32	s1, #0
+ 339 0022 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 340 0026 02D1     		bne	.L41
+ 341              		.loc 1 71 36 view .LVU57
+ 342 0028 DFEDBD8A 		vldr.32	s17, .L45+24
+ 343 002c 63E1     		b	.L22
+ 344              	.L41:
+  72:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     #if PLAN == PLAN_A
+  73:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     float Temp_cos_Y_X = cos_Y_X(Y_, X_);//Ê×´Îµü´úÑö½ÇÖ¸ÏòÇ°ÉÚÕ¾
+  74:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     float Temp_sin_Y_X;
+  75:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     arm_sqrt_f32(1-Temp_cos_Y_X*Temp_cos_Y_X, &Temp_sin_Y_X);//¼ÆËãsin
+  76:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     
+  77:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****                                     //ln||ÄÚ·Ö×Ó
+  78:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     float Temp_Y = (m/k)*log(abs_d( cos( m/(k*Vo*Temp_cos_Y_X)*(pow(e, k/m*X_)-1)*sqrt(G*k/m)-atan(
+  79:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****                                    /cos( atan(Vo*Temp_sin_Y_X*sqrt(k/m/G))                         
+  80:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****                                     //ln||ÄÚ·ÖÄ¸
+  81:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     float Y_error = Temp_Y - Y_;//µ¯µÀÆ«¸ßÎªÕý
+  82:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     float try_change = 1;
+  83:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     while(abs_f(Y_error) > 0.01f)//Îó²î¹ý´óÏòÇ°µü´ú,¸ù¾ÝÊµ¼Ê¾­ÑéÅÐ¶Ï£¬<45¡ãµÄÇé¿öÏÂ£¬Ñö½Ç up£¬ÂäµãY
+  84:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     {
+  85:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****         static float last_Y_error = 0;
+  86:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****         if(Y_error < 0)//ÂäµãµÍ£¬Ñö½ÇÔö¼Ó
+  87:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****         {
+  88:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****             if (last_Y_error>0)    try_change /= 2;//ÉÏÒ»´ÎÔËËãÎªÂäµã¹ý¸ß£¬µ«Õâ´ÎÈ·ÊµÂäµã¹ýµÍ£¬Ö¤Ã÷
+  89:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** 
+  90:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****             Temp_cos_Y_X+=try_change;
+  91:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****             arm_sqrt_f32(1-Temp_cos_Y_X*Temp_cos_Y_X ,&Temp_sin_Y_X);//¼ÆËãsin
+  92:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****             Temp_Y = (m/k)*log(abs_d( cos( m/(k*Vo*Temp_cos_Y_X)*(pow(e, k/m*X_)-1)*sqrt(G*k/m)-ata
+  93:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****                                      /cos( atan(Vo*Temp_sin_Y_X*sqrt(k/m/G))                       
+  94:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** 
+  95:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****         }
+  96:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****         else//Âäµã¸ß£¬Ñö½Ç¼õÐ¡
+  97:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****         {
+  98:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****             if (last_Y_error<0)    try_change /= 2;//ÉÏÒ»´ÎÔËËãÎªÂäµã¹ýµÍ£¬µ«Õâ´ÎÈ·ÊµÂäµã¹ý¸ß£¬Ö¤Ã÷
+  99:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****             Temp_cos_Y_X-=try_change;
+ 100:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****             arm_sqrt_f32(1-Temp_cos_Y_X*Temp_cos_Y_X ,&Temp_sin_Y_X);//¼ÆËãsin
+ 101:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****             Temp_Y = (m/k)*log(abs_d( cos( m/(k*Vo*Temp_cos_Y_X)*(pow(e, k/m*X_)-1)*sqrt(G*k/m)-ata
+ 102:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****                                      /cos( atan(Vo*Temp_sin_Y_X*sqrt(k/m/G))                       
+ 103:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****         }
+ 104:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****         //¸üÐÂÂäµãYÖµ
+ 105:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****         last_Y_error = Y_error;
+ 106:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****         Y_error = Temp_Y - Y_;
+ 107:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     }
+ 108:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     return acos(Temp_cos_Y_X);
+ 109:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     #elif PLAN == PLAN_B
+ 110:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     uint8_t calc_time = 0;
+ 345              		.loc 1 110 5 is_stmt 1 view .LVU58
+ 346              	.LVL26:
+ 111:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** 	float Temp_cos_Y_X = cos_Y_X(Y_, X_);//Ê×´Îµü´úÑö½ÇÖ¸ÏòÇ°ÉÚÕ¾
+ 347              		.loc 1 111 2 view .LVU59
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 9
+
+
+ 348              		.loc 1 111 23 is_stmt 0 view .LVU60
+ 349 002e FFF7FEFF 		bl	cos_Y_X
+ 350              	.LVL27:
+ 351              		.loc 1 111 23 view .LVU61
+ 352 0032 F0EE408A 		vmov.f32	s17, s0
+ 353              	.LVL28:
+ 112:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** 	float Temp_sin_Y_X = sin_Y_X(Y_, X_);//¼ÆËãsin
+ 354              		.loc 1 112 2 is_stmt 1 view .LVU62
+ 355              		.loc 1 112 23 is_stmt 0 view .LVU63
+ 356 0036 F0EE480A 		vmov.f32	s1, s16
+ 357 003a B0EE690A 		vmov.f32	s0, s19
+ 358              	.LVL29:
+ 359              		.loc 1 112 23 view .LVU64
+ 360 003e FFF7FEFF 		bl	sin_Y_X
+ 361              	.LVL30:
+ 113:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** 	float V_x = Temp_cos_Y_X*Vo;
+ 362              		.loc 1 113 2 is_stmt 1 view .LVU65
+ 363              		.loc 1 113 8 is_stmt 0 view .LVU66
+ 364 0042 B2EE0E9A 		vmov.f32	s18, #1.5e+1
+ 365 0046 68EE89BA 		vmul.f32	s23, s17, s18
+ 366              	.LVL31:
+ 114:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** 	float V_y = Temp_sin_Y_X*Vo;
+ 367              		.loc 1 114 2 is_stmt 1 view .LVU67
+ 368              		.loc 1 114 8 is_stmt 0 view .LVU68
+ 369 004a 20EE099A 		vmul.f32	s18, s0, s18
+ 370              	.LVL32:
+ 115:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** 	float Angle = acos(Temp_cos_Y_X)*57.3;
+ 371              		.loc 1 115 2 is_stmt 1 view .LVU69
+ 372              		.loc 1 115 16 is_stmt 0 view .LVU70
+ 373 004e 18EE900A 		vmov	r0, s17
+ 374 0052 FFF7FEFF 		bl	__aeabi_f2d
+ 375              	.LVL33:
+ 376              		.loc 1 115 16 view .LVU71
+ 377 0056 41EC100B 		vmov	d0, r0, r1
+ 378 005a FFF7FEFF 		bl	acos
+ 379              	.LVL34:
+ 380 005e 51EC100B 		vmov	r0, r1, d0
+ 381              		.loc 1 115 34 view .LVU72
+ 382 0062 A9A3     		adr	r3, .L45
+ 383 0064 D3E90023 		ldrd	r2, [r3]
+ 384 0068 FFF7FEFF 		bl	__aeabi_dmul
+ 385              	.LVL35:
+ 386              		.loc 1 115 8 view .LVU73
+ 387 006c FFF7FEFF 		bl	__aeabi_d2f
+ 388              	.LVL36:
+ 389 0070 08EE900A 		vmov	s17, r0
+ 390              	.LVL37:
+ 116:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** 
+ 117:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** 	float t = (pow(e,k_1*X_)-1)/(k_1*V_x);//¼ÆËã·ÉÐÐÊ±¼ä
+ 391              		.loc 1 117 2 is_stmt 1 view .LVU74
+ 392              		.loc 1 117 22 is_stmt 0 view .LVU75
+ 393 0074 9FEDABBA 		vldr.32	s22, .L45+28
+ 394              		.loc 1 117 13 view .LVU76
+ 395 0078 68EE0B7A 		vmul.f32	s15, s16, s22
+ 396 007c 17EE900A 		vmov	r0, s15
+ 397              	.LVL38:
+ 398              		.loc 1 117 13 view .LVU77
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 10
+
+
+ 399 0080 FFF7FEFF 		bl	__aeabi_f2d
+ 400              	.LVL39:
+ 401 0084 41EC1A0B 		vmov	d10, r0, r1
+ 402 0088 41EC110B 		vmov	d1, r0, r1
+ 403 008c 9FEDA00B 		vldr.64	d0, .L45+8
+ 404 0090 FFF7FEFF 		bl	pow
+ 405              	.LVL40:
+ 406 0094 51EC100B 		vmov	r0, r1, d0
+ 407              		.loc 1 117 26 view .LVU78
+ 408 0098 0022     		movs	r2, #0
+ 409 009a A34B     		ldr	r3, .L45+32
+ 410 009c FFF7FEFF 		bl	__aeabi_dsub
+ 411              	.LVL41:
+ 412 00a0 0646     		mov	r6, r0
+ 413 00a2 0F46     		mov	r7, r1
+ 414              		.loc 1 117 34 view .LVU79
+ 415 00a4 6BEE8B7A 		vmul.f32	s15, s23, s22
+ 416 00a8 17EE900A 		vmov	r0, s15
+ 417 00ac FFF7FEFF 		bl	__aeabi_f2d
+ 418              	.LVL42:
+ 419 00b0 0246     		mov	r2, r0
+ 420 00b2 0B46     		mov	r3, r1
+ 421              		.loc 1 117 29 view .LVU80
+ 422 00b4 3046     		mov	r0, r6
+ 423 00b6 3946     		mov	r1, r7
+ 424 00b8 FFF7FEFF 		bl	__aeabi_ddiv
+ 425              	.LVL43:
+ 426              		.loc 1 117 8 view .LVU81
+ 427 00bc FFF7FEFF 		bl	__aeabi_d2f
+ 428              	.LVL44:
+ 429 00c0 08EE100A 		vmov	s16, r0
+ 430              	.LVL45:
+ 118:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** 	float Temp_Y = V_y*t-0.5*G*t*t;//²»¿¼ÂÇ¿ÕÆø×èÁ¦µÄÔÈ¼õËÙÔË¶¯
+ 431              		.loc 1 118 2 is_stmt 1 view .LVU82
+ 432              		.loc 1 118 20 is_stmt 0 view .LVU83
+ 433 00c4 69EE087A 		vmul.f32	s15, s18, s16
+ 434 00c8 17EE900A 		vmov	r0, s15
+ 435              	.LVL46:
+ 436              		.loc 1 118 20 view .LVU84
+ 437 00cc FFF7FEFF 		bl	__aeabi_f2d
+ 438              	.LVL47:
+ 439 00d0 0646     		mov	r6, r0
+ 440 00d2 0F46     		mov	r7, r1
+ 441              		.loc 1 118 28 view .LVU85
+ 442 00d4 18EE100A 		vmov	r0, s16
+ 443 00d8 FFF7FEFF 		bl	__aeabi_f2d
+ 444              	.LVL48:
+ 445 00dc 8046     		mov	r8, r0
+ 446 00de 8946     		mov	r9, r1
+ 447 00e0 8DA3     		adr	r3, .L45+16
+ 448 00e2 D3E90023 		ldrd	r2, [r3]
+ 449 00e6 FFF7FEFF 		bl	__aeabi_dmul
+ 450              	.LVL49:
+ 451 00ea 0246     		mov	r2, r0
+ 452 00ec 0B46     		mov	r3, r1
+ 453              		.loc 1 118 30 view .LVU86
+ 454 00ee 4046     		mov	r0, r8
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 11
+
+
+ 455 00f0 4946     		mov	r1, r9
+ 456 00f2 FFF7FEFF 		bl	__aeabi_dmul
+ 457              	.LVL50:
+ 458 00f6 0246     		mov	r2, r0
+ 459 00f8 0B46     		mov	r3, r1
+ 460              		.loc 1 118 22 view .LVU87
+ 461 00fa 3046     		mov	r0, r6
+ 462 00fc 3946     		mov	r1, r7
+ 463 00fe FFF7FEFF 		bl	__aeabi_dsub
+ 464              	.LVL51:
+ 465              		.loc 1 118 8 view .LVU88
+ 466 0102 FFF7FEFF 		bl	__aeabi_d2f
+ 467              	.LVL52:
+ 468 0106 09EE100A 		vmov	s18, r0
+ 469              	.LVL53:
+ 119:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** 
+ 120:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** 	float Y_error = Temp_Y - Y_;//µ¯µÀÆ«¸ßÎªÕý
+ 470              		.loc 1 120 2 is_stmt 1 view .LVU89
+ 471              		.loc 1 120 8 is_stmt 0 view .LVU90
+ 472 010a 39EE699A 		vsub.f32	s18, s18, s19
+ 473              	.LVL54:
+ 121:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** 	float try_change = 1;
+ 474              		.loc 1 121 2 is_stmt 1 view .LVU91
+ 122:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** 	
+ 123:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** 	while(abs_f(Y_error) > 0.01f)//Îó²î¹ý´óÏòÇ°µü´ú,¸ù¾ÝÊµ¼Ê¾­ÑéÅÐ¶Ï£¬<45¡ãµÄÇé¿öÏÂ£¬Ñö½Ç up£¬ÂäµãY up
+ 475              		.loc 1 123 2 view .LVU92
+ 121:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** 	float try_change = 1;
+ 476              		.loc 1 121 8 is_stmt 0 view .LVU93
+ 477 010e F7EE00BA 		vmov.f32	s23, #1.0e+0
+ 478              	.LVL55:
+ 110:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** 	float Temp_cos_Y_X = cos_Y_X(Y_, X_);//Ê×´Îµü´úÑö½ÇÖ¸ÏòÇ°ÉÚÕ¾
+ 479              		.loc 1 110 13 view .LVU94
+ 480 0112 0024     		movs	r4, #0
+ 481              		.loc 1 123 7 view .LVU95
+ 482 0114 C7E0     		b	.L24
+ 483              	.LVL56:
+ 484              	.L43:
+ 485              	.LBB2:
+ 124:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** 	{
+ 125:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****         calc_time++;
+ 126:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****         if (calc_time > 20)
+ 127:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****         {
+ 128:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****             *Fly_time = 0;
+ 486              		.loc 1 128 13 is_stmt 1 view .LVU96
+ 487              		.loc 1 128 23 is_stmt 0 view .LVU97
+ 488 0116 0023     		movs	r3, #0
+ 489 0118 2B60     		str	r3, [r5]	@ float
+ 129:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****             return Angle;//¼ÆËãµü´úÂÖÊýÉÏÏÞ50´Î
+ 490              		.loc 1 129 13 is_stmt 1 view .LVU98
+ 491              		.loc 1 129 20 is_stmt 0 view .LVU99
+ 492 011a ECE0     		b	.L22
+ 493              	.L44:
+ 130:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****         }            
+ 131:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****         
+ 132:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** 		static float last_Y_error = 0;
+ 133:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** 		if(Y_error < 0)//ÂäµãµÍ£¬Ñö½ÇÔö¼Ó
+ 134:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** 		{
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 12
+
+
+ 135:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** 			if (last_Y_error>0)    try_change /= 2;//ÉÏÒ»´ÎÔËËãÎªÂäµã¹ý¸ß£¬µ«Õâ´ÎÈ·ÊµÂäµã¹ýµÍ£¬Ö¤Ã÷Ñö½Ç¼õÌ«¶
+ 494              		.loc 1 135 4 is_stmt 1 view .LVU100
+ 495              		.loc 1 135 20 is_stmt 0 view .LVU101
+ 496 011c 834B     		ldr	r3, .L45+36
+ 497 011e D3ED007A 		vldr.32	s15, [r3]
+ 498              		.loc 1 135 7 view .LVU102
+ 499 0122 F5EEC07A 		vcmpe.f32	s15, #0
+ 500 0126 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 501 012a 03DD     		ble	.L28
+ 502              		.loc 1 135 27 is_stmt 1 discriminator 1 view .LVU103
+ 503              		.loc 1 135 38 is_stmt 0 discriminator 1 view .LVU104
+ 504 012c F6EE007A 		vmov.f32	s15, #5.0e-1
+ 505 0130 6BEEA7BA 		vmul.f32	s23, s23, s15
+ 506              	.LVL57:
+ 507              	.L28:
+ 136:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** 			
+ 137:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****             Angle+=try_change;
+ 508              		.loc 1 137 13 is_stmt 1 view .LVU105
+ 509              		.loc 1 137 18 is_stmt 0 view .LVU106
+ 510 0134 78EEAB8A 		vadd.f32	s17, s17, s23
+ 511              	.LVL58:
+ 138:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****             
+ 139:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** 			Temp_cos_Y_X = cos_calculate(Angle);
+ 512              		.loc 1 139 4 is_stmt 1 view .LVU107
+ 513              		.loc 1 139 19 is_stmt 0 view .LVU108
+ 514 0138 B0EE680A 		vmov.f32	s0, s17
+ 515 013c FFF7FEFF 		bl	cos_calculate
+ 516              	.LVL59:
+ 517 0140 B0EE408A 		vmov.f32	s16, s0
+ 518              	.LVL60:
+ 140:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****             Temp_sin_Y_X = sin_calculate(Angle);
+ 519              		.loc 1 140 13 is_stmt 1 view .LVU109
+ 520              		.loc 1 140 28 is_stmt 0 view .LVU110
+ 521 0144 B0EE680A 		vmov.f32	s0, s17
+ 522              	.LVL61:
+ 523              		.loc 1 140 28 view .LVU111
+ 524 0148 FFF7FEFF 		bl	sin_calculate
+ 525              	.LVL62:
+ 141:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****             V_x = Temp_cos_Y_X*Vo;
+ 526              		.loc 1 141 13 is_stmt 1 view .LVU112
+ 527              		.loc 1 141 17 is_stmt 0 view .LVU113
+ 528 014c B2EE0EBA 		vmov.f32	s22, #1.5e+1
+ 529 0150 28EE0B8A 		vmul.f32	s16, s16, s22
+ 530              	.LVL63:
+ 142:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** 			V_y = Temp_sin_Y_X*Vo;
+ 531              		.loc 1 142 4 is_stmt 1 view .LVU114
+ 532              		.loc 1 142 8 is_stmt 0 view .LVU115
+ 533 0154 20EE0BBA 		vmul.f32	s22, s0, s22
+ 534              	.LVL64:
+ 143:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****             
+ 144:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** 			t = (pow(e,k_1*X_)-1)/(k_1*V_x);
+ 535              		.loc 1 144 4 is_stmt 1 view .LVU116
+ 536              		.loc 1 144 9 is_stmt 0 view .LVU117
+ 537 0158 B0EE4A1A 		vmov.f32	s2, s20
+ 538 015c F0EE6A1A 		vmov.f32	s3, s21
+ 539 0160 9FED6B0B 		vldr.64	d0, .L45+8
+ 540              	.LVL65:
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 13
+
+
+ 541              		.loc 1 144 9 view .LVU118
+ 542 0164 FFF7FEFF 		bl	pow
+ 543              	.LVL66:
+ 544 0168 51EC100B 		vmov	r0, r1, d0
+ 545              		.loc 1 144 22 view .LVU119
+ 546 016c 0022     		movs	r2, #0
+ 547 016e 6E4B     		ldr	r3, .L45+32
+ 548 0170 FFF7FEFF 		bl	__aeabi_dsub
+ 549              	.LVL67:
+ 550 0174 0646     		mov	r6, r0
+ 551 0176 0F46     		mov	r7, r1
+ 552              		.loc 1 144 30 view .LVU120
+ 553 0178 DFED6A7A 		vldr.32	s15, .L45+28
+ 554 017c 68EE277A 		vmul.f32	s15, s16, s15
+ 555 0180 17EE900A 		vmov	r0, s15
+ 556 0184 FFF7FEFF 		bl	__aeabi_f2d
+ 557              	.LVL68:
+ 558 0188 0246     		mov	r2, r0
+ 559 018a 0B46     		mov	r3, r1
+ 560              		.loc 1 144 25 view .LVU121
+ 561 018c 3046     		mov	r0, r6
+ 562 018e 3946     		mov	r1, r7
+ 563 0190 FFF7FEFF 		bl	__aeabi_ddiv
+ 564              	.LVL69:
+ 565              		.loc 1 144 6 view .LVU122
+ 566 0194 FFF7FEFF 		bl	__aeabi_d2f
+ 567              	.LVL70:
+ 568 0198 08EE100A 		vmov	s16, r0
+ 569              	.LVL71:
+ 145:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** 			Temp_Y = V_y*t-0.5*G*t*t;//²»¿¼ÂÇ¿ÕÆø×èÁ¦µÄÔÈ¼õËÙÔË¶¯
+ 570              		.loc 1 145 4 is_stmt 1 view .LVU123
+ 571              		.loc 1 145 16 is_stmt 0 view .LVU124
+ 572 019c 6BEE087A 		vmul.f32	s15, s22, s16
+ 573 01a0 17EE900A 		vmov	r0, s15
+ 574              	.LVL72:
+ 575              		.loc 1 145 16 view .LVU125
+ 576 01a4 FFF7FEFF 		bl	__aeabi_f2d
+ 577              	.LVL73:
+ 578 01a8 0646     		mov	r6, r0
+ 579 01aa 0F46     		mov	r7, r1
+ 580              		.loc 1 145 24 view .LVU126
+ 581 01ac 18EE100A 		vmov	r0, s16
+ 582 01b0 FFF7FEFF 		bl	__aeabi_f2d
+ 583              	.LVL74:
+ 584 01b4 8046     		mov	r8, r0
+ 585 01b6 8946     		mov	r9, r1
+ 586 01b8 57A3     		adr	r3, .L45+16
+ 587 01ba D3E90023 		ldrd	r2, [r3]
+ 588 01be FFF7FEFF 		bl	__aeabi_dmul
+ 589              	.LVL75:
+ 590 01c2 0246     		mov	r2, r0
+ 591 01c4 0B46     		mov	r3, r1
+ 592              		.loc 1 145 26 view .LVU127
+ 593 01c6 4046     		mov	r0, r8
+ 594 01c8 4946     		mov	r1, r9
+ 595 01ca FFF7FEFF 		bl	__aeabi_dmul
+ 596              	.LVL76:
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 14
+
+
+ 597 01ce 0246     		mov	r2, r0
+ 598 01d0 0B46     		mov	r3, r1
+ 599              		.loc 1 145 18 view .LVU128
+ 600 01d2 3046     		mov	r0, r6
+ 601 01d4 3946     		mov	r1, r7
+ 602 01d6 FFF7FEFF 		bl	__aeabi_dsub
+ 603              	.LVL77:
+ 604              		.loc 1 145 11 view .LVU129
+ 605 01da FFF7FEFF 		bl	__aeabi_d2f
+ 606              	.LVL78:
+ 607 01de 07EE900A 		vmov	s15, r0
+ 608              	.LVL79:
+ 146:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** 			
+ 147:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** 			last_Y_error = Y_error;			//¸üÐÂÂäµãYÖµ
+ 609              		.loc 1 147 4 is_stmt 1 view .LVU130
+ 610              		.loc 1 147 17 is_stmt 0 view .LVU131
+ 611 01e2 524B     		ldr	r3, .L45+36
+ 612 01e4 83ED009A 		vstr.32	s18, [r3]
+ 148:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** 			Y_error = Temp_Y - Y_;
+ 613              		.loc 1 148 4 is_stmt 1 view .LVU132
+ 614              		.loc 1 148 12 is_stmt 0 view .LVU133
+ 615 01e8 37EEE99A 		vsub.f32	s18, s15, s19
+ 616              	.LVL80:
+ 617              		.loc 1 148 12 view .LVU134
+ 618 01ec 5BE0     		b	.L24
+ 619              	.LVL81:
+ 620              	.L31:
+ 149:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** 
+ 150:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** 		}
+ 151:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** 		else//Âäµã¸ß£¬Ñö½Ç¼õÐ¡
+ 152:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** 		{
+ 153:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** 			if (last_Y_error<0)    try_change /= 2;//ÉÏÒ»´ÎÔËËãÎªÂäµã¹ýµÍ£¬µ«Õâ´ÎÈ·ÊµÂäµã¹ý¸ß£¬Ö¤Ã÷Ñö½Ç¼ÓÌ«¶
+ 154:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** 			
+ 155:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** 			Angle-=try_change;
+ 621              		.loc 1 155 4 is_stmt 1 view .LVU135
+ 622              		.loc 1 155 9 is_stmt 0 view .LVU136
+ 623 01ee 78EEEB8A 		vsub.f32	s17, s17, s23
+ 624              	.LVL82:
+ 156:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****             
+ 157:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** 			Temp_cos_Y_X = cos_calculate(Angle);
+ 625              		.loc 1 157 4 is_stmt 1 view .LVU137
+ 626              		.loc 1 157 19 is_stmt 0 view .LVU138
+ 627 01f2 B0EE680A 		vmov.f32	s0, s17
+ 628 01f6 FFF7FEFF 		bl	cos_calculate
+ 629              	.LVL83:
+ 630 01fa B0EE408A 		vmov.f32	s16, s0
+ 631              	.LVL84:
+ 158:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****             Temp_sin_Y_X = sin_calculate(Angle);
+ 632              		.loc 1 158 13 is_stmt 1 view .LVU139
+ 633              		.loc 1 158 28 is_stmt 0 view .LVU140
+ 634 01fe B0EE680A 		vmov.f32	s0, s17
+ 635              	.LVL85:
+ 636              		.loc 1 158 28 view .LVU141
+ 637 0202 FFF7FEFF 		bl	sin_calculate
+ 638              	.LVL86:
+ 159:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****             V_x = Temp_cos_Y_X*Vo;
+ 639              		.loc 1 159 13 is_stmt 1 view .LVU142
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 15
+
+
+ 640              		.loc 1 159 17 is_stmt 0 view .LVU143
+ 641 0206 B2EE0EBA 		vmov.f32	s22, #1.5e+1
+ 642 020a 28EE0B8A 		vmul.f32	s16, s16, s22
+ 643              	.LVL87:
+ 160:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** 			V_y = Temp_sin_Y_X*Vo;
+ 644              		.loc 1 160 4 is_stmt 1 view .LVU144
+ 645              		.loc 1 160 8 is_stmt 0 view .LVU145
+ 646 020e 20EE0BBA 		vmul.f32	s22, s0, s22
+ 647              	.LVL88:
+ 161:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****             
+ 162:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** 			t = (pow(e,k_1*X_)-1)/(k_1*V_x);
+ 648              		.loc 1 162 4 is_stmt 1 view .LVU146
+ 649              		.loc 1 162 9 is_stmt 0 view .LVU147
+ 650 0212 B0EE4A1A 		vmov.f32	s2, s20
+ 651 0216 F0EE6A1A 		vmov.f32	s3, s21
+ 652 021a 9FED3D0B 		vldr.64	d0, .L45+8
+ 653              	.LVL89:
+ 654              		.loc 1 162 9 view .LVU148
+ 655 021e FFF7FEFF 		bl	pow
+ 656              	.LVL90:
+ 657 0222 51EC100B 		vmov	r0, r1, d0
+ 658              		.loc 1 162 22 view .LVU149
+ 659 0226 0022     		movs	r2, #0
+ 660 0228 3F4B     		ldr	r3, .L45+32
+ 661 022a FFF7FEFF 		bl	__aeabi_dsub
+ 662              	.LVL91:
+ 663 022e 0646     		mov	r6, r0
+ 664 0230 0F46     		mov	r7, r1
+ 665              		.loc 1 162 30 view .LVU150
+ 666 0232 DFED3C7A 		vldr.32	s15, .L45+28
+ 667 0236 68EE277A 		vmul.f32	s15, s16, s15
+ 668 023a 17EE900A 		vmov	r0, s15
+ 669 023e FFF7FEFF 		bl	__aeabi_f2d
+ 670              	.LVL92:
+ 671 0242 0246     		mov	r2, r0
+ 672 0244 0B46     		mov	r3, r1
+ 673              		.loc 1 162 25 view .LVU151
+ 674 0246 3046     		mov	r0, r6
+ 675 0248 3946     		mov	r1, r7
+ 676 024a FFF7FEFF 		bl	__aeabi_ddiv
+ 677              	.LVL93:
+ 678              		.loc 1 162 6 view .LVU152
+ 679 024e FFF7FEFF 		bl	__aeabi_d2f
+ 680              	.LVL94:
+ 681 0252 08EE100A 		vmov	s16, r0
+ 682              	.LVL95:
+ 163:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** 			Temp_Y = V_y*t-0.5*G*t*t;//²»¿¼ÂÇ¿ÕÆø×èÁ¦µÄÔÈ¼õËÙÔË¶¯
+ 683              		.loc 1 163 4 is_stmt 1 view .LVU153
+ 684              		.loc 1 163 16 is_stmt 0 view .LVU154
+ 685 0256 6BEE087A 		vmul.f32	s15, s22, s16
+ 686 025a 17EE900A 		vmov	r0, s15
+ 687              	.LVL96:
+ 688              		.loc 1 163 16 view .LVU155
+ 689 025e FFF7FEFF 		bl	__aeabi_f2d
+ 690              	.LVL97:
+ 691 0262 0646     		mov	r6, r0
+ 692 0264 0F46     		mov	r7, r1
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 16
+
+
+ 693              		.loc 1 163 24 view .LVU156
+ 694 0266 18EE100A 		vmov	r0, s16
+ 695 026a FFF7FEFF 		bl	__aeabi_f2d
+ 696              	.LVL98:
+ 697 026e 8046     		mov	r8, r0
+ 698 0270 8946     		mov	r9, r1
+ 699 0272 29A3     		adr	r3, .L45+16
+ 700 0274 D3E90023 		ldrd	r2, [r3]
+ 701 0278 FFF7FEFF 		bl	__aeabi_dmul
+ 702              	.LVL99:
+ 703 027c 0246     		mov	r2, r0
+ 704 027e 0B46     		mov	r3, r1
+ 705              		.loc 1 163 26 view .LVU157
+ 706 0280 4046     		mov	r0, r8
+ 707 0282 4946     		mov	r1, r9
+ 708 0284 FFF7FEFF 		bl	__aeabi_dmul
+ 709              	.LVL100:
+ 710 0288 0246     		mov	r2, r0
+ 711 028a 0B46     		mov	r3, r1
+ 712              		.loc 1 163 18 view .LVU158
+ 713 028c 3046     		mov	r0, r6
+ 714 028e 3946     		mov	r1, r7
+ 715 0290 FFF7FEFF 		bl	__aeabi_dsub
+ 716              	.LVL101:
+ 717              		.loc 1 163 11 view .LVU159
+ 718 0294 FFF7FEFF 		bl	__aeabi_d2f
+ 719              	.LVL102:
+ 720 0298 07EE900A 		vmov	s15, r0
+ 721              	.LVL103:
+ 164:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** 			
+ 165:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** 			last_Y_error = Y_error;			//¸üÐÂÂäµãYÖµ
+ 722              		.loc 1 165 4 is_stmt 1 view .LVU160
+ 723              		.loc 1 165 17 is_stmt 0 view .LVU161
+ 724 029c 234B     		ldr	r3, .L45+36
+ 725 029e 83ED009A 		vstr.32	s18, [r3]
+ 166:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** 			Y_error = Temp_Y - Y_;
+ 726              		.loc 1 166 4 is_stmt 1 view .LVU162
+ 727              		.loc 1 166 12 is_stmt 0 view .LVU163
+ 728 02a2 37EEE99A 		vsub.f32	s18, s15, s19
+ 729              	.LVL104:
+ 730              	.L24:
+ 731              		.loc 1 166 12 view .LVU164
+ 732              	.LBE2:
+ 123:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** 	{
+ 733              		.loc 1 123 7 is_stmt 1 view .LVU165
+ 123:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** 	{
+ 734              		.loc 1 123 8 is_stmt 0 view .LVU166
+ 735 02a6 B0EE490A 		vmov.f32	s0, s18
+ 736 02aa FFF7FEFF 		bl	abs_f
+ 737              	.LVL105:
+ 123:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** 	{
+ 738              		.loc 1 123 7 view .LVU167
+ 739 02ae DFED207A 		vldr.32	s15, .L45+40
+ 740 02b2 B4EEE70A 		vcmpe.f32	s0, s15
+ 741 02b6 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 742 02ba 17DD     		ble	.L42
+ 743              	.LBB3:
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 17
+
+
+ 125:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****         if (calc_time > 20)
+ 744              		.loc 1 125 9 is_stmt 1 view .LVU168
+ 125:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****         if (calc_time > 20)
+ 745              		.loc 1 125 18 is_stmt 0 view .LVU169
+ 746 02bc 0134     		adds	r4, r4, #1
+ 747              	.LVL106:
+ 125:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****         if (calc_time > 20)
+ 748              		.loc 1 125 18 view .LVU170
+ 749 02be E4B2     		uxtb	r4, r4
+ 750              	.LVL107:
+ 126:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****         {
+ 751              		.loc 1 126 9 is_stmt 1 view .LVU171
+ 126:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****         {
+ 752              		.loc 1 126 12 is_stmt 0 view .LVU172
+ 753 02c0 142C     		cmp	r4, #20
+ 754 02c2 3FF628AF 		bhi	.L43
+ 132:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** 		if(Y_error < 0)//ÂäµãµÍ£¬Ñö½ÇÔö¼Ó
+ 755              		.loc 1 132 3 is_stmt 1 view .LVU173
+ 133:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** 		{
+ 756              		.loc 1 133 3 view .LVU174
+ 133:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** 		{
+ 757              		.loc 1 133 5 is_stmt 0 view .LVU175
+ 758 02c6 B5EEC09A 		vcmpe.f32	s18, #0
+ 759 02ca F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 760 02ce 3FF525AF 		bmi	.L44
+ 153:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** 			
+ 761              		.loc 1 153 4 is_stmt 1 view .LVU176
+ 153:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** 			
+ 762              		.loc 1 153 20 is_stmt 0 view .LVU177
+ 763 02d2 164B     		ldr	r3, .L45+36
+ 764 02d4 D3ED007A 		vldr.32	s15, [r3]
+ 153:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** 			
+ 765              		.loc 1 153 7 view .LVU178
+ 766 02d8 F5EEC07A 		vcmpe.f32	s15, #0
+ 767 02dc F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 768 02e0 85D5     		bpl	.L31
+ 153:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** 			
+ 769              		.loc 1 153 27 is_stmt 1 discriminator 1 view .LVU179
+ 153:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** 			
+ 770              		.loc 1 153 38 is_stmt 0 discriminator 1 view .LVU180
+ 771 02e2 F6EE007A 		vmov.f32	s15, #5.0e-1
+ 772 02e6 6BEEA7BA 		vmul.f32	s23, s23, s15
+ 773              	.LVL108:
+ 153:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** 			
+ 774              		.loc 1 153 38 discriminator 1 view .LVU181
+ 775 02ea 80E7     		b	.L31
+ 776              	.L42:
+ 153:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** 			
+ 777              		.loc 1 153 38 discriminator 1 view .LVU182
+ 778              	.LBE3:
+ 167:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** 		}
+ 168:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** 	}
+ 169:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     *Fly_time = t;//³É¹¦ÄâºÏµ¯µÀ£¬·µ»Ø·ÉÐÐÊ±¼ä
+ 779              		.loc 1 169 5 is_stmt 1 view .LVU183
+ 780              		.loc 1 169 15 is_stmt 0 view .LVU184
+ 781 02ec 85ED008A 		vstr.32	s16, [r5]
+ 170:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** 	return Angle;
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 18
+
+
+ 782              		.loc 1 170 2 is_stmt 1 view .LVU185
+ 783              		.loc 1 170 9 is_stmt 0 view .LVU186
+ 784 02f0 01E0     		b	.L22
+ 785              	.LVL109:
+ 786              	.L34:
+  71:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     #if PLAN == PLAN_A
+ 787              		.loc 1 71 36 view .LVU187
+ 788 02f2 DFED0B8A 		vldr.32	s17, .L45+24
+ 789              	.LVL110:
+ 790              	.L22:
+ 171:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     #endif
+ 172:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** }
+ 791              		.loc 1 172 1 view .LVU188
+ 792 02f6 B0EE680A 		vmov.f32	s0, s17
+ 793 02fa BDEC088B 		vldm	sp!, {d8-d11}
+ 794              	.LCFI11:
+ 795              		.cfi_restore 86
+ 796              		.cfi_restore 87
+ 797              		.cfi_restore 84
+ 798              		.cfi_restore 85
+ 799              		.cfi_restore 82
+ 800              		.cfi_restore 83
+ 801              		.cfi_restore 80
+ 802              		.cfi_restore 81
+ 803              		.cfi_def_cfa_offset 32
+ 804 02fe BDE8F883 		pop	{r3, r4, r5, r6, r7, r8, r9, pc}
+ 805              	.L46:
+ 806 0302 00BFAFF3 		.align	3
+ 806      0080
+ 807              	.L45:
+ 808 0308 66666666 		.word	1717986918
+ 809 030c 66A64C40 		.word	1078765158
+ 810 0310 00000080 		.word	-2147483648
+ 811 0314 0ABF0540 		.word	1074118410
+ 812 0318 000000A0 		.word	-1610612736
+ 813 031c 99991340 		.word	1075026329
+ 814 0320 00000000 		.word	0
+ 815 0324 CDCCCC3D 		.word	1036831949
+ 816 0328 0000F03F 		.word	1072693248
+ 817 032c 00000000 		.word	.LANCHOR2
+ 818 0330 0AD7233C 		.word	1008981770
+ 819              		.cfi_endproc
+ 820              	.LFE134:
+ 822              		.section	.text.Yaw_Angle_close,"ax",%progbits
+ 823              		.align	1
+ 824              		.global	Yaw_Angle_close
+ 825              		.syntax unified
+ 826              		.thumb
+ 827              		.thumb_func
+ 829              	Yaw_Angle_close:
+ 830              	.LVL111:
+ 831              	.LFB135:
+ 173:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** 
+ 174:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** /**
+ 175:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****   *@brief YAWÓëÇ°ÉÚÕ¾Æ«×ªµÄ½Ç¶È
+ 176:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****   *@param X Ë®Æ½XÖá¾àÀë,¾µÍ·×ø±êÏµÓÒÎªÕý
+ 177:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****   *@param Y Ë®Æ½YÖá¾àÀë,¾µÍ·×ø±êÏµÇ°ÎªÕý
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 19
+
+
+ 178:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****   *@note  ÄæÊ±ÕëÕý
+ 179:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****   */
+ 180:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** /*
+ 181:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     Z /| Y
+ 182:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     /__|
+ 183:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****       X
+ 184:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** */
+ 185:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** float Yaw_Angle_close(float X_, float Y_)
+ 186:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** {
+ 832              		.loc 1 186 1 is_stmt 1 view -0
+ 833              		.cfi_startproc
+ 834              		@ args = 0, pretend = 0, frame = 0
+ 835              		@ frame_needed = 0, uses_anonymous_args = 0
+ 836              		.loc 1 186 1 is_stmt 0 view .LVU190
+ 837 0000 08B5     		push	{r3, lr}
+ 838              	.LCFI12:
+ 839              		.cfi_def_cfa_offset 8
+ 840              		.cfi_offset 3, -8
+ 841              		.cfi_offset 14, -4
+ 842 0002 2DED048B 		vpush.64	{d8, d9}
+ 843              	.LCFI13:
+ 844              		.cfi_def_cfa_offset 24
+ 845              		.cfi_offset 80, -24
+ 846              		.cfi_offset 81, -20
+ 847              		.cfi_offset 82, -16
+ 848              		.cfi_offset 83, -12
+ 849 0006 F0EE408A 		vmov.f32	s17, s0
+ 187:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     float Z;
+ 850              		.loc 1 187 5 is_stmt 1 view .LVU191
+ 188:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     Z = sqrt(X_*X_+Y_*Y_);
+ 851              		.loc 1 188 5 view .LVU192
+ 852              		.loc 1 188 16 is_stmt 0 view .LVU193
+ 853 000a 20EE008A 		vmul.f32	s16, s0, s0
+ 854              		.loc 1 188 22 view .LVU194
+ 855 000e 20EEA09A 		vmul.f32	s18, s1, s1
+ 856              		.loc 1 188 9 view .LVU195
+ 857 0012 78EE097A 		vadd.f32	s15, s16, s18
+ 858 0016 17EE900A 		vmov	r0, s15
+ 859 001a FFF7FEFF 		bl	__aeabi_f2d
+ 860              	.LVL112:
+ 861              		.loc 1 188 9 view .LVU196
+ 862 001e 41EC100B 		vmov	d0, r0, r1
+ 863 0022 FFF7FEFF 		bl	sqrt
+ 864              	.LVL113:
+ 865 0026 51EC100B 		vmov	r0, r1, d0
+ 866              		.loc 1 188 7 view .LVU197
+ 867 002a FFF7FEFF 		bl	__aeabi_d2f
+ 868              	.LVL114:
+ 869 002e 07EE900A 		vmov	s15, r0
+ 870              	.LVL115:
+ 189:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     //arm_sqrt_f32(X_*X_+Y_*Y_, &Z);//Ö±½ÇÐ±±ß
+ 190:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     float cos = (X_*X_+Z*Z-Y_*Y_)/2*X_*Z;//ÓàÏÒ¶¨Àí
+ 871              		.loc 1 190 5 is_stmt 1 view .LVU198
+ 872              		.loc 1 190 25 is_stmt 0 view .LVU199
+ 873 0032 27EEA70A 		vmul.f32	s0, s15, s15
+ 874              		.loc 1 190 23 view .LVU200
+ 875 0036 38EE008A 		vadd.f32	s16, s16, s0
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 20
+
+
+ 876              		.loc 1 190 27 view .LVU201
+ 877 003a 38EE498A 		vsub.f32	s16, s16, s18
+ 878              		.loc 1 190 34 view .LVU202
+ 879 003e B6EE000A 		vmov.f32	s0, #5.0e-1
+ 880 0042 28EE008A 		vmul.f32	s16, s16, s0
+ 881              		.loc 1 190 36 view .LVU203
+ 882 0046 28EE280A 		vmul.f32	s0, s16, s17
+ 883              	.LVL116:
+ 191:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     float Angle_close = acos(cos);//ÓàÏÒÖµÇó»¡¶È
+ 884              		.loc 1 191 5 is_stmt 1 view .LVU204
+ 885              		.loc 1 191 25 is_stmt 0 view .LVU205
+ 886 004a 60EE277A 		vmul.f32	s15, s0, s15
+ 887              	.LVL117:
+ 888              		.loc 1 191 25 view .LVU206
+ 889 004e 17EE900A 		vmov	r0, s15
+ 890              	.LVL118:
+ 891              		.loc 1 191 25 view .LVU207
+ 892 0052 FFF7FEFF 		bl	__aeabi_f2d
+ 893              	.LVL119:
+ 894              		.loc 1 191 25 view .LVU208
+ 895 0056 41EC100B 		vmov	d0, r0, r1
+ 896 005a FFF7FEFF 		bl	acos
+ 897              	.LVL120:
+ 898 005e 51EC100B 		vmov	r0, r1, d0
+ 899              		.loc 1 191 11 view .LVU209
+ 900 0062 FFF7FEFF 		bl	__aeabi_d2f
+ 901              	.LVL121:
+ 902 0066 07EE900A 		vmov	s15, r0
+ 903              	.LVL122:
+ 192:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     Angle_close = Angle_close*180/PI;//»¡¶È×ª½Ç¶È
+ 904              		.loc 1 192 5 is_stmt 1 view .LVU210
+ 905              		.loc 1 192 30 is_stmt 0 view .LVU211
+ 906 006a 9FED050A 		vldr.32	s0, .L49
+ 907 006e 67EE807A 		vmul.f32	s15, s15, s0
+ 908              	.LVL123:
+ 193:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     return Angle_close;
+ 909              		.loc 1 193 5 is_stmt 1 view .LVU212
+ 194:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** }
+ 910              		.loc 1 194 1 is_stmt 0 view .LVU213
+ 911 0072 9FED040A 		vldr.32	s0, .L49+4
+ 912 0076 87EE800A 		vdiv.f32	s0, s15, s0
+ 913              	.LVL124:
+ 914              		.loc 1 194 1 view .LVU214
+ 915 007a BDEC048B 		vldm	sp!, {d8-d9}
+ 916              	.LCFI14:
+ 917              		.cfi_restore 82
+ 918              		.cfi_restore 83
+ 919              		.cfi_restore 80
+ 920              		.cfi_restore 81
+ 921              		.cfi_def_cfa_offset 8
+ 922              		.loc 1 194 1 view .LVU215
+ 923 007e 08BD     		pop	{r3, pc}
+ 924              	.L50:
+ 925              		.align	2
+ 926              	.L49:
+ 927 0080 00003443 		.word	1127481344
+ 928 0084 DB0F4940 		.word	1078530011
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 21
+
+
+ 929              		.cfi_endproc
+ 930              	.LFE135:
+ 932              		.global	__aeabi_f2lz
+ 933              		.global	__aeabi_l2f
+ 934              		.section	.text.calc_fire_time,"ax",%progbits
+ 935              		.align	1
+ 936              		.global	calc_fire_time
+ 937              		.syntax unified
+ 938              		.thumb
+ 939              		.thumb_func
+ 941              	calc_fire_time:
+ 942              	.LVL125:
+ 943              	.LFB136:
+ 195:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** /**
+ 196:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****   *@brief ¼ÆËãÇ°ÉÚÕ¾×°¼×°æÐý×ªµ½Ó¢ÐÛÓëÇ°ÉÚÕ¾ÖÐÐÄÁ¬ÏßµÄÊ±¼ä
+ 197:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****   */
+ 198:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** #define FIRE_DELAY_MS  200.0f//´ý²â
+ 199:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** #define ROTATE_TIME_MS 325.0f//833.3333f °Ð³µ13Ãë10È¦ 0.77rad
+ 200:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** //10m/s 5mÔ¶ 1m¸ß ·ÉÐÐÊ±¼ä0.7s ¼ÓÉÏFIRE_DELAY_MS²¦µ¯ÅÌÑÓ³Ù£¬ÒÑ³¬¹ý
+ 201:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** /**
+ 202:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****   *@parm µ¥Î»ms
+ 203:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****   */
+ 204:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** float calc_fire_time(float now_in_place_time, float fly_time)
+ 205:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** {
+ 944              		.loc 1 205 1 is_stmt 1 view -0
+ 945              		.cfi_startproc
+ 946              		@ args = 0, pretend = 0, frame = 0
+ 947              		@ frame_needed = 0, uses_anonymous_args = 0
+ 206:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     if (fly_time == 0)  return 0;
+ 948              		.loc 1 206 5 view .LVU217
+ 949              		.loc 1 206 8 is_stmt 0 view .LVU218
+ 950 0000 F5EE400A 		vcmp.f32	s1, #0
+ 951 0004 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 952 0008 2CD0     		beq	.L55
+ 205:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     if (fly_time == 0)  return 0;
+ 953              		.loc 1 205 1 view .LVU219
+ 954 000a 08B5     		push	{r3, lr}
+ 955              	.LCFI15:
+ 956              		.cfi_def_cfa_offset 8
+ 957              		.cfi_offset 3, -8
+ 958              		.cfi_offset 14, -4
+ 959 000c 2DED048B 		vpush.64	{d8, d9}
+ 960              	.LCFI16:
+ 961              		.cfi_def_cfa_offset 24
+ 962              		.cfi_offset 80, -24
+ 963              		.cfi_offset 81, -20
+ 964              		.cfi_offset 82, -16
+ 965              		.cfi_offset 83, -12
+ 966 0010 B0EE609A 		vmov.f32	s18, s1
+ 207:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     int64_t increat_time = ROTATE_TIME_MS;
+ 967              		.loc 1 207 5 is_stmt 1 view .LVU220
+ 968              	.LVL126:
+ 208:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     float next_in_place_time = now_in_place_time + ROTATE_TIME_MS;//ÏÂÒ»´Î×ªµ½ÖÐÐÄµÄÊ±¼ä´Á
+ 969              		.loc 1 208 5 view .LVU221
+ 970              		.loc 1 208 11 is_stmt 0 view .LVU222
+ 971 0014 DFED158A 		vldr.32	s17, .L60
+ 972 0018 70EE288A 		vadd.f32	s17, s0, s17
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 22
+
+
+ 973              	.LVL127:
+ 209:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     while ((FIRE_DELAY_MS + fly_time) > increat_time)
+ 974              		.loc 1 209 5 is_stmt 1 view .LVU223
+ 207:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     int64_t increat_time = ROTATE_TIME_MS;
+ 975              		.loc 1 207 13 is_stmt 0 view .LVU224
+ 976 001c 40F24510 		movw	r0, #325
+ 977 0020 0021     		movs	r1, #0
+ 978              		.loc 1 209 11 view .LVU225
+ 979 0022 09E0     		b	.L53
+ 980              	.LVL128:
+ 981              	.L54:
+ 210:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     {   //·¢µ¯Ê±¼ä£«·ÉÐÐÊ±¼ä³¬¹ýÏÂÒ»¿é×°¼×°å×ªµ½Î»µÄÊ±¼ä£¬Òò´ËÓ¦¸ÃÔ¤ÅÐÏÂÏÂ¿é×°¼×°åµ½Î»Ê±¼ä
+ 211:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****         next_in_place_time += ROTATE_TIME_MS;
+ 982              		.loc 1 211 9 is_stmt 1 view .LVU226
+ 983              		.loc 1 211 28 is_stmt 0 view .LVU227
+ 984 0024 9FED117A 		vldr.32	s14, .L60
+ 985 0028 78EE878A 		vadd.f32	s17, s17, s14
+ 986              	.LVL129:
+ 212:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****         increat_time += ROTATE_TIME_MS;
+ 987              		.loc 1 212 9 is_stmt 1 view .LVU228
+ 988              		.loc 1 212 22 is_stmt 0 view .LVU229
+ 989 002c 77EE877A 		vadd.f32	s15, s15, s14
+ 990 0030 17EE900A 		vmov	r0, s15
+ 991 0034 FFF7FEFF 		bl	__aeabi_f2lz
+ 992              	.LVL130:
+ 993              	.L53:
+ 209:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     while ((FIRE_DELAY_MS + fly_time) > increat_time)
+ 994              		.loc 1 209 11 is_stmt 1 view .LVU230
+ 209:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     while ((FIRE_DELAY_MS + fly_time) > increat_time)
+ 995              		.loc 1 209 27 is_stmt 0 view .LVU231
+ 996 0038 9FED0D8A 		vldr.32	s16, .L60+4
+ 997 003c 39EE088A 		vadd.f32	s16, s18, s16
+ 209:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     while ((FIRE_DELAY_MS + fly_time) > increat_time)
+ 998              		.loc 1 209 39 view .LVU232
+ 999 0040 FFF7FEFF 		bl	__aeabi_l2f
+ 1000              	.LVL131:
+ 209:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     while ((FIRE_DELAY_MS + fly_time) > increat_time)
+ 1001              		.loc 1 209 39 view .LVU233
+ 1002 0044 07EE900A 		vmov	s15, r0
+ 209:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     while ((FIRE_DELAY_MS + fly_time) > increat_time)
+ 1003              		.loc 1 209 11 view .LVU234
+ 1004 0048 B4EEE78A 		vcmpe.f32	s16, s15
+ 1005 004c F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 1006 0050 E8DC     		bgt	.L54
+ 213:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     }
+ 214:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     float fire_time = next_in_place_time-FIRE_DELAY_MS-fly_time;
+ 1007              		.loc 1 214 5 is_stmt 1 view .LVU235
+ 1008              		.loc 1 214 41 is_stmt 0 view .LVU236
+ 1009 0052 9FED070A 		vldr.32	s0, .L60+4
+ 1010 0056 78EEC08A 		vsub.f32	s17, s17, s0
+ 1011              	.LVL132:
+ 1012              		.loc 1 214 11 view .LVU237
+ 1013 005a 38EEC90A 		vsub.f32	s0, s17, s18
+ 1014              	.LVL133:
+ 215:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     return  fire_time;
+ 1015              		.loc 1 215 5 is_stmt 1 view .LVU238
+ 216:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** }
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 23
+
+
+ 1016              		.loc 1 216 1 is_stmt 0 view .LVU239
+ 1017 005e BDEC048B 		vldm	sp!, {d8-d9}
+ 1018              	.LCFI17:
+ 1019              		.cfi_restore 82
+ 1020              		.cfi_restore 83
+ 1021              		.cfi_restore 80
+ 1022              		.cfi_restore 81
+ 1023              		.cfi_def_cfa_offset 8
+ 1024              	.LVL134:
+ 1025              		.loc 1 216 1 view .LVU240
+ 1026 0062 08BD     		pop	{r3, pc}
+ 1027              	.LVL135:
+ 1028              	.L55:
+ 1029              	.LCFI18:
+ 1030              		.cfi_def_cfa_offset 0
+ 1031              		.cfi_restore 3
+ 1032              		.cfi_restore 14
+ 206:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     int64_t increat_time = ROTATE_TIME_MS;
+ 1033              		.loc 1 206 32 view .LVU241
+ 1034 0064 9FED030A 		vldr.32	s0, .L60+8
+ 1035              	.LVL136:
+ 1036              		.loc 1 216 1 view .LVU242
+ 1037 0068 7047     		bx	lr
+ 1038              	.L61:
+ 1039 006a 00BF     		.align	2
+ 1040              	.L60:
+ 1041 006c 0080A243 		.word	1134723072
+ 1042 0070 00004843 		.word	1128792064
+ 1043 0074 00000000 		.word	0
+ 1044              		.cfi_endproc
+ 1045              	.LFE136:
+ 1047              		.section	.text.JudgeCanFire,"ax",%progbits
+ 1048              		.align	1
+ 1049              		.global	JudgeCanFire
+ 1050              		.syntax unified
+ 1051              		.thumb
+ 1052              		.thumb_func
+ 1054              	JudgeCanFire:
+ 1055              	.LVL137:
+ 1056              	.LFB137:
+ 217:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** /**
+ 218:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****   *@brief ÅÐ¶ÏÊÇ·ñ·ûºÏ¿ª»ðÊµ¼Ê
+ 219:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****   *@note  Èç¹û·ûºÏÇåÁãÔ¤¼ÆÏÂÒ»´Îµ½Î»Ê±¼ä
+ 220:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****   *@reval 0 ·¢»ðÊ±»úÎ´µ½ | 1 ·¢»ðÊ±»úÒÑµ½ | 2 ·¢»ðÊ±»úÒÑ¹ý | 3 ´«²Î´íÎó
+ 221:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****   */
+ 222:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** float fla = 20;
+ 223:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** int64_t Fire_delay = 200;
+ 224:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** uint8_t JudgeCanFire(float now_in_place_time, float *next_in_place_time)
+ 225:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** {
+ 1057              		.loc 1 225 1 is_stmt 1 view -0
+ 1058              		.cfi_startproc
+ 1059              		@ args = 0, pretend = 0, frame = 0
+ 1060              		@ frame_needed = 0, uses_anonymous_args = 0
+ 226:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     if (now_in_place_time == 0) return 3;
+ 1061              		.loc 1 226 5 view .LVU244
+ 1062              		.loc 1 226 8 is_stmt 0 view .LVU245
+ 1063 0000 B5EE400A 		vcmp.f32	s0, #0
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 24
+
+
+ 1064 0004 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 1065 0008 23D0     		beq	.L67
+ 225:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     if (now_in_place_time == 0) return 3;
+ 1066              		.loc 1 225 1 view .LVU246
+ 1067 000a 10B5     		push	{r4, lr}
+ 1068              	.LCFI19:
+ 1069              		.cfi_def_cfa_offset 8
+ 1070              		.cfi_offset 4, -8
+ 1071              		.cfi_offset 14, -4
+ 1072 000c 0446     		mov	r4, r0
+ 227:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     if (*next_in_place_time == 0) return 3;
+ 1073              		.loc 1 227 5 is_stmt 1 view .LVU247
+ 1074              		.loc 1 227 9 is_stmt 0 view .LVU248
+ 1075 000e D0ED007A 		vldr.32	s15, [r0]
+ 1076              		.loc 1 227 8 view .LVU249
+ 1077 0012 F5EE407A 		vcmp.f32	s15, #0
+ 1078 0016 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 1079 001a 1CD0     		beq	.L68
+ 228:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     if (now_in_place_time > *next_in_place_time)
+ 1080              		.loc 1 228 5 is_stmt 1 view .LVU250
+ 1081              		.loc 1 228 8 is_stmt 0 view .LVU251
+ 1082 001c F4EEC07A 		vcmpe.f32	s15, s0
+ 1083 0020 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 1084 0024 0DD4     		bmi	.L78
+ 229:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     {
+ 230:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****         *next_in_place_time = 0;
+ 231:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****         return 2;
+ 232:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     }        
+ 233:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     if (abs_f(now_in_place_time - *next_in_place_time) < fla)
+ 1085              		.loc 1 233 5 is_stmt 1 view .LVU252
+ 1086              		.loc 1 233 9 is_stmt 0 view .LVU253
+ 1087 0026 30EE670A 		vsub.f32	s0, s0, s15
+ 1088              	.LVL138:
+ 1089              		.loc 1 233 9 view .LVU254
+ 1090 002a FFF7FEFF 		bl	abs_f
+ 1091              	.LVL139:
+ 1092              		.loc 1 233 56 view .LVU255
+ 1093 002e 0B4B     		ldr	r3, .L80
+ 1094 0030 D3ED007A 		vldr.32	s15, [r3]
+ 1095              		.loc 1 233 8 view .LVU256
+ 1096 0034 B4EEE70A 		vcmpe.f32	s0, s15
+ 1097 0038 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 1098 003c 05D4     		bmi	.L79
+ 234:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     {
+ 235:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****         *next_in_place_time = 0;
+ 236:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****         return 1;    
+ 237:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     }                                                       
+ 238:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     return 0;
+ 1099              		.loc 1 238 12 view .LVU257
+ 1100 003e 0020     		movs	r0, #0
+ 1101              	.L63:
+ 239:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** }
+ 1102              		.loc 1 239 1 view .LVU258
+ 1103 0040 10BD     		pop	{r4, pc}
+ 1104              	.LVL140:
+ 1105              	.L78:
+ 230:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****         return 2;
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 25
+
+
+ 1106              		.loc 1 230 9 is_stmt 1 view .LVU259
+ 230:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****         return 2;
+ 1107              		.loc 1 230 29 is_stmt 0 view .LVU260
+ 1108 0042 0023     		movs	r3, #0
+ 1109 0044 0360     		str	r3, [r0]	@ float
+ 231:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     }        
+ 1110              		.loc 1 231 9 is_stmt 1 view .LVU261
+ 231:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     }        
+ 1111              		.loc 1 231 16 is_stmt 0 view .LVU262
+ 1112 0046 0220     		movs	r0, #2
+ 1113              	.LVL141:
+ 231:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     }        
+ 1114              		.loc 1 231 16 view .LVU263
+ 1115 0048 FAE7     		b	.L63
+ 1116              	.LVL142:
+ 1117              	.L79:
+ 235:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****         return 1;    
+ 1118              		.loc 1 235 9 is_stmt 1 view .LVU264
+ 235:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****         return 1;    
+ 1119              		.loc 1 235 29 is_stmt 0 view .LVU265
+ 1120 004a 0023     		movs	r3, #0
+ 1121 004c 2360     		str	r3, [r4]	@ float
+ 236:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     }                                                       
+ 1122              		.loc 1 236 9 is_stmt 1 view .LVU266
+ 236:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     }                                                       
+ 1123              		.loc 1 236 16 is_stmt 0 view .LVU267
+ 1124 004e 0120     		movs	r0, #1
+ 1125 0050 F6E7     		b	.L63
+ 1126              	.LVL143:
+ 1127              	.L67:
+ 1128              	.LCFI20:
+ 1129              		.cfi_def_cfa_offset 0
+ 1130              		.cfi_restore 4
+ 1131              		.cfi_restore 14
+ 226:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     if (*next_in_place_time == 0) return 3;
+ 1132              		.loc 1 226 40 view .LVU268
+ 1133 0052 0320     		movs	r0, #3
+ 1134              	.LVL144:
+ 1135              		.loc 1 239 1 view .LVU269
+ 1136 0054 7047     		bx	lr
+ 1137              	.LVL145:
+ 1138              	.L68:
+ 1139              	.LCFI21:
+ 1140              		.cfi_def_cfa_offset 8
+ 1141              		.cfi_offset 4, -8
+ 1142              		.cfi_offset 14, -4
+ 227:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     if (now_in_place_time > *next_in_place_time)
+ 1143              		.loc 1 227 42 view .LVU270
+ 1144 0056 0320     		movs	r0, #3
+ 1145              	.LVL146:
+ 227:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     if (now_in_place_time > *next_in_place_time)
+ 1146              		.loc 1 227 42 view .LVU271
+ 1147 0058 F2E7     		b	.L63
+ 1148              	.L81:
+ 1149 005a 00BF     		.align	2
+ 1150              	.L80:
+ 1151 005c 00000000 		.word	.LANCHOR3
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 26
+
+
+ 1152              		.cfi_endproc
+ 1153              	.LFE137:
+ 1155              		.section	.text.Calc_The_Distance,"ax",%progbits
+ 1156              		.align	1
+ 1157              		.global	Calc_The_Distance
+ 1158              		.syntax unified
+ 1159              		.thumb
+ 1160              		.thumb_func
+ 1162              	Calc_The_Distance:
+ 1163              	.LVL147:
+ 1164              	.LFB138:
+ 240:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** 
+ 241:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** fp32 Calc_The_Distance(float X_,float Y_)
+ 242:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** {
+ 1165              		.loc 1 242 1 is_stmt 1 view -0
+ 1166              		.cfi_startproc
+ 1167              		@ args = 0, pretend = 0, frame = 0
+ 1168              		@ frame_needed = 0, uses_anonymous_args = 0
+ 243:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     if (X_ == 0 && Y_ == 0) return 0;
+ 1169              		.loc 1 243 5 view .LVU273
+ 1170              		.loc 1 243 8 is_stmt 0 view .LVU274
+ 1171 0000 B5EE400A 		vcmp.f32	s0, #0
+ 1172 0004 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 1173 0008 04D1     		bne	.L83
+ 1174              		.loc 1 243 17 discriminator 1 view .LVU275
+ 1175 000a F5EE400A 		vcmp.f32	s1, #0
+ 1176 000e F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 1177 0012 15D0     		beq	.L85
+ 1178              	.L83:
+ 242:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     if (X_ == 0 && Y_ == 0) return 0;
+ 1179              		.loc 1 242 1 view .LVU276
+ 1180 0014 08B5     		push	{r3, lr}
+ 1181              	.LCFI22:
+ 1182              		.cfi_def_cfa_offset 8
+ 1183              		.cfi_offset 3, -8
+ 1184              		.cfi_offset 14, -4
+ 244:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     float Z;
+ 1185              		.loc 1 244 5 is_stmt 1 view .LVU277
+ 245:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     Z = sqrt(X_*X_+Y_*Y_);
+ 1186              		.loc 1 245 5 view .LVU278
+ 1187              		.loc 1 245 16 is_stmt 0 view .LVU279
+ 1188 0016 20EE000A 		vmul.f32	s0, s0, s0
+ 1189              	.LVL148:
+ 1190              		.loc 1 245 22 view .LVU280
+ 1191 001a 60EEA00A 		vmul.f32	s1, s1, s1
+ 1192              	.LVL149:
+ 1193              		.loc 1 245 9 view .LVU281
+ 1194 001e 70EE207A 		vadd.f32	s15, s0, s1
+ 1195 0022 17EE900A 		vmov	r0, s15
+ 1196 0026 FFF7FEFF 		bl	__aeabi_f2d
+ 1197              	.LVL150:
+ 1198 002a 41EC100B 		vmov	d0, r0, r1
+ 1199 002e FFF7FEFF 		bl	sqrt
+ 1200              	.LVL151:
+ 1201 0032 51EC100B 		vmov	r0, r1, d0
+ 1202              		.loc 1 245 7 view .LVU282
+ 1203 0036 FFF7FEFF 		bl	__aeabi_d2f
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 27
+
+
+ 1204              	.LVL152:
+ 1205 003a 00EE100A 		vmov	s0, r0
+ 1206              	.LVL153:
+ 246:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     //arm_sqrt_f32(X_*X_+Y_*Y_,&Z);
+ 247:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     return Z;
+ 1207              		.loc 1 247 5 is_stmt 1 view .LVU283
+ 248:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** }
+ 1208              		.loc 1 248 1 is_stmt 0 view .LVU284
+ 1209 003e 08BD     		pop	{r3, pc}
+ 1210              	.LVL154:
+ 1211              	.L85:
+ 1212              	.LCFI23:
+ 1213              		.cfi_def_cfa_offset 0
+ 1214              		.cfi_restore 3
+ 1215              		.cfi_restore 14
+ 243:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     float Z;
+ 1216              		.loc 1 243 36 view .LVU285
+ 1217 0040 9FED010A 		vldr.32	s0, .L89
+ 1218              	.LVL155:
+ 1219              		.loc 1 248 1 view .LVU286
+ 1220 0044 7047     		bx	lr
+ 1221              	.L90:
+ 1222 0046 00BF     		.align	2
+ 1223              	.L89:
+ 1224 0048 00000000 		.word	0
+ 1225              		.cfi_endproc
+ 1226              	.LFE138:
+ 1228              		.global	in_place_time
+ 1229              		.global	Fire_delay
+ 1230              		.global	fla
+ 1231              		.global	root
+ 1232              		.global	s
+ 1233              		.section	.bss.in_place_time,"aw",%nobits
+ 1234              		.align	2
+ 1237              	in_place_time:
+ 1238 0000 00000000 		.space	8
+ 1238      00000000 
+ 1239              		.section	.bss.last_Y_error.0,"aw",%nobits
+ 1240              		.align	2
+ 1241              		.set	.LANCHOR2,. + 0
+ 1244              	last_Y_error.0:
+ 1245 0000 00000000 		.space	4
+ 1246              		.section	.bss.root,"aw",%nobits
+ 1247              		.align	3
+ 1248              		.set	.LANCHOR1,. + 0
+ 1251              	root:
+ 1252 0000 00000000 		.space	8
+ 1252      00000000 
+ 1253              		.section	.bss.s,"aw",%nobits
+ 1254              		.align	2
+ 1255              		.set	.LANCHOR0,. + 0
+ 1258              	s:
+ 1259 0000 00000000 		.space	4
+ 1260              		.section	.data.Fire_delay,"aw"
+ 1261              		.align	3
+ 1264              	Fire_delay:
+ 1265 0000 C8000000 		.word	200
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 28
+
+
+ 1266 0004 00000000 		.word	0
+ 1267              		.section	.data.fla,"aw"
+ 1268              		.align	2
+ 1269              		.set	.LANCHOR3,. + 0
+ 1272              	fla:
+ 1273 0000 0000A041 		.word	1101004800
+ 1274              		.text
+ 1275              	.Letext0:
+ 1276              		.file 2 "ACE-ECF/Algorithm/inc/struct_typedef.h"
+ 1277              		.file 3 "<built-in>"
+ 1278              		.file 4 "ACE-ECF/Algorithm/inc/maths.h"
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 29
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 bsp_Parabolic_calculation.c
+C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s:21     .text.abs_d:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s:27     .text.abs_d:00000000 abs_d
+C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s:68     .text.abs_f:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s:74     .text.abs_f:00000000 abs_f
+C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s:102    .text.cos_Y_X:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s:108    .text.cos_Y_X:00000000 cos_Y_X
+C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s:183    .text.cos_Y_X:00000048 $d
+C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s:192    .text.sin_Y_X:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s:198    .text.sin_Y_X:00000000 sin_Y_X
+C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s:285    .text.sin_Y_X:00000068 $d
+C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s:293    .text.Calc_Pitch_Angle:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s:299    .text.Calc_Pitch_Angle:00000000 Calc_Pitch_Angle
+C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s:808    .text.Calc_Pitch_Angle:00000308 $d
+C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s:823    .text.Yaw_Angle_close:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s:829    .text.Yaw_Angle_close:00000000 Yaw_Angle_close
+C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s:927    .text.Yaw_Angle_close:00000080 $d
+C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s:935    .text.calc_fire_time:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s:941    .text.calc_fire_time:00000000 calc_fire_time
+C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s:1041   .text.calc_fire_time:0000006c $d
+C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s:1048   .text.JudgeCanFire:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s:1054   .text.JudgeCanFire:00000000 JudgeCanFire
+C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s:1151   .text.JudgeCanFire:0000005c $d
+C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s:1156   .text.Calc_The_Distance:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s:1162   .text.Calc_The_Distance:00000000 Calc_The_Distance
+C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s:1224   .text.Calc_The_Distance:00000048 $d
+C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s:1237   .bss.in_place_time:00000000 in_place_time
+C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s:1264   .data.Fire_delay:00000000 Fire_delay
+C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s:1272   .data.fla:00000000 fla
+C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s:1251   .bss.root:00000000 root
+C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s:1258   .bss.s:00000000 s
+C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s:1234   .bss.in_place_time:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s:1240   .bss.last_Y_error.0:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s:1244   .bss.last_Y_error.0:00000000 last_Y_error.0
+C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s:1247   .bss.root:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s:1254   .bss.s:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s:1261   .data.Fire_delay:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s:1268   .data.fla:00000000 $d
+
+UNDEFINED SYMBOLS
+__aeabi_dcmpge
+sqrtf
+__aeabi_f2d
+__aeabi_ddiv
+__aeabi_d2f
+sqrt
+__aeabi_dmul
+__aeabi_dsub
+acos
+pow
+cos_calculate
+sin_calculate
+__aeabi_f2lz
+__aeabi_l2f

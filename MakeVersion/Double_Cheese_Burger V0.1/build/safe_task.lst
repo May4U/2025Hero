@@ -1,0 +1,1033 @@
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccZX8aRV.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.arch armv7e-m
+   3              		.fpu fpv4-sp-d16
+   4              		.eabi_attribute 27, 1
+   5              		.eabi_attribute 28, 1
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.file	"safe_task.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.Safe_Init,"ax",%progbits
+  20              		.align	1
+  21              		.global	Safe_Init
+  22              		.syntax unified
+  23              		.thumb
+  24              		.thumb_func
+  26              	Safe_Init:
+  27              	.LVL0:
+  28              	.LFB5:
+  29              		.file 1 "ACE-ECF/Application/src/safe_task.c"
+   1:ACE-ECF/Application/src/safe_task.c **** /*************************** Dongguan-University of Technology -ACE**************************
+   2:ACE-ECF/Application/src/safe_task.c ****  * @file    safe_task.c
+   3:ACE-ECF/Application/src/safe_task.c ****  * @author  zhengNannnn
+   4:ACE-ECF/Application/src/safe_task.c ****  * @version V1.0
+   5:ACE-ECF/Application/src/safe_task.c ****  * @date    2023/11/5
+   6:ACE-ECF/Application/src/safe_task.c ****  * @brief
+   7:ACE-ECF/Application/src/safe_task.c ****  ******************************************************************************
+   8:ACE-ECF/Application/src/safe_task.c ****  * @verbatim
+   9:ACE-ECF/Application/src/safe_task.c ****  *  安全任务函数，支持用户自定义名称、失联检测时间、失联回调函数
+  10:ACE-ECF/Application/src/safe_task.c ****  *  使用方法：
+  11:ACE-ECF/Application/src/safe_task.c ****  *      申请一个安全任务，丢入名字及自定义失联回调函数
+  12:ACE-ECF/Application/src/safe_task.c ****  *      类似与喂狗机制，在收到消息时刷新在线状态
+  13:ACE-ECF/Application/src/safe_task.c ****  *      当达到失联阈值时执行自定义任务
+  14:ACE-ECF/Application/src/safe_task.c ****  *  demo：
+  15:ACE-ECF/Application/src/safe_task.c ****  *       在Init_task.c中的init_Task()函数里添加
+  16:ACE-ECF/Application/src/safe_task.c ****  *       Safe_Init(1);//任务周期1ms
+  17:ACE-ECF/Application/src/safe_task.c ****  *       //创建安全任务
+  18:ACE-ECF/Application/src/safe_task.c ****  *       osThreadDef(SAFE_TASK, Safe_Task, osPriorityHigh, 0, 128);
+  19:ACE-ECF/Application/src/safe_task.c ****  *		 Chassis_TASKHandle = osThreadCreate(osThread(Chassis_task), NULL);
+  20:ACE-ECF/Application/src/safe_task.c **** 
+  21:ACE-ECF/Application/src/safe_task.c ****  *       void online(void){enable米狗电机}
+  22:ACE-ECF/Application/src/safe_task.c ****  *       void disconnect(void){unable米狗电机}
+  23:ACE-ECF/Application/src/safe_task.c ****  *       //申请安全任务
+  24:ACE-ECF/Application/src/safe_task.c ****  *       safe_task_t* demo_safe_task_ptr = Safe_task_add(demo,10,disconnect,online);
+  25:ACE-ECF/Application/src/safe_task.c ****  *       //接收中断函数中喂狗，以下二选一
+  26:ACE-ECF/Application/src/safe_task.c ****  *       Safe_Task_online_ptr_(demo_safe_task_ptr);//基于指针
+  27:ACE-ECF/Application/src/safe_task.c ****  *       Safe_Task_online_name_(demo);             //基于名字
+  28:ACE-ECF/Application/src/safe_task.c ****  * @attention
+  29:ACE-ECF/Application/src/safe_task.c ****  *      如果要使用基于名字的喂狗，请确保名字不重复，惰性查找只会喂遍历到的第一个
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccZX8aRV.s 			page 2
+
+
+  30:ACE-ECF/Application/src/safe_task.c ****  *      是基于指针则无所谓
+  31:ACE-ECF/Application/src/safe_task.c ****  *      如果用C++任务重载就不用特别区别函数后缀了捏
+  32:ACE-ECF/Application/src/safe_task.c ****  *      删除任务也是如此
+  33:ACE-ECF/Application/src/safe_task.c ****  * @version
+  34:ACE-ECF/Application/src/safe_task.c ****  * v1.0   基础版本
+  35:ACE-ECF/Application/src/safe_task.c ****  ************************** Dongguan-University of Technology -ACE***************************/
+  36:ACE-ECF/Application/src/safe_task.c **** #include "safe_task.h"
+  37:ACE-ECF/Application/src/safe_task.c **** #include <string.h>
+  38:ACE-ECF/Application/src/safe_task.c **** /*任务间采用链表*/
+  39:ACE-ECF/Application/src/safe_task.c **** #define TASK_INTERVAL_MS 1
+  40:ACE-ECF/Application/src/safe_task.c **** uint32_t RUN_cycle_MS;
+  41:ACE-ECF/Application/src/safe_task.c **** Head_t* Head;
+  42:ACE-ECF/Application/src/safe_task.c **** uint8_t init_falg = 1;
+  43:ACE-ECF/Application/src/safe_task.c **** 
+  44:ACE-ECF/Application/src/safe_task.c **** /**
+  45:ACE-ECF/Application/src/safe_task.c ****   * @brief  Safe_Init     安全任务初始化
+  46:ACE-ECF/Application/src/safe_task.c ****   * @param  RUN_cycle_ms  每次运行周期（ms）
+  47:ACE-ECF/Application/src/safe_task.c ****   * @retval null
+  48:ACE-ECF/Application/src/safe_task.c ****   */
+  49:ACE-ECF/Application/src/safe_task.c **** void Safe_Init(uint32_t RUN_cycle_ms)
+  50:ACE-ECF/Application/src/safe_task.c **** {
+  30              		.loc 1 50 1 view -0
+  31              		.cfi_startproc
+  32              		@ args = 0, pretend = 0, frame = 0
+  33              		@ frame_needed = 0, uses_anonymous_args = 0
+  34              		.loc 1 50 1 is_stmt 0 view .LVU1
+  35 0000 08B5     		push	{r3, lr}
+  36              	.LCFI0:
+  37              		.cfi_def_cfa_offset 8
+  38              		.cfi_offset 3, -8
+  39              		.cfi_offset 14, -4
+  51:ACE-ECF/Application/src/safe_task.c ****     if (init_falg)
+  40              		.loc 1 51 5 is_stmt 1 view .LVU2
+  41              		.loc 1 51 9 is_stmt 0 view .LVU3
+  42 0002 084B     		ldr	r3, .L5
+  43 0004 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+  44              		.loc 1 51 8 view .LVU4
+  45 0006 03B9     		cbnz	r3, .L4
+  46              	.LVL1:
+  47              	.L1:
+  52:ACE-ECF/Application/src/safe_task.c ****     {
+  53:ACE-ECF/Application/src/safe_task.c ****         init_falg--;
+  54:ACE-ECF/Application/src/safe_task.c ****         RUN_cycle_MS = RUN_cycle_ms;
+  55:ACE-ECF/Application/src/safe_task.c ****         Head = (Head_t*)malloc(sizeof(Head_t));
+  56:ACE-ECF/Application/src/safe_task.c ****         Head->first_task = NULL;
+  57:ACE-ECF/Application/src/safe_task.c ****     }
+  58:ACE-ECF/Application/src/safe_task.c **** }
+  48              		.loc 1 58 1 view .LVU5
+  49 0008 08BD     		pop	{r3, pc}
+  50              	.LVL2:
+  51              	.L4:
+  53:ACE-ECF/Application/src/safe_task.c ****         RUN_cycle_MS = RUN_cycle_ms;
+  52              		.loc 1 53 9 is_stmt 1 view .LVU6
+  53:ACE-ECF/Application/src/safe_task.c ****         RUN_cycle_MS = RUN_cycle_ms;
+  53              		.loc 1 53 18 is_stmt 0 view .LVU7
+  54 000a 013B     		subs	r3, r3, #1
+  55 000c 054A     		ldr	r2, .L5
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccZX8aRV.s 			page 3
+
+
+  56 000e 1370     		strb	r3, [r2]
+  54:ACE-ECF/Application/src/safe_task.c ****         Head = (Head_t*)malloc(sizeof(Head_t));
+  57              		.loc 1 54 9 is_stmt 1 view .LVU8
+  54:ACE-ECF/Application/src/safe_task.c ****         Head = (Head_t*)malloc(sizeof(Head_t));
+  58              		.loc 1 54 22 is_stmt 0 view .LVU9
+  59 0010 054B     		ldr	r3, .L5+4
+  60 0012 1860     		str	r0, [r3]
+  55:ACE-ECF/Application/src/safe_task.c ****         Head->first_task = NULL;
+  61              		.loc 1 55 9 is_stmt 1 view .LVU10
+  55:ACE-ECF/Application/src/safe_task.c ****         Head->first_task = NULL;
+  62              		.loc 1 55 25 is_stmt 0 view .LVU11
+  63 0014 0420     		movs	r0, #4
+  64              	.LVL3:
+  55:ACE-ECF/Application/src/safe_task.c ****         Head->first_task = NULL;
+  65              		.loc 1 55 25 view .LVU12
+  66 0016 FFF7FEFF 		bl	malloc
+  67              	.LVL4:
+  55:ACE-ECF/Application/src/safe_task.c ****         Head->first_task = NULL;
+  68              		.loc 1 55 14 view .LVU13
+  69 001a 044B     		ldr	r3, .L5+8
+  70 001c 1860     		str	r0, [r3]
+  56:ACE-ECF/Application/src/safe_task.c ****     }
+  71              		.loc 1 56 9 is_stmt 1 view .LVU14
+  56:ACE-ECF/Application/src/safe_task.c ****     }
+  72              		.loc 1 56 26 is_stmt 0 view .LVU15
+  73 001e 0023     		movs	r3, #0
+  74 0020 0360     		str	r3, [r0]
+  75              		.loc 1 58 1 view .LVU16
+  76 0022 F1E7     		b	.L1
+  77              	.L6:
+  78              		.align	2
+  79              	.L5:
+  80 0024 00000000 		.word	.LANCHOR0
+  81 0028 00000000 		.word	.LANCHOR1
+  82 002c 00000000 		.word	.LANCHOR2
+  83              		.cfi_endproc
+  84              	.LFE5:
+  86              		.section	.text.Safe_task_add,"ax",%progbits
+  87              		.align	1
+  88              		.global	Safe_task_add
+  89              		.syntax unified
+  90              		.thumb
+  91              		.thumb_func
+  93              	Safe_task_add:
+  94              	.LVL5:
+  95              	.LFB6:
+  59:ACE-ECF/Application/src/safe_task.c **** /**
+  60:ACE-ECF/Application/src/safe_task.c ****   * @brief  Safe_task_add  添加一个安全任务
+  61:ACE-ECF/Application/src/safe_task.c ****   * @param  name[20]       名称
+  62:ACE-ECF/Application/src/safe_task.c ****   * @param  Discon_ms      检测失联时长 
+  63:ACE-ECF/Application/src/safe_task.c ****   * @param  DisconnetCallBack     失联时调用回调函数
+  64:ACE-ECF/Application/src/safe_task.c ****   * @param  OnlineCallback        喂狗时调用在线函数
+  65:ACE-ECF/Application/src/safe_task.c ****   * @retval temp_task_ptr  安全任务指针
+  66:ACE-ECF/Application/src/safe_task.c ****   */
+  67:ACE-ECF/Application/src/safe_task.c **** 
+  68:ACE-ECF/Application/src/safe_task.c **** safe_task_t* Safe_task_add(const char* name, uint32_t Discon_ms, Callback DisconnetCallBack, Callba
+  69:ACE-ECF/Application/src/safe_task.c **** {
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccZX8aRV.s 			page 4
+
+
+  96              		.loc 1 69 1 is_stmt 1 view -0
+  97              		.cfi_startproc
+  98              		@ args = 0, pretend = 0, frame = 0
+  99              		@ frame_needed = 0, uses_anonymous_args = 0
+ 100              		.loc 1 69 1 is_stmt 0 view .LVU18
+ 101 0000 2DE9F047 		push	{r4, r5, r6, r7, r8, r9, r10, lr}
+ 102              	.LCFI1:
+ 103              		.cfi_def_cfa_offset 32
+ 104              		.cfi_offset 4, -32
+ 105              		.cfi_offset 5, -28
+ 106              		.cfi_offset 6, -24
+ 107              		.cfi_offset 7, -20
+ 108              		.cfi_offset 8, -16
+ 109              		.cfi_offset 9, -12
+ 110              		.cfi_offset 10, -8
+ 111              		.cfi_offset 14, -4
+ 112 0004 8146     		mov	r9, r0
+ 113 0006 8846     		mov	r8, r1
+ 114 0008 1746     		mov	r7, r2
+ 115 000a 1E46     		mov	r6, r3
+  70:ACE-ECF/Application/src/safe_task.c ****     Safe_Init(TASK_INTERVAL_MS);
+ 116              		.loc 1 70 5 is_stmt 1 view .LVU19
+ 117 000c 0120     		movs	r0, #1
+ 118              	.LVL6:
+ 119              		.loc 1 70 5 is_stmt 0 view .LVU20
+ 120 000e FFF7FEFF 		bl	Safe_Init
+ 121              	.LVL7:
+  71:ACE-ECF/Application/src/safe_task.c ****     safe_task_t* temp_task_ptr = (safe_task_t*)malloc(sizeof(safe_task_t));
+ 122              		.loc 1 71 5 is_stmt 1 view .LVU21
+ 123              		.loc 1 71 48 is_stmt 0 view .LVU22
+ 124 0012 4C20     		movs	r0, #76
+ 125 0014 FFF7FEFF 		bl	malloc
+ 126              	.LVL8:
+ 127 0018 0546     		mov	r5, r0
+ 128              	.LVL9:
+  72:ACE-ECF/Application/src/safe_task.c ****     safe_task_t* last_task_ptr = Head->first_task;
+ 129              		.loc 1 72 5 is_stmt 1 view .LVU23
+ 130              		.loc 1 72 38 is_stmt 0 view .LVU24
+ 131 001a DFF840A0 		ldr	r10, .L12
+ 132 001e DAF80030 		ldr	r3, [r10]
+ 133              		.loc 1 72 18 view .LVU25
+ 134 0022 1C68     		ldr	r4, [r3]
+ 135              	.LVL10:
+  73:ACE-ECF/Application/src/safe_task.c ****     
+  74:ACE-ECF/Application/src/safe_task.c ****     //写入相关参数
+  75:ACE-ECF/Application/src/safe_task.c ****     strcpy(temp_task_ptr->name, name);
+ 136              		.loc 1 75 5 is_stmt 1 view .LVU26
+ 137 0024 4946     		mov	r1, r9
+ 138 0026 FFF7FEFF 		bl	strcpy
+ 139              	.LVL11:
+  76:ACE-ECF/Application/src/safe_task.c ****     temp_task_ptr->Disconnection_threshold = Discon_ms;
+ 140              		.loc 1 76 5 view .LVU27
+ 141              		.loc 1 76 44 is_stmt 0 view .LVU28
+ 142 002a C5F83880 		str	r8, [r5, #56]
+  77:ACE-ECF/Application/src/safe_task.c ****     temp_task_ptr->Disconnection_count = 0;
+ 143              		.loc 1 77 5 is_stmt 1 view .LVU29
+ 144              		.loc 1 77 40 is_stmt 0 view .LVU30
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccZX8aRV.s 			page 5
+
+
+ 145 002e 0021     		movs	r1, #0
+ 146 0030 6963     		str	r1, [r5, #52]
+  78:ACE-ECF/Application/src/safe_task.c ****     temp_task_ptr->Disconnection_falg = 0;
+ 147              		.loc 1 78 5 is_stmt 1 view .LVU31
+ 148              		.loc 1 78 39 is_stmt 0 view .LVU32
+ 149 0032 85F83C10 		strb	r1, [r5, #60]
+  79:ACE-ECF/Application/src/safe_task.c ****     temp_task_ptr->First_Disconnect = 0;
+ 150              		.loc 1 79 5 is_stmt 1 view .LVU33
+ 151              		.loc 1 79 37 is_stmt 0 view .LVU34
+ 152 0036 85F83D10 		strb	r1, [r5, #61]
+  80:ACE-ECF/Application/src/safe_task.c ****     temp_task_ptr->DisconnetCallBack = DisconnetCallBack;
+ 153              		.loc 1 80 5 is_stmt 1 view .LVU35
+ 154              		.loc 1 80 38 is_stmt 0 view .LVU36
+ 155 003a 2F64     		str	r7, [r5, #64]
+  81:ACE-ECF/Application/src/safe_task.c ****     temp_task_ptr->OnlineCallBack = OnlineCallback;
+ 156              		.loc 1 81 5 is_stmt 1 view .LVU37
+ 157              		.loc 1 81 35 is_stmt 0 view .LVU38
+ 158 003c 6E64     		str	r6, [r5, #68]
+  82:ACE-ECF/Application/src/safe_task.c ****     temp_task_ptr->next_task = NULL;
+ 159              		.loc 1 82 5 is_stmt 1 view .LVU39
+ 160              		.loc 1 82 30 is_stmt 0 view .LVU40
+ 161 003e A964     		str	r1, [r5, #72]
+  83:ACE-ECF/Application/src/safe_task.c ****     //链表尾插法
+  84:ACE-ECF/Application/src/safe_task.c ****     if(Head->first_task == NULL)
+ 162              		.loc 1 84 5 is_stmt 1 view .LVU41
+ 163              		.loc 1 84 12 is_stmt 0 view .LVU42
+ 164 0040 DAF80030 		ldr	r3, [r10]
+ 165 0044 1A68     		ldr	r2, [r3]
+ 166              		.loc 1 84 7 view .LVU43
+ 167 0046 3AB1     		cbz	r2, .L11
+ 168              	.LVL12:
+ 169              	.L8:
+  85:ACE-ECF/Application/src/safe_task.c ****     {
+  86:ACE-ECF/Application/src/safe_task.c ****         Head->first_task = temp_task_ptr;
+  87:ACE-ECF/Application/src/safe_task.c ****         return temp_task_ptr;
+  88:ACE-ECF/Application/src/safe_task.c ****     }        
+  89:ACE-ECF/Application/src/safe_task.c ****     while(last_task_ptr->next_task != NULL)     last_task_ptr = last_task_ptr->next_task;
+ 170              		.loc 1 89 10 is_stmt 1 discriminator 1 view .LVU44
+ 171 0048 2346     		mov	r3, r4
+ 172              		.loc 1 89 24 is_stmt 0 discriminator 1 view .LVU45
+ 173 004a A46C     		ldr	r4, [r4, #72]
+ 174              	.LVL13:
+ 175              		.loc 1 89 10 discriminator 1 view .LVU46
+ 176 004c 002C     		cmp	r4, #0
+ 177 004e FBD1     		bne	.L8
+  90:ACE-ECF/Application/src/safe_task.c ****     last_task_ptr->next_task = temp_task_ptr;
+ 178              		.loc 1 90 5 is_stmt 1 view .LVU47
+ 179              		.loc 1 90 30 is_stmt 0 view .LVU48
+ 180 0050 9D64     		str	r5, [r3, #72]
+  91:ACE-ECF/Application/src/safe_task.c ****     
+  92:ACE-ECF/Application/src/safe_task.c ****     return temp_task_ptr;
+ 181              		.loc 1 92 5 is_stmt 1 view .LVU49
+ 182              	.LVL14:
+ 183              	.L7:
+  93:ACE-ECF/Application/src/safe_task.c **** }
+ 184              		.loc 1 93 1 is_stmt 0 view .LVU50
+ 185 0052 2846     		mov	r0, r5
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccZX8aRV.s 			page 6
+
+
+ 186 0054 BDE8F087 		pop	{r4, r5, r6, r7, r8, r9, r10, pc}
+ 187              	.LVL15:
+ 188              	.L11:
+  86:ACE-ECF/Application/src/safe_task.c ****         return temp_task_ptr;
+ 189              		.loc 1 86 9 is_stmt 1 view .LVU51
+  86:ACE-ECF/Application/src/safe_task.c ****         return temp_task_ptr;
+ 190              		.loc 1 86 26 is_stmt 0 view .LVU52
+ 191 0058 1D60     		str	r5, [r3]
+  87:ACE-ECF/Application/src/safe_task.c ****     }        
+ 192              		.loc 1 87 9 is_stmt 1 view .LVU53
+  87:ACE-ECF/Application/src/safe_task.c ****     }        
+ 193              		.loc 1 87 16 is_stmt 0 view .LVU54
+ 194 005a FAE7     		b	.L7
+ 195              	.L13:
+ 196              		.align	2
+ 197              	.L12:
+ 198 005c 00000000 		.word	.LANCHOR2
+ 199              		.cfi_endproc
+ 200              	.LFE6:
+ 202              		.section	.text.SAFE_TASK,"ax",%progbits
+ 203              		.align	1
+ 204              		.global	SAFE_TASK
+ 205              		.syntax unified
+ 206              		.thumb
+ 207              		.thumb_func
+ 209              	SAFE_TASK:
+ 210              	.LVL16:
+ 211              	.LFB7:
+  94:ACE-ECF/Application/src/safe_task.c **** 
+  95:ACE-ECF/Application/src/safe_task.c **** void SAFE_TASK(void const *argument)
+  96:ACE-ECF/Application/src/safe_task.c **** {
+ 212              		.loc 1 96 1 is_stmt 1 view -0
+ 213              		.cfi_startproc
+ 214              		@ args = 0, pretend = 0, frame = 0
+ 215              		@ frame_needed = 0, uses_anonymous_args = 0
+ 216              		.loc 1 96 1 is_stmt 0 view .LVU56
+ 217 0000 10B5     		push	{r4, lr}
+ 218              	.LCFI2:
+ 219              		.cfi_def_cfa_offset 8
+ 220              		.cfi_offset 4, -8
+ 221              		.cfi_offset 14, -4
+  97:ACE-ECF/Application/src/safe_task.c **** 	Safe_Init(TASK_INTERVAL_MS);//虽然大概率can接收和dr16接收等会在FreeRTOS创建Safe_Task前调用初始化，
+ 222              		.loc 1 97 2 is_stmt 1 view .LVU57
+ 223 0002 0120     		movs	r0, #1
+ 224              	.LVL17:
+ 225              		.loc 1 97 2 is_stmt 0 view .LVU58
+ 226 0004 FFF7FEFF 		bl	Safe_Init
+ 227              	.LVL18:
+ 228 0008 1BE0     		b	.L18
+ 229              	.LVL19:
+ 230              	.L16:
+ 231              	.LBB2:
+  98:ACE-ECF/Application/src/safe_task.c **** 	while(1)
+  99:ACE-ECF/Application/src/safe_task.c **** 	{
+ 100:ACE-ECF/Application/src/safe_task.c **** 		taskENTER_CRITICAL(); //进入临界区
+ 101:ACE-ECF/Application/src/safe_task.c ****         //链表轮询
+ 102:ACE-ECF/Application/src/safe_task.c ****         safe_task_t* temp_task_ptr = Head->first_task;
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccZX8aRV.s 			page 7
+
+
+ 103:ACE-ECF/Application/src/safe_task.c ****         while(temp_task_ptr != NULL)
+ 104:ACE-ECF/Application/src/safe_task.c ****         {
+ 105:ACE-ECF/Application/src/safe_task.c ****             temp_task_ptr->Disconnection_count += RUN_cycle_MS;//添加这一轮任务的失联时间
+ 106:ACE-ECF/Application/src/safe_task.c ****             if (temp_task_ptr->Disconnection_count >= temp_task_ptr->Disconnection_threshold)//达到
+ 107:ACE-ECF/Application/src/safe_task.c ****             {
+ 108:ACE-ECF/Application/src/safe_task.c ****                 if(temp_task_ptr->First_Disconnect == 0)//防止多次进入失联回调函数
+ 109:ACE-ECF/Application/src/safe_task.c ****                 {
+ 110:ACE-ECF/Application/src/safe_task.c ****                     temp_task_ptr->First_Disconnect++;
+ 111:ACE-ECF/Application/src/safe_task.c ****                     temp_task_ptr->Disconnection_falg = 1;//失联标志
+ 112:ACE-ECF/Application/src/safe_task.c ****                     temp_task_ptr->DisconnetCallBack();//执行用户自定义失联回调函数
+ 113:ACE-ECF/Application/src/safe_task.c ****                 }
+ 114:ACE-ECF/Application/src/safe_task.c ****             }
+ 115:ACE-ECF/Application/src/safe_task.c ****             temp_task_ptr = temp_task_ptr->next_task;
+ 232              		.loc 1 115 13 is_stmt 1 view .LVU59
+ 233              		.loc 1 115 27 is_stmt 0 view .LVU60
+ 234 000a A46C     		ldr	r4, [r4, #72]
+ 235              	.LVL20:
+ 236              	.L15:
+ 103:ACE-ECF/Application/src/safe_task.c ****         {
+ 237              		.loc 1 103 14 is_stmt 1 view .LVU61
+ 238 000c 9CB1     		cbz	r4, .L20
+ 105:ACE-ECF/Application/src/safe_task.c ****             if (temp_task_ptr->Disconnection_count >= temp_task_ptr->Disconnection_threshold)//达到
+ 239              		.loc 1 105 13 view .LVU62
+ 105:ACE-ECF/Application/src/safe_task.c ****             if (temp_task_ptr->Disconnection_count >= temp_task_ptr->Disconnection_threshold)//达到
+ 240              		.loc 1 105 48 is_stmt 0 view .LVU63
+ 241 000e 636B     		ldr	r3, [r4, #52]
+ 242 0010 0F4A     		ldr	r2, .L21
+ 243 0012 1268     		ldr	r2, [r2]
+ 244 0014 1344     		add	r3, r3, r2
+ 245 0016 6363     		str	r3, [r4, #52]
+ 106:ACE-ECF/Application/src/safe_task.c ****             {
+ 246              		.loc 1 106 13 is_stmt 1 view .LVU64
+ 106:ACE-ECF/Application/src/safe_task.c ****             {
+ 247              		.loc 1 106 68 is_stmt 0 view .LVU65
+ 248 0018 A26B     		ldr	r2, [r4, #56]
+ 106:ACE-ECF/Application/src/safe_task.c ****             {
+ 249              		.loc 1 106 16 view .LVU66
+ 250 001a 9342     		cmp	r3, r2
+ 251 001c F5D3     		bcc	.L16
+ 108:ACE-ECF/Application/src/safe_task.c ****                 {
+ 252              		.loc 1 108 17 is_stmt 1 view .LVU67
+ 108:ACE-ECF/Application/src/safe_task.c ****                 {
+ 253              		.loc 1 108 33 is_stmt 0 view .LVU68
+ 254 001e 94F83D30 		ldrb	r3, [r4, #61]	@ zero_extendqisi2
+ 108:ACE-ECF/Application/src/safe_task.c ****                 {
+ 255              		.loc 1 108 19 view .LVU69
+ 256 0022 002B     		cmp	r3, #0
+ 257 0024 F1D1     		bne	.L16
+ 110:ACE-ECF/Application/src/safe_task.c ****                     temp_task_ptr->Disconnection_falg = 1;//失联标志
+ 258              		.loc 1 110 21 is_stmt 1 view .LVU70
+ 110:ACE-ECF/Application/src/safe_task.c ****                     temp_task_ptr->Disconnection_falg = 1;//失联标志
+ 259              		.loc 1 110 52 is_stmt 0 view .LVU71
+ 260 0026 0133     		adds	r3, r3, #1
+ 261 0028 84F83D30 		strb	r3, [r4, #61]
+ 111:ACE-ECF/Application/src/safe_task.c ****                     temp_task_ptr->DisconnetCallBack();//执行用户自定义失联回调函数
+ 262              		.loc 1 111 21 is_stmt 1 view .LVU72
+ 111:ACE-ECF/Application/src/safe_task.c ****                     temp_task_ptr->DisconnetCallBack();//执行用户自定义失联回调函数
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccZX8aRV.s 			page 8
+
+
+ 263              		.loc 1 111 55 is_stmt 0 view .LVU73
+ 264 002c 84F83C30 		strb	r3, [r4, #60]
+ 112:ACE-ECF/Application/src/safe_task.c ****                 }
+ 265              		.loc 1 112 21 is_stmt 1 view .LVU74
+ 112:ACE-ECF/Application/src/safe_task.c ****                 }
+ 266              		.loc 1 112 34 is_stmt 0 view .LVU75
+ 267 0030 236C     		ldr	r3, [r4, #64]
+ 112:ACE-ECF/Application/src/safe_task.c ****                 }
+ 268              		.loc 1 112 21 view .LVU76
+ 269 0032 9847     		blx	r3
+ 270              	.LVL21:
+ 271 0034 E9E7     		b	.L16
+ 272              	.L20:
+ 116:ACE-ECF/Application/src/safe_task.c ****         }
+ 117:ACE-ECF/Application/src/safe_task.c ****         
+ 118:ACE-ECF/Application/src/safe_task.c **** 		taskEXIT_CRITICAL(); //退出临界区
+ 273              		.loc 1 118 3 is_stmt 1 view .LVU77
+ 274 0036 FFF7FEFF 		bl	vPortExitCritical
+ 275              	.LVL22:
+ 119:ACE-ECF/Application/src/safe_task.c **** 		vTaskDelay(RUN_cycle_MS);
+ 276              		.loc 1 119 3 view .LVU78
+ 277 003a 054B     		ldr	r3, .L21
+ 278 003c 1868     		ldr	r0, [r3]
+ 279 003e FFF7FEFF 		bl	vTaskDelay
+ 280              	.LVL23:
+ 281              	.LBE2:
+  98:ACE-ECF/Application/src/safe_task.c **** 	{
+ 282              		.loc 1 98 7 view .LVU79
+ 283              	.L18:
+  98:ACE-ECF/Application/src/safe_task.c **** 	{
+ 284              		.loc 1 98 2 view .LVU80
+ 285              	.LBB3:
+ 100:ACE-ECF/Application/src/safe_task.c ****         //链表轮询
+ 286              		.loc 1 100 3 view .LVU81
+ 287 0042 FFF7FEFF 		bl	vPortEnterCritical
+ 288              	.LVL24:
+ 102:ACE-ECF/Application/src/safe_task.c ****         while(temp_task_ptr != NULL)
+ 289              		.loc 1 102 9 view .LVU82
+ 102:ACE-ECF/Application/src/safe_task.c ****         while(temp_task_ptr != NULL)
+ 290              		.loc 1 102 42 is_stmt 0 view .LVU83
+ 291 0046 034B     		ldr	r3, .L21+4
+ 292 0048 1B68     		ldr	r3, [r3]
+ 102:ACE-ECF/Application/src/safe_task.c ****         while(temp_task_ptr != NULL)
+ 293              		.loc 1 102 22 view .LVU84
+ 294 004a 1C68     		ldr	r4, [r3]
+ 295              	.LVL25:
+ 103:ACE-ECF/Application/src/safe_task.c ****         {
+ 296              		.loc 1 103 9 is_stmt 1 view .LVU85
+ 103:ACE-ECF/Application/src/safe_task.c ****         {
+ 297              		.loc 1 103 14 is_stmt 0 view .LVU86
+ 298 004c DEE7     		b	.L15
+ 299              	.L22:
+ 300 004e 00BF     		.align	2
+ 301              	.L21:
+ 302 0050 00000000 		.word	.LANCHOR1
+ 303 0054 00000000 		.word	.LANCHOR2
+ 304              	.LBE3:
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccZX8aRV.s 			page 9
+
+
+ 305              		.cfi_endproc
+ 306              	.LFE7:
+ 308              		.section	.text.Safe_Task_online_ptr_,"ax",%progbits
+ 309              		.align	1
+ 310              		.global	Safe_Task_online_ptr_
+ 311              		.syntax unified
+ 312              		.thumb
+ 313              		.thumb_func
+ 315              	Safe_Task_online_ptr_:
+ 316              	.LVL26:
+ 317              	.LFB8:
+ 120:ACE-ECF/Application/src/safe_task.c **** 	}
+ 121:ACE-ECF/Application/src/safe_task.c **** }
+ 122:ACE-ECF/Application/src/safe_task.c **** 
+ 123:ACE-ECF/Application/src/safe_task.c **** /**
+ 124:ACE-ECF/Application/src/safe_task.c ****   * @brief  Safe_Task_online_name_  安全任务在线刷新
+ 125:ACE-ECF/Application/src/safe_task.c ****   * @param  temp_task_ptr           刷新的任务指针
+ 126:ACE-ECF/Application/src/safe_task.c ****   * @return uint8_t                 刷新结果
+ 127:ACE-ECF/Application/src/safe_task.c ****   * @retval 1：成功刷新；0：刷新失败
+ 128:ACE-ECF/Application/src/safe_task.c ****   */
+ 129:ACE-ECF/Application/src/safe_task.c **** uint8_t Safe_Task_online_ptr_(safe_task_t* temp_task_ptr)
+ 130:ACE-ECF/Application/src/safe_task.c **** {
+ 318              		.loc 1 130 1 is_stmt 1 view -0
+ 319              		.cfi_startproc
+ 320              		@ args = 0, pretend = 0, frame = 0
+ 321              		@ frame_needed = 0, uses_anonymous_args = 0
+ 131:ACE-ECF/Application/src/safe_task.c ****     if(temp_task_ptr == NULL)   return 0;
+ 322              		.loc 1 131 5 view .LVU88
+ 323              		.loc 1 131 7 is_stmt 0 view .LVU89
+ 324 0000 50B1     		cbz	r0, .L25
+ 130:ACE-ECF/Application/src/safe_task.c ****     if(temp_task_ptr == NULL)   return 0;
+ 325              		.loc 1 130 1 view .LVU90
+ 326 0002 08B5     		push	{r3, lr}
+ 327              	.LCFI3:
+ 328              		.cfi_def_cfa_offset 8
+ 329              		.cfi_offset 3, -8
+ 330              		.cfi_offset 14, -4
+ 132:ACE-ECF/Application/src/safe_task.c ****     temp_task_ptr->Disconnection_count = 0;
+ 331              		.loc 1 132 5 is_stmt 1 view .LVU91
+ 332              		.loc 1 132 40 is_stmt 0 view .LVU92
+ 333 0004 0022     		movs	r2, #0
+ 334 0006 4263     		str	r2, [r0, #52]
+ 133:ACE-ECF/Application/src/safe_task.c ****     temp_task_ptr->Disconnection_falg = 0;
+ 335              		.loc 1 133 5 is_stmt 1 view .LVU93
+ 336              		.loc 1 133 39 is_stmt 0 view .LVU94
+ 337 0008 80F83C20 		strb	r2, [r0, #60]
+ 134:ACE-ECF/Application/src/safe_task.c ****     temp_task_ptr->First_Disconnect = 0;
+ 338              		.loc 1 134 5 is_stmt 1 view .LVU95
+ 339              		.loc 1 134 37 is_stmt 0 view .LVU96
+ 340 000c 80F83D20 		strb	r2, [r0, #61]
+ 135:ACE-ECF/Application/src/safe_task.c ****     temp_task_ptr->OnlineCallBack();
+ 341              		.loc 1 135 5 is_stmt 1 view .LVU97
+ 342              		.loc 1 135 18 is_stmt 0 view .LVU98
+ 343 0010 436C     		ldr	r3, [r0, #68]
+ 344              		.loc 1 135 5 view .LVU99
+ 345 0012 9847     		blx	r3
+ 346              	.LVL27:
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccZX8aRV.s 			page 10
+
+
+ 136:ACE-ECF/Application/src/safe_task.c ****     return 1;
+ 347              		.loc 1 136 5 is_stmt 1 view .LVU100
+ 348              		.loc 1 136 12 is_stmt 0 view .LVU101
+ 349 0014 0120     		movs	r0, #1
+ 137:ACE-ECF/Application/src/safe_task.c **** }
+ 350              		.loc 1 137 1 view .LVU102
+ 351 0016 08BD     		pop	{r3, pc}
+ 352              	.LVL28:
+ 353              	.L25:
+ 354              	.LCFI4:
+ 355              		.cfi_def_cfa_offset 0
+ 356              		.cfi_restore 3
+ 357              		.cfi_restore 14
+ 131:ACE-ECF/Application/src/safe_task.c ****     temp_task_ptr->Disconnection_count = 0;
+ 358              		.loc 1 131 40 view .LVU103
+ 359 0018 0020     		movs	r0, #0
+ 360              	.LVL29:
+ 361              		.loc 1 137 1 view .LVU104
+ 362 001a 7047     		bx	lr
+ 363              		.cfi_endproc
+ 364              	.LFE8:
+ 366              		.section	.text.Safe_Task_online_name_,"ax",%progbits
+ 367              		.align	1
+ 368              		.global	Safe_Task_online_name_
+ 369              		.syntax unified
+ 370              		.thumb
+ 371              		.thumb_func
+ 373              	Safe_Task_online_name_:
+ 374              	.LVL30:
+ 375              	.LFB9:
+ 138:ACE-ECF/Application/src/safe_task.c **** 
+ 139:ACE-ECF/Application/src/safe_task.c **** /**
+ 140:ACE-ECF/Application/src/safe_task.c ****   * @brief  Safe_Task_online_name_  安全任务在线刷新
+ 141:ACE-ECF/Application/src/safe_task.c ****   * @param  name                    刷新的任务名称
+ 142:ACE-ECF/Application/src/safe_task.c ****   * @return uint8_t                 刷新结果
+ 143:ACE-ECF/Application/src/safe_task.c ****   * @retval 1：成功刷新；0：刷新失败
+ 144:ACE-ECF/Application/src/safe_task.c ****   */
+ 145:ACE-ECF/Application/src/safe_task.c **** uint8_t Safe_Task_online_name_(char * name)
+ 146:ACE-ECF/Application/src/safe_task.c **** {
+ 376              		.loc 1 146 1 is_stmt 1 view -0
+ 377              		.cfi_startproc
+ 378              		@ args = 0, pretend = 0, frame = 0
+ 379              		@ frame_needed = 0, uses_anonymous_args = 0
+ 380              		.loc 1 146 1 is_stmt 0 view .LVU106
+ 381 0000 38B5     		push	{r3, r4, r5, lr}
+ 382              	.LCFI5:
+ 383              		.cfi_def_cfa_offset 16
+ 384              		.cfi_offset 3, -16
+ 385              		.cfi_offset 4, -12
+ 386              		.cfi_offset 5, -8
+ 387              		.cfi_offset 14, -4
+ 388 0002 0546     		mov	r5, r0
+ 147:ACE-ECF/Application/src/safe_task.c ****     safe_task_t* temp_task_ptr = Head->first_task;
+ 389              		.loc 1 147 5 is_stmt 1 view .LVU107
+ 390              		.loc 1 147 38 is_stmt 0 view .LVU108
+ 391 0004 0B4B     		ldr	r3, .L37
+ 392 0006 1B68     		ldr	r3, [r3]
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccZX8aRV.s 			page 11
+
+
+ 393              		.loc 1 147 18 view .LVU109
+ 394 0008 1C68     		ldr	r4, [r3]
+ 395              	.LVL31:
+ 148:ACE-ECF/Application/src/safe_task.c ****     while(temp_task_ptr != NULL)
+ 396              		.loc 1 148 5 is_stmt 1 view .LVU110
+ 397              		.loc 1 148 10 is_stmt 0 view .LVU111
+ 398 000a 00E0     		b	.L31
+ 399              	.LVL32:
+ 400              	.L32:
+ 149:ACE-ECF/Application/src/safe_task.c ****     {
+ 150:ACE-ECF/Application/src/safe_task.c ****         if (strcmp(temp_task_ptr->name,name) == 0)
+ 151:ACE-ECF/Application/src/safe_task.c ****         {
+ 152:ACE-ECF/Application/src/safe_task.c ****             temp_task_ptr->Disconnection_count = 0;
+ 153:ACE-ECF/Application/src/safe_task.c ****             temp_task_ptr->Disconnection_falg = 0;
+ 154:ACE-ECF/Application/src/safe_task.c ****             temp_task_ptr->First_Disconnect = 0;
+ 155:ACE-ECF/Application/src/safe_task.c ****             temp_task_ptr->OnlineCallBack();
+ 156:ACE-ECF/Application/src/safe_task.c ****             return 1;
+ 157:ACE-ECF/Application/src/safe_task.c ****         }
+ 158:ACE-ECF/Application/src/safe_task.c ****         temp_task_ptr = temp_task_ptr->next_task;
+ 401              		.loc 1 158 9 is_stmt 1 view .LVU112
+ 402              		.loc 1 158 23 is_stmt 0 view .LVU113
+ 403 000c A46C     		ldr	r4, [r4, #72]
+ 404              	.LVL33:
+ 405              	.L31:
+ 148:ACE-ECF/Application/src/safe_task.c ****     while(temp_task_ptr != NULL)
+ 406              		.loc 1 148 10 is_stmt 1 view .LVU114
+ 407 000e 7CB1     		cbz	r4, .L36
+ 150:ACE-ECF/Application/src/safe_task.c ****         {
+ 408              		.loc 1 150 9 view .LVU115
+ 150:ACE-ECF/Application/src/safe_task.c ****         {
+ 409              		.loc 1 150 13 is_stmt 0 view .LVU116
+ 410 0010 2946     		mov	r1, r5
+ 411 0012 2046     		mov	r0, r4
+ 412 0014 FFF7FEFF 		bl	strcmp
+ 413              	.LVL34:
+ 150:ACE-ECF/Application/src/safe_task.c ****         {
+ 414              		.loc 1 150 12 view .LVU117
+ 415 0018 0028     		cmp	r0, #0
+ 416 001a F7D1     		bne	.L32
+ 152:ACE-ECF/Application/src/safe_task.c ****             temp_task_ptr->Disconnection_falg = 0;
+ 417              		.loc 1 152 13 is_stmt 1 view .LVU118
+ 152:ACE-ECF/Application/src/safe_task.c ****             temp_task_ptr->Disconnection_falg = 0;
+ 418              		.loc 1 152 48 is_stmt 0 view .LVU119
+ 419 001c 0023     		movs	r3, #0
+ 420 001e 6363     		str	r3, [r4, #52]
+ 153:ACE-ECF/Application/src/safe_task.c ****             temp_task_ptr->First_Disconnect = 0;
+ 421              		.loc 1 153 13 is_stmt 1 view .LVU120
+ 153:ACE-ECF/Application/src/safe_task.c ****             temp_task_ptr->First_Disconnect = 0;
+ 422              		.loc 1 153 47 is_stmt 0 view .LVU121
+ 423 0020 84F83C30 		strb	r3, [r4, #60]
+ 154:ACE-ECF/Application/src/safe_task.c ****             temp_task_ptr->OnlineCallBack();
+ 424              		.loc 1 154 13 is_stmt 1 view .LVU122
+ 154:ACE-ECF/Application/src/safe_task.c ****             temp_task_ptr->OnlineCallBack();
+ 425              		.loc 1 154 45 is_stmt 0 view .LVU123
+ 426 0024 84F83D30 		strb	r3, [r4, #61]
+ 155:ACE-ECF/Application/src/safe_task.c ****             return 1;
+ 427              		.loc 1 155 13 is_stmt 1 view .LVU124
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccZX8aRV.s 			page 12
+
+
+ 155:ACE-ECF/Application/src/safe_task.c ****             return 1;
+ 428              		.loc 1 155 26 is_stmt 0 view .LVU125
+ 429 0028 636C     		ldr	r3, [r4, #68]
+ 155:ACE-ECF/Application/src/safe_task.c ****             return 1;
+ 430              		.loc 1 155 13 view .LVU126
+ 431 002a 9847     		blx	r3
+ 432              	.LVL35:
+ 156:ACE-ECF/Application/src/safe_task.c ****         }
+ 433              		.loc 1 156 13 is_stmt 1 view .LVU127
+ 156:ACE-ECF/Application/src/safe_task.c ****         }
+ 434              		.loc 1 156 20 is_stmt 0 view .LVU128
+ 435 002c 0120     		movs	r0, #1
+ 436 002e 00E0     		b	.L33
+ 437              	.L36:
+ 159:ACE-ECF/Application/src/safe_task.c ****     }   
+ 160:ACE-ECF/Application/src/safe_task.c ****     return 0;
+ 438              		.loc 1 160 12 view .LVU129
+ 439 0030 0020     		movs	r0, #0
+ 440              	.L33:
+ 161:ACE-ECF/Application/src/safe_task.c **** }
+ 441              		.loc 1 161 1 view .LVU130
+ 442 0032 38BD     		pop	{r3, r4, r5, pc}
+ 443              	.LVL36:
+ 444              	.L38:
+ 445              		.loc 1 161 1 view .LVU131
+ 446              		.align	2
+ 447              	.L37:
+ 448 0034 00000000 		.word	.LANCHOR2
+ 449              		.cfi_endproc
+ 450              	.LFE9:
+ 452              		.section	.text.Safe_task_delect_ptr_,"ax",%progbits
+ 453              		.align	1
+ 454              		.global	Safe_task_delect_ptr_
+ 455              		.syntax unified
+ 456              		.thumb
+ 457              		.thumb_func
+ 459              	Safe_task_delect_ptr_:
+ 460              	.LVL37:
+ 461              	.LFB10:
+ 162:ACE-ECF/Application/src/safe_task.c **** 
+ 163:ACE-ECF/Application/src/safe_task.c **** /**
+ 164:ACE-ECF/Application/src/safe_task.c ****   * @brief  Safe_task_delect_ptr_   安全任务删除
+ 165:ACE-ECF/Application/src/safe_task.c ****   * @param  name                    删除的任务指针
+ 166:ACE-ECF/Application/src/safe_task.c ****   * @return uint8_t                 删除结果
+ 167:ACE-ECF/Application/src/safe_task.c ****   * @retval 1：成功删除；0：删除失败
+ 168:ACE-ECF/Application/src/safe_task.c ****   */
+ 169:ACE-ECF/Application/src/safe_task.c **** uint8_t Safe_task_delect_ptr_(safe_task_t* delect_task_ptr)
+ 170:ACE-ECF/Application/src/safe_task.c **** {
+ 462              		.loc 1 170 1 is_stmt 1 view -0
+ 463              		.cfi_startproc
+ 464              		@ args = 0, pretend = 0, frame = 0
+ 465              		@ frame_needed = 0, uses_anonymous_args = 0
+ 466              		.loc 1 170 1 is_stmt 0 view .LVU133
+ 467 0000 08B5     		push	{r3, lr}
+ 468              	.LCFI6:
+ 469              		.cfi_def_cfa_offset 8
+ 470              		.cfi_offset 3, -8
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccZX8aRV.s 			page 13
+
+
+ 471              		.cfi_offset 14, -4
+ 171:ACE-ECF/Application/src/safe_task.c ****     safe_task_t* temp_task_ptr = Head->first_task;
+ 472              		.loc 1 171 5 is_stmt 1 view .LVU134
+ 473              		.loc 1 171 38 is_stmt 0 view .LVU135
+ 474 0002 0C4B     		ldr	r3, .L46
+ 475 0004 1A68     		ldr	r2, [r3]
+ 476              		.loc 1 171 18 view .LVU136
+ 477 0006 1368     		ldr	r3, [r2]
+ 478              	.LVL38:
+ 172:ACE-ECF/Application/src/safe_task.c ****     
+ 173:ACE-ECF/Application/src/safe_task.c ****     if(temp_task_ptr == delect_task_ptr)
+ 479              		.loc 1 173 5 is_stmt 1 view .LVU137
+ 480              		.loc 1 173 7 is_stmt 0 view .LVU138
+ 481 0008 8342     		cmp	r3, r0
+ 482 000a 0AD0     		beq	.L44
+ 483              	.LVL39:
+ 484              	.L40:
+ 174:ACE-ECF/Application/src/safe_task.c ****     {
+ 175:ACE-ECF/Application/src/safe_task.c ****         Head->first_task = NULL;
+ 176:ACE-ECF/Application/src/safe_task.c ****         free(delect_task_ptr);
+ 177:ACE-ECF/Application/src/safe_task.c ****         return 1;
+ 178:ACE-ECF/Application/src/safe_task.c ****     }
+ 179:ACE-ECF/Application/src/safe_task.c ****     
+ 180:ACE-ECF/Application/src/safe_task.c ****     while(temp_task_ptr->next_task != NULL)
+ 485              		.loc 1 180 10 is_stmt 1 view .LVU139
+ 486 000c 1A46     		mov	r2, r3
+ 487              		.loc 1 180 24 is_stmt 0 view .LVU140
+ 488 000e 9B6C     		ldr	r3, [r3, #72]
+ 489              	.LVL40:
+ 490              		.loc 1 180 10 view .LVU141
+ 491 0010 6BB1     		cbz	r3, .L45
+ 181:ACE-ECF/Application/src/safe_task.c ****     {
+ 182:ACE-ECF/Application/src/safe_task.c ****         if(temp_task_ptr->next_task == delect_task_ptr)
+ 492              		.loc 1 182 9 is_stmt 1 view .LVU142
+ 493              		.loc 1 182 11 is_stmt 0 view .LVU143
+ 494 0012 8342     		cmp	r3, r0
+ 495 0014 FAD1     		bne	.L40
+ 183:ACE-ECF/Application/src/safe_task.c ****         {
+ 184:ACE-ECF/Application/src/safe_task.c ****             temp_task_ptr->next_task = delect_task_ptr->next_task;
+ 496              		.loc 1 184 13 is_stmt 1 view .LVU144
+ 497              		.loc 1 184 55 is_stmt 0 view .LVU145
+ 498 0016 836C     		ldr	r3, [r0, #72]
+ 499              		.loc 1 184 38 view .LVU146
+ 500 0018 9364     		str	r3, [r2, #72]
+ 185:ACE-ECF/Application/src/safe_task.c ****             free(delect_task_ptr);
+ 501              		.loc 1 185 13 is_stmt 1 view .LVU147
+ 502 001a FFF7FEFF 		bl	free
+ 503              	.LVL41:
+ 186:ACE-ECF/Application/src/safe_task.c ****             return 1;
+ 504              		.loc 1 186 13 view .LVU148
+ 505              		.loc 1 186 20 is_stmt 0 view .LVU149
+ 506 001e 0120     		movs	r0, #1
+ 507 0020 06E0     		b	.L41
+ 508              	.LVL42:
+ 509              	.L44:
+ 175:ACE-ECF/Application/src/safe_task.c ****         free(delect_task_ptr);
+ 510              		.loc 1 175 9 is_stmt 1 view .LVU150
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccZX8aRV.s 			page 14
+
+
+ 175:ACE-ECF/Application/src/safe_task.c ****         free(delect_task_ptr);
+ 511              		.loc 1 175 26 is_stmt 0 view .LVU151
+ 512 0022 0023     		movs	r3, #0
+ 513              	.LVL43:
+ 175:ACE-ECF/Application/src/safe_task.c ****         free(delect_task_ptr);
+ 514              		.loc 1 175 26 view .LVU152
+ 515 0024 1360     		str	r3, [r2]
+ 516              	.LVL44:
+ 176:ACE-ECF/Application/src/safe_task.c ****         return 1;
+ 517              		.loc 1 176 9 is_stmt 1 view .LVU153
+ 518 0026 FFF7FEFF 		bl	free
+ 519              	.LVL45:
+ 177:ACE-ECF/Application/src/safe_task.c ****     }
+ 520              		.loc 1 177 9 view .LVU154
+ 177:ACE-ECF/Application/src/safe_task.c ****     }
+ 521              		.loc 1 177 16 is_stmt 0 view .LVU155
+ 522 002a 0120     		movs	r0, #1
+ 523 002c 00E0     		b	.L41
+ 524              	.LVL46:
+ 525              	.L45:
+ 187:ACE-ECF/Application/src/safe_task.c ****         }
+ 188:ACE-ECF/Application/src/safe_task.c ****         temp_task_ptr = temp_task_ptr->next_task;
+ 189:ACE-ECF/Application/src/safe_task.c ****     }   
+ 190:ACE-ECF/Application/src/safe_task.c ****     return 0;
+ 526              		.loc 1 190 12 view .LVU156
+ 527 002e 0020     		movs	r0, #0
+ 528              	.LVL47:
+ 529              	.L41:
+ 191:ACE-ECF/Application/src/safe_task.c **** }
+ 530              		.loc 1 191 1 view .LVU157
+ 531 0030 08BD     		pop	{r3, pc}
+ 532              	.L47:
+ 533 0032 00BF     		.align	2
+ 534              	.L46:
+ 535 0034 00000000 		.word	.LANCHOR2
+ 536              		.cfi_endproc
+ 537              	.LFE10:
+ 539              		.section	.text.Safe_Task_delect_name_,"ax",%progbits
+ 540              		.align	1
+ 541              		.global	Safe_Task_delect_name_
+ 542              		.syntax unified
+ 543              		.thumb
+ 544              		.thumb_func
+ 546              	Safe_Task_delect_name_:
+ 547              	.LVL48:
+ 548              	.LFB11:
+ 192:ACE-ECF/Application/src/safe_task.c **** /**
+ 193:ACE-ECF/Application/src/safe_task.c ****   * @brief  Safe_task_delect_name_  安全任务删除
+ 194:ACE-ECF/Application/src/safe_task.c ****   * @param  name                    删除的任务名称
+ 195:ACE-ECF/Application/src/safe_task.c ****   * @return uint8_t                 删除结果
+ 196:ACE-ECF/Application/src/safe_task.c ****   * @retval 1：成功删除；0：删除失败
+ 197:ACE-ECF/Application/src/safe_task.c ****   */
+ 198:ACE-ECF/Application/src/safe_task.c **** uint8_t Safe_Task_delect_name_(char * delect_task_name)
+ 199:ACE-ECF/Application/src/safe_task.c **** {
+ 549              		.loc 1 199 1 is_stmt 1 view -0
+ 550              		.cfi_startproc
+ 551              		@ args = 0, pretend = 0, frame = 0
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccZX8aRV.s 			page 15
+
+
+ 552              		@ frame_needed = 0, uses_anonymous_args = 0
+ 553              		.loc 1 199 1 is_stmt 0 view .LVU159
+ 554 0000 70B5     		push	{r4, r5, r6, lr}
+ 555              	.LCFI7:
+ 556              		.cfi_def_cfa_offset 16
+ 557              		.cfi_offset 4, -16
+ 558              		.cfi_offset 5, -12
+ 559              		.cfi_offset 6, -8
+ 560              		.cfi_offset 14, -4
+ 561 0002 0546     		mov	r5, r0
+ 200:ACE-ECF/Application/src/safe_task.c ****     safe_task_t* temp_task_ptr = Head->first_task;
+ 562              		.loc 1 200 5 is_stmt 1 view .LVU160
+ 563              		.loc 1 200 38 is_stmt 0 view .LVU161
+ 564 0004 104B     		ldr	r3, .L55
+ 565 0006 1E68     		ldr	r6, [r3]
+ 566              		.loc 1 200 18 view .LVU162
+ 567 0008 3468     		ldr	r4, [r6]
+ 568              	.LVL49:
+ 201:ACE-ECF/Application/src/safe_task.c ****     safe_task_t* delect_task_ptr;
+ 569              		.loc 1 201 5 is_stmt 1 view .LVU163
+ 202:ACE-ECF/Application/src/safe_task.c ****     
+ 203:ACE-ECF/Application/src/safe_task.c ****     if(strcmp(temp_task_ptr->name,delect_task_name) == 0)
+ 570              		.loc 1 203 5 view .LVU164
+ 571              		.loc 1 203 8 is_stmt 0 view .LVU165
+ 572 000a 0146     		mov	r1, r0
+ 573 000c 2046     		mov	r0, r4
+ 574              	.LVL50:
+ 575              		.loc 1 203 8 view .LVU166
+ 576 000e FFF7FEFF 		bl	strcmp
+ 577              	.LVL51:
+ 578              		.loc 1 203 7 view .LVU167
+ 579 0012 78B1     		cbz	r0, .L53
+ 580              	.LVL52:
+ 581              	.L49:
+ 204:ACE-ECF/Application/src/safe_task.c ****     {
+ 205:ACE-ECF/Application/src/safe_task.c ****         Head->first_task = NULL;
+ 206:ACE-ECF/Application/src/safe_task.c ****         free(delect_task_ptr);
+ 207:ACE-ECF/Application/src/safe_task.c ****         return 1;
+ 208:ACE-ECF/Application/src/safe_task.c ****     }
+ 209:ACE-ECF/Application/src/safe_task.c ****     
+ 210:ACE-ECF/Application/src/safe_task.c ****     while(temp_task_ptr->next_task != NULL)
+ 582              		.loc 1 210 10 is_stmt 1 view .LVU168
+ 583 0014 2646     		mov	r6, r4
+ 584              		.loc 1 210 24 is_stmt 0 view .LVU169
+ 585 0016 A46C     		ldr	r4, [r4, #72]
+ 586              	.LVL53:
+ 587              		.loc 1 210 10 view .LVU170
+ 588 0018 9CB1     		cbz	r4, .L54
+ 211:ACE-ECF/Application/src/safe_task.c ****     {
+ 212:ACE-ECF/Application/src/safe_task.c ****         if(strcmp(temp_task_ptr->next_task->name,delect_task_name) == 0)
+ 589              		.loc 1 212 9 is_stmt 1 view .LVU171
+ 590              		.loc 1 212 12 is_stmt 0 view .LVU172
+ 591 001a 2946     		mov	r1, r5
+ 592 001c 2046     		mov	r0, r4
+ 593 001e FFF7FEFF 		bl	strcmp
+ 594              	.LVL54:
+ 595              		.loc 1 212 11 view .LVU173
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccZX8aRV.s 			page 16
+
+
+ 596 0022 0028     		cmp	r0, #0
+ 597 0024 F6D1     		bne	.L49
+ 213:ACE-ECF/Application/src/safe_task.c ****         {
+ 214:ACE-ECF/Application/src/safe_task.c ****             delect_task_ptr = temp_task_ptr->next_task;
+ 598              		.loc 1 214 13 is_stmt 1 view .LVU174
+ 599              	.LVL55:
+ 215:ACE-ECF/Application/src/safe_task.c ****             temp_task_ptr->next_task = delect_task_ptr->next_task;
+ 600              		.loc 1 215 13 view .LVU175
+ 601              		.loc 1 215 55 is_stmt 0 view .LVU176
+ 602 0026 A36C     		ldr	r3, [r4, #72]
+ 603              		.loc 1 215 38 view .LVU177
+ 604 0028 B364     		str	r3, [r6, #72]
+ 216:ACE-ECF/Application/src/safe_task.c ****             free(delect_task_ptr);
+ 605              		.loc 1 216 13 is_stmt 1 view .LVU178
+ 606 002a 2046     		mov	r0, r4
+ 607 002c FFF7FEFF 		bl	free
+ 608              	.LVL56:
+ 217:ACE-ECF/Application/src/safe_task.c ****             return 1;
+ 609              		.loc 1 217 13 view .LVU179
+ 610              		.loc 1 217 20 is_stmt 0 view .LVU180
+ 611 0030 0120     		movs	r0, #1
+ 612 0032 07E0     		b	.L50
+ 613              	.LVL57:
+ 614              	.L53:
+ 205:ACE-ECF/Application/src/safe_task.c ****         free(delect_task_ptr);
+ 615              		.loc 1 205 9 is_stmt 1 view .LVU181
+ 205:ACE-ECF/Application/src/safe_task.c ****         free(delect_task_ptr);
+ 616              		.loc 1 205 26 is_stmt 0 view .LVU182
+ 617 0034 0023     		movs	r3, #0
+ 618 0036 3360     		str	r3, [r6]
+ 206:ACE-ECF/Application/src/safe_task.c ****         return 1;
+ 619              		.loc 1 206 9 is_stmt 1 view .LVU183
+ 620 0038 1846     		mov	r0, r3
+ 621 003a FFF7FEFF 		bl	free
+ 622              	.LVL58:
+ 207:ACE-ECF/Application/src/safe_task.c ****     }
+ 623              		.loc 1 207 9 view .LVU184
+ 207:ACE-ECF/Application/src/safe_task.c ****     }
+ 624              		.loc 1 207 16 is_stmt 0 view .LVU185
+ 625 003e 0120     		movs	r0, #1
+ 626 0040 00E0     		b	.L50
+ 627              	.LVL59:
+ 628              	.L54:
+ 218:ACE-ECF/Application/src/safe_task.c ****         }
+ 219:ACE-ECF/Application/src/safe_task.c ****         temp_task_ptr = temp_task_ptr->next_task;
+ 220:ACE-ECF/Application/src/safe_task.c ****     }   
+ 221:ACE-ECF/Application/src/safe_task.c ****     return 0;
+ 629              		.loc 1 221 12 view .LVU186
+ 630 0042 0020     		movs	r0, #0
+ 631              	.LVL60:
+ 632              	.L50:
+ 222:ACE-ECF/Application/src/safe_task.c **** }...
+ 633              		.loc 1 222 1 view .LVU187
+ 634 0044 70BD     		pop	{r4, r5, r6, pc}
+ 635              	.LVL61:
+ 636              	.L56:
+ 637              		.loc 1 222 1 view .LVU188
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccZX8aRV.s 			page 17
+
+
+ 638 0046 00BF     		.align	2
+ 639              	.L55:
+ 640 0048 00000000 		.word	.LANCHOR2
+ 641              		.cfi_endproc
+ 642              	.LFE11:
+ 644              		.global	init_falg
+ 645              		.global	Head
+ 646              		.global	RUN_cycle_MS
+ 647              		.section	.bss.Head,"aw",%nobits
+ 648              		.align	2
+ 649              		.set	.LANCHOR2,. + 0
+ 652              	Head:
+ 653 0000 00000000 		.space	4
+ 654              		.section	.bss.RUN_cycle_MS,"aw",%nobits
+ 655              		.align	2
+ 656              		.set	.LANCHOR1,. + 0
+ 659              	RUN_cycle_MS:
+ 660 0000 00000000 		.space	4
+ 661              		.section	.data.init_falg,"aw"
+ 662              		.set	.LANCHOR0,. + 0
+ 665              	init_falg:
+ 666 0000 01       		.byte	1
+ 667              		.text
+ 668              	.Letext0:
+ 669              		.file 2 "d:\\gcc-arm-none-eabi-10.3-2021.10\\arm-none-eabi\\include\\machine\\_default_types.h"
+ 670              		.file 3 "d:\\gcc-arm-none-eabi-10.3-2021.10\\arm-none-eabi\\include\\sys\\_stdint.h"
+ 671              		.file 4 "ACE-ECF/Application/inc/safe_task.h"
+ 672              		.file 5 "d:\\gcc-arm-none-eabi-10.3-2021.10\\arm-none-eabi\\include\\string.h"
+ 673              		.file 6 "d:\\gcc-arm-none-eabi-10.3-2021.10\\arm-none-eabi\\include\\stdlib.h"
+ 674              		.file 7 "Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/portmacro.h"
+ 675              		.file 8 "Middlewares/Third_Party/FreeRTOS/Source/include/task.h"
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccZX8aRV.s 			page 18
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 safe_task.c
+C:\Users\28212\AppData\Local\Temp\ccZX8aRV.s:20     .text.Safe_Init:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccZX8aRV.s:26     .text.Safe_Init:00000000 Safe_Init
+C:\Users\28212\AppData\Local\Temp\ccZX8aRV.s:80     .text.Safe_Init:00000024 $d
+C:\Users\28212\AppData\Local\Temp\ccZX8aRV.s:87     .text.Safe_task_add:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccZX8aRV.s:93     .text.Safe_task_add:00000000 Safe_task_add
+C:\Users\28212\AppData\Local\Temp\ccZX8aRV.s:198    .text.Safe_task_add:0000005c $d
+C:\Users\28212\AppData\Local\Temp\ccZX8aRV.s:203    .text.SAFE_TASK:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccZX8aRV.s:209    .text.SAFE_TASK:00000000 SAFE_TASK
+C:\Users\28212\AppData\Local\Temp\ccZX8aRV.s:302    .text.SAFE_TASK:00000050 $d
+C:\Users\28212\AppData\Local\Temp\ccZX8aRV.s:309    .text.Safe_Task_online_ptr_:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccZX8aRV.s:315    .text.Safe_Task_online_ptr_:00000000 Safe_Task_online_ptr_
+C:\Users\28212\AppData\Local\Temp\ccZX8aRV.s:367    .text.Safe_Task_online_name_:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccZX8aRV.s:373    .text.Safe_Task_online_name_:00000000 Safe_Task_online_name_
+C:\Users\28212\AppData\Local\Temp\ccZX8aRV.s:448    .text.Safe_Task_online_name_:00000034 $d
+C:\Users\28212\AppData\Local\Temp\ccZX8aRV.s:453    .text.Safe_task_delect_ptr_:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccZX8aRV.s:459    .text.Safe_task_delect_ptr_:00000000 Safe_task_delect_ptr_
+C:\Users\28212\AppData\Local\Temp\ccZX8aRV.s:535    .text.Safe_task_delect_ptr_:00000034 $d
+C:\Users\28212\AppData\Local\Temp\ccZX8aRV.s:540    .text.Safe_Task_delect_name_:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccZX8aRV.s:546    .text.Safe_Task_delect_name_:00000000 Safe_Task_delect_name_
+C:\Users\28212\AppData\Local\Temp\ccZX8aRV.s:640    .text.Safe_Task_delect_name_:00000048 $d
+C:\Users\28212\AppData\Local\Temp\ccZX8aRV.s:665    .data.init_falg:00000000 init_falg
+C:\Users\28212\AppData\Local\Temp\ccZX8aRV.s:652    .bss.Head:00000000 Head
+C:\Users\28212\AppData\Local\Temp\ccZX8aRV.s:659    .bss.RUN_cycle_MS:00000000 RUN_cycle_MS
+C:\Users\28212\AppData\Local\Temp\ccZX8aRV.s:648    .bss.Head:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccZX8aRV.s:655    .bss.RUN_cycle_MS:00000000 $d
+
+UNDEFINED SYMBOLS
+malloc
+strcpy
+vPortExitCritical
+vTaskDelay
+vPortEnterCritical
+strcmp
+free

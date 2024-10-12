@@ -1,0 +1,546 @@
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccYYs30O.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.arch armv7e-m
+   3              		.fpu fpv4-sp-d16
+   4              		.eabi_attribute 27, 1
+   5              		.eabi_attribute 28, 1
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.file	"bsp_navigation.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.Get_Navigation_Point,"ax",%progbits
+  20              		.align	1
+  21              		.global	Get_Navigation_Point
+  22              		.syntax unified
+  23              		.thumb
+  24              		.thumb_func
+  26              	Get_Navigation_Point:
+  27              	.LFB134:
+  28              		.file 1 "ACE-ECF/Bsp/Src/bsp_navigation.c"
+   1:ACE-ECF/Bsp/Src/bsp_navigation.c **** /************************** Dongguan-University of Technology -ACE**************************
+   2:ACE-ECF/Bsp/Src/bsp_navigation.c **** * @file bsp_navigation.c
+   3:ACE-ECF/Bsp/Src/bsp_navigation.c **** * @brief
+   4:ACE-ECF/Bsp/Src/bsp_navigation.c **** * @author love_sorrow 吴锴泓 (2567715886@qq.com)
+   5:ACE-ECF/Bsp/Src/bsp_navigation.c **** * @version 1.0
+   6:ACE-ECF/Bsp/Src/bsp_navigation.c **** * @date 2024-1-20
+   7:ACE-ECF/Bsp/Src/bsp_navigation.c **** *
+   8:ACE-ECF/Bsp/Src/bsp_navigation.c **** *
+   9:ACE-ECF/Bsp/Src/bsp_navigation.c **** * @history
+  10:ACE-ECF/Bsp/Src/bsp_navigation.c **** * <table>
+  11:ACE-ECF/Bsp/Src/bsp_navigation.c **** * Date       Version Author Description
+  12:ACE-ECF/Bsp/Src/bsp_navigation.c **** * 2024-1-20  1.0   吴锴泓  接收导航数据
+  13:ACE-ECF/Bsp/Src/bsp_navigation.c **** * 使用方法：使用Get函数获取速度结构体指针,处理函数记得丢进任务里面实时进行
+  14:ACE-ECF/Bsp/Src/bsp_navigation.c **** * 注意事项：需要自己配置虚拟串口并且到 usbd_cdc_if.c 里更换接收函数，并且引用一些变量
+  15:ACE-ECF/Bsp/Src/bsp_navigation.c **** * @verbatim
+  16:ACE-ECF/Bsp/Src/bsp_navigation.c **** * ==============================================================================
+  17:ACE-ECF/Bsp/Src/bsp_navigation.c **** */
+  18:ACE-ECF/Bsp/Src/bsp_navigation.c **** 
+  19:ACE-ECF/Bsp/Src/bsp_navigation.c **** #include "bsp_navigation.h"
+  20:ACE-ECF/Bsp/Src/bsp_navigation.c **** #include "usb_device.h"
+  21:ACE-ECF/Bsp/Src/bsp_navigation.c **** #include "usbd_core.h"
+  22:ACE-ECF/Bsp/Src/bsp_navigation.c **** #include "usbd_desc.h"
+  23:ACE-ECF/Bsp/Src/bsp_navigation.c **** #include "usbd_cdc.h"
+  24:ACE-ECF/Bsp/Src/bsp_navigation.c **** #include "usbd_cdc_if.h"
+  25:ACE-ECF/Bsp/Src/bsp_navigation.c **** 
+  26:ACE-ECF/Bsp/Src/bsp_navigation.c **** VcpRx_t temp1 = {
+  27:ACE-ECF/Bsp/Src/bsp_navigation.c ****     .rxlen =0,
+  28:ACE-ECF/Bsp/Src/bsp_navigation.c ****     .flag = 0
+  29:ACE-ECF/Bsp/Src/bsp_navigation.c **** };
+  30:ACE-ECF/Bsp/Src/bsp_navigation.c **** 
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccYYs30O.s 			page 2
+
+
+  31:ACE-ECF/Bsp/Src/bsp_navigation.c **** navi_t navi_data;
+  32:ACE-ECF/Bsp/Src/bsp_navigation.c **** 
+  33:ACE-ECF/Bsp/Src/bsp_navigation.c **** extern uint8_t UserTxBufferFS[APP_TX_DATA_SIZE];
+  34:ACE-ECF/Bsp/Src/bsp_navigation.c **** extern uint8_t UserRxBufferFS[APP_RX_DATA_SIZE];
+  35:ACE-ECF/Bsp/Src/bsp_navigation.c **** 
+  36:ACE-ECF/Bsp/Src/bsp_navigation.c **** Chassis_Speed Speed;
+  37:ACE-ECF/Bsp/Src/bsp_navigation.c **** 
+  38:ACE-ECF/Bsp/Src/bsp_navigation.c **** extern USBD_HandleTypeDef hUsbDeviceFS;
+  39:ACE-ECF/Bsp/Src/bsp_navigation.c **** 
+  40:ACE-ECF/Bsp/Src/bsp_navigation.c **** //这个是速度死区停下来
+  41:ACE-ECF/Bsp/Src/bsp_navigation.c **** int count = 0;
+  42:ACE-ECF/Bsp/Src/bsp_navigation.c **** //这个没有接收到数据停下来
+  43:ACE-ECF/Bsp/Src/bsp_navigation.c **** int Receive_count = 0;
+  44:ACE-ECF/Bsp/Src/bsp_navigation.c **** 
+  45:ACE-ECF/Bsp/Src/bsp_navigation.c **** /************************** Dongguan-University of Technology*-ACE**************************
+  46:ACE-ECF/Bsp/Src/bsp_navigation.c ****  * @brief简介 速度结构体指针获取函数，z轴速度是°/s
+  47:ACE-ECF/Bsp/Src/bsp_navigation.c ****  * 注意事项： 对 x，y 速度放大到 0~9000，请注意限幅
+  48:ACE-ECF/Bsp/Src/bsp_navigation.c ****  ************************** Dongguan-University of Technology*-ACE************************** */
+  49:ACE-ECF/Bsp/Src/bsp_navigation.c **** Chassis_Speed* Get_Navigation_Point(void)
+  50:ACE-ECF/Bsp/Src/bsp_navigation.c **** {
+  29              		.loc 1 50 1 view -0
+  30              		.cfi_startproc
+  31              		@ args = 0, pretend = 0, frame = 0
+  32              		@ frame_needed = 0, uses_anonymous_args = 0
+  33              		@ link register save eliminated.
+  51:ACE-ECF/Bsp/Src/bsp_navigation.c **** 	return &Speed;
+  34              		.loc 1 51 2 view .LVU1
+  52:ACE-ECF/Bsp/Src/bsp_navigation.c **** }
+  35              		.loc 1 52 1 is_stmt 0 view .LVU2
+  36 0000 0048     		ldr	r0, .L2
+  37 0002 7047     		bx	lr
+  38              	.L3:
+  39              		.align	2
+  40              	.L2:
+  41 0004 00000000 		.word	.LANCHOR0
+  42              		.cfi_endproc
+  43              	.LFE134:
+  45              		.global	__aeabi_f2d
+  46              		.global	__aeabi_dmul
+  47              		.global	__aeabi_d2iz
+  48              		.section	.text.Speed_Enlarge,"ax",%progbits
+  49              		.align	1
+  50              		.global	Speed_Enlarge
+  51              		.syntax unified
+  52              		.thumb
+  53              		.thumb_func
+  55              	Speed_Enlarge:
+  56              	.LFB136:
+  53:ACE-ECF/Bsp/Src/bsp_navigation.c **** 
+  54:ACE-ECF/Bsp/Src/bsp_navigation.c **** /************************** Dongguan-University of Technology*-ACE**************************
+  55:ACE-ECF/Bsp/Src/bsp_navigation.c ****  * @brief简介 导航数据解算函数
+  56:ACE-ECF/Bsp/Src/bsp_navigation.c ****  * 功能： 加入死区限制和掉线检测
+  57:ACE-ECF/Bsp/Src/bsp_navigation.c ****  ************************** Dongguan-University of Technology*-ACE************************** */
+  58:ACE-ECF/Bsp/Src/bsp_navigation.c **** void USB_DataRecive(void)
+  59:ACE-ECF/Bsp/Src/bsp_navigation.c **** {
+  60:ACE-ECF/Bsp/Src/bsp_navigation.c **** 	Receive_count++;
+  61:ACE-ECF/Bsp/Src/bsp_navigation.c ****   if(temp1.flag)
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccYYs30O.s 			page 3
+
+
+  62:ACE-ECF/Bsp/Src/bsp_navigation.c ****   {
+  63:ACE-ECF/Bsp/Src/bsp_navigation.c ****    // usb_printf("%s\r\n", UserRxBufferFS);//若无需回发，屏蔽即可
+  64:ACE-ECF/Bsp/Src/bsp_navigation.c ****     temp1.flag = 0;
+  65:ACE-ECF/Bsp/Src/bsp_navigation.c ****     temp1.rxlen = 0;
+  66:ACE-ECF/Bsp/Src/bsp_navigation.c ****     for(uint8_t i=0;i<4;i++)
+  67:ACE-ECF/Bsp/Src/bsp_navigation.c ****     {
+  68:ACE-ECF/Bsp/Src/bsp_navigation.c ****       navi_data.x.byte[0+i]=UserRxBufferFS[1+i];
+  69:ACE-ECF/Bsp/Src/bsp_navigation.c ****     }
+  70:ACE-ECF/Bsp/Src/bsp_navigation.c ****    for(uint8_t i=0;i<4;i++)
+  71:ACE-ECF/Bsp/Src/bsp_navigation.c ****     {
+  72:ACE-ECF/Bsp/Src/bsp_navigation.c ****       navi_data.y.byte[0+i]=UserRxBufferFS[5+i];
+  73:ACE-ECF/Bsp/Src/bsp_navigation.c ****     }
+  74:ACE-ECF/Bsp/Src/bsp_navigation.c ****     for(uint8_t i=0;i<4;i++)
+  75:ACE-ECF/Bsp/Src/bsp_navigation.c ****     {
+  76:ACE-ECF/Bsp/Src/bsp_navigation.c ****       navi_data.z.byte[0+i]=UserRxBufferFS[9+i];
+  77:ACE-ECF/Bsp/Src/bsp_navigation.c ****     }
+  78:ACE-ECF/Bsp/Src/bsp_navigation.c ****     memset(UserRxBufferFS, 0, APP_RX_DATA_SIZE);
+  79:ACE-ECF/Bsp/Src/bsp_navigation.c ****     USBD_CDC_SetRxBuffer(&hUsbDeviceFS, UserRxBufferFS); 
+  80:ACE-ECF/Bsp/Src/bsp_navigation.c ****     USBD_CDC_ReceivePacket(&hUsbDeviceFS);
+  81:ACE-ECF/Bsp/Src/bsp_navigation.c **** 		
+  82:ACE-ECF/Bsp/Src/bsp_navigation.c **** //		//看看发过来的数据是否都在0附近
+  83:ACE-ECF/Bsp/Src/bsp_navigation.c **** //		if(abs(navi_data.x.speed ) < USB_Dead && abs(navi_data.y.speed ) < USB_Dead)
+  84:ACE-ECF/Bsp/Src/bsp_navigation.c **** //      count++;
+  85:ACE-ECF/Bsp/Src/bsp_navigation.c **** //		else 
+  86:ACE-ECF/Bsp/Src/bsp_navigation.c **** //			count = 0;
+  87:ACE-ECF/Bsp/Src/bsp_navigation.c **** //		
+  88:ACE-ECF/Bsp/Src/bsp_navigation.c **** //		//超过0.5s，则判定为停下来锁死
+  89:ACE-ECF/Bsp/Src/bsp_navigation.c **** //		if(count > 500)
+  90:ACE-ECF/Bsp/Src/bsp_navigation.c **** //		{
+  91:ACE-ECF/Bsp/Src/bsp_navigation.c **** //			//让计数器不要无限增大
+  92:ACE-ECF/Bsp/Src/bsp_navigation.c **** //			count = 501;
+  93:ACE-ECF/Bsp/Src/bsp_navigation.c **** 
+  94:ACE-ECF/Bsp/Src/bsp_navigation.c **** //			navi_data.x.speed = 0;
+  95:ACE-ECF/Bsp/Src/bsp_navigation.c **** //			navi_data.y.speed = 0;
+  96:ACE-ECF/Bsp/Src/bsp_navigation.c **** //			navi_data.z.speed = 0;
+  97:ACE-ECF/Bsp/Src/bsp_navigation.c **** //		}
+  98:ACE-ECF/Bsp/Src/bsp_navigation.c **** //  }
+  99:ACE-ECF/Bsp/Src/bsp_navigation.c **** //	
+ 100:ACE-ECF/Bsp/Src/bsp_navigation.c **** //	  if(Receive_count > 500)
+ 101:ACE-ECF/Bsp/Src/bsp_navigation.c **** //		{
+ 102:ACE-ECF/Bsp/Src/bsp_navigation.c **** //			Receive_count = 501;
+ 103:ACE-ECF/Bsp/Src/bsp_navigation.c **** //			navi_data.x.speed = 0;
+ 104:ACE-ECF/Bsp/Src/bsp_navigation.c **** //			navi_data.y.speed = 0;
+ 105:ACE-ECF/Bsp/Src/bsp_navigation.c **** //			navi_data.z.speed = 0;
+ 106:ACE-ECF/Bsp/Src/bsp_navigation.c **** //		}
+ 107:ACE-ECF/Bsp/Src/bsp_navigation.c **** 		
+ 108:ACE-ECF/Bsp/Src/bsp_navigation.c **** 		Speed_Enlarge();
+ 109:ACE-ECF/Bsp/Src/bsp_navigation.c ****     }
+ 110:ACE-ECF/Bsp/Src/bsp_navigation.c **** }
+ 111:ACE-ECF/Bsp/Src/bsp_navigation.c **** 
+ 112:ACE-ECF/Bsp/Src/bsp_navigation.c **** void Speed_Enlarge(void)
+ 113:ACE-ECF/Bsp/Src/bsp_navigation.c **** {
+  57              		.loc 1 113 1 is_stmt 1 view -0
+  58              		.cfi_startproc
+  59              		@ args = 0, pretend = 0, frame = 0
+  60              		@ frame_needed = 0, uses_anonymous_args = 0
+  61 0000 10B5     		push	{r4, lr}
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccYYs30O.s 			page 4
+
+
+  62              	.LCFI0:
+  63              		.cfi_def_cfa_offset 8
+  64              		.cfi_offset 4, -8
+  65              		.cfi_offset 14, -4
+ 114:ACE-ECF/Bsp/Src/bsp_navigation.c **** 	Speed.x = - navi_data.y.speed * Move_Speed_Factor;
+  66              		.loc 1 114 2 view .LVU4
+  67              		.loc 1 114 25 is_stmt 0 view .LVU5
+  68 0002 134B     		ldr	r3, .L6+8
+  69 0004 93ED027A 		vldr.32	s14, [r3, #8]
+  70              		.loc 1 114 32 view .LVU6
+  71 0008 DFED126A 		vldr.32	s13, .L6+12
+  72 000c 27EE667A 		vnmul.f32	s14, s14, s13
+  73              		.loc 1 114 10 view .LVU7
+  74 0010 114C     		ldr	r4, .L6+16
+  75 0012 BDEEC77A 		vcvt.s32.f32	s14, s14
+  76 0016 17EE102A 		vmov	r2, s14	@ int
+  77 001a 2280     		strh	r2, [r4]	@ movhi
+ 115:ACE-ECF/Bsp/Src/bsp_navigation.c **** 	Speed.y = navi_data.x.speed * Move_Speed_Factor;
+  78              		.loc 1 115 2 is_stmt 1 view .LVU8
+  79              		.loc 1 115 23 is_stmt 0 view .LVU9
+  80 001c D3ED017A 		vldr.32	s15, [r3, #4]
+  81              		.loc 1 115 30 view .LVU10
+  82 0020 67EEA67A 		vmul.f32	s15, s15, s13
+  83              		.loc 1 115 10 view .LVU11
+  84 0024 FDEEE77A 		vcvt.s32.f32	s15, s15
+  85 0028 17EE902A 		vmov	r2, s15	@ int
+  86 002c 6280     		strh	r2, [r4, #2]	@ movhi
+ 116:ACE-ECF/Bsp/Src/bsp_navigation.c **** //	Speed.z = navi_data.z.speed * Rotate_Speed_Factor;
+ 117:ACE-ECF/Bsp/Src/bsp_navigation.c **** 	Speed.z = navi_data.z.speed * Gimbal_Speed_Factor;
+  87              		.loc 1 117 2 is_stmt 1 view .LVU12
+  88              		.loc 1 117 23 is_stmt 0 view .LVU13
+  89 002e D868     		ldr	r0, [r3, #12]	@ float
+  90 0030 FFF7FEFF 		bl	__aeabi_f2d
+  91              	.LVL0:
+  92              		.loc 1 117 30 view .LVU14
+  93 0034 04A3     		adr	r3, .L6
+  94 0036 D3E90023 		ldrd	r2, [r3]
+  95 003a FFF7FEFF 		bl	__aeabi_dmul
+  96              	.LVL1:
+  97              		.loc 1 117 10 view .LVU15
+  98 003e FFF7FEFF 		bl	__aeabi_d2iz
+  99              	.LVL2:
+ 100 0042 A080     		strh	r0, [r4, #4]	@ movhi
+ 118:ACE-ECF/Bsp/Src/bsp_navigation.c **** }
+ 101              		.loc 1 118 1 view .LVU16
+ 102 0044 10BD     		pop	{r4, pc}
+ 103              	.L7:
+ 104 0046 00BF     		.align	3
+ 105              	.L6:
+ 106 0048 CDCCCCCC 		.word	-858993459
+ 107 004c CC8C4C40 		.word	1078758604
+ 108 0050 00000000 		.word	.LANCHOR1
+ 109 0054 0000C843 		.word	1137180672
+ 110 0058 00000000 		.word	.LANCHOR0
+ 111              		.cfi_endproc
+ 112              	.LFE136:
+ 114              		.section	.text.USB_DataRecive,"ax",%progbits
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccYYs30O.s 			page 5
+
+
+ 115              		.align	1
+ 116              		.global	USB_DataRecive
+ 117              		.syntax unified
+ 118              		.thumb
+ 119              		.thumb_func
+ 121              	USB_DataRecive:
+ 122              	.LFB135:
+  59:ACE-ECF/Bsp/Src/bsp_navigation.c **** 	Receive_count++;
+ 123              		.loc 1 59 1 is_stmt 1 view -0
+ 124              		.cfi_startproc
+ 125              		@ args = 0, pretend = 0, frame = 0
+ 126              		@ frame_needed = 0, uses_anonymous_args = 0
+ 127 0000 38B5     		push	{r3, r4, r5, lr}
+ 128              	.LCFI1:
+ 129              		.cfi_def_cfa_offset 16
+ 130              		.cfi_offset 3, -16
+ 131              		.cfi_offset 4, -12
+ 132              		.cfi_offset 5, -8
+ 133              		.cfi_offset 14, -4
+  60:ACE-ECF/Bsp/Src/bsp_navigation.c ****   if(temp1.flag)
+ 134              		.loc 1 60 2 view .LVU18
+  60:ACE-ECF/Bsp/Src/bsp_navigation.c ****   if(temp1.flag)
+ 135              		.loc 1 60 15 is_stmt 0 view .LVU19
+ 136 0002 204A     		ldr	r2, .L17
+ 137 0004 1368     		ldr	r3, [r2]
+ 138 0006 0133     		adds	r3, r3, #1
+ 139 0008 1360     		str	r3, [r2]
+  61:ACE-ECF/Bsp/Src/bsp_navigation.c ****   {
+ 140              		.loc 1 61 3 is_stmt 1 view .LVU20
+  61:ACE-ECF/Bsp/Src/bsp_navigation.c ****   {
+ 141              		.loc 1 61 11 is_stmt 0 view .LVU21
+ 142 000a 1F4B     		ldr	r3, .L17+4
+ 143 000c 5B68     		ldr	r3, [r3, #4]
+  61:ACE-ECF/Bsp/Src/bsp_navigation.c ****   {
+ 144              		.loc 1 61 5 view .LVU22
+ 145 000e 002B     		cmp	r3, #0
+ 146 0010 37D0     		beq	.L8
+  64:ACE-ECF/Bsp/Src/bsp_navigation.c ****     temp1.rxlen = 0;
+ 147              		.loc 1 64 5 is_stmt 1 view .LVU23
+  64:ACE-ECF/Bsp/Src/bsp_navigation.c ****     temp1.rxlen = 0;
+ 148              		.loc 1 64 16 is_stmt 0 view .LVU24
+ 149 0012 1D4A     		ldr	r2, .L17+4
+ 150 0014 0023     		movs	r3, #0
+ 151 0016 5360     		str	r3, [r2, #4]
+  65:ACE-ECF/Bsp/Src/bsp_navigation.c ****     for(uint8_t i=0;i<4;i++)
+ 152              		.loc 1 65 5 is_stmt 1 view .LVU25
+  65:ACE-ECF/Bsp/Src/bsp_navigation.c ****     for(uint8_t i=0;i<4;i++)
+ 153              		.loc 1 65 17 is_stmt 0 view .LVU26
+ 154 0018 1360     		str	r3, [r2]
+  66:ACE-ECF/Bsp/Src/bsp_navigation.c ****     {
+ 155              		.loc 1 66 5 is_stmt 1 view .LVU27
+ 156              	.LBB2:
+  66:ACE-ECF/Bsp/Src/bsp_navigation.c ****     {
+ 157              		.loc 1 66 9 view .LVU28
+ 158              	.LVL3:
+  66:ACE-ECF/Bsp/Src/bsp_navigation.c ****     {
+ 159              		.loc 1 66 5 is_stmt 0 view .LVU29
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccYYs30O.s 			page 6
+
+
+ 160 001a 06E0     		b	.L10
+ 161              	.LVL4:
+ 162              	.L11:
+  68:ACE-ECF/Bsp/Src/bsp_navigation.c ****     }
+ 163              		.loc 1 68 7 is_stmt 1 discriminator 3 view .LVU30
+  68:ACE-ECF/Bsp/Src/bsp_navigation.c ****     }
+ 164              		.loc 1 68 45 is_stmt 0 discriminator 3 view .LVU31
+ 165 001c 591C     		adds	r1, r3, #1
+  68:ACE-ECF/Bsp/Src/bsp_navigation.c ****     }
+ 166              		.loc 1 68 43 discriminator 3 view .LVU32
+ 167 001e 1B4A     		ldr	r2, .L17+8
+ 168 0020 505C     		ldrb	r0, [r2, r1]	@ zero_extendqisi2
+  68:ACE-ECF/Bsp/Src/bsp_navigation.c ****     }
+ 169              		.loc 1 68 28 discriminator 3 view .LVU33
+ 170 0022 1B4A     		ldr	r2, .L17+12
+ 171 0024 1344     		add	r3, r3, r2
+ 172              	.LVL5:
+  68:ACE-ECF/Bsp/Src/bsp_navigation.c ****     }
+ 173              		.loc 1 68 28 discriminator 3 view .LVU34
+ 174 0026 1871     		strb	r0, [r3, #4]
+  66:ACE-ECF/Bsp/Src/bsp_navigation.c ****     {
+ 175              		.loc 1 66 25 is_stmt 1 discriminator 3 view .LVU35
+  66:ACE-ECF/Bsp/Src/bsp_navigation.c ****     {
+ 176              		.loc 1 66 26 is_stmt 0 discriminator 3 view .LVU36
+ 177 0028 CBB2     		uxtb	r3, r1
+ 178              	.LVL6:
+ 179              	.L10:
+  66:ACE-ECF/Bsp/Src/bsp_navigation.c ****     {
+ 180              		.loc 1 66 21 is_stmt 1 discriminator 1 view .LVU37
+  66:ACE-ECF/Bsp/Src/bsp_navigation.c ****     {
+ 181              		.loc 1 66 5 is_stmt 0 discriminator 1 view .LVU38
+ 182 002a 032B     		cmp	r3, #3
+ 183 002c F6D9     		bls	.L11
+ 184              	.LBE2:
+ 185              	.LBB3:
+  70:ACE-ECF/Bsp/Src/bsp_navigation.c ****     {
+ 186              		.loc 1 70 16 view .LVU39
+ 187 002e 0023     		movs	r3, #0
+ 188              	.LVL7:
+  70:ACE-ECF/Bsp/Src/bsp_navigation.c ****     {
+ 189              		.loc 1 70 16 view .LVU40
+ 190 0030 07E0     		b	.L12
+ 191              	.LVL8:
+ 192              	.L13:
+  72:ACE-ECF/Bsp/Src/bsp_navigation.c ****     }
+ 193              		.loc 1 72 7 is_stmt 1 discriminator 3 view .LVU41
+  72:ACE-ECF/Bsp/Src/bsp_navigation.c ****     }
+ 194              		.loc 1 72 45 is_stmt 0 discriminator 3 view .LVU42
+ 195 0032 5A1D     		adds	r2, r3, #5
+  72:ACE-ECF/Bsp/Src/bsp_navigation.c ****     }
+ 196              		.loc 1 72 43 discriminator 3 view .LVU43
+ 197 0034 1549     		ldr	r1, .L17+8
+ 198 0036 895C     		ldrb	r1, [r1, r2]	@ zero_extendqisi2
+  72:ACE-ECF/Bsp/Src/bsp_navigation.c ****     }
+ 199              		.loc 1 72 28 discriminator 3 view .LVU44
+ 200 0038 154A     		ldr	r2, .L17+12
+ 201 003a 1A44     		add	r2, r2, r3
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccYYs30O.s 			page 7
+
+
+ 202 003c 1172     		strb	r1, [r2, #8]
+  70:ACE-ECF/Bsp/Src/bsp_navigation.c ****     {
+ 203              		.loc 1 70 24 is_stmt 1 discriminator 3 view .LVU45
+  70:ACE-ECF/Bsp/Src/bsp_navigation.c ****     {
+ 204              		.loc 1 70 25 is_stmt 0 discriminator 3 view .LVU46
+ 205 003e 0133     		adds	r3, r3, #1
+ 206              	.LVL9:
+  70:ACE-ECF/Bsp/Src/bsp_navigation.c ****     {
+ 207              		.loc 1 70 25 discriminator 3 view .LVU47
+ 208 0040 DBB2     		uxtb	r3, r3
+ 209              	.LVL10:
+ 210              	.L12:
+  70:ACE-ECF/Bsp/Src/bsp_navigation.c ****     {
+ 211              		.loc 1 70 20 is_stmt 1 discriminator 1 view .LVU48
+  70:ACE-ECF/Bsp/Src/bsp_navigation.c ****     {
+ 212              		.loc 1 70 4 is_stmt 0 discriminator 1 view .LVU49
+ 213 0042 032B     		cmp	r3, #3
+ 214 0044 F5D9     		bls	.L13
+ 215              	.LBE3:
+ 216              	.LBB4:
+  74:ACE-ECF/Bsp/Src/bsp_navigation.c ****     {
+ 217              		.loc 1 74 17 view .LVU50
+ 218 0046 0023     		movs	r3, #0
+ 219              	.LVL11:
+  74:ACE-ECF/Bsp/Src/bsp_navigation.c ****     {
+ 220              		.loc 1 74 17 view .LVU51
+ 221 0048 08E0     		b	.L14
+ 222              	.LVL12:
+ 223              	.L15:
+  76:ACE-ECF/Bsp/Src/bsp_navigation.c ****     }
+ 224              		.loc 1 76 7 is_stmt 1 discriminator 3 view .LVU52
+  76:ACE-ECF/Bsp/Src/bsp_navigation.c ****     }
+ 225              		.loc 1 76 45 is_stmt 0 discriminator 3 view .LVU53
+ 226 004a 03F10902 		add	r2, r3, #9
+  76:ACE-ECF/Bsp/Src/bsp_navigation.c ****     }
+ 227              		.loc 1 76 43 discriminator 3 view .LVU54
+ 228 004e 0F49     		ldr	r1, .L17+8
+ 229 0050 895C     		ldrb	r1, [r1, r2]	@ zero_extendqisi2
+  76:ACE-ECF/Bsp/Src/bsp_navigation.c ****     }
+ 230              		.loc 1 76 28 discriminator 3 view .LVU55
+ 231 0052 0F4A     		ldr	r2, .L17+12
+ 232 0054 1A44     		add	r2, r2, r3
+ 233 0056 1173     		strb	r1, [r2, #12]
+  74:ACE-ECF/Bsp/Src/bsp_navigation.c ****     {
+ 234              		.loc 1 74 25 is_stmt 1 discriminator 3 view .LVU56
+  74:ACE-ECF/Bsp/Src/bsp_navigation.c ****     {
+ 235              		.loc 1 74 26 is_stmt 0 discriminator 3 view .LVU57
+ 236 0058 0133     		adds	r3, r3, #1
+ 237              	.LVL13:
+  74:ACE-ECF/Bsp/Src/bsp_navigation.c ****     {
+ 238              		.loc 1 74 26 discriminator 3 view .LVU58
+ 239 005a DBB2     		uxtb	r3, r3
+ 240              	.LVL14:
+ 241              	.L14:
+  74:ACE-ECF/Bsp/Src/bsp_navigation.c ****     {
+ 242              		.loc 1 74 21 is_stmt 1 discriminator 1 view .LVU59
+  74:ACE-ECF/Bsp/Src/bsp_navigation.c ****     {
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccYYs30O.s 			page 8
+
+
+ 243              		.loc 1 74 5 is_stmt 0 discriminator 1 view .LVU60
+ 244 005c 032B     		cmp	r3, #3
+ 245 005e F4D9     		bls	.L15
+ 246              	.LBE4:
+  78:ACE-ECF/Bsp/Src/bsp_navigation.c ****     USBD_CDC_SetRxBuffer(&hUsbDeviceFS, UserRxBufferFS); 
+ 247              		.loc 1 78 5 is_stmt 1 view .LVU61
+ 248 0060 0A4D     		ldr	r5, .L17+8
+ 249 0062 4FF40062 		mov	r2, #2048
+ 250 0066 0021     		movs	r1, #0
+ 251 0068 2846     		mov	r0, r5
+ 252 006a FFF7FEFF 		bl	memset
+ 253              	.LVL15:
+  79:ACE-ECF/Bsp/Src/bsp_navigation.c ****     USBD_CDC_ReceivePacket(&hUsbDeviceFS);
+ 254              		.loc 1 79 5 view .LVU62
+ 255 006e 094C     		ldr	r4, .L17+16
+ 256 0070 2946     		mov	r1, r5
+ 257 0072 2046     		mov	r0, r4
+ 258 0074 FFF7FEFF 		bl	USBD_CDC_SetRxBuffer
+ 259              	.LVL16:
+  80:ACE-ECF/Bsp/Src/bsp_navigation.c **** 		
+ 260              		.loc 1 80 5 view .LVU63
+ 261 0078 2046     		mov	r0, r4
+ 262 007a FFF7FEFF 		bl	USBD_CDC_ReceivePacket
+ 263              	.LVL17:
+ 108:ACE-ECF/Bsp/Src/bsp_navigation.c ****     }
+ 264              		.loc 1 108 3 view .LVU64
+ 265 007e FFF7FEFF 		bl	Speed_Enlarge
+ 266              	.LVL18:
+ 267              	.L8:
+ 110:ACE-ECF/Bsp/Src/bsp_navigation.c **** 
+ 268              		.loc 1 110 1 is_stmt 0 view .LVU65
+ 269 0082 38BD     		pop	{r3, r4, r5, pc}
+ 270              	.L18:
+ 271              		.align	2
+ 272              	.L17:
+ 273 0084 00000000 		.word	.LANCHOR2
+ 274 0088 00000000 		.word	.LANCHOR3
+ 275 008c 00000000 		.word	UserRxBufferFS
+ 276 0090 00000000 		.word	.LANCHOR1
+ 277 0094 00000000 		.word	hUsbDeviceFS
+ 278              		.cfi_endproc
+ 279              	.LFE135:
+ 281              		.global	Receive_count
+ 282              		.global	count
+ 283              		.global	Speed
+ 284              		.global	navi_data
+ 285              		.global	temp1
+ 286              		.section	.bss.Receive_count,"aw",%nobits
+ 287              		.align	2
+ 288              		.set	.LANCHOR2,. + 0
+ 291              	Receive_count:
+ 292 0000 00000000 		.space	4
+ 293              		.section	.bss.Speed,"aw",%nobits
+ 294              		.align	2
+ 295              		.set	.LANCHOR0,. + 0
+ 298              	Speed:
+ 299 0000 00000000 		.space	6
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccYYs30O.s 			page 9
+
+
+ 299      0000
+ 300              		.section	.bss.count,"aw",%nobits
+ 301              		.align	2
+ 304              	count:
+ 305 0000 00000000 		.space	4
+ 306              		.section	.bss.navi_data,"aw",%nobits
+ 307              		.align	2
+ 308              		.set	.LANCHOR1,. + 0
+ 311              	navi_data:
+ 312 0000 00000000 		.space	20
+ 312      00000000 
+ 312      00000000 
+ 312      00000000 
+ 312      00000000 
+ 313              		.section	.bss.temp1,"aw",%nobits
+ 314              		.align	2
+ 315              		.set	.LANCHOR3,. + 0
+ 318              	temp1:
+ 319 0000 00000000 		.space	8
+ 319      00000000 
+ 320              		.text
+ 321              	.Letext0:
+ 322              		.file 2 "ACE-ECF/Algorithm/inc/struct_typedef.h"
+ 323              		.file 3 "d:\\gcc-arm-none-eabi-10.3-2021.10\\arm-none-eabi\\include\\machine\\_default_types.h"
+ 324              		.file 4 "d:\\gcc-arm-none-eabi-10.3-2021.10\\arm-none-eabi\\include\\sys\\_stdint.h"
+ 325              		.file 5 "ACE-ECF/Bsp/Inc/bsp_navigation.h"
+ 326              		.file 6 "Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_def.h"
+ 327              		.file 7 "Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc/usbd_cdc.h"
+ 328              		.file 8 "<built-in>"
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccYYs30O.s 			page 10
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 bsp_navigation.c
+C:\Users\28212\AppData\Local\Temp\ccYYs30O.s:20     .text.Get_Navigation_Point:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccYYs30O.s:26     .text.Get_Navigation_Point:00000000 Get_Navigation_Point
+C:\Users\28212\AppData\Local\Temp\ccYYs30O.s:41     .text.Get_Navigation_Point:00000004 $d
+C:\Users\28212\AppData\Local\Temp\ccYYs30O.s:49     .text.Speed_Enlarge:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccYYs30O.s:55     .text.Speed_Enlarge:00000000 Speed_Enlarge
+C:\Users\28212\AppData\Local\Temp\ccYYs30O.s:106    .text.Speed_Enlarge:00000048 $d
+C:\Users\28212\AppData\Local\Temp\ccYYs30O.s:115    .text.USB_DataRecive:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccYYs30O.s:121    .text.USB_DataRecive:00000000 USB_DataRecive
+C:\Users\28212\AppData\Local\Temp\ccYYs30O.s:273    .text.USB_DataRecive:00000084 $d
+C:\Users\28212\AppData\Local\Temp\ccYYs30O.s:291    .bss.Receive_count:00000000 Receive_count
+C:\Users\28212\AppData\Local\Temp\ccYYs30O.s:304    .bss.count:00000000 count
+C:\Users\28212\AppData\Local\Temp\ccYYs30O.s:298    .bss.Speed:00000000 Speed
+C:\Users\28212\AppData\Local\Temp\ccYYs30O.s:311    .bss.navi_data:00000000 navi_data
+C:\Users\28212\AppData\Local\Temp\ccYYs30O.s:318    .bss.temp1:00000000 temp1
+C:\Users\28212\AppData\Local\Temp\ccYYs30O.s:287    .bss.Receive_count:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccYYs30O.s:294    .bss.Speed:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccYYs30O.s:301    .bss.count:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccYYs30O.s:307    .bss.navi_data:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccYYs30O.s:314    .bss.temp1:00000000 $d
+
+UNDEFINED SYMBOLS
+__aeabi_f2d
+__aeabi_dmul
+__aeabi_d2iz
+memset
+USBD_CDC_SetRxBuffer
+USBD_CDC_ReceivePacket
+UserRxBufferFS
+hUsbDeviceFS

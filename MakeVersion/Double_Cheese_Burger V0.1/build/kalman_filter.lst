@@ -1,0 +1,2883 @@
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccmkfrD3.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.arch armv7e-m
+   3              		.fpu fpv4-sp-d16
+   4              		.eabi_attribute 27, 1
+   5              		.eabi_attribute 28, 1
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.file	"kalman_filter.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.H_K_R_Adjustment,"ax",%progbits
+  20              		.align	1
+  21              		.syntax unified
+  22              		.thumb
+  23              		.thumb_func
+  25              	H_K_R_Adjustment:
+  26              	.LVL0:
+  27              	.LFB171:
+  28              		.file 1 "ACE-ECF/Application/src/IMU_Driver/kalman_filter.c"
+   1:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** /**
+   2:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  ******************************************************************************
+   3:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  * @file    kalman filter.c
+   4:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  * @author  Wang Hongxi
+   5:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  * @version V1.2.2
+   6:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  * @date    2022/1/8
+   7:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  * @brief   C implementation of kalman filter
+   8:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  ******************************************************************************
+   9:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  * @attention
+  10:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  * ∏√ø®∂˚¬¸¬À≤®∆˜ø…“‘‘⁄¥´∏–∆˜≤…—˘∆µ¬ ≤ªÕ¨µƒ«Èøˆœ¬£¨∂ØÃ¨µ˜’˚æÿ’ÛH R∫ÕKµƒŒ¨ ˝”Î ˝÷µ°£
+  11:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  * This implementation of kalman filter can dynamically adjust dimension and
+  12:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  * value of matrix H R and K according to the measurement validity under any
+  13:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  * circumstance that the sampling rate of component sensors are different.
+  14:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  *
+  15:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  * “Ú¥Àæÿ’ÛH∫ÕRµƒ≥ı ºªØª·”Îæÿ’ÛP A∫ÕQ”–À˘≤ªÕ¨°£¡ÌÕ‚µƒ£¨‘⁄≥ı ºªØ¡ø≤‚œÚ¡øz ±–Ë“™∂ÓÕ‚–¥
+  16:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  * »Î¥´∏–∆˜¡ø≤‚À˘∂‘”¶µƒ◊¥Ã¨”Î’‚∏ˆ¡ø≤‚µƒ∑Ω Ω£¨œÍ«È«Îº˚¿˝≥Ã
+  17:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  * Therefore, the initialization of matrix P, F, and Q is sometimes different
+  18:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  * from that of matrices H R. when initialization. Additionally, the corresponding
+  19:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  * state and the method of the measurement should be provided when initializing
+  20:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  * measurement vector z. For more details, please see the example.
+  21:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  *
+  22:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  * »Ù≤ª–Ë“™∂ØÃ¨µ˜’˚¡ø≤‚œÚ¡øz£¨ø…ºÚµ•Ω´Ω·ππÃÂ÷–µƒUse_Auto_Adjustment≥ı ºªØŒ™0£¨≤¢œÒ≥ı
+  23:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  *  ºªØæÿ’ÛPƒ«—˘”√≥£πÊ∑Ω Ω≥ı ºªØz H Rº¥ø…°£
+  24:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  * If automatic adjustment is not required, assign zero to the UseAutoAdjustment
+  25:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  * and initialize z H R in the normal way as matrix P.
+  26:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  *
+  27:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  * “™«Û¡ø≤‚œÚ¡øz”Îøÿ÷∆œÚ¡øu‘⁄¥´∏–∆˜ªÿµ˜∫Ø ˝÷–∏¸–¬°£’˚ ˝0“‚Œ∂◊≈¡ø≤‚Œﬁ–ß£¨º¥◊‘…œ¥Œø®∂˚¬¸
+  28:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  * ¬À≤®∏¸–¬∫ÛŒﬁ¥´∏–∆˜ ˝æ›∏¸–¬°£“Ú¥À¡ø≤‚œÚ¡øz”Îøÿ÷∆œÚ¡øuª·‘⁄ø®∂˚¬¸¬À≤®∏¸–¬π˝≥Ã÷–±ª«Â¡„
+  29:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  * MeasuredVector and ControlVector are required to be updated in the sensor
+  30:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  * callback function. Integer 0 in measurement vector z indicates the invalidity
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccmkfrD3.s 			page 2
+
+
+  31:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  * of current measurement, so MeasuredVector and ControlVector will be reset
+  32:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  * (to 0) during each update.
+  33:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  *
+  34:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  * ¥ÀÕ‚£¨æÿ’ÛPπ˝∂» ’¡≤∫Û¬À≤®∆˜Ω´ƒ—“‘‘Ÿ  ”¶◊¥Ã¨µƒª∫¬˝±‰ªØ£¨¥”∂¯≤˙…˙¬À≤®π¿º∆∆´≤Ó°£∏√À„∑®
+  35:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  * Õ®π˝œﬁ÷∆æÿ’ÛP◊Ó–°÷µµƒ∑Ω∑®£¨ø…”––ß“÷÷∆¬À≤®∆˜µƒπ˝∂» ’¡≤£¨œÍ«È«Îº˚¿˝≥Ã°£
+  36:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  * Additionally, the excessive convergence of matrix P will make filter incapable
+  37:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  * of adopting the slowly changing state. This implementation can effectively
+  38:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  * suppress filter excessive convergence through boundary limiting for matrix P.
+  39:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  * For more details, please see the example.
+  40:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  *
+  41:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  * @example:
+  42:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  * x =
+  43:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  *   |   height   |
+  44:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  *   |  velocity  |
+  45:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  *   |acceleration|
+  46:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  *
+  47:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  * KalmanFilter_t Height_KF;
+  48:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  *
+  49:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  * void INS_Task_Init(void)
+  50:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  * {
+  51:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  *     static float P_Init[9] =
+  52:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  *     {
+  53:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  *         10, 0, 0,
+  54:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  *         0, 30, 0,
+  55:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  *         0, 0, 10,
+  56:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  *     };
+  57:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  *     static float F_Init[9] =
+  58:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  *     {
+  59:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  *         1, dt, 0.5*dt*dt,
+  60:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  *         0, 1, dt,
+  61:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  *         0, 0, 1,
+  62:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  *     };
+  63:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  *     static float Q_Init[9] =
+  64:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  *     {
+  65:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  *         0.25*dt*dt*dt*dt, 0.5*dt*dt*dt, 0.5*dt*dt,
+  66:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  *         0.5*dt*dt*dt,        dt*dt,         dt,
+  67:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  *         0.5*dt*dt,              dt,         1,
+  68:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  *     };
+  69:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  *
+  70:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  *     // …Ë÷√◊Ó–°∑Ω≤Ó
+  71:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  *     static float state_min_variance[3] = {0.03, 0.005, 0.1};
+  72:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  *
+  73:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  *     // ø™∆Ù◊‘∂Øµ˜’˚
+  74:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  *     Height_KF.UseAutoAdjustment = 1;
+  75:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  *
+  76:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  *     // ∆¯—π≤‚µ√∏ﬂ∂» GPS≤‚µ√∏ﬂ∂» º”ÀŸ∂»º∆≤‚µ√z÷·‘À∂Øº”ÀŸ∂»
+  77:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  *     static uint8_t measurement_reference[3] = {1, 1, 3}
+  78:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  *
+  79:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  *     static float measurement_degree[3] = {1, 1, 1}
+  80:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  *     // ∏˘æ›measurement_reference”Îmeasurement_degree…˙≥…Hæÿ’Û»Áœ¬£®‘⁄µ±«∞÷‹∆⁄»´≤ø≤‚¡ø ˝æ›”––ß«Èø
+  81:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  *       |1   0   0|
+  82:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  *       |1   0   0|
+  83:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  *       |0   0   1|
+  84:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  *
+  85:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  *     static float mat_R_diagonal_elements = {30, 25, 35}
+  86:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  *     //∏˘æ›mat_R_diagonal_elements…˙≥…Ræÿ’Û»Áœ¬£®‘⁄µ±«∞÷‹∆⁄»´≤ø≤‚¡ø ˝æ›”––ß«Èøˆœ¬£©
+  87:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  *       |30   0   0|
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccmkfrD3.s 			page 3
+
+
+  88:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  *       | 0  25   0|
+  89:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  *       | 0   0  35|
+  90:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  *
+  91:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  *     Kalman_Filter_Init(&Height_KF, 3, 0, 3);
+  92:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  *
+  93:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  *     // …Ë÷√æÿ’Û÷µ
+  94:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  *     memcpy(Height_KF.P_data, P_Init, sizeof(P_Init));
+  95:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  *     memcpy(Height_KF.F_data, F_Init, sizeof(F_Init));
+  96:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  *     memcpy(Height_KF.Q_data, Q_Init, sizeof(Q_Init));
+  97:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  *     memcpy(Height_KF.MeasurementMap, measurement_reference, sizeof(measurement_reference));
+  98:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  *     memcpy(Height_KF.MeasurementDegree, measurement_degree, sizeof(measurement_degree));
+  99:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  *     memcpy(Height_KF.MatR_DiagonalElements, mat_R_diagonal_elements, sizeof(mat_R_diagonal_eleme
+ 100:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  *     memcpy(Height_KF.StateMinVariance, state_min_variance, sizeof(state_min_variance));
+ 101:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  * }
+ 102:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  *
+ 103:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  * void INS_Task(void const *pvParameters)
+ 104:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  * {
+ 105:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  *     // —≠ª∑∏¸–¬
+ 106:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  *     Kalman_Filter_Update(&Height_KF);
+ 107:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  *     vTaskDelay(ts);
+ 108:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  * }
+ 109:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  *
+ 110:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  * // ≤‚¡ø ˝æ›∏¸–¬”¶∞¥’’“‘œ¬–Œ Ω º¥œÚMeasuredVector∏≥÷µ
+ 111:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  * void Barometer_Read_Over(void)
+ 112:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  * {
+ 113:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  *     ......
+ 114:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  *     INS_KF.MeasuredVector[0] = baro_height;
+ 115:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  * }
+ 116:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  * void GPS_Read_Over(void)
+ 117:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  * {
+ 118:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  *     ......
+ 119:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  *     INS_KF.MeasuredVector[1] = GPS_height;
+ 120:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  * }
+ 121:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  * void Acc_Data_Process(void)
+ 122:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  * {
+ 123:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  *     ......
+ 124:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  *     INS_KF.MeasuredVector[2] = acc.z;
+ 125:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  * }
+ 126:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  ******************************************************************************
+ 127:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****  */
+ 128:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 129:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** #include "kalman_filter.h"
+ 130:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 131:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** uint16_t sizeof_float, sizeof_double;
+ 132:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 133:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** static void H_K_R_Adjustment(KalmanFilter_t *kf);
+ 134:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 135:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** void Kalman_Filter_Init(KalmanFilter_t *kf, uint8_t xhatSize, uint8_t uSize, uint8_t zSize)
+ 136:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** {
+ 137:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     sizeof_float = sizeof(float);
+ 138:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     sizeof_double = sizeof(double);
+ 139:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 140:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->xhatSize = xhatSize;
+ 141:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->uSize = uSize;
+ 142:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->zSize = zSize;
+ 143:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 144:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->MeasurementValidNum = 0;
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccmkfrD3.s 			page 4
+
+
+ 145:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 146:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     // measurement flags
+ 147:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->MeasurementMap = (uint8_t *)user_malloc(sizeof(uint8_t) * zSize);
+ 148:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->MeasurementMap, 0, sizeof(uint8_t) * zSize);
+ 149:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->MeasurementDegree = (float *)user_malloc(sizeof_float * zSize);
+ 150:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->MeasurementDegree, 0, sizeof_float * zSize);
+ 151:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->MatR_DiagonalElements = (float *)user_malloc(sizeof_float * zSize);
+ 152:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->MatR_DiagonalElements, 0, sizeof_float * zSize);
+ 153:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->StateMinVariance = (float *)user_malloc(sizeof_float * xhatSize);
+ 154:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->StateMinVariance, 0, sizeof_float * xhatSize);
+ 155:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->temp = (uint8_t *)user_malloc(sizeof(uint8_t) * zSize);
+ 156:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->temp, 0, sizeof(uint8_t) * zSize);
+ 157:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 158:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     // filter data
+ 159:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->FilteredValue = (float *)user_malloc(sizeof_float * xhatSize);
+ 160:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->FilteredValue, 0, sizeof_float * xhatSize);
+ 161:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->MeasuredVector = (float *)user_malloc(sizeof_float * zSize);
+ 162:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->MeasuredVector, 0, sizeof_float * zSize);
+ 163:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->ControlVector = (float *)user_malloc(sizeof_float * uSize);
+ 164:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->ControlVector, 0, sizeof_float * uSize);
+ 165:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 166:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     // xhat x(k|k)
+ 167:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->xhat_data = (float *)user_malloc(sizeof_float * xhatSize);
+ 168:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->xhat_data, 0, sizeof_float * xhatSize);
+ 169:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     Matrix_Init(&kf->xhat, kf->xhatSize, 1, (float *)kf->xhat_data);
+ 170:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 171:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     // xhatminus x(k|k-1)
+ 172:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->xhatminus_data = (float *)user_malloc(sizeof_float * xhatSize);
+ 173:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->xhatminus_data, 0, sizeof_float * xhatSize);
+ 174:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     Matrix_Init(&kf->xhatminus, kf->xhatSize, 1, (float *)kf->xhatminus_data);
+ 175:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 176:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     if (uSize != 0)
+ 177:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     {
+ 178:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         // control vector u
+ 179:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->u_data = (float *)user_malloc(sizeof_float * uSize);
+ 180:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         memset(kf->u_data, 0, sizeof_float * uSize);
+ 181:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         Matrix_Init(&kf->u, kf->uSize, 1, (float *)kf->u_data);
+ 182:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     }
+ 183:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 184:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     // measurement vector z
+ 185:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->z_data = (float *)user_malloc(sizeof_float * zSize);
+ 186:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->z_data, 0, sizeof_float * zSize);
+ 187:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     Matrix_Init(&kf->z, kf->zSize, 1, (float *)kf->z_data);
+ 188:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 189:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     // covariance matrix P(k|k)
+ 190:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->P_data = (float *)user_malloc(sizeof_float * xhatSize * xhatSize);
+ 191:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->P_data, 0, sizeof_float * xhatSize * xhatSize);
+ 192:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     Matrix_Init(&kf->P, kf->xhatSize, kf->xhatSize, (float *)kf->P_data);
+ 193:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 194:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     // create covariance matrix P(k|k-1)
+ 195:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->Pminus_data = (float *)user_malloc(sizeof_float * xhatSize * xhatSize);
+ 196:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->Pminus_data, 0, sizeof_float * xhatSize * xhatSize);
+ 197:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     Matrix_Init(&kf->Pminus, kf->xhatSize, kf->xhatSize, (float *)kf->Pminus_data);
+ 198:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 199:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     // state transition matrix F FT
+ 200:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->F_data = (float *)user_malloc(sizeof_float * xhatSize * xhatSize);
+ 201:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->FT_data = (float *)user_malloc(sizeof_float * xhatSize * xhatSize);
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccmkfrD3.s 			page 5
+
+
+ 202:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->F_data, 0, sizeof_float * xhatSize * xhatSize);
+ 203:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->FT_data, 0, sizeof_float * xhatSize * xhatSize);
+ 204:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     Matrix_Init(&kf->F, kf->xhatSize, kf->xhatSize, (float *)kf->F_data);
+ 205:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     Matrix_Init(&kf->FT, kf->xhatSize, kf->xhatSize, (float *)kf->FT_data);
+ 206:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 207:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     if (uSize != 0)
+ 208:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     {
+ 209:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         // control matrix B
+ 210:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->B_data = (float *)user_malloc(sizeof_float * xhatSize * uSize);
+ 211:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         memset(kf->B_data, 0, sizeof_float * xhatSize * uSize);
+ 212:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         Matrix_Init(&kf->B, kf->xhatSize, kf->uSize, (float *)kf->B_data);
+ 213:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     }
+ 214:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 215:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     // measurement matrix H
+ 216:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->H_data = (float *)user_malloc(sizeof_float * zSize * xhatSize);
+ 217:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->HT_data = (float *)user_malloc(sizeof_float * xhatSize * zSize);
+ 218:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->H_data, 0, sizeof_float * zSize * xhatSize);
+ 219:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->HT_data, 0, sizeof_float * xhatSize * zSize);
+ 220:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     Matrix_Init(&kf->H, kf->zSize, kf->xhatSize, (float *)kf->H_data);
+ 221:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     Matrix_Init(&kf->HT, kf->xhatSize, kf->zSize, (float *)kf->HT_data);
+ 222:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 223:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     // process noise covariance matrix Q
+ 224:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->Q_data = (float *)user_malloc(sizeof_float * xhatSize * xhatSize);
+ 225:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->Q_data, 0, sizeof_float * xhatSize * xhatSize);
+ 226:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     Matrix_Init(&kf->Q, kf->xhatSize, kf->xhatSize, (float *)kf->Q_data);
+ 227:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 228:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     // measurement noise covariance matrix R
+ 229:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->R_data = (float *)user_malloc(sizeof_float * zSize * zSize);
+ 230:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->R_data, 0, sizeof_float * zSize * zSize);
+ 231:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     Matrix_Init(&kf->R, kf->zSize, kf->zSize, (float *)kf->R_data);
+ 232:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 233:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     // kalman gain K
+ 234:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->K_data = (float *)user_malloc(sizeof_float * xhatSize * zSize);
+ 235:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->K_data, 0, sizeof_float * xhatSize * zSize);
+ 236:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     Matrix_Init(&kf->K, kf->xhatSize, kf->zSize, (float *)kf->K_data);
+ 237:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 238:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->S_data = (float *)user_malloc(sizeof_float * kf->xhatSize * kf->xhatSize);
+ 239:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->temp_matrix_data = (float *)user_malloc(sizeof_float * kf->xhatSize * kf->xhatSize);
+ 240:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->temp_matrix_data1 = (float *)user_malloc(sizeof_float * kf->xhatSize * kf->xhatSize);
+ 241:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->temp_vector_data = (float *)user_malloc(sizeof_float * kf->xhatSize);
+ 242:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->temp_vector_data1 = (float *)user_malloc(sizeof_float * kf->xhatSize);
+ 243:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     Matrix_Init(&kf->S, kf->xhatSize, kf->xhatSize, (float *)kf->S_data);
+ 244:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     Matrix_Init(&kf->temp_matrix, kf->xhatSize, kf->xhatSize, (float *)kf->temp_matrix_data);
+ 245:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     Matrix_Init(&kf->temp_matrix1, kf->xhatSize, kf->xhatSize, (float *)kf->temp_matrix_data1);
+ 246:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     Matrix_Init(&kf->temp_vector, kf->xhatSize, 1, (float *)kf->temp_vector_data);
+ 247:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     Matrix_Init(&kf->temp_vector1, kf->xhatSize, 1, (float *)kf->temp_vector_data1);
+ 248:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 249:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->SkipEq1 = 0;
+ 250:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->SkipEq2 = 0;
+ 251:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->SkipEq3 = 0;
+ 252:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->SkipEq4 = 0;
+ 253:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->SkipEq5 = 0;
+ 254:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** }
+ 255:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 256:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** void Kalman_Filter_Measure(KalmanFilter_t *kf)
+ 257:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** {
+ 258:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     // æÿ’ÛH K R∏˘æ›¡ø≤‚«Èøˆ◊‘∂Øµ˜’˚
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccmkfrD3.s 			page 6
+
+
+ 259:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     // matrix H K R auto adjustment
+ 260:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     if (kf->UseAutoAdjustment != 0)
+ 261:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         H_K_R_Adjustment(kf);
+ 262:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     else
+ 263:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     {
+ 264:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         memcpy(kf->z_data, kf->MeasuredVector, sizeof_float * kf->zSize);
+ 265:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         memset(kf->MeasuredVector, 0, sizeof_float * kf->zSize);
+ 266:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     }
+ 267:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 268:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memcpy(kf->u_data, kf->ControlVector, sizeof_float * kf->uSize);
+ 269:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** }
+ 270:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** void Kalman_Filter_xhatMinusUpdate(KalmanFilter_t *kf)
+ 271:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** {
+ 272:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     if (!kf->SkipEq1)
+ 273:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     {
+ 274:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         if (kf->uSize > 0)
+ 275:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         {
+ 276:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****             kf->temp_vector.numRows = kf->xhatSize;
+ 277:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****             kf->temp_vector.numCols = 1;
+ 278:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****             kf->MatStatus = Matrix_Multiply(&kf->F, &kf->xhat, &kf->temp_vector);
+ 279:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****             kf->temp_vector1.numRows = kf->xhatSize;
+ 280:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****             kf->temp_vector1.numCols = 1;
+ 281:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****             kf->MatStatus = Matrix_Multiply(&kf->B, &kf->u, &kf->temp_vector1);
+ 282:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****             kf->MatStatus = Matrix_Add(&kf->temp_vector, &kf->temp_vector1, &kf->xhatminus);
+ 283:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         }
+ 284:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         else
+ 285:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         {
+ 286:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****             kf->MatStatus = Matrix_Multiply(&kf->F, &kf->xhat, &kf->xhatminus);
+ 287:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         }
+ 288:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     }
+ 289:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** }
+ 290:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** void Kalman_Filter_PminusUpdate(KalmanFilter_t *kf)
+ 291:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** {
+ 292:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     if (!kf->SkipEq2)
+ 293:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     {
+ 294:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->MatStatus = Matrix_Transpose(&kf->F, &kf->FT);
+ 295:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->MatStatus = Matrix_Multiply(&kf->F, &kf->P, &kf->Pminus);
+ 296:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->temp_matrix.numRows = kf->Pminus.numRows;
+ 297:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->temp_matrix.numCols = kf->FT.numCols;
+ 298:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->MatStatus = Matrix_Multiply(&kf->Pminus, &kf->FT, &kf->temp_matrix); // temp_matrix = F
+ 299:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->MatStatus = Matrix_Add(&kf->temp_matrix, &kf->Q, &kf->Pminus);
+ 300:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     }
+ 301:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** }
+ 302:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** void Kalman_Filter_SetK(KalmanFilter_t *kf)
+ 303:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** {
+ 304:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     if (!kf->SkipEq3)
+ 305:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     {
+ 306:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->MatStatus = Matrix_Transpose(&kf->H, &kf->HT); // z|x => x|z
+ 307:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->temp_matrix.numRows = kf->H.numRows;
+ 308:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->temp_matrix.numCols = kf->Pminus.numCols;
+ 309:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->MatStatus = Matrix_Multiply(&kf->H, &kf->Pminus, &kf->temp_matrix); // temp_matrix = H°
+ 310:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->temp_matrix1.numRows = kf->temp_matrix.numRows;
+ 311:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->temp_matrix1.numCols = kf->HT.numCols;
+ 312:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->MatStatus = Matrix_Multiply(&kf->temp_matrix, &kf->HT, &kf->temp_matrix1); // temp_matr
+ 313:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->S.numRows = kf->R.numRows;
+ 314:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->S.numCols = kf->R.numCols;
+ 315:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->MatStatus = Matrix_Add(&kf->temp_matrix1, &kf->R, &kf->S); // S = H P'(k) HT + R
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccmkfrD3.s 			page 7
+
+
+ 316:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->MatStatus = Matrix_Inverse(&kf->S, &kf->temp_matrix1);     // temp_matrix1 = inv(H°§P'(
+ 317:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->temp_matrix.numRows = kf->Pminus.numRows;
+ 318:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->temp_matrix.numCols = kf->HT.numCols;
+ 319:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->MatStatus = Matrix_Multiply(&kf->Pminus, &kf->HT, &kf->temp_matrix); // temp_matrix = P
+ 320:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->MatStatus = Matrix_Multiply(&kf->temp_matrix, &kf->temp_matrix1, &kf->K);
+ 321:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     }
+ 322:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** }
+ 323:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** void Kalman_Filter_xhatUpdate(KalmanFilter_t *kf)
+ 324:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** {
+ 325:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     if (!kf->SkipEq4)
+ 326:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     {
+ 327:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->temp_vector.numRows = kf->H.numRows;
+ 328:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->temp_vector.numCols = 1;
+ 329:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->MatStatus = Matrix_Multiply(&kf->H, &kf->xhatminus, &kf->temp_vector); // temp_vector =
+ 330:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->temp_vector1.numRows = kf->z.numRows;
+ 331:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->temp_vector1.numCols = 1;
+ 332:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->MatStatus = Matrix_Subtract(&kf->z, &kf->temp_vector, &kf->temp_vector1); // temp_vecto
+ 333:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->temp_vector.numRows = kf->K.numRows;
+ 334:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->temp_vector.numCols = 1;
+ 335:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->MatStatus = Matrix_Multiply(&kf->K, &kf->temp_vector1, &kf->temp_vector); // temp_vecto
+ 336:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->MatStatus = Matrix_Add(&kf->xhatminus, &kf->temp_vector, &kf->xhat);
+ 337:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     }
+ 338:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** }
+ 339:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** void Kalman_Filter_P_Update(KalmanFilter_t *kf)
+ 340:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** {
+ 341:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     if (!kf->SkipEq5)
+ 342:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     {
+ 343:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->temp_matrix.numRows = kf->K.numRows;
+ 344:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->temp_matrix.numCols = kf->H.numCols;
+ 345:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->temp_matrix1.numRows = kf->temp_matrix.numRows;
+ 346:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->temp_matrix1.numCols = kf->Pminus.numCols;
+ 347:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->MatStatus = Matrix_Multiply(&kf->K, &kf->H, &kf->temp_matrix);                 // temp_
+ 348:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->MatStatus = Matrix_Multiply(&kf->temp_matrix, &kf->Pminus, &kf->temp_matrix1); // temp_
+ 349:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->MatStatus = Matrix_Subtract(&kf->Pminus, &kf->temp_matrix1, &kf->P);
+ 350:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     }
+ 351:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** }
+ 352:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 353:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** float *Kalman_Filter_Update(KalmanFilter_t *kf)
+ 354:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** {
+ 355:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     Kalman_Filter_Measure(kf);
+ 356:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 357:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     if (kf->User_Func0_f != NULL)
+ 358:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->User_Func0_f(kf);
+ 359:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 360:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     // 1. xhat'(k)= A°§xhat(k-1) + B°§u
+ 361:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     Kalman_Filter_xhatMinusUpdate(kf);
+ 362:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 363:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     if (kf->User_Func1_f != NULL)
+ 364:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->User_Func1_f(kf);
+ 365:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 366:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     // ‘§≤‚∏¸–¬
+ 367:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     // 2. P'(k) = A°§P(k-1)°§AT + Q
+ 368:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     Kalman_Filter_PminusUpdate(kf);
+ 369:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 370:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     if (kf->User_Func2_f != NULL)
+ 371:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->User_Func2_f(kf);
+ 372:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccmkfrD3.s 			page 8
+
+
+ 373:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     if (kf->MeasurementValidNum != 0 || kf->UseAutoAdjustment == 0)
+ 374:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     {
+ 375:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         // ¡ø≤‚∏¸–¬
+ 376:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         // 3. K(k) = P'(k)°§HT / (H°§P'(k)°§HT + R)
+ 377:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         Kalman_Filter_SetK(kf);
+ 378:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 379:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         if (kf->User_Func3_f != NULL)
+ 380:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****             kf->User_Func3_f(kf);
+ 381:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 382:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         // 4. xhat(k) = xhat'(k) + K(k)°§(z(k) - H°§xhat'(k))
+ 383:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         Kalman_Filter_xhatUpdate(kf);
+ 384:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 385:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         if (kf->User_Func4_f != NULL)
+ 386:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****             kf->User_Func4_f(kf);
+ 387:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 388:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         // 5. P(k) = (1-K(k)°§H)°§P'(k) ==> P(k) = P'(k)-K(k)°§H°§P'(k)
+ 389:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         Kalman_Filter_P_Update(kf);
+ 390:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     }
+ 391:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     else
+ 392:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     {
+ 393:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         // Œﬁ”––ß¡ø≤‚ Ωˆ‘§≤‚
+ 394:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         // xhat(k) = xhat'(k)
+ 395:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         // P(k) = P'(k)
+ 396:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         memcpy(kf->xhat_data, kf->xhatminus_data, sizeof_float * kf->xhatSize);
+ 397:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         memcpy(kf->P_data, kf->Pminus_data, sizeof_float * kf->xhatSize * kf->xhatSize);
+ 398:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     }
+ 399:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 400:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     if (kf->User_Func5_f != NULL)
+ 401:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->User_Func5_f(kf);
+ 402:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 403:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     // ±‹√‚¬À≤®∆˜π˝∂» ’¡≤
+ 404:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     // suppress filter excessive convergence
+ 405:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     for (uint8_t i = 0; i < kf->xhatSize; i++)
+ 406:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     {
+ 407:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         if (kf->P_data[i * kf->xhatSize + i] < kf->StateMinVariance[i])
+ 408:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****             kf->P_data[i * kf->xhatSize + i] = kf->StateMinVariance[i];
+ 409:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     }
+ 410:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 411:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memcpy(kf->FilteredValue, kf->xhat_data, sizeof_float * kf->xhatSize);
+ 412:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 413:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     if (kf->User_Func6_f != NULL)
+ 414:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->User_Func6_f(kf);
+ 415:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 416:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     return kf->FilteredValue;
+ 417:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** }
+ 418:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 419:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** static void H_K_R_Adjustment(KalmanFilter_t *kf)
+ 420:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** {
+  29              		.loc 1 420 1 view -0
+  30              		.cfi_startproc
+  31              		@ args = 0, pretend = 0, frame = 0
+  32              		@ frame_needed = 0, uses_anonymous_args = 0
+  33              		.loc 1 420 1 is_stmt 0 view .LVU1
+  34 0000 70B5     		push	{r4, r5, r6, lr}
+  35              	.LCFI0:
+  36              		.cfi_def_cfa_offset 16
+  37              		.cfi_offset 4, -16
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccmkfrD3.s 			page 9
+
+
+  38              		.cfi_offset 5, -12
+  39              		.cfi_offset 6, -8
+  40              		.cfi_offset 14, -4
+  41 0002 0446     		mov	r4, r0
+ 421:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->MeasurementValidNum = 0;
+  42              		.loc 1 421 5 is_stmt 1 view .LVU2
+  43              		.loc 1 421 29 is_stmt 0 view .LVU3
+  44 0004 0025     		movs	r5, #0
+  45 0006 0574     		strb	r5, [r0, #16]
+ 422:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 423:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memcpy(kf->z_data, kf->MeasuredVector, sizeof_float * kf->zSize);
+  46              		.loc 1 423 5 is_stmt 1 view .LVU4
+  47              		.loc 1 423 61 is_stmt 0 view .LVU5
+  48 0008 827B     		ldrb	r2, [r0, #14]	@ zero_extendqisi2
+  49              		.loc 1 423 57 view .LVU6
+  50 000a 424E     		ldr	r6, .L9
+  51 000c 3388     		ldrh	r3, [r6]
+  52              		.loc 1 423 5 view .LVU7
+  53 000e 03FB02F2 		mul	r2, r3, r2
+  54 0012 4168     		ldr	r1, [r0, #4]
+  55 0014 D0F8F400 		ldr	r0, [r0, #244]
+  56              	.LVL1:
+  57              		.loc 1 423 5 view .LVU8
+  58 0018 FFF7FEFF 		bl	memcpy
+  59              	.LVL2:
+ 424:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->MeasuredVector, 0, sizeof_float * kf->zSize);
+  60              		.loc 1 424 5 is_stmt 1 view .LVU9
+  61              		.loc 1 424 52 is_stmt 0 view .LVU10
+  62 001c A27B     		ldrb	r2, [r4, #14]	@ zero_extendqisi2
+  63              		.loc 1 424 48 view .LVU11
+  64 001e 3388     		ldrh	r3, [r6]
+  65              		.loc 1 424 5 view .LVU12
+  66 0020 03FB02F2 		mul	r2, r3, r2
+  67 0024 2946     		mov	r1, r5
+  68 0026 6068     		ldr	r0, [r4, #4]
+  69 0028 FFF7FEFF 		bl	memset
+  70              	.LVL3:
+ 425:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 426:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     //  ∂±¡ø≤‚ ˝æ›”––ß–‘≤¢µ˜’˚æÿ’ÛH R K
+ 427:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     // recognize measurement validity and adjust matrices H R K
+ 428:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->R_data, 0, sizeof_float * kf->zSize * kf->zSize);
+  71              		.loc 1 428 5 is_stmt 1 view .LVU13
+  72              		.loc 1 428 44 is_stmt 0 view .LVU14
+  73 002c A27B     		ldrb	r2, [r4, #14]	@ zero_extendqisi2
+  74              		.loc 1 428 40 view .LVU15
+  75 002e 3388     		ldrh	r3, [r6]
+  76 0030 02FB03F3 		mul	r3, r2, r3
+  77              		.loc 1 428 5 view .LVU16
+  78 0034 03FB02F2 		mul	r2, r3, r2
+  79 0038 2946     		mov	r1, r5
+  80 003a D4F81801 		ldr	r0, [r4, #280]
+  81 003e FFF7FEFF 		bl	memset
+  82              	.LVL4:
+ 429:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->H_data, 0, sizeof_float * kf->xhatSize * kf->zSize);
+  83              		.loc 1 429 5 is_stmt 1 view .LVU17
+  84              		.loc 1 429 44 is_stmt 0 view .LVU18
+  85 0042 227B     		ldrb	r2, [r4, #12]	@ zero_extendqisi2
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccmkfrD3.s 			page 10
+
+
+  86              		.loc 1 429 40 view .LVU19
+  87 0044 3388     		ldrh	r3, [r6]
+  88 0046 02FB03F3 		mul	r3, r2, r3
+  89              		.loc 1 429 59 view .LVU20
+  90 004a A27B     		ldrb	r2, [r4, #14]	@ zero_extendqisi2
+  91              		.loc 1 429 5 view .LVU21
+  92 004c 03FB02F2 		mul	r2, r3, r2
+  93 0050 2946     		mov	r1, r5
+  94 0052 D4F80C01 		ldr	r0, [r4, #268]
+  95 0056 FFF7FEFF 		bl	memset
+  96              	.LVL5:
+ 430:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     for (uint8_t i = 0; i < kf->zSize; i++)
+  97              		.loc 1 430 5 is_stmt 1 view .LVU22
+  98              	.LBB2:
+  99              		.loc 1 430 10 view .LVU23
+ 100              		.loc 1 430 18 is_stmt 0 view .LVU24
+ 101 005a 2946     		mov	r1, r5
+ 102              		.loc 1 430 5 view .LVU25
+ 103 005c 01E0     		b	.L2
+ 104              	.LVL6:
+ 105              	.L3:
+ 106              		.loc 1 430 40 is_stmt 1 discriminator 2 view .LVU26
+ 107              		.loc 1 430 41 is_stmt 0 discriminator 2 view .LVU27
+ 108 005e 0131     		adds	r1, r1, #1
+ 109              	.LVL7:
+ 110              		.loc 1 430 41 discriminator 2 view .LVU28
+ 111 0060 C9B2     		uxtb	r1, r1
+ 112              	.LVL8:
+ 113              	.L2:
+ 114              		.loc 1 430 25 is_stmt 1 discriminator 1 view .LVU29
+ 115              		.loc 1 430 31 is_stmt 0 discriminator 1 view .LVU30
+ 116 0062 A37B     		ldrb	r3, [r4, #14]	@ zero_extendqisi2
+ 117              		.loc 1 430 5 discriminator 1 view .LVU31
+ 118 0064 8B42     		cmp	r3, r1
+ 119 0066 2AD9     		bls	.L8
+ 431:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     {
+ 432:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         if (kf->z_data[i] != 0)
+ 120              		.loc 1 432 9 is_stmt 1 view .LVU32
+ 121              		.loc 1 432 15 is_stmt 0 view .LVU33
+ 122 0068 D4F8F430 		ldr	r3, [r4, #244]
+ 123              		.loc 1 432 23 view .LVU34
+ 124 006c 4FEA810C 		lsl	ip, r1, #2
+ 125 0070 03EB8102 		add	r2, r3, r1, lsl #2
+ 126 0074 D2ED007A 		vldr.32	s15, [r2]
+ 127              		.loc 1 432 12 view .LVU35
+ 128 0078 F5EE407A 		vcmp.f32	s15, #0
+ 129 007c F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 130 0080 EDD0     		beq	.L3
+ 433:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         {
+ 434:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****             // ÷ÿππœÚ¡øz
+ 435:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****             // rebuild vector z
+ 436:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****             kf->z_data[kf->MeasurementValidNum] = kf->z_data[i];
+ 131              		.loc 1 436 13 is_stmt 1 view .LVU36
+ 132              		.loc 1 436 26 is_stmt 0 view .LVU37
+ 133 0082 227C     		ldrb	r2, [r4, #16]	@ zero_extendqisi2
+ 134              		.loc 1 436 23 view .LVU38
+ 135 0084 03EB8203 		add	r3, r3, r2, lsl #2
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccmkfrD3.s 			page 11
+
+
+ 136              		.loc 1 436 49 view .LVU39
+ 137 0088 C3ED007A 		vstr.32	s15, [r3]
+ 437:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****             kf->temp[kf->MeasurementValidNum] = i;
+ 138              		.loc 1 437 13 is_stmt 1 view .LVU40
+ 139              		.loc 1 437 15 is_stmt 0 view .LVU41
+ 140 008c 626A     		ldr	r2, [r4, #36]
+ 141              		.loc 1 437 24 view .LVU42
+ 142 008e 237C     		ldrb	r3, [r4, #16]	@ zero_extendqisi2
+ 143              		.loc 1 437 47 view .LVU43
+ 144 0090 D154     		strb	r1, [r2, r3]
+ 438:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****             // ÷ÿππæÿ’ÛH
+ 439:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****             // rebuild matrix H
+ 440:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****             kf->H_data[kf->xhatSize * kf->MeasurementValidNum + kf->MeasurementMap[i] - 1] = kf->Me
+ 145              		.loc 1 440 13 is_stmt 1 view .LVU44
+ 146              		.loc 1 440 96 is_stmt 0 view .LVU45
+ 147 0092 A069     		ldr	r0, [r4, #24]
+ 148              		.loc 1 440 15 view .LVU46
+ 149 0094 D4F80C21 		ldr	r2, [r4, #268]
+ 150              		.loc 1 440 26 view .LVU47
+ 151 0098 94F80CE0 		ldrb	lr, [r4, #12]	@ zero_extendqisi2
+ 152              		.loc 1 440 41 view .LVU48
+ 153 009c 257C     		ldrb	r5, [r4, #16]	@ zero_extendqisi2
+ 154              		.loc 1 440 67 view .LVU49
+ 155 009e 6369     		ldr	r3, [r4, #20]
+ 156              		.loc 1 440 83 view .LVU50
+ 157 00a0 5B5C     		ldrb	r3, [r3, r1]	@ zero_extendqisi2
+ 158              		.loc 1 440 63 view .LVU51
+ 159 00a2 05FB0E33 		mla	r3, r5, lr, r3
+ 160              		.loc 1 440 23 view .LVU52
+ 161 00a6 03F18043 		add	r3, r3, #1073741824
+ 162 00aa 013B     		subs	r3, r3, #1
+ 163 00ac 02EB8303 		add	r3, r2, r3, lsl #2
+ 164              		.loc 1 440 115 view .LVU53
+ 165 00b0 6044     		add	r0, r0, ip
+ 166 00b2 0268     		ldr	r2, [r0]	@ float
+ 167              		.loc 1 440 92 view .LVU54
+ 168 00b4 1A60     		str	r2, [r3]	@ float
+ 441:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****             kf->MeasurementValidNum++;
+ 169              		.loc 1 441 13 is_stmt 1 view .LVU55
+ 170              		.loc 1 441 15 is_stmt 0 view .LVU56
+ 171 00b6 237C     		ldrb	r3, [r4, #16]	@ zero_extendqisi2
+ 172              		.loc 1 441 36 view .LVU57
+ 173 00b8 0133     		adds	r3, r3, #1
+ 174 00ba 2374     		strb	r3, [r4, #16]
+ 175 00bc CFE7     		b	.L3
+ 176              	.L8:
+ 177              	.LBE2:
+ 178              	.LBB3:
+ 442:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         }
+ 443:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     }
+ 444:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     for (uint8_t i = 0; i < kf->MeasurementValidNum; i++)
+ 179              		.loc 1 444 18 view .LVU58
+ 180 00be 0023     		movs	r3, #0
+ 181 00c0 0FE0     		b	.L5
+ 182              	.LVL9:
+ 183              	.L6:
+ 445:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     {
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccmkfrD3.s 			page 12
+
+
+ 446:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         // ÷ÿππæÿ’ÛR
+ 447:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         // rebuild matrix R
+ 448:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->R_data[i * kf->MeasurementValidNum + i] = kf->MatR_DiagonalElements[kf->temp[i]];
+ 184              		.loc 1 448 9 is_stmt 1 discriminator 3 view .LVU59
+ 185              		.loc 1 448 57 is_stmt 0 discriminator 3 view .LVU60
+ 186 00c2 E069     		ldr	r0, [r4, #28]
+ 187              		.loc 1 448 83 discriminator 3 view .LVU61
+ 188 00c4 616A     		ldr	r1, [r4, #36]
+ 189              		.loc 1 448 89 discriminator 3 view .LVU62
+ 190 00c6 11F803C0 		ldrb	ip, [r1, r3]	@ zero_extendqisi2
+ 191              		.loc 1 448 11 discriminator 3 view .LVU63
+ 192 00ca D4F81811 		ldr	r1, [r4, #280]
+ 193              		.loc 1 448 48 discriminator 3 view .LVU64
+ 194 00ce 02FB0332 		mla	r2, r2, r3, r3
+ 195              		.loc 1 448 19 discriminator 3 view .LVU65
+ 196 00d2 01EB8202 		add	r2, r1, r2, lsl #2
+ 197              		.loc 1 448 80 discriminator 3 view .LVU66
+ 198 00d6 00EB8C00 		add	r0, r0, ip, lsl #2
+ 199 00da 0168     		ldr	r1, [r0]	@ float
+ 200              		.loc 1 448 53 discriminator 3 view .LVU67
+ 201 00dc 1160     		str	r1, [r2]	@ float
+ 444:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     {
+ 202              		.loc 1 444 54 is_stmt 1 discriminator 3 view .LVU68
+ 444:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     {
+ 203              		.loc 1 444 55 is_stmt 0 discriminator 3 view .LVU69
+ 204 00de 0133     		adds	r3, r3, #1
+ 205              	.LVL10:
+ 444:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     {
+ 206              		.loc 1 444 55 discriminator 3 view .LVU70
+ 207 00e0 DBB2     		uxtb	r3, r3
+ 208              	.LVL11:
+ 209              	.L5:
+ 444:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     {
+ 210              		.loc 1 444 25 is_stmt 1 discriminator 1 view .LVU71
+ 444:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     {
+ 211              		.loc 1 444 31 is_stmt 0 discriminator 1 view .LVU72
+ 212 00e2 227C     		ldrb	r2, [r4, #16]	@ zero_extendqisi2
+ 444:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     {
+ 213              		.loc 1 444 5 discriminator 1 view .LVU73
+ 214 00e4 9A42     		cmp	r2, r3
+ 215 00e6 ECD8     		bhi	.L6
+ 216              	.LBE3:
+ 449:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     }
+ 450:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 451:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     // µ˜’˚æÿ’ÛŒ¨ ˝
+ 452:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     // adjust the dimensions of system matrices
+ 453:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->H.numRows = kf->MeasurementValidNum;
+ 217              		.loc 1 453 5 is_stmt 1 view .LVU74
+ 218              		.loc 1 453 23 is_stmt 0 view .LVU75
+ 219 00e8 92B2     		uxth	r2, r2
+ 220              		.loc 1 453 19 view .LVU76
+ 221 00ea A4F87820 		strh	r2, [r4, #120]	@ movhi
+ 454:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->H.numCols = kf->xhatSize;
+ 222              		.loc 1 454 5 is_stmt 1 view .LVU77
+ 223              		.loc 1 454 23 is_stmt 0 view .LVU78
+ 224 00ee 237B     		ldrb	r3, [r4, #12]	@ zero_extendqisi2
+ 225              	.LVL12:
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccmkfrD3.s 			page 13
+
+
+ 226              		.loc 1 454 19 view .LVU79
+ 227 00f0 A4F87A30 		strh	r3, [r4, #122]	@ movhi
+ 455:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->HT.numRows = kf->xhatSize;
+ 228              		.loc 1 455 5 is_stmt 1 view .LVU80
+ 229              		.loc 1 455 20 is_stmt 0 view .LVU81
+ 230 00f4 A4F88030 		strh	r3, [r4, #128]	@ movhi
+ 456:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->HT.numCols = kf->MeasurementValidNum;
+ 231              		.loc 1 456 5 is_stmt 1 view .LVU82
+ 232              		.loc 1 456 20 is_stmt 0 view .LVU83
+ 233 00f8 A4F88220 		strh	r2, [r4, #130]	@ movhi
+ 457:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->R.numRows = kf->MeasurementValidNum;
+ 234              		.loc 1 457 5 is_stmt 1 view .LVU84
+ 235              		.loc 1 457 19 is_stmt 0 view .LVU85
+ 236 00fc A4F89020 		strh	r2, [r4, #144]	@ movhi
+ 458:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->R.numCols = kf->MeasurementValidNum;
+ 237              		.loc 1 458 5 is_stmt 1 view .LVU86
+ 238              		.loc 1 458 19 is_stmt 0 view .LVU87
+ 239 0100 A4F89220 		strh	r2, [r4, #146]	@ movhi
+ 459:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->K.numRows = kf->xhatSize;
+ 240              		.loc 1 459 5 is_stmt 1 view .LVU88
+ 241              		.loc 1 459 19 is_stmt 0 view .LVU89
+ 242 0104 A4F89830 		strh	r3, [r4, #152]	@ movhi
+ 460:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->K.numCols = kf->MeasurementValidNum;
+ 243              		.loc 1 460 5 is_stmt 1 view .LVU90
+ 244              		.loc 1 460 19 is_stmt 0 view .LVU91
+ 245 0108 A4F89A20 		strh	r2, [r4, #154]	@ movhi
+ 461:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->z.numRows = kf->MeasurementValidNum;
+ 246              		.loc 1 461 5 is_stmt 1 view .LVU92
+ 247              		.loc 1 461 19 is_stmt 0 view .LVU93
+ 248 010c A4F84820 		strh	r2, [r4, #72]	@ movhi
+ 462:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** }
+ 249              		.loc 1 462 1 view .LVU94
+ 250 0110 70BD     		pop	{r4, r5, r6, pc}
+ 251              	.LVL13:
+ 252              	.L10:
+ 253              		.loc 1 462 1 view .LVU95
+ 254 0112 00BF     		.align	2
+ 255              	.L9:
+ 256 0114 00000000 		.word	.LANCHOR0
+ 257              		.cfi_endproc
+ 258              	.LFE171:
+ 260              		.section	.text.Kalman_Filter_Init,"ax",%progbits
+ 261              		.align	1
+ 262              		.global	Kalman_Filter_Init
+ 263              		.syntax unified
+ 264              		.thumb
+ 265              		.thumb_func
+ 267              	Kalman_Filter_Init:
+ 268              	.LVL14:
+ 269              	.LFB163:
+ 136:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     sizeof_float = sizeof(float);
+ 270              		.loc 1 136 1 is_stmt 1 view -0
+ 271              		.cfi_startproc
+ 272              		@ args = 0, pretend = 0, frame = 0
+ 273              		@ frame_needed = 0, uses_anonymous_args = 0
+ 136:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     sizeof_float = sizeof(float);
+ 274              		.loc 1 136 1 is_stmt 0 view .LVU97
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccmkfrD3.s 			page 14
+
+
+ 275 0000 2DE9F047 		push	{r4, r5, r6, r7, r8, r9, r10, lr}
+ 276              	.LCFI1:
+ 277              		.cfi_def_cfa_offset 32
+ 278              		.cfi_offset 4, -32
+ 279              		.cfi_offset 5, -28
+ 280              		.cfi_offset 6, -24
+ 281              		.cfi_offset 7, -20
+ 282              		.cfi_offset 8, -16
+ 283              		.cfi_offset 9, -12
+ 284              		.cfi_offset 10, -8
+ 285              		.cfi_offset 14, -4
+ 286 0004 0446     		mov	r4, r0
+ 287 0006 0D46     		mov	r5, r1
+ 288 0008 9146     		mov	r9, r2
+ 289 000a 1E46     		mov	r6, r3
+ 137:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     sizeof_double = sizeof(double);
+ 290              		.loc 1 137 5 is_stmt 1 view .LVU98
+ 137:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     sizeof_double = sizeof(double);
+ 291              		.loc 1 137 18 is_stmt 0 view .LVU99
+ 292 000c DFF8B883 		ldr	r8, .L17+4
+ 293 0010 0423     		movs	r3, #4
+ 294              	.LVL15:
+ 137:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     sizeof_double = sizeof(double);
+ 295              		.loc 1 137 18 view .LVU100
+ 296 0012 A8F80030 		strh	r3, [r8]	@ movhi
+ 138:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 297              		.loc 1 138 5 is_stmt 1 view .LVU101
+ 138:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 298              		.loc 1 138 19 is_stmt 0 view .LVU102
+ 299 0016 EB4B     		ldr	r3, .L17
+ 300 0018 0822     		movs	r2, #8
+ 301              	.LVL16:
+ 138:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 302              		.loc 1 138 19 view .LVU103
+ 303 001a 1A80     		strh	r2, [r3]	@ movhi
+ 140:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->uSize = uSize;
+ 304              		.loc 1 140 5 is_stmt 1 view .LVU104
+ 140:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->uSize = uSize;
+ 305              		.loc 1 140 18 is_stmt 0 view .LVU105
+ 306 001c 0173     		strb	r1, [r0, #12]
+ 141:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->zSize = zSize;
+ 307              		.loc 1 141 5 is_stmt 1 view .LVU106
+ 141:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->zSize = zSize;
+ 308              		.loc 1 141 15 is_stmt 0 view .LVU107
+ 309 001e 80F80D90 		strb	r9, [r0, #13]
+ 142:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 310              		.loc 1 142 5 is_stmt 1 view .LVU108
+ 142:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 311              		.loc 1 142 15 is_stmt 0 view .LVU109
+ 312 0022 8673     		strb	r6, [r0, #14]
+ 144:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 313              		.loc 1 144 5 is_stmt 1 view .LVU110
+ 144:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 314              		.loc 1 144 29 is_stmt 0 view .LVU111
+ 315 0024 0027     		movs	r7, #0
+ 316 0026 0774     		strb	r7, [r0, #16]
+ 147:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->MeasurementMap, 0, sizeof(uint8_t) * zSize);
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccmkfrD3.s 			page 15
+
+
+ 317              		.loc 1 147 5 is_stmt 1 view .LVU112
+ 147:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->MeasurementMap, 0, sizeof(uint8_t) * zSize);
+ 318              		.loc 1 147 37 is_stmt 0 view .LVU113
+ 319 0028 3046     		mov	r0, r6
+ 320              	.LVL17:
+ 147:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->MeasurementMap, 0, sizeof(uint8_t) * zSize);
+ 321              		.loc 1 147 37 view .LVU114
+ 322 002a FFF7FEFF 		bl	malloc
+ 323              	.LVL18:
+ 147:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->MeasurementMap, 0, sizeof(uint8_t) * zSize);
+ 324              		.loc 1 147 24 view .LVU115
+ 325 002e 6061     		str	r0, [r4, #20]
+ 148:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->MeasurementDegree = (float *)user_malloc(sizeof_float * zSize);
+ 326              		.loc 1 148 5 is_stmt 1 view .LVU116
+ 327 0030 3246     		mov	r2, r6
+ 328 0032 3946     		mov	r1, r7
+ 329 0034 FFF7FEFF 		bl	memset
+ 330              	.LVL19:
+ 149:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->MeasurementDegree, 0, sizeof_float * zSize);
+ 331              		.loc 1 149 5 view .LVU117
+ 149:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->MeasurementDegree, 0, sizeof_float * zSize);
+ 332              		.loc 1 149 63 is_stmt 0 view .LVU118
+ 333 0038 B8F800A0 		ldrh	r10, [r8]
+ 334 003c 06FB0AFA 		mul	r10, r6, r10
+ 149:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->MeasurementDegree, 0, sizeof_float * zSize);
+ 335              		.loc 1 149 38 view .LVU119
+ 336 0040 5046     		mov	r0, r10
+ 337 0042 FFF7FEFF 		bl	malloc
+ 338              	.LVL20:
+ 149:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->MeasurementDegree, 0, sizeof_float * zSize);
+ 339              		.loc 1 149 27 view .LVU120
+ 340 0046 A061     		str	r0, [r4, #24]
+ 150:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->MatR_DiagonalElements = (float *)user_malloc(sizeof_float * zSize);
+ 341              		.loc 1 150 5 is_stmt 1 view .LVU121
+ 342 0048 5246     		mov	r2, r10
+ 343 004a 3946     		mov	r1, r7
+ 344 004c FFF7FEFF 		bl	memset
+ 345              	.LVL21:
+ 151:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->MatR_DiagonalElements, 0, sizeof_float * zSize);
+ 346              		.loc 1 151 5 view .LVU122
+ 151:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->MatR_DiagonalElements, 0, sizeof_float * zSize);
+ 347              		.loc 1 151 67 is_stmt 0 view .LVU123
+ 348 0050 B8F800A0 		ldrh	r10, [r8]
+ 349 0054 06FB0AFA 		mul	r10, r6, r10
+ 151:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->MatR_DiagonalElements, 0, sizeof_float * zSize);
+ 350              		.loc 1 151 42 view .LVU124
+ 351 0058 5046     		mov	r0, r10
+ 352 005a FFF7FEFF 		bl	malloc
+ 353              	.LVL22:
+ 151:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->MatR_DiagonalElements, 0, sizeof_float * zSize);
+ 354              		.loc 1 151 31 view .LVU125
+ 355 005e E061     		str	r0, [r4, #28]
+ 152:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->StateMinVariance = (float *)user_malloc(sizeof_float * xhatSize);
+ 356              		.loc 1 152 5 is_stmt 1 view .LVU126
+ 357 0060 5246     		mov	r2, r10
+ 358 0062 3946     		mov	r1, r7
+ 359 0064 FFF7FEFF 		bl	memset
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccmkfrD3.s 			page 16
+
+
+ 360              	.LVL23:
+ 153:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->StateMinVariance, 0, sizeof_float * xhatSize);
+ 361              		.loc 1 153 5 view .LVU127
+ 153:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->StateMinVariance, 0, sizeof_float * xhatSize);
+ 362              		.loc 1 153 62 is_stmt 0 view .LVU128
+ 363 0068 B8F800A0 		ldrh	r10, [r8]
+ 364 006c 05FB0AFA 		mul	r10, r5, r10
+ 153:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->StateMinVariance, 0, sizeof_float * xhatSize);
+ 365              		.loc 1 153 37 view .LVU129
+ 366 0070 5046     		mov	r0, r10
+ 367 0072 FFF7FEFF 		bl	malloc
+ 368              	.LVL24:
+ 153:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->StateMinVariance, 0, sizeof_float * xhatSize);
+ 369              		.loc 1 153 26 view .LVU130
+ 370 0076 2062     		str	r0, [r4, #32]
+ 154:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->temp = (uint8_t *)user_malloc(sizeof(uint8_t) * zSize);
+ 371              		.loc 1 154 5 is_stmt 1 view .LVU131
+ 372 0078 5246     		mov	r2, r10
+ 373 007a 3946     		mov	r1, r7
+ 374 007c FFF7FEFF 		bl	memset
+ 375              	.LVL25:
+ 155:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->temp, 0, sizeof(uint8_t) * zSize);
+ 376              		.loc 1 155 5 view .LVU132
+ 155:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->temp, 0, sizeof(uint8_t) * zSize);
+ 377              		.loc 1 155 27 is_stmt 0 view .LVU133
+ 378 0080 3046     		mov	r0, r6
+ 379 0082 FFF7FEFF 		bl	malloc
+ 380              	.LVL26:
+ 155:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->temp, 0, sizeof(uint8_t) * zSize);
+ 381              		.loc 1 155 14 view .LVU134
+ 382 0086 6062     		str	r0, [r4, #36]
+ 156:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 383              		.loc 1 156 5 is_stmt 1 view .LVU135
+ 384 0088 3246     		mov	r2, r6
+ 385 008a 3946     		mov	r1, r7
+ 386 008c FFF7FEFF 		bl	memset
+ 387              	.LVL27:
+ 159:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->FilteredValue, 0, sizeof_float * xhatSize);
+ 388              		.loc 1 159 5 view .LVU136
+ 159:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->FilteredValue, 0, sizeof_float * xhatSize);
+ 389              		.loc 1 159 59 is_stmt 0 view .LVU137
+ 390 0090 B8F80000 		ldrh	r0, [r8]
+ 159:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->FilteredValue, 0, sizeof_float * xhatSize);
+ 391              		.loc 1 159 34 view .LVU138
+ 392 0094 05FB00F0 		mul	r0, r5, r0
+ 393 0098 FFF7FEFF 		bl	malloc
+ 394              	.LVL28:
+ 159:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->FilteredValue, 0, sizeof_float * xhatSize);
+ 395              		.loc 1 159 23 view .LVU139
+ 396 009c 2060     		str	r0, [r4]
+ 160:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->MeasuredVector = (float *)user_malloc(sizeof_float * zSize);
+ 397              		.loc 1 160 5 is_stmt 1 view .LVU140
+ 160:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->MeasuredVector = (float *)user_malloc(sizeof_float * zSize);
+ 398              		.loc 1 160 47 is_stmt 0 view .LVU141
+ 399 009e B8F80020 		ldrh	r2, [r8]
+ 160:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->MeasuredVector = (float *)user_malloc(sizeof_float * zSize);
+ 400              		.loc 1 160 5 view .LVU142
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccmkfrD3.s 			page 17
+
+
+ 401 00a2 05FB02F2 		mul	r2, r5, r2
+ 402 00a6 3946     		mov	r1, r7
+ 403 00a8 FFF7FEFF 		bl	memset
+ 404              	.LVL29:
+ 161:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->MeasuredVector, 0, sizeof_float * zSize);
+ 405              		.loc 1 161 5 is_stmt 1 view .LVU143
+ 161:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->MeasuredVector, 0, sizeof_float * zSize);
+ 406              		.loc 1 161 60 is_stmt 0 view .LVU144
+ 407 00ac B8F800A0 		ldrh	r10, [r8]
+ 408 00b0 06FB0AFA 		mul	r10, r6, r10
+ 161:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->MeasuredVector, 0, sizeof_float * zSize);
+ 409              		.loc 1 161 35 view .LVU145
+ 410 00b4 5046     		mov	r0, r10
+ 411 00b6 FFF7FEFF 		bl	malloc
+ 412              	.LVL30:
+ 161:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->MeasuredVector, 0, sizeof_float * zSize);
+ 413              		.loc 1 161 24 view .LVU146
+ 414 00ba 6060     		str	r0, [r4, #4]
+ 162:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->ControlVector = (float *)user_malloc(sizeof_float * uSize);
+ 415              		.loc 1 162 5 is_stmt 1 view .LVU147
+ 416 00bc 5246     		mov	r2, r10
+ 417 00be 3946     		mov	r1, r7
+ 418 00c0 FFF7FEFF 		bl	memset
+ 419              	.LVL31:
+ 163:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->ControlVector, 0, sizeof_float * uSize);
+ 420              		.loc 1 163 5 view .LVU148
+ 163:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->ControlVector, 0, sizeof_float * uSize);
+ 421              		.loc 1 163 59 is_stmt 0 view .LVU149
+ 422 00c4 B8F800A0 		ldrh	r10, [r8]
+ 423 00c8 09FB0AFA 		mul	r10, r9, r10
+ 163:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->ControlVector, 0, sizeof_float * uSize);
+ 424              		.loc 1 163 34 view .LVU150
+ 425 00cc 5046     		mov	r0, r10
+ 426 00ce FFF7FEFF 		bl	malloc
+ 427              	.LVL32:
+ 163:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->ControlVector, 0, sizeof_float * uSize);
+ 428              		.loc 1 163 23 view .LVU151
+ 429 00d2 A060     		str	r0, [r4, #8]
+ 164:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 430              		.loc 1 164 5 is_stmt 1 view .LVU152
+ 431 00d4 5246     		mov	r2, r10
+ 432 00d6 3946     		mov	r1, r7
+ 433 00d8 FFF7FEFF 		bl	memset
+ 434              	.LVL33:
+ 167:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->xhat_data, 0, sizeof_float * xhatSize);
+ 435              		.loc 1 167 5 view .LVU153
+ 167:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->xhat_data, 0, sizeof_float * xhatSize);
+ 436              		.loc 1 167 55 is_stmt 0 view .LVU154
+ 437 00dc B8F800A0 		ldrh	r10, [r8]
+ 438 00e0 05FB0AFA 		mul	r10, r5, r10
+ 167:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->xhat_data, 0, sizeof_float * xhatSize);
+ 439              		.loc 1 167 30 view .LVU155
+ 440 00e4 5046     		mov	r0, r10
+ 441 00e6 FFF7FEFF 		bl	malloc
+ 442              	.LVL34:
+ 167:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->xhat_data, 0, sizeof_float * xhatSize);
+ 443              		.loc 1 167 19 view .LVU156
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccmkfrD3.s 			page 18
+
+
+ 444 00ea C4F8E800 		str	r0, [r4, #232]
+ 168:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     Matrix_Init(&kf->xhat, kf->xhatSize, 1, (float *)kf->xhat_data);
+ 445              		.loc 1 168 5 is_stmt 1 view .LVU157
+ 446 00ee 5246     		mov	r2, r10
+ 447 00f0 3946     		mov	r1, r7
+ 448 00f2 FFF7FEFF 		bl	memset
+ 449              	.LVL35:
+ 169:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 450              		.loc 1 169 5 view .LVU158
+ 451 00f6 D4F8E830 		ldr	r3, [r4, #232]
+ 452 00fa 0122     		movs	r2, #1
+ 453 00fc 217B     		ldrb	r1, [r4, #12]	@ zero_extendqisi2
+ 454 00fe 04F13000 		add	r0, r4, #48
+ 455 0102 FFF7FEFF 		bl	arm_mat_init_f32
+ 456              	.LVL36:
+ 172:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->xhatminus_data, 0, sizeof_float * xhatSize);
+ 457              		.loc 1 172 5 view .LVU159
+ 172:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->xhatminus_data, 0, sizeof_float * xhatSize);
+ 458              		.loc 1 172 60 is_stmt 0 view .LVU160
+ 459 0106 B8F80080 		ldrh	r8, [r8]
+ 460 010a 05FB08F8 		mul	r8, r5, r8
+ 172:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->xhatminus_data, 0, sizeof_float * xhatSize);
+ 461              		.loc 1 172 35 view .LVU161
+ 462 010e 4046     		mov	r0, r8
+ 463 0110 FFF7FEFF 		bl	malloc
+ 464              	.LVL37:
+ 172:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->xhatminus_data, 0, sizeof_float * xhatSize);
+ 465              		.loc 1 172 24 view .LVU162
+ 466 0114 C4F8EC00 		str	r0, [r4, #236]
+ 173:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     Matrix_Init(&kf->xhatminus, kf->xhatSize, 1, (float *)kf->xhatminus_data);
+ 467              		.loc 1 173 5 is_stmt 1 view .LVU163
+ 468 0118 4246     		mov	r2, r8
+ 469 011a 3946     		mov	r1, r7
+ 470 011c FFF7FEFF 		bl	memset
+ 471              	.LVL38:
+ 174:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 472              		.loc 1 174 5 view .LVU164
+ 473 0120 D4F8EC30 		ldr	r3, [r4, #236]
+ 474 0124 0122     		movs	r2, #1
+ 475 0126 217B     		ldrb	r1, [r4, #12]	@ zero_extendqisi2
+ 476 0128 04F13800 		add	r0, r4, #56
+ 477 012c FFF7FEFF 		bl	arm_mat_init_f32
+ 478              	.LVL39:
+ 176:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     {
+ 479              		.loc 1 176 5 view .LVU165
+ 176:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     {
+ 480              		.loc 1 176 8 is_stmt 0 view .LVU166
+ 481 0130 B9F1000F 		cmp	r9, #0
+ 482 0134 40F04A81 		bne	.L15
+ 483              	.L12:
+ 185:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->z_data, 0, sizeof_float * zSize);
+ 484              		.loc 1 185 5 is_stmt 1 view .LVU167
+ 185:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->z_data, 0, sizeof_float * zSize);
+ 485              		.loc 1 185 52 is_stmt 0 view .LVU168
+ 486 0138 DFF88C82 		ldr	r8, .L17+4
+ 487 013c B8F80070 		ldrh	r7, [r8]
+ 488 0140 06FB07F7 		mul	r7, r6, r7
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccmkfrD3.s 			page 19
+
+
+ 185:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->z_data, 0, sizeof_float * zSize);
+ 489              		.loc 1 185 27 view .LVU169
+ 490 0144 3846     		mov	r0, r7
+ 491 0146 FFF7FEFF 		bl	malloc
+ 492              	.LVL40:
+ 185:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->z_data, 0, sizeof_float * zSize);
+ 493              		.loc 1 185 16 view .LVU170
+ 494 014a C4F8F400 		str	r0, [r4, #244]
+ 186:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     Matrix_Init(&kf->z, kf->zSize, 1, (float *)kf->z_data);
+ 495              		.loc 1 186 5 is_stmt 1 view .LVU171
+ 496 014e 3A46     		mov	r2, r7
+ 497 0150 0021     		movs	r1, #0
+ 498 0152 FFF7FEFF 		bl	memset
+ 499              	.LVL41:
+ 187:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 500              		.loc 1 187 5 view .LVU172
+ 501 0156 D4F8F430 		ldr	r3, [r4, #244]
+ 502 015a 0122     		movs	r2, #1
+ 503 015c A17B     		ldrb	r1, [r4, #14]	@ zero_extendqisi2
+ 504 015e 04F14800 		add	r0, r4, #72
+ 505 0162 FFF7FEFF 		bl	arm_mat_init_f32
+ 506              	.LVL42:
+ 190:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->P_data, 0, sizeof_float * xhatSize * xhatSize);
+ 507              		.loc 1 190 5 view .LVU173
+ 190:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->P_data, 0, sizeof_float * xhatSize * xhatSize);
+ 508              		.loc 1 190 52 is_stmt 0 view .LVU174
+ 509 0166 B8F80070 		ldrh	r7, [r8]
+ 510 016a 05FB07F7 		mul	r7, r5, r7
+ 190:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->P_data, 0, sizeof_float * xhatSize * xhatSize);
+ 511              		.loc 1 190 63 view .LVU175
+ 512 016e 05FB07F7 		mul	r7, r5, r7
+ 190:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->P_data, 0, sizeof_float * xhatSize * xhatSize);
+ 513              		.loc 1 190 27 view .LVU176
+ 514 0172 3846     		mov	r0, r7
+ 515 0174 FFF7FEFF 		bl	malloc
+ 516              	.LVL43:
+ 190:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->P_data, 0, sizeof_float * xhatSize * xhatSize);
+ 517              		.loc 1 190 16 view .LVU177
+ 518 0178 C4F8F800 		str	r0, [r4, #248]
+ 191:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     Matrix_Init(&kf->P, kf->xhatSize, kf->xhatSize, (float *)kf->P_data);
+ 519              		.loc 1 191 5 is_stmt 1 view .LVU178
+ 520 017c 3A46     		mov	r2, r7
+ 521 017e 0021     		movs	r1, #0
+ 522 0180 FFF7FEFF 		bl	memset
+ 523              	.LVL44:
+ 192:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 524              		.loc 1 192 5 view .LVU179
+ 525 0184 217B     		ldrb	r1, [r4, #12]	@ zero_extendqisi2
+ 526 0186 D4F8F830 		ldr	r3, [r4, #248]
+ 527 018a 0A46     		mov	r2, r1
+ 528 018c 04F15000 		add	r0, r4, #80
+ 529 0190 FFF7FEFF 		bl	arm_mat_init_f32
+ 530              	.LVL45:
+ 195:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->Pminus_data, 0, sizeof_float * xhatSize * xhatSize);
+ 531              		.loc 1 195 5 view .LVU180
+ 195:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->Pminus_data, 0, sizeof_float * xhatSize * xhatSize);
+ 532              		.loc 1 195 57 is_stmt 0 view .LVU181
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccmkfrD3.s 			page 20
+
+
+ 533 0194 B8F80070 		ldrh	r7, [r8]
+ 534 0198 05FB07F7 		mul	r7, r5, r7
+ 195:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->Pminus_data, 0, sizeof_float * xhatSize * xhatSize);
+ 535              		.loc 1 195 68 view .LVU182
+ 536 019c 05FB07F7 		mul	r7, r5, r7
+ 195:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->Pminus_data, 0, sizeof_float * xhatSize * xhatSize);
+ 537              		.loc 1 195 32 view .LVU183
+ 538 01a0 3846     		mov	r0, r7
+ 539 01a2 FFF7FEFF 		bl	malloc
+ 540              	.LVL46:
+ 195:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->Pminus_data, 0, sizeof_float * xhatSize * xhatSize);
+ 541              		.loc 1 195 21 view .LVU184
+ 542 01a6 C4F8FC00 		str	r0, [r4, #252]
+ 196:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     Matrix_Init(&kf->Pminus, kf->xhatSize, kf->xhatSize, (float *)kf->Pminus_data);
+ 543              		.loc 1 196 5 is_stmt 1 view .LVU185
+ 544 01aa 3A46     		mov	r2, r7
+ 545 01ac 0021     		movs	r1, #0
+ 546 01ae FFF7FEFF 		bl	memset
+ 547              	.LVL47:
+ 197:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 548              		.loc 1 197 5 view .LVU186
+ 549 01b2 217B     		ldrb	r1, [r4, #12]	@ zero_extendqisi2
+ 550 01b4 D4F8FC30 		ldr	r3, [r4, #252]
+ 551 01b8 0A46     		mov	r2, r1
+ 552 01ba 04F15800 		add	r0, r4, #88
+ 553 01be FFF7FEFF 		bl	arm_mat_init_f32
+ 554              	.LVL48:
+ 200:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->FT_data = (float *)user_malloc(sizeof_float * xhatSize * xhatSize);
+ 555              		.loc 1 200 5 view .LVU187
+ 200:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->FT_data = (float *)user_malloc(sizeof_float * xhatSize * xhatSize);
+ 556              		.loc 1 200 52 is_stmt 0 view .LVU188
+ 557 01c2 B8F80070 		ldrh	r7, [r8]
+ 558 01c6 05FB07F7 		mul	r7, r5, r7
+ 200:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->FT_data = (float *)user_malloc(sizeof_float * xhatSize * xhatSize);
+ 559              		.loc 1 200 63 view .LVU189
+ 560 01ca 05FB07F7 		mul	r7, r5, r7
+ 200:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->FT_data = (float *)user_malloc(sizeof_float * xhatSize * xhatSize);
+ 561              		.loc 1 200 27 view .LVU190
+ 562 01ce 3846     		mov	r0, r7
+ 563 01d0 FFF7FEFF 		bl	malloc
+ 564              	.LVL49:
+ 565 01d4 8246     		mov	r10, r0
+ 200:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->FT_data = (float *)user_malloc(sizeof_float * xhatSize * xhatSize);
+ 566              		.loc 1 200 16 view .LVU191
+ 567 01d6 C4F80001 		str	r0, [r4, #256]
+ 201:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->F_data, 0, sizeof_float * xhatSize * xhatSize);
+ 568              		.loc 1 201 5 is_stmt 1 view .LVU192
+ 201:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->F_data, 0, sizeof_float * xhatSize * xhatSize);
+ 569              		.loc 1 201 28 is_stmt 0 view .LVU193
+ 570 01da 3846     		mov	r0, r7
+ 571 01dc FFF7FEFF 		bl	malloc
+ 572              	.LVL50:
+ 201:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->F_data, 0, sizeof_float * xhatSize * xhatSize);
+ 573              		.loc 1 201 17 view .LVU194
+ 574 01e0 C4F80401 		str	r0, [r4, #260]
+ 202:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->FT_data, 0, sizeof_float * xhatSize * xhatSize);
+ 575              		.loc 1 202 5 is_stmt 1 view .LVU195
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccmkfrD3.s 			page 21
+
+
+ 576 01e4 3A46     		mov	r2, r7
+ 577 01e6 0021     		movs	r1, #0
+ 578 01e8 5046     		mov	r0, r10
+ 579 01ea FFF7FEFF 		bl	memset
+ 580              	.LVL51:
+ 203:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     Matrix_Init(&kf->F, kf->xhatSize, kf->xhatSize, (float *)kf->F_data);
+ 581              		.loc 1 203 5 view .LVU196
+ 203:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     Matrix_Init(&kf->F, kf->xhatSize, kf->xhatSize, (float *)kf->F_data);
+ 582              		.loc 1 203 41 is_stmt 0 view .LVU197
+ 583 01ee B8F80020 		ldrh	r2, [r8]
+ 584 01f2 05FB02F2 		mul	r2, r5, r2
+ 203:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     Matrix_Init(&kf->F, kf->xhatSize, kf->xhatSize, (float *)kf->F_data);
+ 585              		.loc 1 203 5 view .LVU198
+ 586 01f6 05FB02F2 		mul	r2, r5, r2
+ 587 01fa 0021     		movs	r1, #0
+ 588 01fc D4F80401 		ldr	r0, [r4, #260]
+ 589 0200 FFF7FEFF 		bl	memset
+ 590              	.LVL52:
+ 204:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     Matrix_Init(&kf->FT, kf->xhatSize, kf->xhatSize, (float *)kf->FT_data);
+ 591              		.loc 1 204 5 is_stmt 1 view .LVU199
+ 592 0204 217B     		ldrb	r1, [r4, #12]	@ zero_extendqisi2
+ 593 0206 D4F80031 		ldr	r3, [r4, #256]
+ 594 020a 0A46     		mov	r2, r1
+ 595 020c 04F16000 		add	r0, r4, #96
+ 596 0210 FFF7FEFF 		bl	arm_mat_init_f32
+ 597              	.LVL53:
+ 205:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 598              		.loc 1 205 5 view .LVU200
+ 599 0214 217B     		ldrb	r1, [r4, #12]	@ zero_extendqisi2
+ 600 0216 D4F80431 		ldr	r3, [r4, #260]
+ 601 021a 0A46     		mov	r2, r1
+ 602 021c 04F16800 		add	r0, r4, #104
+ 603 0220 FFF7FEFF 		bl	arm_mat_init_f32
+ 604              	.LVL54:
+ 207:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     {
+ 605              		.loc 1 207 5 view .LVU201
+ 207:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     {
+ 606              		.loc 1 207 8 is_stmt 0 view .LVU202
+ 607 0224 B9F1000F 		cmp	r9, #0
+ 608 0228 40F0E680 		bne	.L16
+ 609              	.L13:
+ 216:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->HT_data = (float *)user_malloc(sizeof_float * xhatSize * zSize);
+ 610              		.loc 1 216 5 is_stmt 1 view .LVU203
+ 216:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->HT_data = (float *)user_malloc(sizeof_float * xhatSize * zSize);
+ 611              		.loc 1 216 52 is_stmt 0 view .LVU204
+ 612 022c 664F     		ldr	r7, .L17+4
+ 613 022e B7F800A0 		ldrh	r10, [r7]
+ 614 0232 0AFB06F9 		mul	r9, r10, r6
+ 216:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->HT_data = (float *)user_malloc(sizeof_float * xhatSize * zSize);
+ 615              		.loc 1 216 60 view .LVU205
+ 616 0236 09FB05F9 		mul	r9, r9, r5
+ 216:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->HT_data = (float *)user_malloc(sizeof_float * xhatSize * zSize);
+ 617              		.loc 1 216 27 view .LVU206
+ 618 023a 4846     		mov	r0, r9
+ 619 023c FFF7FEFF 		bl	malloc
+ 620              	.LVL55:
+ 621 0240 8046     		mov	r8, r0
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccmkfrD3.s 			page 22
+
+
+ 216:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->HT_data = (float *)user_malloc(sizeof_float * xhatSize * zSize);
+ 622              		.loc 1 216 16 view .LVU207
+ 623 0242 C4F80C01 		str	r0, [r4, #268]
+ 217:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->H_data, 0, sizeof_float * zSize * xhatSize);
+ 624              		.loc 1 217 5 is_stmt 1 view .LVU208
+ 217:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->H_data, 0, sizeof_float * zSize * xhatSize);
+ 625              		.loc 1 217 53 is_stmt 0 view .LVU209
+ 626 0246 0AFB05F0 		mul	r0, r10, r5
+ 217:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->H_data, 0, sizeof_float * zSize * xhatSize);
+ 627              		.loc 1 217 28 view .LVU210
+ 628 024a 06FB00F0 		mul	r0, r6, r0
+ 629 024e FFF7FEFF 		bl	malloc
+ 630              	.LVL56:
+ 217:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->H_data, 0, sizeof_float * zSize * xhatSize);
+ 631              		.loc 1 217 17 view .LVU211
+ 632 0252 C4F81001 		str	r0, [r4, #272]
+ 218:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->HT_data, 0, sizeof_float * xhatSize * zSize);
+ 633              		.loc 1 218 5 is_stmt 1 view .LVU212
+ 634 0256 4A46     		mov	r2, r9
+ 635 0258 0021     		movs	r1, #0
+ 636 025a 4046     		mov	r0, r8
+ 637 025c FFF7FEFF 		bl	memset
+ 638              	.LVL57:
+ 219:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     Matrix_Init(&kf->H, kf->zSize, kf->xhatSize, (float *)kf->H_data);
+ 639              		.loc 1 219 5 view .LVU213
+ 219:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     Matrix_Init(&kf->H, kf->zSize, kf->xhatSize, (float *)kf->H_data);
+ 640              		.loc 1 219 41 is_stmt 0 view .LVU214
+ 641 0260 3A88     		ldrh	r2, [r7]
+ 642 0262 05FB02F2 		mul	r2, r5, r2
+ 219:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     Matrix_Init(&kf->H, kf->zSize, kf->xhatSize, (float *)kf->H_data);
+ 643              		.loc 1 219 5 view .LVU215
+ 644 0266 06FB02F2 		mul	r2, r6, r2
+ 645 026a 0021     		movs	r1, #0
+ 646 026c D4F81001 		ldr	r0, [r4, #272]
+ 647 0270 FFF7FEFF 		bl	memset
+ 648              	.LVL58:
+ 220:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     Matrix_Init(&kf->HT, kf->xhatSize, kf->zSize, (float *)kf->HT_data);
+ 649              		.loc 1 220 5 is_stmt 1 view .LVU216
+ 650 0274 D4F80C31 		ldr	r3, [r4, #268]
+ 651 0278 227B     		ldrb	r2, [r4, #12]	@ zero_extendqisi2
+ 652 027a A17B     		ldrb	r1, [r4, #14]	@ zero_extendqisi2
+ 653 027c 04F17800 		add	r0, r4, #120
+ 654 0280 FFF7FEFF 		bl	arm_mat_init_f32
+ 655              	.LVL59:
+ 221:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 656              		.loc 1 221 5 view .LVU217
+ 657 0284 D4F81031 		ldr	r3, [r4, #272]
+ 658 0288 A27B     		ldrb	r2, [r4, #14]	@ zero_extendqisi2
+ 659 028a 217B     		ldrb	r1, [r4, #12]	@ zero_extendqisi2
+ 660 028c 04F18000 		add	r0, r4, #128
+ 661 0290 FFF7FEFF 		bl	arm_mat_init_f32
+ 662              	.LVL60:
+ 224:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->Q_data, 0, sizeof_float * xhatSize * xhatSize);
+ 663              		.loc 1 224 5 view .LVU218
+ 224:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->Q_data, 0, sizeof_float * xhatSize * xhatSize);
+ 664              		.loc 1 224 52 is_stmt 0 view .LVU219
+ 665 0294 B7F80080 		ldrh	r8, [r7]
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccmkfrD3.s 			page 23
+
+
+ 666 0298 05FB08F8 		mul	r8, r5, r8
+ 224:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->Q_data, 0, sizeof_float * xhatSize * xhatSize);
+ 667              		.loc 1 224 63 view .LVU220
+ 668 029c 08FB05F8 		mul	r8, r8, r5
+ 224:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->Q_data, 0, sizeof_float * xhatSize * xhatSize);
+ 669              		.loc 1 224 27 view .LVU221
+ 670 02a0 4046     		mov	r0, r8
+ 671 02a2 FFF7FEFF 		bl	malloc
+ 672              	.LVL61:
+ 224:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->Q_data, 0, sizeof_float * xhatSize * xhatSize);
+ 673              		.loc 1 224 16 view .LVU222
+ 674 02a6 C4F81401 		str	r0, [r4, #276]
+ 225:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     Matrix_Init(&kf->Q, kf->xhatSize, kf->xhatSize, (float *)kf->Q_data);
+ 675              		.loc 1 225 5 is_stmt 1 view .LVU223
+ 676 02aa 4246     		mov	r2, r8
+ 677 02ac 0021     		movs	r1, #0
+ 678 02ae FFF7FEFF 		bl	memset
+ 679              	.LVL62:
+ 226:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 680              		.loc 1 226 5 view .LVU224
+ 681 02b2 217B     		ldrb	r1, [r4, #12]	@ zero_extendqisi2
+ 682 02b4 D4F81431 		ldr	r3, [r4, #276]
+ 683 02b8 0A46     		mov	r2, r1
+ 684 02ba 04F18800 		add	r0, r4, #136
+ 685 02be FFF7FEFF 		bl	arm_mat_init_f32
+ 686              	.LVL63:
+ 229:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->R_data, 0, sizeof_float * zSize * zSize);
+ 687              		.loc 1 229 5 view .LVU225
+ 229:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->R_data, 0, sizeof_float * zSize * zSize);
+ 688              		.loc 1 229 52 is_stmt 0 view .LVU226
+ 689 02c2 B7F80080 		ldrh	r8, [r7]
+ 690 02c6 06FB08F8 		mul	r8, r6, r8
+ 229:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->R_data, 0, sizeof_float * zSize * zSize);
+ 691              		.loc 1 229 60 view .LVU227
+ 692 02ca 08FB06F8 		mul	r8, r8, r6
+ 229:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->R_data, 0, sizeof_float * zSize * zSize);
+ 693              		.loc 1 229 27 view .LVU228
+ 694 02ce 4046     		mov	r0, r8
+ 695 02d0 FFF7FEFF 		bl	malloc
+ 696              	.LVL64:
+ 229:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->R_data, 0, sizeof_float * zSize * zSize);
+ 697              		.loc 1 229 16 view .LVU229
+ 698 02d4 C4F81801 		str	r0, [r4, #280]
+ 230:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     Matrix_Init(&kf->R, kf->zSize, kf->zSize, (float *)kf->R_data);
+ 699              		.loc 1 230 5 is_stmt 1 view .LVU230
+ 700 02d8 4246     		mov	r2, r8
+ 701 02da 0021     		movs	r1, #0
+ 702 02dc FFF7FEFF 		bl	memset
+ 703              	.LVL65:
+ 231:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 704              		.loc 1 231 5 view .LVU231
+ 705 02e0 A17B     		ldrb	r1, [r4, #14]	@ zero_extendqisi2
+ 706 02e2 D4F81831 		ldr	r3, [r4, #280]
+ 707 02e6 0A46     		mov	r2, r1
+ 708 02e8 04F19000 		add	r0, r4, #144
+ 709 02ec FFF7FEFF 		bl	arm_mat_init_f32
+ 710              	.LVL66:
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccmkfrD3.s 			page 24
+
+
+ 234:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->K_data, 0, sizeof_float * xhatSize * zSize);
+ 711              		.loc 1 234 5 view .LVU232
+ 234:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->K_data, 0, sizeof_float * xhatSize * zSize);
+ 712              		.loc 1 234 52 is_stmt 0 view .LVU233
+ 713 02f0 3988     		ldrh	r1, [r7]
+ 714 02f2 01FB05F5 		mul	r5, r1, r5
+ 234:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->K_data, 0, sizeof_float * xhatSize * zSize);
+ 715              		.loc 1 234 63 view .LVU234
+ 716 02f6 05FB06F6 		mul	r6, r5, r6
+ 234:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->K_data, 0, sizeof_float * xhatSize * zSize);
+ 717              		.loc 1 234 27 view .LVU235
+ 718 02fa 3046     		mov	r0, r6
+ 719 02fc FFF7FEFF 		bl	malloc
+ 720              	.LVL67:
+ 234:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     memset(kf->K_data, 0, sizeof_float * xhatSize * zSize);
+ 721              		.loc 1 234 16 view .LVU236
+ 722 0300 C4F81C01 		str	r0, [r4, #284]
+ 235:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     Matrix_Init(&kf->K, kf->xhatSize, kf->zSize, (float *)kf->K_data);
+ 723              		.loc 1 235 5 is_stmt 1 view .LVU237
+ 724 0304 3246     		mov	r2, r6
+ 725 0306 0021     		movs	r1, #0
+ 726 0308 FFF7FEFF 		bl	memset
+ 727              	.LVL68:
+ 236:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 728              		.loc 1 236 5 view .LVU238
+ 729 030c D4F81C31 		ldr	r3, [r4, #284]
+ 730 0310 A27B     		ldrb	r2, [r4, #14]	@ zero_extendqisi2
+ 731 0312 217B     		ldrb	r1, [r4, #12]	@ zero_extendqisi2
+ 732 0314 04F19800 		add	r0, r4, #152
+ 733 0318 FFF7FEFF 		bl	arm_mat_init_f32
+ 734              	.LVL69:
+ 238:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->temp_matrix_data = (float *)user_malloc(sizeof_float * kf->xhatSize * kf->xhatSize);
+ 735              		.loc 1 238 5 view .LVU239
+ 238:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->temp_matrix_data = (float *)user_malloc(sizeof_float * kf->xhatSize * kf->xhatSize);
+ 736              		.loc 1 238 56 is_stmt 0 view .LVU240
+ 737 031c 267B     		ldrb	r6, [r4, #12]	@ zero_extendqisi2
+ 238:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->temp_matrix_data = (float *)user_malloc(sizeof_float * kf->xhatSize * kf->xhatSize);
+ 738              		.loc 1 238 52 view .LVU241
+ 739 031e 3F88     		ldrh	r7, [r7]
+ 740 0320 06FB07F7 		mul	r7, r6, r7
+ 238:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->temp_matrix_data = (float *)user_malloc(sizeof_float * kf->xhatSize * kf->xhatSize);
+ 741              		.loc 1 238 67 view .LVU242
+ 742 0324 07FB06F5 		mul	r5, r7, r6
+ 238:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->temp_matrix_data = (float *)user_malloc(sizeof_float * kf->xhatSize * kf->xhatSize);
+ 743              		.loc 1 238 27 view .LVU243
+ 744 0328 2846     		mov	r0, r5
+ 745 032a FFF7FEFF 		bl	malloc
+ 746              	.LVL70:
+ 747 032e 8046     		mov	r8, r0
+ 238:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->temp_matrix_data = (float *)user_malloc(sizeof_float * kf->xhatSize * kf->xhatSize);
+ 748              		.loc 1 238 16 view .LVU244
+ 749 0330 C4F82001 		str	r0, [r4, #288]
+ 239:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->temp_matrix_data1 = (float *)user_malloc(sizeof_float * kf->xhatSize * kf->xhatSize);
+ 750              		.loc 1 239 5 is_stmt 1 view .LVU245
+ 239:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->temp_matrix_data1 = (float *)user_malloc(sizeof_float * kf->xhatSize * kf->xhatSize);
+ 751              		.loc 1 239 37 is_stmt 0 view .LVU246
+ 752 0334 2846     		mov	r0, r5
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccmkfrD3.s 			page 25
+
+
+ 753 0336 FFF7FEFF 		bl	malloc
+ 754              	.LVL71:
+ 239:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->temp_matrix_data1 = (float *)user_malloc(sizeof_float * kf->xhatSize * kf->xhatSize);
+ 755              		.loc 1 239 26 view .LVU247
+ 756 033a C4F82401 		str	r0, [r4, #292]
+ 240:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->temp_vector_data = (float *)user_malloc(sizeof_float * kf->xhatSize);
+ 757              		.loc 1 240 5 is_stmt 1 view .LVU248
+ 240:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->temp_vector_data = (float *)user_malloc(sizeof_float * kf->xhatSize);
+ 758              		.loc 1 240 38 is_stmt 0 view .LVU249
+ 759 033e 2846     		mov	r0, r5
+ 760 0340 FFF7FEFF 		bl	malloc
+ 761              	.LVL72:
+ 240:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->temp_vector_data = (float *)user_malloc(sizeof_float * kf->xhatSize);
+ 762              		.loc 1 240 27 view .LVU250
+ 763 0344 C4F82801 		str	r0, [r4, #296]
+ 241:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->temp_vector_data1 = (float *)user_malloc(sizeof_float * kf->xhatSize);
+ 764              		.loc 1 241 5 is_stmt 1 view .LVU251
+ 241:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->temp_vector_data1 = (float *)user_malloc(sizeof_float * kf->xhatSize);
+ 765              		.loc 1 241 37 is_stmt 0 view .LVU252
+ 766 0348 3846     		mov	r0, r7
+ 767 034a FFF7FEFF 		bl	malloc
+ 768              	.LVL73:
+ 241:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->temp_vector_data1 = (float *)user_malloc(sizeof_float * kf->xhatSize);
+ 769              		.loc 1 241 26 view .LVU253
+ 770 034e C4F82C01 		str	r0, [r4, #300]
+ 242:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     Matrix_Init(&kf->S, kf->xhatSize, kf->xhatSize, (float *)kf->S_data);
+ 771              		.loc 1 242 5 is_stmt 1 view .LVU254
+ 242:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     Matrix_Init(&kf->S, kf->xhatSize, kf->xhatSize, (float *)kf->S_data);
+ 772              		.loc 1 242 38 is_stmt 0 view .LVU255
+ 773 0352 3846     		mov	r0, r7
+ 774 0354 FFF7FEFF 		bl	malloc
+ 775              	.LVL74:
+ 242:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     Matrix_Init(&kf->S, kf->xhatSize, kf->xhatSize, (float *)kf->S_data);
+ 776              		.loc 1 242 27 view .LVU256
+ 777 0358 C4F83001 		str	r0, [r4, #304]
+ 243:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     Matrix_Init(&kf->temp_matrix, kf->xhatSize, kf->xhatSize, (float *)kf->temp_matrix_data);
+ 778              		.loc 1 243 5 is_stmt 1 view .LVU257
+ 779 035c B1B2     		uxth	r1, r6
+ 780 035e 4346     		mov	r3, r8
+ 781 0360 0A46     		mov	r2, r1
+ 782 0362 04F1A000 		add	r0, r4, #160
+ 783 0366 FFF7FEFF 		bl	arm_mat_init_f32
+ 784              	.LVL75:
+ 244:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     Matrix_Init(&kf->temp_matrix1, kf->xhatSize, kf->xhatSize, (float *)kf->temp_matrix_data1);
+ 785              		.loc 1 244 5 view .LVU258
+ 786 036a 217B     		ldrb	r1, [r4, #12]	@ zero_extendqisi2
+ 787 036c D4F82431 		ldr	r3, [r4, #292]
+ 788 0370 0A46     		mov	r2, r1
+ 789 0372 04F1A800 		add	r0, r4, #168
+ 790 0376 FFF7FEFF 		bl	arm_mat_init_f32
+ 791              	.LVL76:
+ 245:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     Matrix_Init(&kf->temp_vector, kf->xhatSize, 1, (float *)kf->temp_vector_data);
+ 792              		.loc 1 245 5 view .LVU259
+ 793 037a 217B     		ldrb	r1, [r4, #12]	@ zero_extendqisi2
+ 794 037c D4F82831 		ldr	r3, [r4, #296]
+ 795 0380 0A46     		mov	r2, r1
+ 796 0382 04F1B000 		add	r0, r4, #176
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccmkfrD3.s 			page 26
+
+
+ 797 0386 FFF7FEFF 		bl	arm_mat_init_f32
+ 798              	.LVL77:
+ 246:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     Matrix_Init(&kf->temp_vector1, kf->xhatSize, 1, (float *)kf->temp_vector_data1);
+ 799              		.loc 1 246 5 view .LVU260
+ 800 038a D4F82C31 		ldr	r3, [r4, #300]
+ 801 038e 0122     		movs	r2, #1
+ 802 0390 217B     		ldrb	r1, [r4, #12]	@ zero_extendqisi2
+ 803 0392 04F1B800 		add	r0, r4, #184
+ 804 0396 FFF7FEFF 		bl	arm_mat_init_f32
+ 805              	.LVL78:
+ 247:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 806              		.loc 1 247 5 view .LVU261
+ 807 039a D4F83031 		ldr	r3, [r4, #304]
+ 808 039e 0122     		movs	r2, #1
+ 809 03a0 217B     		ldrb	r1, [r4, #12]	@ zero_extendqisi2
+ 810 03a2 04F1C000 		add	r0, r4, #192
+ 811 03a6 FFF7FEFF 		bl	arm_mat_init_f32
+ 812              	.LVL79:
+ 249:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->SkipEq2 = 0;
+ 813              		.loc 1 249 5 view .LVU262
+ 249:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->SkipEq2 = 0;
+ 814              		.loc 1 249 17 is_stmt 0 view .LVU263
+ 815 03aa 0023     		movs	r3, #0
+ 816 03ac 84F82830 		strb	r3, [r4, #40]
+ 250:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->SkipEq3 = 0;
+ 817              		.loc 1 250 5 is_stmt 1 view .LVU264
+ 250:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->SkipEq3 = 0;
+ 818              		.loc 1 250 17 is_stmt 0 view .LVU265
+ 819 03b0 84F82930 		strb	r3, [r4, #41]
+ 251:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->SkipEq4 = 0;
+ 820              		.loc 1 251 5 is_stmt 1 view .LVU266
+ 251:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->SkipEq4 = 0;
+ 821              		.loc 1 251 17 is_stmt 0 view .LVU267
+ 822 03b4 84F82A30 		strb	r3, [r4, #42]
+ 252:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->SkipEq5 = 0;
+ 823              		.loc 1 252 5 is_stmt 1 view .LVU268
+ 252:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     kf->SkipEq5 = 0;
+ 824              		.loc 1 252 17 is_stmt 0 view .LVU269
+ 825 03b8 84F82B30 		strb	r3, [r4, #43]
+ 253:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** }
+ 826              		.loc 1 253 5 is_stmt 1 view .LVU270
+ 253:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** }
+ 827              		.loc 1 253 17 is_stmt 0 view .LVU271
+ 828 03bc 84F82C30 		strb	r3, [r4, #44]
+ 254:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 829              		.loc 1 254 1 view .LVU272
+ 830 03c0 BDE8F087 		pop	{r4, r5, r6, r7, r8, r9, r10, pc}
+ 831              	.LVL80:
+ 832              	.L18:
+ 254:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 833              		.loc 1 254 1 view .LVU273
+ 834              		.align	2
+ 835              	.L17:
+ 836 03c4 00000000 		.word	.LANCHOR1
+ 837 03c8 00000000 		.word	.LANCHOR0
+ 838              	.LVL81:
+ 839              	.L15:
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccmkfrD3.s 			page 27
+
+
+ 179:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         memset(kf->u_data, 0, sizeof_float * uSize);
+ 840              		.loc 1 179 9 is_stmt 1 view .LVU274
+ 179:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         memset(kf->u_data, 0, sizeof_float * uSize);
+ 841              		.loc 1 179 56 is_stmt 0 view .LVU275
+ 842 03cc 164B     		ldr	r3, .L19
+ 843 03ce 1F88     		ldrh	r7, [r3]
+ 844 03d0 09FB07F7 		mul	r7, r9, r7
+ 179:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         memset(kf->u_data, 0, sizeof_float * uSize);
+ 845              		.loc 1 179 31 view .LVU276
+ 846 03d4 3846     		mov	r0, r7
+ 847 03d6 FFF7FEFF 		bl	malloc
+ 848              	.LVL82:
+ 179:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         memset(kf->u_data, 0, sizeof_float * uSize);
+ 849              		.loc 1 179 20 view .LVU277
+ 850 03da C4F8F000 		str	r0, [r4, #240]
+ 180:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         Matrix_Init(&kf->u, kf->uSize, 1, (float *)kf->u_data);
+ 851              		.loc 1 180 9 is_stmt 1 view .LVU278
+ 852 03de 3A46     		mov	r2, r7
+ 853 03e0 0021     		movs	r1, #0
+ 854 03e2 FFF7FEFF 		bl	memset
+ 855              	.LVL83:
+ 181:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     }
+ 856              		.loc 1 181 9 view .LVU279
+ 857 03e6 D4F8F030 		ldr	r3, [r4, #240]
+ 858 03ea 0122     		movs	r2, #1
+ 859 03ec 617B     		ldrb	r1, [r4, #13]	@ zero_extendqisi2
+ 860 03ee 04F14000 		add	r0, r4, #64
+ 861 03f2 FFF7FEFF 		bl	arm_mat_init_f32
+ 862              	.LVL84:
+ 863 03f6 9FE6     		b	.L12
+ 864              	.L16:
+ 210:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         memset(kf->B_data, 0, sizeof_float * xhatSize * uSize);
+ 865              		.loc 1 210 9 view .LVU280
+ 210:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         memset(kf->B_data, 0, sizeof_float * xhatSize * uSize);
+ 866              		.loc 1 210 56 is_stmt 0 view .LVU281
+ 867 03f8 B8F80020 		ldrh	r2, [r8]
+ 868 03fc 05FB02F2 		mul	r2, r5, r2
+ 210:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         memset(kf->B_data, 0, sizeof_float * xhatSize * uSize);
+ 869              		.loc 1 210 67 view .LVU282
+ 870 0400 02FB09F9 		mul	r9, r2, r9
+ 210:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         memset(kf->B_data, 0, sizeof_float * xhatSize * uSize);
+ 871              		.loc 1 210 31 view .LVU283
+ 872 0404 4846     		mov	r0, r9
+ 873 0406 FFF7FEFF 		bl	malloc
+ 874              	.LVL85:
+ 210:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         memset(kf->B_data, 0, sizeof_float * xhatSize * uSize);
+ 875              		.loc 1 210 20 view .LVU284
+ 876 040a C4F80801 		str	r0, [r4, #264]
+ 211:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         Matrix_Init(&kf->B, kf->xhatSize, kf->uSize, (float *)kf->B_data);
+ 877              		.loc 1 211 9 is_stmt 1 view .LVU285
+ 878 040e 4A46     		mov	r2, r9
+ 879 0410 0021     		movs	r1, #0
+ 880 0412 FFF7FEFF 		bl	memset
+ 881              	.LVL86:
+ 212:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     }
+ 882              		.loc 1 212 9 view .LVU286
+ 883 0416 D4F80831 		ldr	r3, [r4, #264]
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccmkfrD3.s 			page 28
+
+
+ 884 041a 627B     		ldrb	r2, [r4, #13]	@ zero_extendqisi2
+ 885 041c 217B     		ldrb	r1, [r4, #12]	@ zero_extendqisi2
+ 886 041e 04F17000 		add	r0, r4, #112
+ 887 0422 FFF7FEFF 		bl	arm_mat_init_f32
+ 888              	.LVL87:
+ 889 0426 01E7     		b	.L13
+ 890              	.L20:
+ 891              		.align	2
+ 892              	.L19:
+ 893 0428 00000000 		.word	.LANCHOR0
+ 894              		.cfi_endproc
+ 895              	.LFE163:
+ 897              		.section	.text.Kalman_Filter_Measure,"ax",%progbits
+ 898              		.align	1
+ 899              		.global	Kalman_Filter_Measure
+ 900              		.syntax unified
+ 901              		.thumb
+ 902              		.thumb_func
+ 904              	Kalman_Filter_Measure:
+ 905              	.LVL88:
+ 906              	.LFB164:
+ 257:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     // æÿ’ÛH K R∏˘æ›¡ø≤‚«Èøˆ◊‘∂Øµ˜’˚
+ 907              		.loc 1 257 1 view -0
+ 908              		.cfi_startproc
+ 909              		@ args = 0, pretend = 0, frame = 0
+ 910              		@ frame_needed = 0, uses_anonymous_args = 0
+ 257:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     // æÿ’ÛH K R∏˘æ›¡ø≤‚«Èøˆ◊‘∂Øµ˜’˚
+ 911              		.loc 1 257 1 is_stmt 0 view .LVU288
+ 912 0000 38B5     		push	{r3, r4, r5, lr}
+ 913              	.LCFI2:
+ 914              		.cfi_def_cfa_offset 16
+ 915              		.cfi_offset 3, -16
+ 916              		.cfi_offset 4, -12
+ 917              		.cfi_offset 5, -8
+ 918              		.cfi_offset 14, -4
+ 919 0002 0446     		mov	r4, r0
+ 260:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         H_K_R_Adjustment(kf);
+ 920              		.loc 1 260 5 is_stmt 1 view .LVU289
+ 260:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         H_K_R_Adjustment(kf);
+ 921              		.loc 1 260 11 is_stmt 0 view .LVU290
+ 922 0004 C37B     		ldrb	r3, [r0, #15]	@ zero_extendqisi2
+ 260:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         H_K_R_Adjustment(kf);
+ 923              		.loc 1 260 8 view .LVU291
+ 924 0006 63B1     		cbz	r3, .L22
+ 261:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     else
+ 925              		.loc 1 261 9 is_stmt 1 view .LVU292
+ 926 0008 FFF7FEFF 		bl	H_K_R_Adjustment
+ 927              	.LVL89:
+ 928              	.L23:
+ 268:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** }
+ 929              		.loc 1 268 5 view .LVU293
+ 268:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** }
+ 930              		.loc 1 268 60 is_stmt 0 view .LVU294
+ 931 000c 627B     		ldrb	r2, [r4, #13]	@ zero_extendqisi2
+ 268:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** }
+ 932              		.loc 1 268 56 view .LVU295
+ 933 000e 0E4B     		ldr	r3, .L25
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccmkfrD3.s 			page 29
+
+
+ 934 0010 1B88     		ldrh	r3, [r3]
+ 268:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** }
+ 935              		.loc 1 268 5 view .LVU296
+ 936 0012 03FB02F2 		mul	r2, r3, r2
+ 937 0016 A168     		ldr	r1, [r4, #8]
+ 938 0018 D4F8F000 		ldr	r0, [r4, #240]
+ 939 001c FFF7FEFF 		bl	memcpy
+ 940              	.LVL90:
+ 269:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** void Kalman_Filter_xhatMinusUpdate(KalmanFilter_t *kf)
+ 941              		.loc 1 269 1 view .LVU297
+ 942 0020 38BD     		pop	{r3, r4, r5, pc}
+ 943              	.LVL91:
+ 944              	.L22:
+ 264:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         memset(kf->MeasuredVector, 0, sizeof_float * kf->zSize);
+ 945              		.loc 1 264 9 is_stmt 1 view .LVU298
+ 264:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         memset(kf->MeasuredVector, 0, sizeof_float * kf->zSize);
+ 946              		.loc 1 264 65 is_stmt 0 view .LVU299
+ 947 0022 827B     		ldrb	r2, [r0, #14]	@ zero_extendqisi2
+ 264:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         memset(kf->MeasuredVector, 0, sizeof_float * kf->zSize);
+ 948              		.loc 1 264 61 view .LVU300
+ 949 0024 084D     		ldr	r5, .L25
+ 950 0026 2B88     		ldrh	r3, [r5]
+ 264:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         memset(kf->MeasuredVector, 0, sizeof_float * kf->zSize);
+ 951              		.loc 1 264 9 view .LVU301
+ 952 0028 03FB02F2 		mul	r2, r3, r2
+ 953 002c 4168     		ldr	r1, [r0, #4]
+ 954 002e D0F8F400 		ldr	r0, [r0, #244]
+ 955              	.LVL92:
+ 264:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         memset(kf->MeasuredVector, 0, sizeof_float * kf->zSize);
+ 956              		.loc 1 264 9 view .LVU302
+ 957 0032 FFF7FEFF 		bl	memcpy
+ 958              	.LVL93:
+ 265:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     }
+ 959              		.loc 1 265 9 is_stmt 1 view .LVU303
+ 265:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     }
+ 960              		.loc 1 265 56 is_stmt 0 view .LVU304
+ 961 0036 A27B     		ldrb	r2, [r4, #14]	@ zero_extendqisi2
+ 265:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     }
+ 962              		.loc 1 265 52 view .LVU305
+ 963 0038 2B88     		ldrh	r3, [r5]
+ 265:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     }
+ 964              		.loc 1 265 9 view .LVU306
+ 965 003a 03FB02F2 		mul	r2, r3, r2
+ 966 003e 0021     		movs	r1, #0
+ 967 0040 6068     		ldr	r0, [r4, #4]
+ 968 0042 FFF7FEFF 		bl	memset
+ 969              	.LVL94:
+ 970 0046 E1E7     		b	.L23
+ 971              	.L26:
+ 972              		.align	2
+ 973              	.L25:
+ 974 0048 00000000 		.word	.LANCHOR0
+ 975              		.cfi_endproc
+ 976              	.LFE164:
+ 978              		.section	.text.Kalman_Filter_xhatMinusUpdate,"ax",%progbits
+ 979              		.align	1
+ 980              		.global	Kalman_Filter_xhatMinusUpdate
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccmkfrD3.s 			page 30
+
+
+ 981              		.syntax unified
+ 982              		.thumb
+ 983              		.thumb_func
+ 985              	Kalman_Filter_xhatMinusUpdate:
+ 986              	.LVL95:
+ 987              	.LFB165:
+ 271:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     if (!kf->SkipEq1)
+ 988              		.loc 1 271 1 is_stmt 1 view -0
+ 989              		.cfi_startproc
+ 990              		@ args = 0, pretend = 0, frame = 0
+ 991              		@ frame_needed = 0, uses_anonymous_args = 0
+ 272:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     {
+ 992              		.loc 1 272 5 view .LVU308
+ 272:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     {
+ 993              		.loc 1 272 12 is_stmt 0 view .LVU309
+ 994 0000 90F82830 		ldrb	r3, [r0, #40]	@ zero_extendqisi2
+ 272:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     {
+ 995              		.loc 1 272 8 view .LVU310
+ 996 0004 B3BB     		cbnz	r3, .L31
+ 271:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     if (!kf->SkipEq1)
+ 997              		.loc 1 271 1 view .LVU311
+ 998 0006 70B5     		push	{r4, r5, r6, lr}
+ 999              	.LCFI3:
+ 1000              		.cfi_def_cfa_offset 16
+ 1001              		.cfi_offset 4, -16
+ 1002              		.cfi_offset 5, -12
+ 1003              		.cfi_offset 6, -8
+ 1004              		.cfi_offset 14, -4
+ 1005 0008 0446     		mov	r4, r0
+ 274:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         {
+ 1006              		.loc 1 274 9 is_stmt 1 view .LVU312
+ 274:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         {
+ 1007              		.loc 1 274 15 is_stmt 0 view .LVU313
+ 1008 000a 437B     		ldrb	r3, [r0, #13]	@ zero_extendqisi2
+ 274:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         {
+ 1009              		.loc 1 274 12 view .LVU314
+ 1010 000c 43B3     		cbz	r3, .L29
+ 276:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****             kf->temp_vector.numCols = 1;
+ 1011              		.loc 1 276 13 is_stmt 1 view .LVU315
+ 276:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****             kf->temp_vector.numCols = 1;
+ 1012              		.loc 1 276 41 is_stmt 0 view .LVU316
+ 1013 000e 037B     		ldrb	r3, [r0, #12]	@ zero_extendqisi2
+ 276:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****             kf->temp_vector.numCols = 1;
+ 1014              		.loc 1 276 37 view .LVU317
+ 1015 0010 A0F8B830 		strh	r3, [r0, #184]	@ movhi
+ 277:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****             kf->MatStatus = Matrix_Multiply(&kf->F, &kf->xhat, &kf->temp_vector);
+ 1016              		.loc 1 277 13 is_stmt 1 view .LVU318
+ 277:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****             kf->MatStatus = Matrix_Multiply(&kf->F, &kf->xhat, &kf->temp_vector);
+ 1017              		.loc 1 277 37 is_stmt 0 view .LVU319
+ 1018 0014 0126     		movs	r6, #1
+ 1019 0016 A0F8BA60 		strh	r6, [r0, #186]	@ movhi
+ 278:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****             kf->temp_vector1.numRows = kf->xhatSize;
+ 1020              		.loc 1 278 13 is_stmt 1 view .LVU320
+ 278:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****             kf->temp_vector1.numRows = kf->xhatSize;
+ 1021              		.loc 1 278 29 is_stmt 0 view .LVU321
+ 1022 001a 00F1B805 		add	r5, r0, #184
+ 1023 001e 2A46     		mov	r2, r5
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccmkfrD3.s 			page 31
+
+
+ 1024 0020 00F13001 		add	r1, r0, #48
+ 1025 0024 6030     		adds	r0, r0, #96
+ 1026              	.LVL96:
+ 278:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****             kf->temp_vector1.numRows = kf->xhatSize;
+ 1027              		.loc 1 278 29 view .LVU322
+ 1028 0026 FFF7FEFF 		bl	arm_mat_mult_f32
+ 1029              	.LVL97:
+ 278:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****             kf->temp_vector1.numRows = kf->xhatSize;
+ 1030              		.loc 1 278 27 view .LVU323
+ 1031 002a 84F8C800 		strb	r0, [r4, #200]
+ 279:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****             kf->temp_vector1.numCols = 1;
+ 1032              		.loc 1 279 13 is_stmt 1 view .LVU324
+ 279:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****             kf->temp_vector1.numCols = 1;
+ 1033              		.loc 1 279 42 is_stmt 0 view .LVU325
+ 1034 002e 237B     		ldrb	r3, [r4, #12]	@ zero_extendqisi2
+ 279:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****             kf->temp_vector1.numCols = 1;
+ 1035              		.loc 1 279 38 view .LVU326
+ 1036 0030 A4F8C030 		strh	r3, [r4, #192]	@ movhi
+ 280:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****             kf->MatStatus = Matrix_Multiply(&kf->B, &kf->u, &kf->temp_vector1);
+ 1037              		.loc 1 280 13 is_stmt 1 view .LVU327
+ 280:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****             kf->MatStatus = Matrix_Multiply(&kf->B, &kf->u, &kf->temp_vector1);
+ 1038              		.loc 1 280 38 is_stmt 0 view .LVU328
+ 1039 0034 A4F8C260 		strh	r6, [r4, #194]	@ movhi
+ 281:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****             kf->MatStatus = Matrix_Add(&kf->temp_vector, &kf->temp_vector1, &kf->xhatminus);
+ 1040              		.loc 1 281 13 is_stmt 1 view .LVU329
+ 281:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****             kf->MatStatus = Matrix_Add(&kf->temp_vector, &kf->temp_vector1, &kf->xhatminus);
+ 1041              		.loc 1 281 29 is_stmt 0 view .LVU330
+ 1042 0038 04F1C006 		add	r6, r4, #192
+ 1043 003c 3246     		mov	r2, r6
+ 1044 003e 04F14001 		add	r1, r4, #64
+ 1045 0042 04F17000 		add	r0, r4, #112
+ 1046 0046 FFF7FEFF 		bl	arm_mat_mult_f32
+ 1047              	.LVL98:
+ 281:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****             kf->MatStatus = Matrix_Add(&kf->temp_vector, &kf->temp_vector1, &kf->xhatminus);
+ 1048              		.loc 1 281 27 view .LVU331
+ 1049 004a 84F8C800 		strb	r0, [r4, #200]
+ 282:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         }
+ 1050              		.loc 1 282 13 is_stmt 1 view .LVU332
+ 282:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         }
+ 1051              		.loc 1 282 29 is_stmt 0 view .LVU333
+ 1052 004e 04F13802 		add	r2, r4, #56
+ 1053 0052 3146     		mov	r1, r6
+ 1054 0054 2846     		mov	r0, r5
+ 1055 0056 FFF7FEFF 		bl	arm_mat_add_f32
+ 1056              	.LVL99:
+ 282:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         }
+ 1057              		.loc 1 282 27 view .LVU334
+ 1058 005a 84F8C800 		strb	r0, [r4, #200]
+ 1059              	.L27:
+ 289:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** void Kalman_Filter_PminusUpdate(KalmanFilter_t *kf)
+ 1060              		.loc 1 289 1 view .LVU335
+ 1061 005e 70BD     		pop	{r4, r5, r6, pc}
+ 1062              	.LVL100:
+ 1063              	.L29:
+ 286:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         }
+ 1064              		.loc 1 286 13 is_stmt 1 view .LVU336
+ 286:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         }
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccmkfrD3.s 			page 32
+
+
+ 1065              		.loc 1 286 29 is_stmt 0 view .LVU337
+ 1066 0060 00F13802 		add	r2, r0, #56
+ 1067 0064 00F13001 		add	r1, r0, #48
+ 1068 0068 6030     		adds	r0, r0, #96
+ 1069              	.LVL101:
+ 286:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         }
+ 1070              		.loc 1 286 29 view .LVU338
+ 1071 006a FFF7FEFF 		bl	arm_mat_mult_f32
+ 1072              	.LVL102:
+ 286:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         }
+ 1073              		.loc 1 286 27 view .LVU339
+ 1074 006e 84F8C800 		strb	r0, [r4, #200]
+ 289:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** void Kalman_Filter_PminusUpdate(KalmanFilter_t *kf)
+ 1075              		.loc 1 289 1 view .LVU340
+ 1076 0072 F4E7     		b	.L27
+ 1077              	.LVL103:
+ 1078              	.L31:
+ 1079              	.LCFI4:
+ 1080              		.cfi_def_cfa_offset 0
+ 1081              		.cfi_restore 4
+ 1082              		.cfi_restore 5
+ 1083              		.cfi_restore 6
+ 1084              		.cfi_restore 14
+ 289:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** void Kalman_Filter_PminusUpdate(KalmanFilter_t *kf)
+ 1085              		.loc 1 289 1 view .LVU341
+ 1086 0074 7047     		bx	lr
+ 1087              		.cfi_endproc
+ 1088              	.LFE165:
+ 1090              		.section	.text.Kalman_Filter_PminusUpdate,"ax",%progbits
+ 1091              		.align	1
+ 1092              		.global	Kalman_Filter_PminusUpdate
+ 1093              		.syntax unified
+ 1094              		.thumb
+ 1095              		.thumb_func
+ 1097              	Kalman_Filter_PminusUpdate:
+ 1098              	.LVL104:
+ 1099              	.LFB166:
+ 291:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     if (!kf->SkipEq2)
+ 1100              		.loc 1 291 1 is_stmt 1 view -0
+ 1101              		.cfi_startproc
+ 1102              		@ args = 0, pretend = 0, frame = 0
+ 1103              		@ frame_needed = 0, uses_anonymous_args = 0
+ 291:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     if (!kf->SkipEq2)
+ 1104              		.loc 1 291 1 is_stmt 0 view .LVU343
+ 1105 0000 F8B5     		push	{r3, r4, r5, r6, r7, lr}
+ 1106              	.LCFI5:
+ 1107              		.cfi_def_cfa_offset 24
+ 1108              		.cfi_offset 3, -24
+ 1109              		.cfi_offset 4, -20
+ 1110              		.cfi_offset 5, -16
+ 1111              		.cfi_offset 6, -12
+ 1112              		.cfi_offset 7, -8
+ 1113              		.cfi_offset 14, -4
+ 292:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     {
+ 1114              		.loc 1 292 5 is_stmt 1 view .LVU344
+ 292:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     {
+ 1115              		.loc 1 292 12 is_stmt 0 view .LVU345
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccmkfrD3.s 			page 33
+
+
+ 1116 0002 90F82930 		ldrb	r3, [r0, #41]	@ zero_extendqisi2
+ 292:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     {
+ 1117              		.loc 1 292 8 view .LVU346
+ 1118 0006 03B1     		cbz	r3, .L37
+ 1119              	.LVL105:
+ 1120              	.L34:
+ 301:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** void Kalman_Filter_SetK(KalmanFilter_t *kf)
+ 1121              		.loc 1 301 1 view .LVU347
+ 1122 0008 F8BD     		pop	{r3, r4, r5, r6, r7, pc}
+ 1123              	.LVL106:
+ 1124              	.L37:
+ 301:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** void Kalman_Filter_SetK(KalmanFilter_t *kf)
+ 1125              		.loc 1 301 1 view .LVU348
+ 1126 000a 0446     		mov	r4, r0
+ 294:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->MatStatus = Matrix_Multiply(&kf->F, &kf->P, &kf->Pminus);
+ 1127              		.loc 1 294 9 is_stmt 1 view .LVU349
+ 294:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->MatStatus = Matrix_Multiply(&kf->F, &kf->P, &kf->Pminus);
+ 1128              		.loc 1 294 42 is_stmt 0 view .LVU350
+ 1129 000c 00F16006 		add	r6, r0, #96
+ 294:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->MatStatus = Matrix_Multiply(&kf->F, &kf->P, &kf->Pminus);
+ 1130              		.loc 1 294 25 view .LVU351
+ 1131 0010 00F16807 		add	r7, r0, #104
+ 1132 0014 3946     		mov	r1, r7
+ 1133 0016 3046     		mov	r0, r6
+ 1134              	.LVL107:
+ 294:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->MatStatus = Matrix_Multiply(&kf->F, &kf->P, &kf->Pminus);
+ 1135              		.loc 1 294 25 view .LVU352
+ 1136 0018 FFF7FEFF 		bl	arm_mat_trans_f32
+ 1137              	.LVL108:
+ 294:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->MatStatus = Matrix_Multiply(&kf->F, &kf->P, &kf->Pminus);
+ 1138              		.loc 1 294 23 view .LVU353
+ 1139 001c 84F8C800 		strb	r0, [r4, #200]
+ 295:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->temp_matrix.numRows = kf->Pminus.numRows;
+ 1140              		.loc 1 295 9 is_stmt 1 view .LVU354
+ 295:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->temp_matrix.numRows = kf->Pminus.numRows;
+ 1141              		.loc 1 295 25 is_stmt 0 view .LVU355
+ 1142 0020 04F15805 		add	r5, r4, #88
+ 1143 0024 2A46     		mov	r2, r5
+ 1144 0026 04F15001 		add	r1, r4, #80
+ 1145 002a 3046     		mov	r0, r6
+ 1146 002c FFF7FEFF 		bl	arm_mat_mult_f32
+ 1147              	.LVL109:
+ 295:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->temp_matrix.numRows = kf->Pminus.numRows;
+ 1148              		.loc 1 295 23 view .LVU356
+ 1149 0030 84F8C800 		strb	r0, [r4, #200]
+ 296:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->temp_matrix.numCols = kf->FT.numCols;
+ 1150              		.loc 1 296 9 is_stmt 1 view .LVU357
+ 296:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->temp_matrix.numCols = kf->FT.numCols;
+ 1151              		.loc 1 296 45 is_stmt 0 view .LVU358
+ 1152 0034 B4F85830 		ldrh	r3, [r4, #88]
+ 296:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->temp_matrix.numCols = kf->FT.numCols;
+ 1153              		.loc 1 296 33 view .LVU359
+ 1154 0038 A4F8A830 		strh	r3, [r4, #168]	@ movhi
+ 297:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->MatStatus = Matrix_Multiply(&kf->Pminus, &kf->FT, &kf->temp_matrix); // temp_matrix = F
+ 1155              		.loc 1 297 9 is_stmt 1 view .LVU360
+ 297:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->MatStatus = Matrix_Multiply(&kf->Pminus, &kf->FT, &kf->temp_matrix); // temp_matrix = F
+ 1156              		.loc 1 297 41 is_stmt 0 view .LVU361
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccmkfrD3.s 			page 34
+
+
+ 1157 003c B4F86A30 		ldrh	r3, [r4, #106]
+ 297:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->MatStatus = Matrix_Multiply(&kf->Pminus, &kf->FT, &kf->temp_matrix); // temp_matrix = F
+ 1158              		.loc 1 297 33 view .LVU362
+ 1159 0040 A4F8AA30 		strh	r3, [r4, #170]	@ movhi
+ 298:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->MatStatus = Matrix_Add(&kf->temp_matrix, &kf->Q, &kf->Pminus);
+ 1160              		.loc 1 298 9 is_stmt 1 view .LVU363
+ 298:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->MatStatus = Matrix_Add(&kf->temp_matrix, &kf->Q, &kf->Pminus);
+ 1161              		.loc 1 298 25 is_stmt 0 view .LVU364
+ 1162 0044 04F1A806 		add	r6, r4, #168
+ 1163 0048 3246     		mov	r2, r6
+ 1164 004a 3946     		mov	r1, r7
+ 1165 004c 2846     		mov	r0, r5
+ 1166 004e FFF7FEFF 		bl	arm_mat_mult_f32
+ 1167              	.LVL110:
+ 298:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->MatStatus = Matrix_Add(&kf->temp_matrix, &kf->Q, &kf->Pminus);
+ 1168              		.loc 1 298 23 view .LVU365
+ 1169 0052 84F8C800 		strb	r0, [r4, #200]
+ 299:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     }
+ 1170              		.loc 1 299 9 is_stmt 1 view .LVU366
+ 299:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     }
+ 1171              		.loc 1 299 25 is_stmt 0 view .LVU367
+ 1172 0056 2A46     		mov	r2, r5
+ 1173 0058 04F18801 		add	r1, r4, #136
+ 1174 005c 3046     		mov	r0, r6
+ 1175 005e FFF7FEFF 		bl	arm_mat_add_f32
+ 1176              	.LVL111:
+ 299:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     }
+ 1177              		.loc 1 299 23 view .LVU368
+ 1178 0062 84F8C800 		strb	r0, [r4, #200]
+ 301:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** void Kalman_Filter_SetK(KalmanFilter_t *kf)
+ 1179              		.loc 1 301 1 view .LVU369
+ 1180 0066 CFE7     		b	.L34
+ 1181              		.cfi_endproc
+ 1182              	.LFE166:
+ 1184              		.section	.text.Kalman_Filter_SetK,"ax",%progbits
+ 1185              		.align	1
+ 1186              		.global	Kalman_Filter_SetK
+ 1187              		.syntax unified
+ 1188              		.thumb
+ 1189              		.thumb_func
+ 1191              	Kalman_Filter_SetK:
+ 1192              	.LVL112:
+ 1193              	.LFB167:
+ 303:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     if (!kf->SkipEq3)
+ 1194              		.loc 1 303 1 is_stmt 1 view -0
+ 1195              		.cfi_startproc
+ 1196              		@ args = 0, pretend = 0, frame = 0
+ 1197              		@ frame_needed = 0, uses_anonymous_args = 0
+ 303:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     if (!kf->SkipEq3)
+ 1198              		.loc 1 303 1 is_stmt 0 view .LVU371
+ 1199 0000 2DE9F843 		push	{r3, r4, r5, r6, r7, r8, r9, lr}
+ 1200              	.LCFI6:
+ 1201              		.cfi_def_cfa_offset 32
+ 1202              		.cfi_offset 3, -32
+ 1203              		.cfi_offset 4, -28
+ 1204              		.cfi_offset 5, -24
+ 1205              		.cfi_offset 6, -20
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccmkfrD3.s 			page 35
+
+
+ 1206              		.cfi_offset 7, -16
+ 1207              		.cfi_offset 8, -12
+ 1208              		.cfi_offset 9, -8
+ 1209              		.cfi_offset 14, -4
+ 304:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     {
+ 1210              		.loc 1 304 5 is_stmt 1 view .LVU372
+ 304:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     {
+ 1211              		.loc 1 304 12 is_stmt 0 view .LVU373
+ 1212 0004 90F82A30 		ldrb	r3, [r0, #42]	@ zero_extendqisi2
+ 304:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     {
+ 1213              		.loc 1 304 8 view .LVU374
+ 1214 0008 0BB1     		cbz	r3, .L41
+ 1215              	.LVL113:
+ 1216              	.L38:
+ 322:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** void Kalman_Filter_xhatUpdate(KalmanFilter_t *kf)
+ 1217              		.loc 1 322 1 view .LVU375
+ 1218 000a BDE8F883 		pop	{r3, r4, r5, r6, r7, r8, r9, pc}
+ 1219              	.LVL114:
+ 1220              	.L41:
+ 322:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** void Kalman_Filter_xhatUpdate(KalmanFilter_t *kf)
+ 1221              		.loc 1 322 1 view .LVU376
+ 1222 000e 0446     		mov	r4, r0
+ 306:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->temp_matrix.numRows = kf->H.numRows;
+ 1223              		.loc 1 306 9 is_stmt 1 view .LVU377
+ 306:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->temp_matrix.numRows = kf->H.numRows;
+ 1224              		.loc 1 306 42 is_stmt 0 view .LVU378
+ 1225 0010 00F17806 		add	r6, r0, #120
+ 306:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->temp_matrix.numRows = kf->H.numRows;
+ 1226              		.loc 1 306 25 view .LVU379
+ 1227 0014 00F18007 		add	r7, r0, #128
+ 1228 0018 3946     		mov	r1, r7
+ 1229 001a 3046     		mov	r0, r6
+ 1230              	.LVL115:
+ 306:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->temp_matrix.numRows = kf->H.numRows;
+ 1231              		.loc 1 306 25 view .LVU380
+ 1232 001c FFF7FEFF 		bl	arm_mat_trans_f32
+ 1233              	.LVL116:
+ 306:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->temp_matrix.numRows = kf->H.numRows;
+ 1234              		.loc 1 306 23 view .LVU381
+ 1235 0020 84F8C800 		strb	r0, [r4, #200]
+ 307:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->temp_matrix.numCols = kf->Pminus.numCols;
+ 1236              		.loc 1 307 9 is_stmt 1 view .LVU382
+ 307:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->temp_matrix.numCols = kf->Pminus.numCols;
+ 1237              		.loc 1 307 40 is_stmt 0 view .LVU383
+ 1238 0024 B4F87830 		ldrh	r3, [r4, #120]
+ 307:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->temp_matrix.numCols = kf->Pminus.numCols;
+ 1239              		.loc 1 307 33 view .LVU384
+ 1240 0028 A4F8A830 		strh	r3, [r4, #168]	@ movhi
+ 308:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->MatStatus = Matrix_Multiply(&kf->H, &kf->Pminus, &kf->temp_matrix); // temp_matrix = H°
+ 1241              		.loc 1 308 9 is_stmt 1 view .LVU385
+ 308:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->MatStatus = Matrix_Multiply(&kf->H, &kf->Pminus, &kf->temp_matrix); // temp_matrix = H°
+ 1242              		.loc 1 308 45 is_stmt 0 view .LVU386
+ 1243 002c B4F85A30 		ldrh	r3, [r4, #90]
+ 308:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->MatStatus = Matrix_Multiply(&kf->H, &kf->Pminus, &kf->temp_matrix); // temp_matrix = H°
+ 1244              		.loc 1 308 33 view .LVU387
+ 1245 0030 A4F8AA30 		strh	r3, [r4, #170]	@ movhi
+ 309:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->temp_matrix1.numRows = kf->temp_matrix.numRows;
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccmkfrD3.s 			page 36
+
+
+ 1246              		.loc 1 309 9 is_stmt 1 view .LVU388
+ 309:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->temp_matrix1.numRows = kf->temp_matrix.numRows;
+ 1247              		.loc 1 309 49 is_stmt 0 view .LVU389
+ 1248 0034 04F15808 		add	r8, r4, #88
+ 309:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->temp_matrix1.numRows = kf->temp_matrix.numRows;
+ 1249              		.loc 1 309 25 view .LVU390
+ 1250 0038 04F1A805 		add	r5, r4, #168
+ 1251 003c 2A46     		mov	r2, r5
+ 1252 003e 4146     		mov	r1, r8
+ 1253 0040 3046     		mov	r0, r6
+ 1254 0042 FFF7FEFF 		bl	arm_mat_mult_f32
+ 1255              	.LVL117:
+ 309:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->temp_matrix1.numRows = kf->temp_matrix.numRows;
+ 1256              		.loc 1 309 23 view .LVU391
+ 1257 0046 84F8C800 		strb	r0, [r4, #200]
+ 310:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->temp_matrix1.numCols = kf->HT.numCols;
+ 1258              		.loc 1 310 9 is_stmt 1 view .LVU392
+ 310:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->temp_matrix1.numCols = kf->HT.numCols;
+ 1259              		.loc 1 310 51 is_stmt 0 view .LVU393
+ 1260 004a B4F8A830 		ldrh	r3, [r4, #168]
+ 310:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->temp_matrix1.numCols = kf->HT.numCols;
+ 1261              		.loc 1 310 34 view .LVU394
+ 1262 004e A4F8B030 		strh	r3, [r4, #176]	@ movhi
+ 311:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->MatStatus = Matrix_Multiply(&kf->temp_matrix, &kf->HT, &kf->temp_matrix1); // temp_matr
+ 1263              		.loc 1 311 9 is_stmt 1 view .LVU395
+ 311:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->MatStatus = Matrix_Multiply(&kf->temp_matrix, &kf->HT, &kf->temp_matrix1); // temp_matr
+ 1264              		.loc 1 311 42 is_stmt 0 view .LVU396
+ 1265 0052 B4F88230 		ldrh	r3, [r4, #130]
+ 311:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->MatStatus = Matrix_Multiply(&kf->temp_matrix, &kf->HT, &kf->temp_matrix1); // temp_matr
+ 1266              		.loc 1 311 34 view .LVU397
+ 1267 0056 A4F8B230 		strh	r3, [r4, #178]	@ movhi
+ 312:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->S.numRows = kf->R.numRows;
+ 1268              		.loc 1 312 9 is_stmt 1 view .LVU398
+ 312:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->S.numRows = kf->R.numRows;
+ 1269              		.loc 1 312 25 is_stmt 0 view .LVU399
+ 1270 005a 04F1B006 		add	r6, r4, #176
+ 1271 005e 3246     		mov	r2, r6
+ 1272 0060 3946     		mov	r1, r7
+ 1273 0062 2846     		mov	r0, r5
+ 1274 0064 FFF7FEFF 		bl	arm_mat_mult_f32
+ 1275              	.LVL118:
+ 312:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->S.numRows = kf->R.numRows;
+ 1276              		.loc 1 312 23 view .LVU400
+ 1277 0068 84F8C800 		strb	r0, [r4, #200]
+ 313:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->S.numCols = kf->R.numCols;
+ 1278              		.loc 1 313 9 is_stmt 1 view .LVU401
+ 313:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->S.numCols = kf->R.numCols;
+ 1279              		.loc 1 313 30 is_stmt 0 view .LVU402
+ 1280 006c B4F89030 		ldrh	r3, [r4, #144]
+ 313:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->S.numCols = kf->R.numCols;
+ 1281              		.loc 1 313 23 view .LVU403
+ 1282 0070 A4F8A030 		strh	r3, [r4, #160]	@ movhi
+ 314:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->MatStatus = Matrix_Add(&kf->temp_matrix1, &kf->R, &kf->S); // S = H P'(k) HT + R
+ 1283              		.loc 1 314 9 is_stmt 1 view .LVU404
+ 314:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->MatStatus = Matrix_Add(&kf->temp_matrix1, &kf->R, &kf->S); // S = H P'(k) HT + R
+ 1284              		.loc 1 314 30 is_stmt 0 view .LVU405
+ 1285 0074 B4F89230 		ldrh	r3, [r4, #146]
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccmkfrD3.s 			page 37
+
+
+ 314:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->MatStatus = Matrix_Add(&kf->temp_matrix1, &kf->R, &kf->S); // S = H P'(k) HT + R
+ 1286              		.loc 1 314 23 view .LVU406
+ 1287 0078 A4F8A230 		strh	r3, [r4, #162]	@ movhi
+ 315:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->MatStatus = Matrix_Inverse(&kf->S, &kf->temp_matrix1);     // temp_matrix1 = inv(H°§P'(
+ 1288              		.loc 1 315 9 is_stmt 1 view .LVU407
+ 315:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->MatStatus = Matrix_Inverse(&kf->S, &kf->temp_matrix1);     // temp_matrix1 = inv(H°§P'(
+ 1289              		.loc 1 315 25 is_stmt 0 view .LVU408
+ 1290 007c 04F1A009 		add	r9, r4, #160
+ 1291 0080 4A46     		mov	r2, r9
+ 1292 0082 04F19001 		add	r1, r4, #144
+ 1293 0086 3046     		mov	r0, r6
+ 1294 0088 FFF7FEFF 		bl	arm_mat_add_f32
+ 1295              	.LVL119:
+ 315:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->MatStatus = Matrix_Inverse(&kf->S, &kf->temp_matrix1);     // temp_matrix1 = inv(H°§P'(
+ 1296              		.loc 1 315 23 view .LVU409
+ 1297 008c 84F8C800 		strb	r0, [r4, #200]
+ 316:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->temp_matrix.numRows = kf->Pminus.numRows;
+ 1298              		.loc 1 316 9 is_stmt 1 view .LVU410
+ 316:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->temp_matrix.numRows = kf->Pminus.numRows;
+ 1299              		.loc 1 316 25 is_stmt 0 view .LVU411
+ 1300 0090 3146     		mov	r1, r6
+ 1301 0092 4846     		mov	r0, r9
+ 1302 0094 FFF7FEFF 		bl	arm_mat_inverse_f32
+ 1303              	.LVL120:
+ 316:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->temp_matrix.numRows = kf->Pminus.numRows;
+ 1304              		.loc 1 316 23 view .LVU412
+ 1305 0098 84F8C800 		strb	r0, [r4, #200]
+ 317:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->temp_matrix.numCols = kf->HT.numCols;
+ 1306              		.loc 1 317 9 is_stmt 1 view .LVU413
+ 317:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->temp_matrix.numCols = kf->HT.numCols;
+ 1307              		.loc 1 317 45 is_stmt 0 view .LVU414
+ 1308 009c B4F85830 		ldrh	r3, [r4, #88]
+ 317:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->temp_matrix.numCols = kf->HT.numCols;
+ 1309              		.loc 1 317 33 view .LVU415
+ 1310 00a0 A4F8A830 		strh	r3, [r4, #168]	@ movhi
+ 318:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->MatStatus = Matrix_Multiply(&kf->Pminus, &kf->HT, &kf->temp_matrix); // temp_matrix = P
+ 1311              		.loc 1 318 9 is_stmt 1 view .LVU416
+ 318:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->MatStatus = Matrix_Multiply(&kf->Pminus, &kf->HT, &kf->temp_matrix); // temp_matrix = P
+ 1312              		.loc 1 318 41 is_stmt 0 view .LVU417
+ 1313 00a4 B4F88230 		ldrh	r3, [r4, #130]
+ 318:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->MatStatus = Matrix_Multiply(&kf->Pminus, &kf->HT, &kf->temp_matrix); // temp_matrix = P
+ 1314              		.loc 1 318 33 view .LVU418
+ 1315 00a8 A4F8AA30 		strh	r3, [r4, #170]	@ movhi
+ 319:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->MatStatus = Matrix_Multiply(&kf->temp_matrix, &kf->temp_matrix1, &kf->K);
+ 1316              		.loc 1 319 9 is_stmt 1 view .LVU419
+ 319:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->MatStatus = Matrix_Multiply(&kf->temp_matrix, &kf->temp_matrix1, &kf->K);
+ 1317              		.loc 1 319 25 is_stmt 0 view .LVU420
+ 1318 00ac 2A46     		mov	r2, r5
+ 1319 00ae 3946     		mov	r1, r7
+ 1320 00b0 4046     		mov	r0, r8
+ 1321 00b2 FFF7FEFF 		bl	arm_mat_mult_f32
+ 1322              	.LVL121:
+ 319:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->MatStatus = Matrix_Multiply(&kf->temp_matrix, &kf->temp_matrix1, &kf->K);
+ 1323              		.loc 1 319 23 view .LVU421
+ 1324 00b6 84F8C800 		strb	r0, [r4, #200]
+ 320:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     }
+ 1325              		.loc 1 320 9 is_stmt 1 view .LVU422
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccmkfrD3.s 			page 38
+
+
+ 320:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     }
+ 1326              		.loc 1 320 25 is_stmt 0 view .LVU423
+ 1327 00ba 04F19802 		add	r2, r4, #152
+ 1328 00be 3146     		mov	r1, r6
+ 1329 00c0 2846     		mov	r0, r5
+ 1330 00c2 FFF7FEFF 		bl	arm_mat_mult_f32
+ 1331              	.LVL122:
+ 320:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     }
+ 1332              		.loc 1 320 23 view .LVU424
+ 1333 00c6 84F8C800 		strb	r0, [r4, #200]
+ 322:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** void Kalman_Filter_xhatUpdate(KalmanFilter_t *kf)
+ 1334              		.loc 1 322 1 view .LVU425
+ 1335 00ca 9EE7     		b	.L38
+ 1336              		.cfi_endproc
+ 1337              	.LFE167:
+ 1339              		.section	.text.Kalman_Filter_xhatUpdate,"ax",%progbits
+ 1340              		.align	1
+ 1341              		.global	Kalman_Filter_xhatUpdate
+ 1342              		.syntax unified
+ 1343              		.thumb
+ 1344              		.thumb_func
+ 1346              	Kalman_Filter_xhatUpdate:
+ 1347              	.LVL123:
+ 1348              	.LFB168:
+ 324:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     if (!kf->SkipEq4)
+ 1349              		.loc 1 324 1 is_stmt 1 view -0
+ 1350              		.cfi_startproc
+ 1351              		@ args = 0, pretend = 0, frame = 0
+ 1352              		@ frame_needed = 0, uses_anonymous_args = 0
+ 325:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     {
+ 1353              		.loc 1 325 5 view .LVU427
+ 325:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     {
+ 1354              		.loc 1 325 12 is_stmt 0 view .LVU428
+ 1355 0000 90F82B30 		ldrb	r3, [r0, #43]	@ zero_extendqisi2
+ 325:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     {
+ 1356              		.loc 1 325 8 view .LVU429
+ 1357 0004 03B1     		cbz	r3, .L48
+ 1358 0006 7047     		bx	lr
+ 1359              	.L48:
+ 324:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     if (!kf->SkipEq4)
+ 1360              		.loc 1 324 1 view .LVU430
+ 1361 0008 2DE9F041 		push	{r4, r5, r6, r7, r8, lr}
+ 1362              	.LCFI7:
+ 1363              		.cfi_def_cfa_offset 24
+ 1364              		.cfi_offset 4, -24
+ 1365              		.cfi_offset 5, -20
+ 1366              		.cfi_offset 6, -16
+ 1367              		.cfi_offset 7, -12
+ 1368              		.cfi_offset 8, -8
+ 1369              		.cfi_offset 14, -4
+ 1370 000c 0446     		mov	r4, r0
+ 327:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->temp_vector.numCols = 1;
+ 1371              		.loc 1 327 9 is_stmt 1 view .LVU431
+ 327:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->temp_vector.numCols = 1;
+ 1372              		.loc 1 327 40 is_stmt 0 view .LVU432
+ 1373 000e B0F87830 		ldrh	r3, [r0, #120]
+ 327:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->temp_vector.numCols = 1;
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccmkfrD3.s 			page 39
+
+
+ 1374              		.loc 1 327 33 view .LVU433
+ 1375 0012 A0F8B830 		strh	r3, [r0, #184]	@ movhi
+ 328:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->MatStatus = Matrix_Multiply(&kf->H, &kf->xhatminus, &kf->temp_vector); // temp_vector =
+ 1376              		.loc 1 328 9 is_stmt 1 view .LVU434
+ 328:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->MatStatus = Matrix_Multiply(&kf->H, &kf->xhatminus, &kf->temp_vector); // temp_vector =
+ 1377              		.loc 1 328 33 is_stmt 0 view .LVU435
+ 1378 0016 0126     		movs	r6, #1
+ 1379 0018 A0F8BA60 		strh	r6, [r0, #186]	@ movhi
+ 329:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->temp_vector1.numRows = kf->z.numRows;
+ 1380              		.loc 1 329 9 is_stmt 1 view .LVU436
+ 329:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->temp_vector1.numRows = kf->z.numRows;
+ 1381              		.loc 1 329 49 is_stmt 0 view .LVU437
+ 1382 001c 00F13807 		add	r7, r0, #56
+ 329:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->temp_vector1.numRows = kf->z.numRows;
+ 1383              		.loc 1 329 25 view .LVU438
+ 1384 0020 00F1B805 		add	r5, r0, #184
+ 1385 0024 2A46     		mov	r2, r5
+ 1386 0026 3946     		mov	r1, r7
+ 1387 0028 7830     		adds	r0, r0, #120
+ 1388              	.LVL124:
+ 329:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->temp_vector1.numRows = kf->z.numRows;
+ 1389              		.loc 1 329 25 view .LVU439
+ 1390 002a FFF7FEFF 		bl	arm_mat_mult_f32
+ 1391              	.LVL125:
+ 329:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->temp_vector1.numRows = kf->z.numRows;
+ 1392              		.loc 1 329 23 view .LVU440
+ 1393 002e 84F8C800 		strb	r0, [r4, #200]
+ 330:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->temp_vector1.numCols = 1;
+ 1394              		.loc 1 330 9 is_stmt 1 view .LVU441
+ 330:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->temp_vector1.numCols = 1;
+ 1395              		.loc 1 330 41 is_stmt 0 view .LVU442
+ 1396 0032 B4F84830 		ldrh	r3, [r4, #72]
+ 330:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->temp_vector1.numCols = 1;
+ 1397              		.loc 1 330 34 view .LVU443
+ 1398 0036 A4F8C030 		strh	r3, [r4, #192]	@ movhi
+ 331:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->MatStatus = Matrix_Subtract(&kf->z, &kf->temp_vector, &kf->temp_vector1); // temp_vecto
+ 1399              		.loc 1 331 9 is_stmt 1 view .LVU444
+ 331:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->MatStatus = Matrix_Subtract(&kf->z, &kf->temp_vector, &kf->temp_vector1); // temp_vecto
+ 1400              		.loc 1 331 34 is_stmt 0 view .LVU445
+ 1401 003a A4F8C260 		strh	r6, [r4, #194]	@ movhi
+ 332:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->temp_vector.numRows = kf->K.numRows;
+ 1402              		.loc 1 332 9 is_stmt 1 view .LVU446
+ 332:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->temp_vector.numRows = kf->K.numRows;
+ 1403              		.loc 1 332 25 is_stmt 0 view .LVU447
+ 1404 003e 04F1C008 		add	r8, r4, #192
+ 1405 0042 4246     		mov	r2, r8
+ 1406 0044 2946     		mov	r1, r5
+ 1407 0046 04F14800 		add	r0, r4, #72
+ 1408 004a FFF7FEFF 		bl	arm_mat_sub_f32
+ 1409              	.LVL126:
+ 332:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->temp_vector.numRows = kf->K.numRows;
+ 1410              		.loc 1 332 23 view .LVU448
+ 1411 004e 84F8C800 		strb	r0, [r4, #200]
+ 333:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->temp_vector.numCols = 1;
+ 1412              		.loc 1 333 9 is_stmt 1 view .LVU449
+ 333:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->temp_vector.numCols = 1;
+ 1413              		.loc 1 333 40 is_stmt 0 view .LVU450
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccmkfrD3.s 			page 40
+
+
+ 1414 0052 B4F89830 		ldrh	r3, [r4, #152]
+ 333:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->temp_vector.numCols = 1;
+ 1415              		.loc 1 333 33 view .LVU451
+ 1416 0056 A4F8B830 		strh	r3, [r4, #184]	@ movhi
+ 334:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->MatStatus = Matrix_Multiply(&kf->K, &kf->temp_vector1, &kf->temp_vector); // temp_vecto
+ 1417              		.loc 1 334 9 is_stmt 1 view .LVU452
+ 334:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->MatStatus = Matrix_Multiply(&kf->K, &kf->temp_vector1, &kf->temp_vector); // temp_vecto
+ 1418              		.loc 1 334 33 is_stmt 0 view .LVU453
+ 1419 005a A4F8BA60 		strh	r6, [r4, #186]	@ movhi
+ 335:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->MatStatus = Matrix_Add(&kf->xhatminus, &kf->temp_vector, &kf->xhat);
+ 1420              		.loc 1 335 9 is_stmt 1 view .LVU454
+ 335:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->MatStatus = Matrix_Add(&kf->xhatminus, &kf->temp_vector, &kf->xhat);
+ 1421              		.loc 1 335 25 is_stmt 0 view .LVU455
+ 1422 005e 2A46     		mov	r2, r5
+ 1423 0060 4146     		mov	r1, r8
+ 1424 0062 04F19800 		add	r0, r4, #152
+ 1425 0066 FFF7FEFF 		bl	arm_mat_mult_f32
+ 1426              	.LVL127:
+ 335:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->MatStatus = Matrix_Add(&kf->xhatminus, &kf->temp_vector, &kf->xhat);
+ 1427              		.loc 1 335 23 view .LVU456
+ 1428 006a 84F8C800 		strb	r0, [r4, #200]
+ 336:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     }
+ 1429              		.loc 1 336 9 is_stmt 1 view .LVU457
+ 336:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     }
+ 1430              		.loc 1 336 25 is_stmt 0 view .LVU458
+ 1431 006e 04F13002 		add	r2, r4, #48
+ 1432 0072 2946     		mov	r1, r5
+ 1433 0074 3846     		mov	r0, r7
+ 1434 0076 FFF7FEFF 		bl	arm_mat_add_f32
+ 1435              	.LVL128:
+ 336:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     }
+ 1436              		.loc 1 336 23 view .LVU459
+ 1437 007a 84F8C800 		strb	r0, [r4, #200]
+ 338:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** void Kalman_Filter_P_Update(KalmanFilter_t *kf)
+ 1438              		.loc 1 338 1 view .LVU460
+ 1439 007e BDE8F081 		pop	{r4, r5, r6, r7, r8, pc}
+ 338:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** void Kalman_Filter_P_Update(KalmanFilter_t *kf)
+ 1440              		.loc 1 338 1 view .LVU461
+ 1441              		.cfi_endproc
+ 1442              	.LFE168:
+ 1444              		.section	.text.Kalman_Filter_P_Update,"ax",%progbits
+ 1445              		.align	1
+ 1446              		.global	Kalman_Filter_P_Update
+ 1447              		.syntax unified
+ 1448              		.thumb
+ 1449              		.thumb_func
+ 1451              	Kalman_Filter_P_Update:
+ 1452              	.LVL129:
+ 1453              	.LFB169:
+ 340:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     if (!kf->SkipEq5)
+ 1454              		.loc 1 340 1 is_stmt 1 view -0
+ 1455              		.cfi_startproc
+ 1456              		@ args = 0, pretend = 0, frame = 0
+ 1457              		@ frame_needed = 0, uses_anonymous_args = 0
+ 340:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     if (!kf->SkipEq5)
+ 1458              		.loc 1 340 1 is_stmt 0 view .LVU463
+ 1459 0000 F8B5     		push	{r3, r4, r5, r6, r7, lr}
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccmkfrD3.s 			page 41
+
+
+ 1460              	.LCFI8:
+ 1461              		.cfi_def_cfa_offset 24
+ 1462              		.cfi_offset 3, -24
+ 1463              		.cfi_offset 4, -20
+ 1464              		.cfi_offset 5, -16
+ 1465              		.cfi_offset 6, -12
+ 1466              		.cfi_offset 7, -8
+ 1467              		.cfi_offset 14, -4
+ 341:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     {
+ 1468              		.loc 1 341 5 is_stmt 1 view .LVU464
+ 341:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     {
+ 1469              		.loc 1 341 12 is_stmt 0 view .LVU465
+ 1470 0002 90F82C30 		ldrb	r3, [r0, #44]	@ zero_extendqisi2
+ 341:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     {
+ 1471              		.loc 1 341 8 view .LVU466
+ 1472 0006 03B1     		cbz	r3, .L52
+ 1473              	.LVL130:
+ 1474              	.L49:
+ 351:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 1475              		.loc 1 351 1 view .LVU467
+ 1476 0008 F8BD     		pop	{r3, r4, r5, r6, r7, pc}
+ 1477              	.LVL131:
+ 1478              	.L52:
+ 351:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 1479              		.loc 1 351 1 view .LVU468
+ 1480 000a 0446     		mov	r4, r0
+ 343:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->temp_matrix.numCols = kf->H.numCols;
+ 1481              		.loc 1 343 9 is_stmt 1 view .LVU469
+ 343:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->temp_matrix.numCols = kf->H.numCols;
+ 1482              		.loc 1 343 40 is_stmt 0 view .LVU470
+ 1483 000c B0F89830 		ldrh	r3, [r0, #152]
+ 343:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->temp_matrix.numCols = kf->H.numCols;
+ 1484              		.loc 1 343 33 view .LVU471
+ 1485 0010 A0F8A830 		strh	r3, [r0, #168]	@ movhi
+ 344:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->temp_matrix1.numRows = kf->temp_matrix.numRows;
+ 1486              		.loc 1 344 9 is_stmt 1 view .LVU472
+ 344:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->temp_matrix1.numRows = kf->temp_matrix.numRows;
+ 1487              		.loc 1 344 40 is_stmt 0 view .LVU473
+ 1488 0014 B0F87A20 		ldrh	r2, [r0, #122]
+ 344:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->temp_matrix1.numRows = kf->temp_matrix.numRows;
+ 1489              		.loc 1 344 33 view .LVU474
+ 1490 0018 A0F8AA20 		strh	r2, [r0, #170]	@ movhi
+ 345:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->temp_matrix1.numCols = kf->Pminus.numCols;
+ 1491              		.loc 1 345 9 is_stmt 1 view .LVU475
+ 345:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->temp_matrix1.numCols = kf->Pminus.numCols;
+ 1492              		.loc 1 345 34 is_stmt 0 view .LVU476
+ 1493 001c A0F8B030 		strh	r3, [r0, #176]	@ movhi
+ 346:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->MatStatus = Matrix_Multiply(&kf->K, &kf->H, &kf->temp_matrix);                 // temp_
+ 1494              		.loc 1 346 9 is_stmt 1 view .LVU477
+ 346:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->MatStatus = Matrix_Multiply(&kf->K, &kf->H, &kf->temp_matrix);                 // temp_
+ 1495              		.loc 1 346 46 is_stmt 0 view .LVU478
+ 1496 0020 B0F85A30 		ldrh	r3, [r0, #90]
+ 346:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->MatStatus = Matrix_Multiply(&kf->K, &kf->H, &kf->temp_matrix);                 // temp_
+ 1497              		.loc 1 346 34 view .LVU479
+ 1498 0024 A0F8B230 		strh	r3, [r0, #178]	@ movhi
+ 347:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->MatStatus = Matrix_Multiply(&kf->temp_matrix, &kf->Pminus, &kf->temp_matrix1); // temp_
+ 1499              		.loc 1 347 9 is_stmt 1 view .LVU480
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccmkfrD3.s 			page 42
+
+
+ 347:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->MatStatus = Matrix_Multiply(&kf->temp_matrix, &kf->Pminus, &kf->temp_matrix1); // temp_
+ 1500              		.loc 1 347 25 is_stmt 0 view .LVU481
+ 1501 0028 00F1A807 		add	r7, r0, #168
+ 1502 002c 3A46     		mov	r2, r7
+ 1503 002e 00F17801 		add	r1, r0, #120
+ 1504 0032 9830     		adds	r0, r0, #152
+ 1505              	.LVL132:
+ 347:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->MatStatus = Matrix_Multiply(&kf->temp_matrix, &kf->Pminus, &kf->temp_matrix1); // temp_
+ 1506              		.loc 1 347 25 view .LVU482
+ 1507 0034 FFF7FEFF 		bl	arm_mat_mult_f32
+ 1508              	.LVL133:
+ 347:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->MatStatus = Matrix_Multiply(&kf->temp_matrix, &kf->Pminus, &kf->temp_matrix1); // temp_
+ 1509              		.loc 1 347 23 view .LVU483
+ 1510 0038 84F8C800 		strb	r0, [r4, #200]
+ 348:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->MatStatus = Matrix_Subtract(&kf->Pminus, &kf->temp_matrix1, &kf->P);
+ 1511              		.loc 1 348 9 is_stmt 1 view .LVU484
+ 348:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->MatStatus = Matrix_Subtract(&kf->Pminus, &kf->temp_matrix1, &kf->P);
+ 1512              		.loc 1 348 59 is_stmt 0 view .LVU485
+ 1513 003c 04F15805 		add	r5, r4, #88
+ 348:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->MatStatus = Matrix_Subtract(&kf->Pminus, &kf->temp_matrix1, &kf->P);
+ 1514              		.loc 1 348 25 view .LVU486
+ 1515 0040 04F1B006 		add	r6, r4, #176
+ 1516 0044 3246     		mov	r2, r6
+ 1517 0046 2946     		mov	r1, r5
+ 1518 0048 3846     		mov	r0, r7
+ 1519 004a FFF7FEFF 		bl	arm_mat_mult_f32
+ 1520              	.LVL134:
+ 348:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->MatStatus = Matrix_Subtract(&kf->Pminus, &kf->temp_matrix1, &kf->P);
+ 1521              		.loc 1 348 23 view .LVU487
+ 1522 004e 84F8C800 		strb	r0, [r4, #200]
+ 349:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     }
+ 1523              		.loc 1 349 9 is_stmt 1 view .LVU488
+ 349:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     }
+ 1524              		.loc 1 349 25 is_stmt 0 view .LVU489
+ 1525 0052 04F15002 		add	r2, r4, #80
+ 1526 0056 3146     		mov	r1, r6
+ 1527 0058 2846     		mov	r0, r5
+ 1528 005a FFF7FEFF 		bl	arm_mat_sub_f32
+ 1529              	.LVL135:
+ 349:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     }
+ 1530              		.loc 1 349 23 view .LVU490
+ 1531 005e 84F8C800 		strb	r0, [r4, #200]
+ 351:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 1532              		.loc 1 351 1 view .LVU491
+ 1533 0062 D1E7     		b	.L49
+ 1534              		.cfi_endproc
+ 1535              	.LFE169:
+ 1537              		.section	.text.Kalman_Filter_Update,"ax",%progbits
+ 1538              		.align	1
+ 1539              		.global	Kalman_Filter_Update
+ 1540              		.syntax unified
+ 1541              		.thumb
+ 1542              		.thumb_func
+ 1544              	Kalman_Filter_Update:
+ 1545              	.LVL136:
+ 1546              	.LFB170:
+ 354:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     Kalman_Filter_Measure(kf);
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccmkfrD3.s 			page 43
+
+
+ 1547              		.loc 1 354 1 is_stmt 1 view -0
+ 1548              		.cfi_startproc
+ 1549              		@ args = 0, pretend = 0, frame = 0
+ 1550              		@ frame_needed = 0, uses_anonymous_args = 0
+ 354:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     Kalman_Filter_Measure(kf);
+ 1551              		.loc 1 354 1 is_stmt 0 view .LVU493
+ 1552 0000 38B5     		push	{r3, r4, r5, lr}
+ 1553              	.LCFI9:
+ 1554              		.cfi_def_cfa_offset 16
+ 1555              		.cfi_offset 3, -16
+ 1556              		.cfi_offset 4, -12
+ 1557              		.cfi_offset 5, -8
+ 1558              		.cfi_offset 14, -4
+ 1559 0002 0446     		mov	r4, r0
+ 355:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 1560              		.loc 1 355 5 is_stmt 1 view .LVU494
+ 1561 0004 FFF7FEFF 		bl	Kalman_Filter_Measure
+ 1562              	.LVL137:
+ 357:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->User_Func0_f(kf);
+ 1563              		.loc 1 357 5 view .LVU495
+ 357:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->User_Func0_f(kf);
+ 1564              		.loc 1 357 11 is_stmt 0 view .LVU496
+ 1565 0008 D4F8CC30 		ldr	r3, [r4, #204]
+ 357:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->User_Func0_f(kf);
+ 1566              		.loc 1 357 8 view .LVU497
+ 1567 000c 0BB1     		cbz	r3, .L54
+ 358:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 1568              		.loc 1 358 9 is_stmt 1 view .LVU498
+ 1569 000e 2046     		mov	r0, r4
+ 1570 0010 9847     		blx	r3
+ 1571              	.LVL138:
+ 1572              	.L54:
+ 361:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 1573              		.loc 1 361 5 view .LVU499
+ 1574 0012 2046     		mov	r0, r4
+ 1575 0014 FFF7FEFF 		bl	Kalman_Filter_xhatMinusUpdate
+ 1576              	.LVL139:
+ 363:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->User_Func1_f(kf);
+ 1577              		.loc 1 363 5 view .LVU500
+ 363:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->User_Func1_f(kf);
+ 1578              		.loc 1 363 11 is_stmt 0 view .LVU501
+ 1579 0018 D4F8D030 		ldr	r3, [r4, #208]
+ 363:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->User_Func1_f(kf);
+ 1580              		.loc 1 363 8 view .LVU502
+ 1581 001c 0BB1     		cbz	r3, .L55
+ 364:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 1582              		.loc 1 364 9 is_stmt 1 view .LVU503
+ 1583 001e 2046     		mov	r0, r4
+ 1584 0020 9847     		blx	r3
+ 1585              	.LVL140:
+ 1586              	.L55:
+ 368:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 1587              		.loc 1 368 5 view .LVU504
+ 1588 0022 2046     		mov	r0, r4
+ 1589 0024 FFF7FEFF 		bl	Kalman_Filter_PminusUpdate
+ 1590              	.LVL141:
+ 370:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->User_Func2_f(kf);
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccmkfrD3.s 			page 44
+
+
+ 1591              		.loc 1 370 5 view .LVU505
+ 370:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->User_Func2_f(kf);
+ 1592              		.loc 1 370 11 is_stmt 0 view .LVU506
+ 1593 0028 D4F8D430 		ldr	r3, [r4, #212]
+ 370:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->User_Func2_f(kf);
+ 1594              		.loc 1 370 8 view .LVU507
+ 1595 002c 0BB1     		cbz	r3, .L56
+ 371:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 1596              		.loc 1 371 9 is_stmt 1 view .LVU508
+ 1597 002e 2046     		mov	r0, r4
+ 1598 0030 9847     		blx	r3
+ 1599              	.LVL142:
+ 1600              	.L56:
+ 373:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     {
+ 1601              		.loc 1 373 5 view .LVU509
+ 373:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     {
+ 1602              		.loc 1 373 11 is_stmt 0 view .LVU510
+ 1603 0032 237C     		ldrb	r3, [r4, #16]	@ zero_extendqisi2
+ 373:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     {
+ 1604              		.loc 1 373 8 view .LVU511
+ 1605 0034 0BB9     		cbnz	r3, .L57
+ 373:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     {
+ 1606              		.loc 1 373 43 discriminator 1 view .LVU512
+ 1607 0036 E37B     		ldrb	r3, [r4, #15]	@ zero_extendqisi2
+ 373:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     {
+ 1608              		.loc 1 373 38 discriminator 1 view .LVU513
+ 1609 0038 CBB9     		cbnz	r3, .L58
+ 1610              	.L57:
+ 377:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 1611              		.loc 1 377 9 is_stmt 1 view .LVU514
+ 1612 003a 2046     		mov	r0, r4
+ 1613 003c FFF7FEFF 		bl	Kalman_Filter_SetK
+ 1614              	.LVL143:
+ 379:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****             kf->User_Func3_f(kf);
+ 1615              		.loc 1 379 9 view .LVU515
+ 379:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****             kf->User_Func3_f(kf);
+ 1616              		.loc 1 379 15 is_stmt 0 view .LVU516
+ 1617 0040 D4F8D830 		ldr	r3, [r4, #216]
+ 379:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****             kf->User_Func3_f(kf);
+ 1618              		.loc 1 379 12 view .LVU517
+ 1619 0044 0BB1     		cbz	r3, .L59
+ 380:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 1620              		.loc 1 380 13 is_stmt 1 view .LVU518
+ 1621 0046 2046     		mov	r0, r4
+ 1622 0048 9847     		blx	r3
+ 1623              	.LVL144:
+ 1624              	.L59:
+ 383:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 1625              		.loc 1 383 9 view .LVU519
+ 1626 004a 2046     		mov	r0, r4
+ 1627 004c FFF7FEFF 		bl	Kalman_Filter_xhatUpdate
+ 1628              	.LVL145:
+ 385:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****             kf->User_Func4_f(kf);
+ 1629              		.loc 1 385 9 view .LVU520
+ 385:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****             kf->User_Func4_f(kf);
+ 1630              		.loc 1 385 15 is_stmt 0 view .LVU521
+ 1631 0050 D4F8DC30 		ldr	r3, [r4, #220]
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccmkfrD3.s 			page 45
+
+
+ 385:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****             kf->User_Func4_f(kf);
+ 1632              		.loc 1 385 12 view .LVU522
+ 1633 0054 0BB1     		cbz	r3, .L60
+ 386:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 1634              		.loc 1 386 13 is_stmt 1 view .LVU523
+ 1635 0056 2046     		mov	r0, r4
+ 1636 0058 9847     		blx	r3
+ 1637              	.LVL146:
+ 1638              	.L60:
+ 389:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     }
+ 1639              		.loc 1 389 9 view .LVU524
+ 1640 005a 2046     		mov	r0, r4
+ 1641 005c FFF7FEFF 		bl	Kalman_Filter_P_Update
+ 1642              	.LVL147:
+ 1643              	.L61:
+ 400:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->User_Func5_f(kf);
+ 1644              		.loc 1 400 5 view .LVU525
+ 400:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->User_Func5_f(kf);
+ 1645              		.loc 1 400 11 is_stmt 0 view .LVU526
+ 1646 0060 D4F8E030 		ldr	r3, [r4, #224]
+ 400:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->User_Func5_f(kf);
+ 1647              		.loc 1 400 8 view .LVU527
+ 1648 0064 0BB1     		cbz	r3, .L62
+ 401:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 1649              		.loc 1 401 9 is_stmt 1 view .LVU528
+ 1650 0066 2046     		mov	r0, r4
+ 1651 0068 9847     		blx	r3
+ 1652              	.LVL148:
+ 1653              	.L62:
+ 354:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     Kalman_Filter_Measure(kf);
+ 1654              		.loc 1 354 1 is_stmt 0 discriminator 1 view .LVU529
+ 1655 006a 0023     		movs	r3, #0
+ 1656 006c 19E0     		b	.L63
+ 1657              	.L58:
+ 396:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         memcpy(kf->P_data, kf->Pminus_data, sizeof_float * kf->xhatSize * kf->xhatSize);
+ 1658              		.loc 1 396 9 is_stmt 1 view .LVU530
+ 396:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         memcpy(kf->P_data, kf->Pminus_data, sizeof_float * kf->xhatSize * kf->xhatSize);
+ 1659              		.loc 1 396 68 is_stmt 0 view .LVU531
+ 1660 006e 227B     		ldrb	r2, [r4, #12]	@ zero_extendqisi2
+ 396:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         memcpy(kf->P_data, kf->Pminus_data, sizeof_float * kf->xhatSize * kf->xhatSize);
+ 1661              		.loc 1 396 64 view .LVU532
+ 1662 0070 204D     		ldr	r5, .L71
+ 1663 0072 2B88     		ldrh	r3, [r5]
+ 396:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         memcpy(kf->P_data, kf->Pminus_data, sizeof_float * kf->xhatSize * kf->xhatSize);
+ 1664              		.loc 1 396 9 view .LVU533
+ 1665 0074 03FB02F2 		mul	r2, r3, r2
+ 1666 0078 D4F8EC10 		ldr	r1, [r4, #236]
+ 1667 007c D4F8E800 		ldr	r0, [r4, #232]
+ 1668 0080 FFF7FEFF 		bl	memcpy
+ 1669              	.LVL149:
+ 397:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     }
+ 1670              		.loc 1 397 9 is_stmt 1 view .LVU534
+ 397:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     }
+ 1671              		.loc 1 397 62 is_stmt 0 view .LVU535
+ 1672 0084 227B     		ldrb	r2, [r4, #12]	@ zero_extendqisi2
+ 397:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     }
+ 1673              		.loc 1 397 58 view .LVU536
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccmkfrD3.s 			page 46
+
+
+ 1674 0086 2B88     		ldrh	r3, [r5]
+ 1675 0088 02FB03F3 		mul	r3, r2, r3
+ 397:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     }
+ 1676              		.loc 1 397 9 view .LVU537
+ 1677 008c 03FB02F2 		mul	r2, r3, r2
+ 1678 0090 D4F8FC10 		ldr	r1, [r4, #252]
+ 1679 0094 D4F8F800 		ldr	r0, [r4, #248]
+ 1680 0098 FFF7FEFF 		bl	memcpy
+ 1681              	.LVL150:
+ 1682 009c E0E7     		b	.L61
+ 1683              	.LVL151:
+ 1684              	.L64:
+ 1685              	.LBB4:
+ 405:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     {
+ 1686              		.loc 1 405 43 is_stmt 1 discriminator 2 view .LVU538
+ 405:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     {
+ 1687              		.loc 1 405 44 is_stmt 0 discriminator 2 view .LVU539
+ 1688 009e 0133     		adds	r3, r3, #1
+ 1689              	.LVL152:
+ 405:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     {
+ 1690              		.loc 1 405 44 discriminator 2 view .LVU540
+ 1691 00a0 DBB2     		uxtb	r3, r3
+ 1692              	.LVL153:
+ 1693              	.L63:
+ 405:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     {
+ 1694              		.loc 1 405 25 is_stmt 1 discriminator 1 view .LVU541
+ 405:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     {
+ 1695              		.loc 1 405 31 is_stmt 0 discriminator 1 view .LVU542
+ 1696 00a2 227B     		ldrb	r2, [r4, #12]	@ zero_extendqisi2
+ 405:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     {
+ 1697              		.loc 1 405 5 discriminator 1 view .LVU543
+ 1698 00a4 9A42     		cmp	r2, r3
+ 1699 00a6 14D9     		bls	.L70
+ 407:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****             kf->P_data[i * kf->xhatSize + i] = kf->StateMinVariance[i];
+ 1700              		.loc 1 407 9 is_stmt 1 view .LVU544
+ 407:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****             kf->P_data[i * kf->xhatSize + i] = kf->StateMinVariance[i];
+ 1701              		.loc 1 407 15 is_stmt 0 view .LVU545
+ 1702 00a8 D4F8F810 		ldr	r1, [r4, #248]
+ 407:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****             kf->P_data[i * kf->xhatSize + i] = kf->StateMinVariance[i];
+ 1703              		.loc 1 407 41 view .LVU546
+ 1704 00ac 02FB0332 		mla	r2, r2, r3, r3
+ 407:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****             kf->P_data[i * kf->xhatSize + i] = kf->StateMinVariance[i];
+ 1705              		.loc 1 407 23 view .LVU547
+ 1706 00b0 01EB8202 		add	r2, r1, r2, lsl #2
+ 1707 00b4 92ED007A 		vldr.32	s14, [r2]
+ 407:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****             kf->P_data[i * kf->xhatSize + i] = kf->StateMinVariance[i];
+ 1708              		.loc 1 407 50 view .LVU548
+ 1709 00b8 216A     		ldr	r1, [r4, #32]
+ 407:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****             kf->P_data[i * kf->xhatSize + i] = kf->StateMinVariance[i];
+ 1710              		.loc 1 407 68 view .LVU549
+ 1711 00ba 01EB8301 		add	r1, r1, r3, lsl #2
+ 1712 00be D1ED007A 		vldr.32	s15, [r1]
+ 407:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****             kf->P_data[i * kf->xhatSize + i] = kf->StateMinVariance[i];
+ 1713              		.loc 1 407 12 view .LVU550
+ 1714 00c2 B4EEE77A 		vcmpe.f32	s14, s15
+ 1715 00c6 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 1716 00ca E8D5     		bpl	.L64
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccmkfrD3.s 			page 47
+
+
+ 408:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     }
+ 1717              		.loc 1 408 13 is_stmt 1 view .LVU551
+ 408:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****     }
+ 1718              		.loc 1 408 46 is_stmt 0 view .LVU552
+ 1719 00cc C2ED007A 		vstr.32	s15, [r2]
+ 1720 00d0 E5E7     		b	.L64
+ 1721              	.L70:
+ 1722              	.LBE4:
+ 411:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 1723              		.loc 1 411 5 is_stmt 1 view .LVU553
+ 411:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 1724              		.loc 1 411 59 is_stmt 0 view .LVU554
+ 1725 00d2 084B     		ldr	r3, .L71
+ 1726              	.LVL154:
+ 411:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 1727              		.loc 1 411 59 view .LVU555
+ 1728 00d4 1B88     		ldrh	r3, [r3]
+ 411:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 1729              		.loc 1 411 5 view .LVU556
+ 1730 00d6 03FB02F2 		mul	r2, r3, r2
+ 1731 00da D4F8E810 		ldr	r1, [r4, #232]
+ 1732 00de 2068     		ldr	r0, [r4]
+ 1733 00e0 FFF7FEFF 		bl	memcpy
+ 1734              	.LVL155:
+ 413:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->User_Func6_f(kf);
+ 1735              		.loc 1 413 5 is_stmt 1 view .LVU557
+ 413:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->User_Func6_f(kf);
+ 1736              		.loc 1 413 11 is_stmt 0 view .LVU558
+ 1737 00e4 D4F8E430 		ldr	r3, [r4, #228]
+ 413:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c ****         kf->User_Func6_f(kf);
+ 1738              		.loc 1 413 8 view .LVU559
+ 1739 00e8 0BB1     		cbz	r3, .L67
+ 414:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 1740              		.loc 1 414 9 is_stmt 1 view .LVU560
+ 1741 00ea 2046     		mov	r0, r4
+ 1742 00ec 9847     		blx	r3
+ 1743              	.LVL156:
+ 1744              	.L67:
+ 416:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** }
+ 1745              		.loc 1 416 5 view .LVU561
+ 417:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 1746              		.loc 1 417 1 is_stmt 0 view .LVU562
+ 1747 00ee 2068     		ldr	r0, [r4]
+ 1748 00f0 38BD     		pop	{r3, r4, r5, pc}
+ 1749              	.LVL157:
+ 1750              	.L72:
+ 417:ACE-ECF/Application/src/IMU_Driver/kalman_filter.c **** 
+ 1751              		.loc 1 417 1 view .LVU563
+ 1752 00f2 00BF     		.align	2
+ 1753              	.L71:
+ 1754 00f4 00000000 		.word	.LANCHOR0
+ 1755              		.cfi_endproc
+ 1756              	.LFE170:
+ 1758              		.global	sizeof_double
+ 1759              		.global	sizeof_float
+ 1760              		.section	.bss.sizeof_double,"aw",%nobits
+ 1761              		.align	1
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccmkfrD3.s 			page 48
+
+
+ 1762              		.set	.LANCHOR1,. + 0
+ 1765              	sizeof_double:
+ 1766 0000 0000     		.space	2
+ 1767              		.section	.bss.sizeof_float,"aw",%nobits
+ 1768              		.align	1
+ 1769              		.set	.LANCHOR0,. + 0
+ 1772              	sizeof_float:
+ 1773 0000 0000     		.space	2
+ 1774              		.text
+ 1775              	.Letext0:
+ 1776              		.file 2 "d:\\gcc-arm-none-eabi-10.3-2021.10\\arm-none-eabi\\include\\machine\\_default_types.h"
+ 1777              		.file 3 "d:\\gcc-arm-none-eabi-10.3-2021.10\\arm-none-eabi\\include\\sys\\_stdint.h"
+ 1778              		.file 4 "Middlewares/ST/ARM/DSP/Inc/arm_math.h"
+ 1779              		.file 5 "ACE-ECF/Application/inc/IMU_Driver/kalman_filter.h"
+ 1780              		.file 6 "<built-in>"
+ 1781              		.file 7 "d:\\gcc-arm-none-eabi-10.3-2021.10\\arm-none-eabi\\include\\stdlib.h"
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccmkfrD3.s 			page 49
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 kalman_filter.c
+C:\Users\28212\AppData\Local\Temp\ccmkfrD3.s:20     .text.H_K_R_Adjustment:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccmkfrD3.s:25     .text.H_K_R_Adjustment:00000000 H_K_R_Adjustment
+C:\Users\28212\AppData\Local\Temp\ccmkfrD3.s:256    .text.H_K_R_Adjustment:00000114 $d
+C:\Users\28212\AppData\Local\Temp\ccmkfrD3.s:261    .text.Kalman_Filter_Init:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccmkfrD3.s:267    .text.Kalman_Filter_Init:00000000 Kalman_Filter_Init
+C:\Users\28212\AppData\Local\Temp\ccmkfrD3.s:836    .text.Kalman_Filter_Init:000003c4 $d
+C:\Users\28212\AppData\Local\Temp\ccmkfrD3.s:842    .text.Kalman_Filter_Init:000003cc $t
+C:\Users\28212\AppData\Local\Temp\ccmkfrD3.s:893    .text.Kalman_Filter_Init:00000428 $d
+C:\Users\28212\AppData\Local\Temp\ccmkfrD3.s:898    .text.Kalman_Filter_Measure:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccmkfrD3.s:904    .text.Kalman_Filter_Measure:00000000 Kalman_Filter_Measure
+C:\Users\28212\AppData\Local\Temp\ccmkfrD3.s:974    .text.Kalman_Filter_Measure:00000048 $d
+C:\Users\28212\AppData\Local\Temp\ccmkfrD3.s:979    .text.Kalman_Filter_xhatMinusUpdate:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccmkfrD3.s:985    .text.Kalman_Filter_xhatMinusUpdate:00000000 Kalman_Filter_xhatMinusUpdate
+C:\Users\28212\AppData\Local\Temp\ccmkfrD3.s:1091   .text.Kalman_Filter_PminusUpdate:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccmkfrD3.s:1097   .text.Kalman_Filter_PminusUpdate:00000000 Kalman_Filter_PminusUpdate
+C:\Users\28212\AppData\Local\Temp\ccmkfrD3.s:1185   .text.Kalman_Filter_SetK:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccmkfrD3.s:1191   .text.Kalman_Filter_SetK:00000000 Kalman_Filter_SetK
+C:\Users\28212\AppData\Local\Temp\ccmkfrD3.s:1340   .text.Kalman_Filter_xhatUpdate:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccmkfrD3.s:1346   .text.Kalman_Filter_xhatUpdate:00000000 Kalman_Filter_xhatUpdate
+C:\Users\28212\AppData\Local\Temp\ccmkfrD3.s:1445   .text.Kalman_Filter_P_Update:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccmkfrD3.s:1451   .text.Kalman_Filter_P_Update:00000000 Kalman_Filter_P_Update
+C:\Users\28212\AppData\Local\Temp\ccmkfrD3.s:1538   .text.Kalman_Filter_Update:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccmkfrD3.s:1544   .text.Kalman_Filter_Update:00000000 Kalman_Filter_Update
+C:\Users\28212\AppData\Local\Temp\ccmkfrD3.s:1754   .text.Kalman_Filter_Update:000000f4 $d
+C:\Users\28212\AppData\Local\Temp\ccmkfrD3.s:1765   .bss.sizeof_double:00000000 sizeof_double
+C:\Users\28212\AppData\Local\Temp\ccmkfrD3.s:1772   .bss.sizeof_float:00000000 sizeof_float
+C:\Users\28212\AppData\Local\Temp\ccmkfrD3.s:1761   .bss.sizeof_double:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccmkfrD3.s:1768   .bss.sizeof_float:00000000 $d
+
+UNDEFINED SYMBOLS
+memcpy
+memset
+malloc
+arm_mat_init_f32
+arm_mat_mult_f32
+arm_mat_add_f32
+arm_mat_trans_f32
+arm_mat_inverse_f32
+arm_mat_sub_f32

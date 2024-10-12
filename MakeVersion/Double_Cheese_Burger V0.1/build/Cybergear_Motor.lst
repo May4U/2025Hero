@@ -1,0 +1,3013 @@
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.arch armv7e-m
+   3              		.fpu fpv4-sp-d16
+   4              		.eabi_attribute 27, 1
+   5              		.eabi_attribute 28, 1
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.file	"Cybergear_Motor.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.Float_to_Byte,"ax",%progbits
+  20              		.align	1
+  21              		.global	Float_to_Byte
+  22              		.syntax unified
+  23              		.thumb
+  24              		.thumb_func
+  26              	Float_to_Byte:
+  27              	.LVL0:
+  28              	.LFB130:
+  29              		.file 1 "ACE-ECF/Control/Src/Cybergear_Motor.c"
+   1:ACE-ECF/Control/Src/Cybergear_Motor.c **** 
+   2:ACE-ECF/Control/Src/Cybergear_Motor.c **** /*************************** Dongguan-University of Technology -ACE**************************
+   3:ACE-ECF/Control/Src/Cybergear_Motor.c ****  * @file    cybergear.c
+   4:ACE-ECF/Control/Src/Cybergear_Motor.c ****  * @author  zhengNannnn
+   5:ACE-ECF/Control/Src/Cybergear_Motor.c ****  * @version V1.0
+   6:ACE-ECF/Control/Src/Cybergear_Motor.c ****  * @date    2023/10/1
+   7:ACE-ECF/Control/Src/Cybergear_Motor.c ****  * @brief
+   8:ACE-ECF/Control/Src/Cybergear_Motor.c ****  ******************************************************************************
+   9:ACE-ECF/Control/Src/Cybergear_Motor.c ****  * @verbatim
+  10:ACE-ECF/Control/Src/Cybergear_Motor.c ****  *  Ã×¹·µç»úÇý¶¯¿â,Ö§³Ö×Ô¶¨ÒåÑ¡ÔñcanÓÊÏä,Ö§³Ö¶àµç»úÍ¬Ê±Ê¹ÓÃ
+  11:ACE-ECF/Control/Src/Cybergear_Motor.c ****  *  Ê¹ÓÃ·½·¨£º
+  12:ACE-ECF/Control/Src/Cybergear_Motor.c ****  *      ÏÈ´´½¨Ò»¸öÃ×¹·µç»ú½á¹¹Ìå
+  13:ACE-ECF/Control/Src/Cybergear_Motor.c ****  *      ³õÊ¼»¯£º
+  14:ACE-ECF/Control/Src/Cybergear_Motor.c ****  *            Ê¹ÓÃMI_motor_initÉêÇëÊý¾Ý½á¹¹Ìå£¬×¢ÒâÕâÀïÉèÖÃºóÃæÊ¹ÓÃµÄcanÍøÂç
+  15:ACE-ECF/Control/Src/Cybergear_Motor.c ****  *            Ê¹ÓÃMI_motor_get_ID(MI_Motor);//»ñÈ¡µç»úidÖµ
+  16:ACE-ECF/Control/Src/Cybergear_Motor.c ****  *            Ê¹ÓÃchangeID(MI_Motor,num);//¸ü¸ÄID
+  17:ACE-ECF/Control/Src/Cybergear_Motor.c ****  *      Ê¹ÓÃ£º¶àÖÖÔËÐÐÄ£Ê½,¾ßÌåÁ÷³Ì²Î¿¼ÓÃ»§ÊÖ²á
+  18:ACE-ECF/Control/Src/Cybergear_Motor.c ****  *  demo£º
+  19:ACE-ECF/Control/Src/Cybergear_Motor.c ****  *       extern MI_Motor_t MI_Motor;//ÒýÓÃÒ»¸öÃ×¹·µç»ú½á¹¹Ìå,Êµ¼ÊÉÏÔÚcan½ÓÊÕÏà¹Ø.cÖÐÉùÃ÷¶¨Òå
+  20:ACE-ECF/Control/Src/Cybergear_Motor.c ****  *       MI_Motor = MI_motor_init(hcan1);//¹ÒÔØÔÚcan1
+  21:ACE-ECF/Control/Src/Cybergear_Motor.c ****  *       MI_motor_get_ID(MI_Motor);//»ñÈ¡µç»úidÖµ,´¢´æµ½½á¹¹Ìå
+  22:ACE-ECF/Control/Src/Cybergear_Motor.c ****  *       MI_motor_changeID(MI_Motor,127);//¸ü¸ÄIDÎª127
+  23:ACE-ECF/Control/Src/Cybergear_Motor.c ****  *       MI_motor_enable(MI_Motor)£»//µç»úÊ¹ÄÜ
+  24:ACE-ECF/Control/Src/Cybergear_Motor.c ****  *       MI_motor_controlmode(MI_Motor, torque, MechPosition , speed , kp , kd);//ÔË¿ØÄ£Ê½
+  25:ACE-ECF/Control/Src/Cybergear_Motor.c ****  *       void MI_motor_stop(MI_Motor_t* hmotor);//µç»úÊ§ÄÜ
+  26:ACE-ECF/Control/Src/Cybergear_Motor.c ****  * @attention
+  27:ACE-ECF/Control/Src/Cybergear_Motor.c ****  *      ÇëÈ·±£CANÒÑ¾­start
+  28:ACE-ECF/Control/Src/Cybergear_Motor.c ****  *      ÇëÏÈÅÐ¶Ï»ùÓÚ´ó¶ËÍ¨ÐÅ»¹ÊÇÐ¡¶ÎÍ¨ÐÅ,ÔÚMI_motor_recive_callbackº¯ÊýÄÚÐÞ¸Äºê¶¨Òå
+  29:ACE-ECF/Control/Src/Cybergear_Motor.c ****  *      Ã¿´´½¨Ò»¸öÃ×¹·µç»ú½á¹¹Ìå,¾Í¶ªÒ»¸ö´¦Àíº¯Êýµ½¶ÔÓ¦µÄcanÖÐ¶ÏÀïÃæ,ÀýÈç
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s 			page 2
+
+
+  30:ACE-ECF/Control/Src/Cybergear_Motor.c ****  *      MI_Motor_t YAW_Motor;
+  31:ACE-ECF/Control/Src/Cybergear_Motor.c ****  *      MI_Motor_t PITCH_Motor;
+  32:ACE-ECF/Control/Src/Cybergear_Motor.c ****  *      MI_motor_recive_callback(YAW_Motor, Rxmessage.ExtId, Rx_Data)¶ªµ½ÖÐ¶Ï´¦Àíº¯Êý
+  33:ACE-ECF/Control/Src/Cybergear_Motor.c ****  *      MI_motor_recive_callback(PITCH_Motor, Rxmessage.ExtId, Rx_Data)¶ªµ½ÖÐ¶Ï´¦Àíº¯Êý
+  34:ACE-ECF/Control/Src/Cybergear_Motor.c ****  * @version
+  35:ACE-ECF/Control/Src/Cybergear_Motor.c ****  * v1.0   »ù´¡°æ±¾
+  36:ACE-ECF/Control/Src/Cybergear_Motor.c ****  * v1.1   Ìí¼Ó½ÓÊÕ´¦Àíº¯Êý
+  37:ACE-ECF/Control/Src/Cybergear_Motor.c ****  * v1.2   ¼¯³ÉËÙ¶ÈÎ»ÖÃ»·PID
+  38:ACE-ECF/Control/Src/Cybergear_Motor.c ****  ************************** Dongguan-University of Technology -ACE***************************/
+  39:ACE-ECF/Control/Src/Cybergear_Motor.c **** #include "Cybergear_Motor.h"
+  40:ACE-ECF/Control/Src/Cybergear_Motor.c **** #include "bsp_can.h"
+  41:ACE-ECF/Control/Src/Cybergear_Motor.c **** #include <string.h>
+  42:ACE-ECF/Control/Src/Cybergear_Motor.c **** #include <stdlib.h>
+  43:ACE-ECF/Control/Src/Cybergear_Motor.c **** 
+  44:ACE-ECF/Control/Src/Cybergear_Motor.c **** //¹²ÓÃÌåfloat×ªÐÍuint8_t
+  45:ACE-ECF/Control/Src/Cybergear_Motor.c **** union FloatAndBytes_t {
+  46:ACE-ECF/Control/Src/Cybergear_Motor.c ****     float floatValue;
+  47:ACE-ECF/Control/Src/Cybergear_Motor.c ****     uint8_t byteValue[4];
+  48:ACE-ECF/Control/Src/Cybergear_Motor.c **** }FloatAndBytes;
+  49:ACE-ECF/Control/Src/Cybergear_Motor.c **** 
+  50:ACE-ECF/Control/Src/Cybergear_Motor.c **** bool get_can_id = false;
+  51:ACE-ECF/Control/Src/Cybergear_Motor.c **** uint8_t MI_id = 0;
+  52:ACE-ECF/Control/Src/Cybergear_Motor.c **** /**
+  53:ACE-ECF/Control/Src/Cybergear_Motor.c ****   * @brief         ¸¡µãÊý×ª4×Ö½Ú
+  54:ACE-ECF/Control/Src/Cybergear_Motor.c ****   * @param         ¸¡µãÊý
+  55:ACE-ECF/Control/Src/Cybergear_Motor.c ****   * @return        4×Ö½ÚÊý×é
+  56:ACE-ECF/Control/Src/Cybergear_Motor.c ****   * @description   IEEE 754 Ð­Òé
+  57:ACE-ECF/Control/Src/Cybergear_Motor.c ****   */
+  58:ACE-ECF/Control/Src/Cybergear_Motor.c **** uint8_t byte[4];
+  59:ACE-ECF/Control/Src/Cybergear_Motor.c **** uint8_t* Float_to_Byte(float f)
+  60:ACE-ECF/Control/Src/Cybergear_Motor.c **** {
+  30              		.loc 1 60 1 view -0
+  31              		.cfi_startproc
+  32              		@ args = 0, pretend = 0, frame = 8
+  33              		@ frame_needed = 0, uses_anonymous_args = 0
+  34              		@ link register save eliminated.
+  35              		.loc 1 60 1 is_stmt 0 view .LVU1
+  36 0000 82B0     		sub	sp, sp, #8
+  37              	.LCFI0:
+  38              		.cfi_def_cfa_offset 8
+  39 0002 8DED010A 		vstr.32	s0, [sp, #4]
+  61:ACE-ECF/Control/Src/Cybergear_Motor.c **** 	unsigned long longdata = 0;
+  40              		.loc 1 61 2 is_stmt 1 view .LVU2
+  41              	.LVL1:
+  62:ACE-ECF/Control/Src/Cybergear_Motor.c **** 	longdata = *(unsigned long*)&f;       
+  42              		.loc 1 62 2 view .LVU3
+  43              		.loc 1 62 11 is_stmt 0 view .LVU4
+  44 0006 019B     		ldr	r3, [sp, #4]
+  45              	.LVL2:
+  63:ACE-ECF/Control/Src/Cybergear_Motor.c **** 	byte[0] = (longdata & 0xFF000000) >> 24;
+  46              		.loc 1 63 2 is_stmt 1 view .LVU5
+  47              		.loc 1 63 36 is_stmt 0 view .LVU6
+  48 0008 1A0E     		lsrs	r2, r3, #24
+  49              		.loc 1 63 10 view .LVU7
+  50 000a 0448     		ldr	r0, .L3
+  51 000c 0270     		strb	r2, [r0]
+  64:ACE-ECF/Control/Src/Cybergear_Motor.c **** 	byte[1] = (longdata & 0x00FF0000) >> 16;
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s 			page 3
+
+
+  52              		.loc 1 64 2 is_stmt 1 view .LVU8
+  53              		.loc 1 64 36 is_stmt 0 view .LVU9
+  54 000e 1A0C     		lsrs	r2, r3, #16
+  55              		.loc 1 64 10 view .LVU10
+  56 0010 4270     		strb	r2, [r0, #1]
+  65:ACE-ECF/Control/Src/Cybergear_Motor.c **** 	byte[2] = (longdata & 0x0000FF00) >> 8;
+  57              		.loc 1 65 2 is_stmt 1 view .LVU11
+  58              		.loc 1 65 36 is_stmt 0 view .LVU12
+  59 0012 1A0A     		lsrs	r2, r3, #8
+  60              		.loc 1 65 10 view .LVU13
+  61 0014 8270     		strb	r2, [r0, #2]
+  66:ACE-ECF/Control/Src/Cybergear_Motor.c **** 	byte[3] = (longdata & 0x000000FF);
+  62              		.loc 1 66 2 is_stmt 1 view .LVU14
+  63              		.loc 1 66 10 is_stmt 0 view .LVU15
+  64 0016 C370     		strb	r3, [r0, #3]
+  67:ACE-ECF/Control/Src/Cybergear_Motor.c **** 	return byte;
+  65              		.loc 1 67 2 is_stmt 1 view .LVU16
+  68:ACE-ECF/Control/Src/Cybergear_Motor.c **** }
+  66              		.loc 1 68 1 is_stmt 0 view .LVU17
+  67 0018 02B0     		add	sp, sp, #8
+  68              	.LCFI1:
+  69              		.cfi_def_cfa_offset 0
+  70              		@ sp needed
+  71 001a 7047     		bx	lr
+  72              	.L4:
+  73              		.align	2
+  74              	.L3:
+  75 001c 00000000 		.word	.LANCHOR0
+  76              		.cfi_endproc
+  77              	.LFE130:
+  79              		.section	.text.Byte_to_Float,"ax",%progbits
+  80              		.align	1
+  81              		.global	Byte_to_Float
+  82              		.syntax unified
+  83              		.thumb
+  84              		.thumb_func
+  86              	Byte_to_Float:
+  87              	.LVL3:
+  88              	.LFB131:
+  69:ACE-ECF/Control/Src/Cybergear_Motor.c **** /**
+  70:ACE-ECF/Control/Src/Cybergear_Motor.c ****   * @brief         4×Ö½Ú×ª¸¡µãÊý
+  71:ACE-ECF/Control/Src/Cybergear_Motor.c ****   * @param         4×Ö½ÚÊý×é
+  72:ACE-ECF/Control/Src/Cybergear_Motor.c ****   * @return        ¸¡µãÊý
+  73:ACE-ECF/Control/Src/Cybergear_Motor.c ****   * @description   IEEE 754 Ð­Òé
+  74:ACE-ECF/Control/Src/Cybergear_Motor.c ****   */
+  75:ACE-ECF/Control/Src/Cybergear_Motor.c **** float Byte_to_Float(uint8_t* byte)
+  76:ACE-ECF/Control/Src/Cybergear_Motor.c **** {
+  89              		.loc 1 76 1 is_stmt 1 view -0
+  90              		.cfi_startproc
+  91              		@ args = 0, pretend = 0, frame = 0
+  92              		@ frame_needed = 0, uses_anonymous_args = 0
+  93              		@ link register save eliminated.
+  77:ACE-ECF/Control/Src/Cybergear_Motor.c ****     unsigned long longdata = 0;
+  94              		.loc 1 77 5 view .LVU19
+  78:ACE-ECF/Control/Src/Cybergear_Motor.c **** 
+  79:ACE-ECF/Control/Src/Cybergear_Motor.c ****     // ½«×Ö½Ú°´Î»×é×°³ÉÒ»¸öÎÞ·ûºÅ³¤ÕûÊý
+  80:ACE-ECF/Control/Src/Cybergear_Motor.c ****     longdata |= (unsigned long)byte[0] << 24;
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s 			page 4
+
+
+  95              		.loc 1 80 5 view .LVU20
+  96              		.loc 1 80 36 is_stmt 0 view .LVU21
+  97 0000 0278     		ldrb	r2, [r0]	@ zero_extendqisi2
+  98              	.LVL4:
+  81:ACE-ECF/Control/Src/Cybergear_Motor.c ****     longdata |= (unsigned long)byte[1] << 16;
+  99              		.loc 1 81 5 is_stmt 1 view .LVU22
+ 100              		.loc 1 81 36 is_stmt 0 view .LVU23
+ 101 0002 4378     		ldrb	r3, [r0, #1]	@ zero_extendqisi2
+ 102              		.loc 1 81 40 view .LVU24
+ 103 0004 1B04     		lsls	r3, r3, #16
+ 104              		.loc 1 81 14 view .LVU25
+ 105 0006 43EA0263 		orr	r3, r3, r2, lsl #24
+ 106              	.LVL5:
+  82:ACE-ECF/Control/Src/Cybergear_Motor.c ****     longdata |= (unsigned long)byte[2] << 8;
+ 107              		.loc 1 82 5 is_stmt 1 view .LVU26
+ 108              		.loc 1 82 36 is_stmt 0 view .LVU27
+ 109 000a 8278     		ldrb	r2, [r0, #2]	@ zero_extendqisi2
+ 110              		.loc 1 82 14 view .LVU28
+ 111 000c 43EA0223 		orr	r3, r3, r2, lsl #8
+ 112              	.LVL6:
+  83:ACE-ECF/Control/Src/Cybergear_Motor.c ****     longdata |= (unsigned long)byte[3];
+ 113              		.loc 1 83 5 is_stmt 1 view .LVU29
+ 114              		.loc 1 83 36 is_stmt 0 view .LVU30
+ 115 0010 C278     		ldrb	r2, [r0, #3]	@ zero_extendqisi2
+ 116              	.LVL7:
+  84:ACE-ECF/Control/Src/Cybergear_Motor.c **** 
+  85:ACE-ECF/Control/Src/Cybergear_Motor.c ****     // ½«³¤ÕûÊýÖØÐÂ½âÊÍÎª¸¡µãÊý
+  86:ACE-ECF/Control/Src/Cybergear_Motor.c ****     float result = *(float*)&longdata;
+ 117              		.loc 1 86 5 is_stmt 1 view .LVU31
+ 118              		.loc 1 86 11 is_stmt 0 view .LVU32
+ 119 0012 1343     		orrs	r3, r3, r2
+ 120              	.LVL8:
+ 121              		.loc 1 86 11 view .LVU33
+ 122 0014 00EE103A 		vmov	s0, r3	@ int
+ 123              	.LVL9:
+  87:ACE-ECF/Control/Src/Cybergear_Motor.c **** 
+  88:ACE-ECF/Control/Src/Cybergear_Motor.c ****     return result;
+ 124              		.loc 1 88 5 is_stmt 1 view .LVU34
+  89:ACE-ECF/Control/Src/Cybergear_Motor.c **** }
+ 125              		.loc 1 89 1 is_stmt 0 view .LVU35
+ 126 0018 7047     		bx	lr
+ 127              		.cfi_endproc
+ 128              	.LFE131:
+ 130              		.section	.text.float_to_uint,"ax",%progbits
+ 131              		.align	1
+ 132              		.global	float_to_uint
+ 133              		.syntax unified
+ 134              		.thumb
+ 135              		.thumb_func
+ 137              	float_to_uint:
+ 138              	.LVL10:
+ 139              	.LFB132:
+  90:ACE-ECF/Control/Src/Cybergear_Motor.c **** 
+  91:ACE-ECF/Control/Src/Cybergear_Motor.c **** /**
+  92:ACE-ECF/Control/Src/Cybergear_Motor.c ****   * @brief  float×ªint£¬Êý¾Ý´ò°üÓÃ
+  93:ACE-ECF/Control/Src/Cybergear_Motor.c ****   * @param  x floatÊýÖµ
+  94:ACE-ECF/Control/Src/Cybergear_Motor.c ****   * @param  x_min floatÊýÖµµÄ×îÐ¡Öµ
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s 			page 5
+
+
+  95:ACE-ECF/Control/Src/Cybergear_Motor.c ****   * @param  x_max floatÊýÖµµÄ×î´óÖµ
+  96:ACE-ECF/Control/Src/Cybergear_Motor.c ****   * @param  bits  intµÄÊý¾ÝÎ»Êý
+  97:ACE-ECF/Control/Src/Cybergear_Motor.c ****   * @retval null
+  98:ACE-ECF/Control/Src/Cybergear_Motor.c ****   */
+  99:ACE-ECF/Control/Src/Cybergear_Motor.c **** int float_to_uint(float x, float x_min, float x_max, int bits) 
+ 100:ACE-ECF/Control/Src/Cybergear_Motor.c **** {
+ 140              		.loc 1 100 1 is_stmt 1 view -0
+ 141              		.cfi_startproc
+ 142              		@ args = 0, pretend = 0, frame = 0
+ 143              		@ frame_needed = 0, uses_anonymous_args = 0
+ 144              		@ link register save eliminated.
+ 101:ACE-ECF/Control/Src/Cybergear_Motor.c ****     float span = x_max - x_min;
+ 145              		.loc 1 101 5 view .LVU37
+ 146              		.loc 1 101 11 is_stmt 0 view .LVU38
+ 147 0000 31EE607A 		vsub.f32	s14, s2, s1
+ 148              	.LVL11:
+ 102:ACE-ECF/Control/Src/Cybergear_Motor.c ****     float offset = x_min;
+ 149              		.loc 1 102 5 is_stmt 1 view .LVU39
+ 103:ACE-ECF/Control/Src/Cybergear_Motor.c ****     if(x > x_max) x=x_max;
+ 150              		.loc 1 103 5 view .LVU40
+ 151              		.loc 1 103 7 is_stmt 0 view .LVU41
+ 152 0004 B4EEC01A 		vcmpe.f32	s2, s0
+ 153 0008 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 154 000c 06D4     		bmi	.L7
+ 104:ACE-ECF/Control/Src/Cybergear_Motor.c ****     else if(x < x_min) x= x_min;
+ 155              		.loc 1 104 10 is_stmt 1 view .LVU42
+ 156              		.loc 1 104 12 is_stmt 0 view .LVU43
+ 157 000e F4EEC00A 		vcmpe.f32	s1, s0
+ 158 0012 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 159 0016 14DC     		bgt	.L8
+ 160 0018 B0EE401A 		vmov.f32	s2, s0
+ 161              	.LVL12:
+ 162              	.L7:
+ 105:ACE-ECF/Control/Src/Cybergear_Motor.c ****     return (int) ((x-offset)*((float)((1<<bits)-1))/span);
+ 163              		.loc 1 105 5 is_stmt 1 view .LVU44
+ 164              		.loc 1 105 21 is_stmt 0 view .LVU45
+ 165 001c 71EE600A 		vsub.f32	s1, s2, s1
+ 166              	.LVL13:
+ 167              		.loc 1 105 41 view .LVU46
+ 168 0020 0123     		movs	r3, #1
+ 169 0022 03FA00F0 		lsl	r0, r3, r0
+ 170              	.LVL14:
+ 171              		.loc 1 105 48 view .LVU47
+ 172 0026 431E     		subs	r3, r0, #1
+ 173 0028 01EE103A 		vmov	s2, r3	@ int
+ 174              	.LVL15:
+ 175              		.loc 1 105 31 view .LVU48
+ 176 002c B8EEC11A 		vcvt.f32.s32	s2, s2
+ 177              		.loc 1 105 29 view .LVU49
+ 178 0030 20EE811A 		vmul.f32	s2, s1, s2
+ 179              		.loc 1 105 52 view .LVU50
+ 180 0034 C1EE077A 		vdiv.f32	s15, s2, s14
+ 106:ACE-ECF/Control/Src/Cybergear_Motor.c **** }
+ 181              		.loc 1 106 1 view .LVU51
+ 182 0038 FDEEE77A 		vcvt.s32.f32	s15, s15
+ 183 003c 17EE900A 		vmov	r0, s15	@ int
+ 184 0040 7047     		bx	lr
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s 			page 6
+
+
+ 185              	.LVL16:
+ 186              	.L8:
+ 104:ACE-ECF/Control/Src/Cybergear_Motor.c ****     else if(x < x_min) x= x_min;
+ 187              		.loc 1 104 25 view .LVU52
+ 188 0042 B0EE601A 		vmov.f32	s2, s1
+ 189              	.LVL17:
+ 104:ACE-ECF/Control/Src/Cybergear_Motor.c ****     else if(x < x_min) x= x_min;
+ 190              		.loc 1 104 25 view .LVU53
+ 191 0046 E9E7     		b	.L7
+ 192              		.cfi_endproc
+ 193              	.LFE132:
+ 195              		.section	.text.uint16_to_float,"ax",%progbits
+ 196              		.align	1
+ 197              		.global	uint16_to_float
+ 198              		.syntax unified
+ 199              		.thumb
+ 200              		.thumb_func
+ 202              	uint16_to_float:
+ 203              	.LVL18:
+ 204              	.LFB133:
+ 107:ACE-ECF/Control/Src/Cybergear_Motor.c **** /**
+ 108:ACE-ECF/Control/Src/Cybergear_Motor.c ****   * @brief  Ð¡Ã×µç»ú»ØÎÄ16Î»Êý¾Ý×ª¸¡µã
+ 109:ACE-ECF/Control/Src/Cybergear_Motor.c ****   * @param  16Î»»ØÎÄ 
+ 110:ACE-ECF/Control/Src/Cybergear_Motor.c ****   * @param  ¶ÔÓ¦²ÎÊýÏÂÏÞ 
+ 111:ACE-ECF/Control/Src/Cybergear_Motor.c ****   * @param  ¶ÔÓ¦²ÎÊýÉÏÏÞ 
+ 112:ACE-ECF/Control/Src/Cybergear_Motor.c ****   * @param  ²ÎÊýÎ»Êý
+ 113:ACE-ECF/Control/Src/Cybergear_Motor.c ****   * @return ²ÎÊý¶ÔÓ¦¸¡µãÊý
+ 114:ACE-ECF/Control/Src/Cybergear_Motor.c ****   */
+ 115:ACE-ECF/Control/Src/Cybergear_Motor.c **** float uint16_to_float(uint16_t x,float x_min,float x_max,int bits){
+ 205              		.loc 1 115 67 is_stmt 1 view -0
+ 206              		.cfi_startproc
+ 207              		@ args = 0, pretend = 0, frame = 0
+ 208              		@ frame_needed = 0, uses_anonymous_args = 0
+ 209              		@ link register save eliminated.
+ 210              		.loc 1 115 67 is_stmt 0 view .LVU55
+ 211 0000 07EE900A 		vmov	s15, r0	@ int
+ 116:ACE-ECF/Control/Src/Cybergear_Motor.c ****     uint32_t span = (1 << bits) - 1;
+ 212              		.loc 1 116 5 is_stmt 1 view .LVU56
+ 213              		.loc 1 116 24 is_stmt 0 view .LVU57
+ 214 0004 0123     		movs	r3, #1
+ 215 0006 8B40     		lsls	r3, r3, r1
+ 216              		.loc 1 116 33 view .LVU58
+ 217 0008 013B     		subs	r3, r3, #1
+ 218              	.LVL19:
+ 117:ACE-ECF/Control/Src/Cybergear_Motor.c ****     float offset = x_max - x_min;
+ 219              		.loc 1 117 5 is_stmt 1 view .LVU59
+ 220              		.loc 1 117 11 is_stmt 0 view .LVU60
+ 221 000a 70EEC00A 		vsub.f32	s1, s1, s0
+ 222              	.LVL20:
+ 118:ACE-ECF/Control/Src/Cybergear_Motor.c ****     return offset * x / span + x_min;
+ 223              		.loc 1 118 5 is_stmt 1 view .LVU61
+ 224              		.loc 1 118 19 is_stmt 0 view .LVU62
+ 225 000e F8EEE77A 		vcvt.f32.s32	s15, s15
+ 226 0012 67EEA00A 		vmul.f32	s1, s15, s1
+ 227              	.LVL21:
+ 228              		.loc 1 118 23 view .LVU63
+ 229 0016 07EE903A 		vmov	s15, r3	@ int
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s 			page 7
+
+
+ 230 001a F8EE677A 		vcvt.f32.u32	s15, s15
+ 231 001e 80EEA77A 		vdiv.f32	s14, s1, s15
+ 119:ACE-ECF/Control/Src/Cybergear_Motor.c **** }
+ 232              		.loc 1 119 1 view .LVU64
+ 233 0022 37EE000A 		vadd.f32	s0, s14, s0
+ 234              	.LVL22:
+ 235              		.loc 1 119 1 view .LVU65
+ 236 0026 7047     		bx	lr
+ 237              		.cfi_endproc
+ 238              	.LFE133:
+ 240              		.section	.text.MI_Motor_CanTx,"ax",%progbits
+ 241              		.align	1
+ 242              		.global	MI_Motor_CanTx
+ 243              		.syntax unified
+ 244              		.thumb
+ 245              		.thumb_func
+ 247              	MI_Motor_CanTx:
+ 248              	.LVL23:
+ 249              	.LFB134:
+ 120:ACE-ECF/Control/Src/Cybergear_Motor.c **** 
+ 121:ACE-ECF/Control/Src/Cybergear_Motor.c **** /**
+ 122:ACE-ECF/Control/Src/Cybergear_Motor.c ****   * @brief  Ð¡Ã×µç»úCANÍ¨ÐÅ·¢ËÍ
+ 123:ACE-ECF/Control/Src/Cybergear_Motor.c ****   * @param  hmotor µç»ú½á¹¹Ìå
+ 124:ACE-ECF/Control/Src/Cybergear_Motor.c ****   * @retval null
+ 125:ACE-ECF/Control/Src/Cybergear_Motor.c ****   */
+ 126:ACE-ECF/Control/Src/Cybergear_Motor.c **** CAN_TxHeaderTypeDef CAN_TxHeader_MI;
+ 127:ACE-ECF/Control/Src/Cybergear_Motor.c **** void MI_Motor_CanTx(MI_Motor_t* MI_motor) 
+ 128:ACE-ECF/Control/Src/Cybergear_Motor.c **** {
+ 250              		.loc 1 128 1 is_stmt 1 view -0
+ 251              		.cfi_startproc
+ 252              		@ args = 0, pretend = 0, frame = 8
+ 253              		@ frame_needed = 0, uses_anonymous_args = 0
+ 254              		.loc 1 128 1 is_stmt 0 view .LVU67
+ 255 0000 30B5     		push	{r4, r5, lr}
+ 256              	.LCFI2:
+ 257              		.cfi_def_cfa_offset 12
+ 258              		.cfi_offset 4, -12
+ 259              		.cfi_offset 5, -8
+ 260              		.cfi_offset 14, -4
+ 261 0002 83B0     		sub	sp, sp, #12
+ 262              	.LCFI3:
+ 263              		.cfi_def_cfa_offset 24
+ 264 0004 0446     		mov	r4, r0
+ 129:ACE-ECF/Control/Src/Cybergear_Motor.c ****     CAN_TxHeader_MI.DLC = 8;
+ 265              		.loc 1 129 5 is_stmt 1 view .LVU68
+ 266              		.loc 1 129 25 is_stmt 0 view .LVU69
+ 267 0006 0D49     		ldr	r1, .L14
+ 268 0008 0823     		movs	r3, #8
+ 269 000a 0B61     		str	r3, [r1, #16]
+ 130:ACE-ECF/Control/Src/Cybergear_Motor.c ****     CAN_TxHeader_MI.IDE = CAN_ID_EXT;
+ 270              		.loc 1 130 5 is_stmt 1 view .LVU70
+ 271              		.loc 1 130 25 is_stmt 0 view .LVU71
+ 272 000c 0423     		movs	r3, #4
+ 273 000e 8B60     		str	r3, [r1, #8]
+ 131:ACE-ECF/Control/Src/Cybergear_Motor.c ****     CAN_TxHeader_MI.RTR = CAN_RTR_DATA;
+ 274              		.loc 1 131 5 is_stmt 1 view .LVU72
+ 275              		.loc 1 131 25 is_stmt 0 view .LVU73
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s 			page 8
+
+
+ 276 0010 0023     		movs	r3, #0
+ 277 0012 CB60     		str	r3, [r1, #12]
+ 132:ACE-ECF/Control/Src/Cybergear_Motor.c ****     CAN_TxHeader_MI.ExtId = *((uint32_t*)&(MI_motor->txMsg.ExtId));
+ 278              		.loc 1 132 5 is_stmt 1 view .LVU74
+ 279              		.loc 1 132 29 is_stmt 0 view .LVU75
+ 280 0014 036E     		ldr	r3, [r0, #96]
+ 281              		.loc 1 132 27 view .LVU76
+ 282 0016 4B60     		str	r3, [r1, #4]
+ 133:ACE-ECF/Control/Src/Cybergear_Motor.c **** 	/*CAN_TxHeader_MI.ExtId = hmotor->EXT_ID.motor_id<<24 | hmotor->EXT_ID.data << 8 | hmotor->EXT_ID.
+ 134:ACE-ECF/Control/Src/Cybergear_Motor.c ****     uint32_t mailbox;
+ 283              		.loc 1 134 5 is_stmt 1 view .LVU77
+ 135:ACE-ECF/Control/Src/Cybergear_Motor.c ****     
+ 136:ACE-ECF/Control/Src/Cybergear_Motor.c ****     uint32_t ret = HAL_CAN_AddTxMessage(MI_motor->phcan, &CAN_TxHeader_MI, MI_motor->txMsg.Data, &m
+ 284              		.loc 1 136 5 view .LVU78
+ 285              		.loc 1 136 91 is_stmt 0 view .LVU79
+ 286 0018 00F16405 		add	r5, r0, #100
+ 287              		.loc 1 136 20 view .LVU80
+ 288 001c 01AB     		add	r3, sp, #4
+ 289 001e 2A46     		mov	r2, r5
+ 290 0020 C06D     		ldr	r0, [r0, #92]
+ 291              	.LVL24:
+ 292              		.loc 1 136 20 view .LVU81
+ 293 0022 FFF7FEFF 		bl	HAL_CAN_AddTxMessage
+ 294              	.LVL25:
+ 137:ACE-ECF/Control/Src/Cybergear_Motor.c **** //    if (ret != HAL_OK) {
+ 138:ACE-ECF/Control/Src/Cybergear_Motor.c **** //        /* Transmission request Error */
+ 139:ACE-ECF/Control/Src/Cybergear_Motor.c **** //        while(1);
+ 140:ACE-ECF/Control/Src/Cybergear_Motor.c **** //    }
+ 141:ACE-ECF/Control/Src/Cybergear_Motor.c ****     while (ret != HAL_OK) {
+ 295              		.loc 1 141 5 is_stmt 1 view .LVU82
+ 296              		.loc 1 141 11 is_stmt 0 view .LVU83
+ 297 0026 05E0     		b	.L11
+ 298              	.L12:
+ 142:ACE-ECF/Control/Src/Cybergear_Motor.c ****         /* Transmission request Error */
+ 143:ACE-ECF/Control/Src/Cybergear_Motor.c ****         ret = HAL_CAN_AddTxMessage(MI_motor->phcan, &CAN_TxHeader_MI, MI_motor->txMsg.Data, &mailbo
+ 299              		.loc 1 143 9 is_stmt 1 view .LVU84
+ 300              		.loc 1 143 15 is_stmt 0 view .LVU85
+ 301 0028 01AB     		add	r3, sp, #4
+ 302 002a 2A46     		mov	r2, r5
+ 303 002c 0349     		ldr	r1, .L14
+ 304 002e E06D     		ldr	r0, [r4, #92]
+ 305              	.LVL26:
+ 306              		.loc 1 143 15 view .LVU86
+ 307 0030 FFF7FEFF 		bl	HAL_CAN_AddTxMessage
+ 308              	.LVL27:
+ 309              	.L11:
+ 141:ACE-ECF/Control/Src/Cybergear_Motor.c ****         /* Transmission request Error */
+ 310              		.loc 1 141 11 is_stmt 1 view .LVU87
+ 311 0034 0028     		cmp	r0, #0
+ 312 0036 F7D1     		bne	.L12
+ 144:ACE-ECF/Control/Src/Cybergear_Motor.c ****     }
+ 145:ACE-ECF/Control/Src/Cybergear_Motor.c **** }
+ 313              		.loc 1 145 1 is_stmt 0 view .LVU88
+ 314 0038 03B0     		add	sp, sp, #12
+ 315              	.LCFI4:
+ 316              		.cfi_def_cfa_offset 12
+ 317              		@ sp needed
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s 			page 9
+
+
+ 318 003a 30BD     		pop	{r4, r5, pc}
+ 319              	.LVL28:
+ 320              	.L15:
+ 321              		.loc 1 145 1 view .LVU89
+ 322              		.align	2
+ 323              	.L14:
+ 324 003c 00000000 		.word	.LANCHOR1
+ 325              		.cfi_endproc
+ 326              	.LFE134:
+ 328              		.section	.text.MI_Motor_CAN_Recive_init,"ax",%progbits
+ 329              		.align	1
+ 330              		.global	MI_Motor_CAN_Recive_init
+ 331              		.syntax unified
+ 332              		.thumb
+ 333              		.thumb_func
+ 335              	MI_Motor_CAN_Recive_init:
+ 336              	.LFB138:
+ 146:ACE-ECF/Control/Src/Cybergear_Motor.c **** 
+ 147:ACE-ECF/Control/Src/Cybergear_Motor.c **** /**
+ 148:ACE-ECF/Control/Src/Cybergear_Motor.c ****   * @brief  ÉêÇëÐ¡Ã×µç»ú½á¹¹Ìå²¢³õÊ¼»¯
+ 149:ACE-ECF/Control/Src/Cybergear_Motor.c ****   * @param  phcan can×ÜÏß¾ä±ú
+ 150:ACE-ECF/Control/Src/Cybergear_Motor.c ****   * @retval ÉêÇëµÄÐ¡Ã×µç»ú½á¹¹ÌåÖ¸Õë
+ 151:ACE-ECF/Control/Src/Cybergear_Motor.c ****   */
+ 152:ACE-ECF/Control/Src/Cybergear_Motor.c **** MI_Motor_t* Now_Malloc_Can1_MI_Motor_Groud[10] = {NULL};
+ 153:ACE-ECF/Control/Src/Cybergear_Motor.c **** MI_Motor_t* Now_Malloc_Can2_MI_Motor_Groud[10] = {NULL};
+ 154:ACE-ECF/Control/Src/Cybergear_Motor.c **** void MI_Motor_CAN_Recive_init(void);
+ 155:ACE-ECF/Control/Src/Cybergear_Motor.c **** 
+ 156:ACE-ECF/Control/Src/Cybergear_Motor.c **** MI_Motor_t* MI_motor_init(CAN_HandleTypeDef *phcan)
+ 157:ACE-ECF/Control/Src/Cybergear_Motor.c **** {
+ 158:ACE-ECF/Control/Src/Cybergear_Motor.c ****     MI_Motor_t *MI_motor = (MI_Motor_t *)malloc(sizeof(MI_Motor_t));
+ 159:ACE-ECF/Control/Src/Cybergear_Motor.c ****     memset(MI_motor, 0, sizeof(MI_Motor_t));
+ 160:ACE-ECF/Control/Src/Cybergear_Motor.c ****     
+ 161:ACE-ECF/Control/Src/Cybergear_Motor.c ****     MI_motor->have_pos_flag = 0;
+ 162:ACE-ECF/Control/Src/Cybergear_Motor.c ****     MI_motor->master_id = MASTER_ID;
+ 163:ACE-ECF/Control/Src/Cybergear_Motor.c ****     MI_motor->motor_id = MOTOR_ID;
+ 164:ACE-ECF/Control/Src/Cybergear_Motor.c ****     MI_motor->phcan = phcan;
+ 165:ACE-ECF/Control/Src/Cybergear_Motor.c ****     MI_motor->CanRxCallBack = NULL;
+ 166:ACE-ECF/Control/Src/Cybergear_Motor.c ****     
+ 167:ACE-ECF/Control/Src/Cybergear_Motor.c ****     if (phcan == &hcan1)
+ 168:ACE-ECF/Control/Src/Cybergear_Motor.c ****     {
+ 169:ACE-ECF/Control/Src/Cybergear_Motor.c ****         for (int i = 0; i < 10; i++)
+ 170:ACE-ECF/Control/Src/Cybergear_Motor.c ****         {
+ 171:ACE-ECF/Control/Src/Cybergear_Motor.c ****             if (Now_Malloc_Can1_MI_Motor_Groud[i] == NULL)
+ 172:ACE-ECF/Control/Src/Cybergear_Motor.c ****             {
+ 173:ACE-ECF/Control/Src/Cybergear_Motor.c ****                 Now_Malloc_Can1_MI_Motor_Groud[i] = MI_motor;
+ 174:ACE-ECF/Control/Src/Cybergear_Motor.c ****                 break;
+ 175:ACE-ECF/Control/Src/Cybergear_Motor.c ****             }                
+ 176:ACE-ECF/Control/Src/Cybergear_Motor.c ****         }
+ 177:ACE-ECF/Control/Src/Cybergear_Motor.c ****     }else if (phcan == &hcan2)
+ 178:ACE-ECF/Control/Src/Cybergear_Motor.c ****     {
+ 179:ACE-ECF/Control/Src/Cybergear_Motor.c ****         for (int i = 0; i < 10; i++)
+ 180:ACE-ECF/Control/Src/Cybergear_Motor.c ****         {
+ 181:ACE-ECF/Control/Src/Cybergear_Motor.c ****             if (Now_Malloc_Can2_MI_Motor_Groud[i] == NULL)   
+ 182:ACE-ECF/Control/Src/Cybergear_Motor.c ****             {
+ 183:ACE-ECF/Control/Src/Cybergear_Motor.c ****                 Now_Malloc_Can2_MI_Motor_Groud[i] = MI_motor;
+ 184:ACE-ECF/Control/Src/Cybergear_Motor.c ****                 break;
+ 185:ACE-ECF/Control/Src/Cybergear_Motor.c ****             }
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s 			page 10
+
+
+ 186:ACE-ECF/Control/Src/Cybergear_Motor.c ****         }
+ 187:ACE-ECF/Control/Src/Cybergear_Motor.c ****     }
+ 188:ACE-ECF/Control/Src/Cybergear_Motor.c ****     
+ 189:ACE-ECF/Control/Src/Cybergear_Motor.c ****     static uint8_t MI_Motor_CallBack_Init_Flag = 0;
+ 190:ACE-ECF/Control/Src/Cybergear_Motor.c ****     if (MI_Motor_CallBack_Init_Flag == 0)
+ 191:ACE-ECF/Control/Src/Cybergear_Motor.c ****     {
+ 192:ACE-ECF/Control/Src/Cybergear_Motor.c ****         MI_Motor_CallBack_Init_Flag++;
+ 193:ACE-ECF/Control/Src/Cybergear_Motor.c ****         MI_Motor_CAN_Recive_init();
+ 194:ACE-ECF/Control/Src/Cybergear_Motor.c ****     }
+ 195:ACE-ECF/Control/Src/Cybergear_Motor.c ****     return MI_motor;
+ 196:ACE-ECF/Control/Src/Cybergear_Motor.c **** }
+ 197:ACE-ECF/Control/Src/Cybergear_Motor.c **** 
+ 198:ACE-ECF/Control/Src/Cybergear_Motor.c **** /*ÄÚ²¿º¯Êý£¬²»¶ÔÍâ¿ª·Å*/
+ 199:ACE-ECF/Control/Src/Cybergear_Motor.c **** void MI_Motor_Can1_Call_Back(CAN_RxHeaderTypeDef *CAN_Rxmessage, uint8_t *MI_Motor_Rx_Data)
+ 200:ACE-ECF/Control/Src/Cybergear_Motor.c **** {
+ 201:ACE-ECF/Control/Src/Cybergear_Motor.c ****     for (int i = 0; i < 10; i++)
+ 202:ACE-ECF/Control/Src/Cybergear_Motor.c ****     {
+ 203:ACE-ECF/Control/Src/Cybergear_Motor.c ****         if (Now_Malloc_Can1_MI_Motor_Groud[i] == NULL)   break;
+ 204:ACE-ECF/Control/Src/Cybergear_Motor.c ****         MI_motor_recive_callback(Now_Malloc_Can1_MI_Motor_Groud[i], CAN_Rxmessage->ExtId, MI_Motor_
+ 205:ACE-ECF/Control/Src/Cybergear_Motor.c ****         if (Now_Malloc_Can1_MI_Motor_Groud[i]->CanRxCallBack != NULL)
+ 206:ACE-ECF/Control/Src/Cybergear_Motor.c ****             Now_Malloc_Can1_MI_Motor_Groud[i]->CanRxCallBack();
+ 207:ACE-ECF/Control/Src/Cybergear_Motor.c ****     }
+ 208:ACE-ECF/Control/Src/Cybergear_Motor.c **** }
+ 209:ACE-ECF/Control/Src/Cybergear_Motor.c **** void MI_Motor_Can2_Call_Back(CAN_RxHeaderTypeDef *CAN_Rxmessage, uint8_t *MI_Motor_Rx_Data)
+ 210:ACE-ECF/Control/Src/Cybergear_Motor.c **** {
+ 211:ACE-ECF/Control/Src/Cybergear_Motor.c ****     for (int i = 0; i < 10; i++)
+ 212:ACE-ECF/Control/Src/Cybergear_Motor.c ****     {
+ 213:ACE-ECF/Control/Src/Cybergear_Motor.c ****         if (Now_Malloc_Can2_MI_Motor_Groud[i] == NULL)   break;
+ 214:ACE-ECF/Control/Src/Cybergear_Motor.c ****         MI_motor_recive_callback(Now_Malloc_Can2_MI_Motor_Groud[i], CAN_Rxmessage->ExtId, MI_Motor_
+ 215:ACE-ECF/Control/Src/Cybergear_Motor.c ****         if (Now_Malloc_Can2_MI_Motor_Groud[i]->CanRxCallBack != NULL)
+ 216:ACE-ECF/Control/Src/Cybergear_Motor.c ****             Now_Malloc_Can2_MI_Motor_Groud[i]->CanRxCallBack();
+ 217:ACE-ECF/Control/Src/Cybergear_Motor.c ****     }
+ 218:ACE-ECF/Control/Src/Cybergear_Motor.c **** }
+ 219:ACE-ECF/Control/Src/Cybergear_Motor.c **** void MI_Motor_CAN_Recive_init(void)
+ 220:ACE-ECF/Control/Src/Cybergear_Motor.c **** {
+ 337              		.loc 1 220 1 is_stmt 1 view -0
+ 338              		.cfi_startproc
+ 339              		@ args = 0, pretend = 0, frame = 0
+ 340              		@ frame_needed = 0, uses_anonymous_args = 0
+ 341 0000 08B5     		push	{r3, lr}
+ 342              	.LCFI5:
+ 343              		.cfi_def_cfa_offset 8
+ 344              		.cfi_offset 3, -8
+ 345              		.cfi_offset 14, -4
+ 221:ACE-ECF/Control/Src/Cybergear_Motor.c ****     ECF_CAN_Rx_Callback_Register(Bsp_Can1, Bsp_Extid, 0, MI_Motor_Can1_Call_Back);
+ 346              		.loc 1 221 5 view .LVU91
+ 347 0002 064B     		ldr	r3, .L18
+ 348 0004 0022     		movs	r2, #0
+ 349 0006 0121     		movs	r1, #1
+ 350 0008 1046     		mov	r0, r2
+ 351 000a FFF7FEFF 		bl	ECF_CAN_Rx_Callback_Register
+ 352              	.LVL29:
+ 222:ACE-ECF/Control/Src/Cybergear_Motor.c ****     ECF_CAN_Rx_Callback_Register(Bsp_Can2, Bsp_Extid, 0, MI_Motor_Can2_Call_Back);
+ 353              		.loc 1 222 5 view .LVU92
+ 354 000e 044B     		ldr	r3, .L18+4
+ 355 0010 0022     		movs	r2, #0
+ 356 0012 0121     		movs	r1, #1
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s 			page 11
+
+
+ 357 0014 0846     		mov	r0, r1
+ 358 0016 FFF7FEFF 		bl	ECF_CAN_Rx_Callback_Register
+ 359              	.LVL30:
+ 223:ACE-ECF/Control/Src/Cybergear_Motor.c **** }
+ 360              		.loc 1 223 1 is_stmt 0 view .LVU93
+ 361 001a 08BD     		pop	{r3, pc}
+ 362              	.L19:
+ 363              		.align	2
+ 364              	.L18:
+ 365 001c 00000000 		.word	MI_Motor_Can1_Call_Back
+ 366 0020 00000000 		.word	MI_Motor_Can2_Call_Back
+ 367              		.cfi_endproc
+ 368              	.LFE138:
+ 370              		.section	.text.MI_motor_init,"ax",%progbits
+ 371              		.align	1
+ 372              		.global	MI_motor_init
+ 373              		.syntax unified
+ 374              		.thumb
+ 375              		.thumb_func
+ 377              	MI_motor_init:
+ 378              	.LVL31:
+ 379              	.LFB135:
+ 157:ACE-ECF/Control/Src/Cybergear_Motor.c ****     MI_Motor_t *MI_motor = (MI_Motor_t *)malloc(sizeof(MI_Motor_t));
+ 380              		.loc 1 157 1 is_stmt 1 view -0
+ 381              		.cfi_startproc
+ 382              		@ args = 0, pretend = 0, frame = 0
+ 383              		@ frame_needed = 0, uses_anonymous_args = 0
+ 157:ACE-ECF/Control/Src/Cybergear_Motor.c ****     MI_Motor_t *MI_motor = (MI_Motor_t *)malloc(sizeof(MI_Motor_t));
+ 384              		.loc 1 157 1 is_stmt 0 view .LVU95
+ 385 0000 38B5     		push	{r3, r4, r5, lr}
+ 386              	.LCFI6:
+ 387              		.cfi_def_cfa_offset 16
+ 388              		.cfi_offset 3, -16
+ 389              		.cfi_offset 4, -12
+ 390              		.cfi_offset 5, -8
+ 391              		.cfi_offset 14, -4
+ 392 0002 0546     		mov	r5, r0
+ 158:ACE-ECF/Control/Src/Cybergear_Motor.c ****     memset(MI_motor, 0, sizeof(MI_Motor_t));
+ 393              		.loc 1 158 5 is_stmt 1 view .LVU96
+ 158:ACE-ECF/Control/Src/Cybergear_Motor.c ****     memset(MI_motor, 0, sizeof(MI_Motor_t));
+ 394              		.loc 1 158 42 is_stmt 0 view .LVU97
+ 395 0004 8020     		movs	r0, #128
+ 396              	.LVL32:
+ 158:ACE-ECF/Control/Src/Cybergear_Motor.c ****     memset(MI_motor, 0, sizeof(MI_Motor_t));
+ 397              		.loc 1 158 42 view .LVU98
+ 398 0006 FFF7FEFF 		bl	malloc
+ 399              	.LVL33:
+ 400 000a 0446     		mov	r4, r0
+ 401              	.LVL34:
+ 159:ACE-ECF/Control/Src/Cybergear_Motor.c ****     
+ 402              		.loc 1 159 5 is_stmt 1 view .LVU99
+ 403 000c 8022     		movs	r2, #128
+ 404 000e 0021     		movs	r1, #0
+ 405 0010 FFF7FEFF 		bl	memset
+ 406              	.LVL35:
+ 161:ACE-ECF/Control/Src/Cybergear_Motor.c ****     MI_motor->master_id = MASTER_ID;
+ 407              		.loc 1 161 5 view .LVU100
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s 			page 12
+
+
+ 162:ACE-ECF/Control/Src/Cybergear_Motor.c ****     MI_motor->motor_id = MOTOR_ID;
+ 408              		.loc 1 162 5 view .LVU101
+ 163:ACE-ECF/Control/Src/Cybergear_Motor.c ****     MI_motor->phcan = phcan;
+ 409              		.loc 1 163 5 view .LVU102
+ 163:ACE-ECF/Control/Src/Cybergear_Motor.c ****     MI_motor->phcan = phcan;
+ 410              		.loc 1 163 24 is_stmt 0 view .LVU103
+ 411 0014 7F23     		movs	r3, #127
+ 412 0016 6371     		strb	r3, [r4, #5]
+ 164:ACE-ECF/Control/Src/Cybergear_Motor.c ****     MI_motor->CanRxCallBack = NULL;
+ 413              		.loc 1 164 5 is_stmt 1 view .LVU104
+ 164:ACE-ECF/Control/Src/Cybergear_Motor.c ****     MI_motor->CanRxCallBack = NULL;
+ 414              		.loc 1 164 21 is_stmt 0 view .LVU105
+ 415 0018 E565     		str	r5, [r4, #92]
+ 165:ACE-ECF/Control/Src/Cybergear_Motor.c ****     
+ 416              		.loc 1 165 5 is_stmt 1 view .LVU106
+ 167:ACE-ECF/Control/Src/Cybergear_Motor.c ****     {
+ 417              		.loc 1 167 5 view .LVU107
+ 167:ACE-ECF/Control/Src/Cybergear_Motor.c ****     {
+ 418              		.loc 1 167 8 is_stmt 0 view .LVU108
+ 419 001a 164B     		ldr	r3, .L37
+ 420 001c 9D42     		cmp	r5, r3
+ 421 001e 13D0     		beq	.L34
+ 177:ACE-ECF/Control/Src/Cybergear_Motor.c ****     {
+ 422              		.loc 1 177 11 is_stmt 1 view .LVU109
+ 177:ACE-ECF/Control/Src/Cybergear_Motor.c ****     {
+ 423              		.loc 1 177 14 is_stmt 0 view .LVU110
+ 424 0020 154B     		ldr	r3, .L37+4
+ 425 0022 9D42     		cmp	r5, r3
+ 426 0024 1ED0     		beq	.L35
+ 427              	.L24:
+ 189:ACE-ECF/Control/Src/Cybergear_Motor.c ****     if (MI_Motor_CallBack_Init_Flag == 0)
+ 428              		.loc 1 189 5 is_stmt 1 view .LVU111
+ 190:ACE-ECF/Control/Src/Cybergear_Motor.c ****     {
+ 429              		.loc 1 190 5 view .LVU112
+ 190:ACE-ECF/Control/Src/Cybergear_Motor.c ****     {
+ 430              		.loc 1 190 37 is_stmt 0 view .LVU113
+ 431 0026 154B     		ldr	r3, .L37+8
+ 432 0028 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 190:ACE-ECF/Control/Src/Cybergear_Motor.c ****     {
+ 433              		.loc 1 190 8 view .LVU114
+ 434 002a EBB1     		cbz	r3, .L36
+ 435              	.L20:
+ 196:ACE-ECF/Control/Src/Cybergear_Motor.c **** 
+ 436              		.loc 1 196 1 view .LVU115
+ 437 002c 2046     		mov	r0, r4
+ 438 002e 38BD     		pop	{r3, r4, r5, pc}
+ 439              	.LVL36:
+ 440              	.L23:
+ 441              	.LBB2:
+ 169:ACE-ECF/Control/Src/Cybergear_Motor.c ****         {
+ 442              		.loc 1 169 33 is_stmt 1 discriminator 2 view .LVU116
+ 169:ACE-ECF/Control/Src/Cybergear_Motor.c ****         {
+ 443              		.loc 1 169 34 is_stmt 0 discriminator 2 view .LVU117
+ 444 0030 0133     		adds	r3, r3, #1
+ 445              	.LVL37:
+ 446              	.L21:
+ 169:ACE-ECF/Control/Src/Cybergear_Motor.c ****         {
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s 			page 13
+
+
+ 447              		.loc 1 169 25 is_stmt 1 discriminator 1 view .LVU118
+ 169:ACE-ECF/Control/Src/Cybergear_Motor.c ****         {
+ 448              		.loc 1 169 9 is_stmt 0 discriminator 1 view .LVU119
+ 449 0032 092B     		cmp	r3, #9
+ 450 0034 F7DC     		bgt	.L24
+ 171:ACE-ECF/Control/Src/Cybergear_Motor.c ****             {
+ 451              		.loc 1 171 13 is_stmt 1 view .LVU120
+ 171:ACE-ECF/Control/Src/Cybergear_Motor.c ****             {
+ 452              		.loc 1 171 47 is_stmt 0 view .LVU121
+ 453 0036 124A     		ldr	r2, .L37+12
+ 454 0038 52F82320 		ldr	r2, [r2, r3, lsl #2]
+ 171:ACE-ECF/Control/Src/Cybergear_Motor.c ****             {
+ 455              		.loc 1 171 16 view .LVU122
+ 456 003c 002A     		cmp	r2, #0
+ 457 003e F7D1     		bne	.L23
+ 173:ACE-ECF/Control/Src/Cybergear_Motor.c ****                 break;
+ 458              		.loc 1 173 17 is_stmt 1 view .LVU123
+ 173:ACE-ECF/Control/Src/Cybergear_Motor.c ****                 break;
+ 459              		.loc 1 173 51 is_stmt 0 view .LVU124
+ 460 0040 0F4A     		ldr	r2, .L37+12
+ 461 0042 42F82340 		str	r4, [r2, r3, lsl #2]
+ 174:ACE-ECF/Control/Src/Cybergear_Motor.c ****             }                
+ 462              		.loc 1 174 17 is_stmt 1 view .LVU125
+ 463 0046 EEE7     		b	.L24
+ 464              	.LVL38:
+ 465              	.L34:
+ 169:ACE-ECF/Control/Src/Cybergear_Motor.c ****         {
+ 466              		.loc 1 169 18 is_stmt 0 view .LVU126
+ 467 0048 0023     		movs	r3, #0
+ 468 004a F2E7     		b	.L21
+ 469              	.LVL39:
+ 470              	.L27:
+ 169:ACE-ECF/Control/Src/Cybergear_Motor.c ****         {
+ 471              		.loc 1 169 18 view .LVU127
+ 472              	.LBE2:
+ 473              	.LBB3:
+ 179:ACE-ECF/Control/Src/Cybergear_Motor.c ****         {
+ 474              		.loc 1 179 33 is_stmt 1 discriminator 2 view .LVU128
+ 179:ACE-ECF/Control/Src/Cybergear_Motor.c ****         {
+ 475              		.loc 1 179 34 is_stmt 0 discriminator 2 view .LVU129
+ 476 004c 0133     		adds	r3, r3, #1
+ 477              	.LVL40:
+ 478              	.L26:
+ 179:ACE-ECF/Control/Src/Cybergear_Motor.c ****         {
+ 479              		.loc 1 179 25 is_stmt 1 discriminator 1 view .LVU130
+ 179:ACE-ECF/Control/Src/Cybergear_Motor.c ****         {
+ 480              		.loc 1 179 9 is_stmt 0 discriminator 1 view .LVU131
+ 481 004e 092B     		cmp	r3, #9
+ 482 0050 E9DC     		bgt	.L24
+ 181:ACE-ECF/Control/Src/Cybergear_Motor.c ****             {
+ 483              		.loc 1 181 13 is_stmt 1 view .LVU132
+ 181:ACE-ECF/Control/Src/Cybergear_Motor.c ****             {
+ 484              		.loc 1 181 47 is_stmt 0 view .LVU133
+ 485 0052 0C4A     		ldr	r2, .L37+16
+ 486 0054 52F82320 		ldr	r2, [r2, r3, lsl #2]
+ 181:ACE-ECF/Control/Src/Cybergear_Motor.c ****             {
+ 487              		.loc 1 181 16 view .LVU134
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s 			page 14
+
+
+ 488 0058 002A     		cmp	r2, #0
+ 489 005a F7D1     		bne	.L27
+ 183:ACE-ECF/Control/Src/Cybergear_Motor.c ****                 break;
+ 490              		.loc 1 183 17 is_stmt 1 view .LVU135
+ 183:ACE-ECF/Control/Src/Cybergear_Motor.c ****                 break;
+ 491              		.loc 1 183 51 is_stmt 0 view .LVU136
+ 492 005c 094A     		ldr	r2, .L37+16
+ 493 005e 42F82340 		str	r4, [r2, r3, lsl #2]
+ 184:ACE-ECF/Control/Src/Cybergear_Motor.c ****             }
+ 494              		.loc 1 184 17 is_stmt 1 view .LVU137
+ 495 0062 E0E7     		b	.L24
+ 496              	.LVL41:
+ 497              	.L35:
+ 179:ACE-ECF/Control/Src/Cybergear_Motor.c ****         {
+ 498              		.loc 1 179 18 is_stmt 0 view .LVU138
+ 499 0064 0023     		movs	r3, #0
+ 500 0066 F2E7     		b	.L26
+ 501              	.L36:
+ 502              	.LBE3:
+ 192:ACE-ECF/Control/Src/Cybergear_Motor.c ****         MI_Motor_CAN_Recive_init();
+ 503              		.loc 1 192 9 is_stmt 1 view .LVU139
+ 192:ACE-ECF/Control/Src/Cybergear_Motor.c ****         MI_Motor_CAN_Recive_init();
+ 504              		.loc 1 192 36 is_stmt 0 view .LVU140
+ 505 0068 0133     		adds	r3, r3, #1
+ 506 006a 044A     		ldr	r2, .L37+8
+ 507 006c 1370     		strb	r3, [r2]
+ 193:ACE-ECF/Control/Src/Cybergear_Motor.c ****     }
+ 508              		.loc 1 193 9 is_stmt 1 view .LVU141
+ 509 006e FFF7FEFF 		bl	MI_Motor_CAN_Recive_init
+ 510              	.LVL42:
+ 195:ACE-ECF/Control/Src/Cybergear_Motor.c **** }
+ 511              		.loc 1 195 5 view .LVU142
+ 195:ACE-ECF/Control/Src/Cybergear_Motor.c **** }
+ 512              		.loc 1 195 12 is_stmt 0 view .LVU143
+ 513 0072 DBE7     		b	.L20
+ 514              	.L38:
+ 515              		.align	2
+ 516              	.L37:
+ 517 0074 00000000 		.word	hcan1
+ 518 0078 00000000 		.word	hcan2
+ 519 007c 00000000 		.word	.LANCHOR4
+ 520 0080 00000000 		.word	.LANCHOR2
+ 521 0084 00000000 		.word	.LANCHOR3
+ 522              		.cfi_endproc
+ 523              	.LFE135:
+ 525              		.section	.text.MI_Motor_CanRx_Callback,"ax",%progbits
+ 526              		.align	1
+ 527              		.global	MI_Motor_CanRx_Callback
+ 528              		.syntax unified
+ 529              		.thumb
+ 530              		.thumb_func
+ 532              	MI_Motor_CanRx_Callback:
+ 533              	.LVL43:
+ 534              	.LFB139:
+ 224:ACE-ECF/Control/Src/Cybergear_Motor.c **** 
+ 225:ACE-ECF/Control/Src/Cybergear_Motor.c **** /**
+ 226:ACE-ECF/Control/Src/Cybergear_Motor.c ****   *@brief MI_Motor_CanRx_Callback   Éè¶¨½ÓÊÕÖÐ¶ÏÖÐµ÷ÓÃµÄº¯Êý
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s 			page 15
+
+
+ 227:ACE-ECF/Control/Src/Cybergear_Motor.c ****   *@parm  Callback                  void·µ»ØÖµvoid²ÎÊýµÄº¯ÊýÖ¸Õë
+ 228:ACE-ECF/Control/Src/Cybergear_Motor.c ****   */
+ 229:ACE-ECF/Control/Src/Cybergear_Motor.c **** void MI_Motor_CanRx_Callback(MI_Motor_t *MI_motor, Callback Callback_function)
+ 230:ACE-ECF/Control/Src/Cybergear_Motor.c **** {
+ 535              		.loc 1 230 1 is_stmt 1 view -0
+ 536              		.cfi_startproc
+ 537              		@ args = 0, pretend = 0, frame = 0
+ 538              		@ frame_needed = 0, uses_anonymous_args = 0
+ 539              		@ link register save eliminated.
+ 231:ACE-ECF/Control/Src/Cybergear_Motor.c ****     MI_motor->CanRxCallBack = Callback_function;
+ 540              		.loc 1 231 5 view .LVU145
+ 541              		.loc 1 231 29 is_stmt 0 view .LVU146
+ 542 0000 8167     		str	r1, [r0, #120]
+ 232:ACE-ECF/Control/Src/Cybergear_Motor.c **** }
+ 543              		.loc 1 232 1 view .LVU147
+ 544 0002 7047     		bx	lr
+ 545              		.cfi_endproc
+ 546              	.LFE139:
+ 548              		.section	.text.MI_motor_enable,"ax",%progbits
+ 549              		.align	1
+ 550              		.global	MI_motor_enable
+ 551              		.syntax unified
+ 552              		.thumb
+ 553              		.thumb_func
+ 555              	MI_motor_enable:
+ 556              	.LVL44:
+ 557              	.LFB140:
+ 233:ACE-ECF/Control/Src/Cybergear_Motor.c **** 
+ 234:ACE-ECF/Control/Src/Cybergear_Motor.c **** /**
+ 235:ACE-ECF/Control/Src/Cybergear_Motor.c ****   * @brief  Ð¡Ã×µç»úÊ¹ÄÜ
+ 236:ACE-ECF/Control/Src/Cybergear_Motor.c ****   * @param  hmotor µç»ú½á¹¹Ìå
+ 237:ACE-ECF/Control/Src/Cybergear_Motor.c ****   * @param  id µç»úid
+ 238:ACE-ECF/Control/Src/Cybergear_Motor.c ****   * @retval null
+ 239:ACE-ECF/Control/Src/Cybergear_Motor.c ****   */
+ 240:ACE-ECF/Control/Src/Cybergear_Motor.c **** void MI_motor_enable(MI_Motor_t* MI_motor)
+ 241:ACE-ECF/Control/Src/Cybergear_Motor.c **** {
+ 558              		.loc 1 241 1 is_stmt 1 view -0
+ 559              		.cfi_startproc
+ 560              		@ args = 0, pretend = 0, frame = 0
+ 561              		@ frame_needed = 0, uses_anonymous_args = 0
+ 562              		.loc 1 241 1 is_stmt 0 view .LVU149
+ 563 0000 08B5     		push	{r3, lr}
+ 564              	.LCFI7:
+ 565              		.cfi_def_cfa_offset 8
+ 566              		.cfi_offset 3, -8
+ 567              		.cfi_offset 14, -4
+ 242:ACE-ECF/Control/Src/Cybergear_Motor.c ****     MI_motor->txMsg.ExtId.mode = 3;
+ 568              		.loc 1 242 5 is_stmt 1 view .LVU150
+ 569              		.loc 1 242 32 is_stmt 0 view .LVU151
+ 570 0002 90F86330 		ldrb	r3, [r0, #99]	@ zero_extendqisi2
+ 571 0006 0322     		movs	r2, #3
+ 572 0008 62F30403 		bfi	r3, r2, #0, #5
+ 573 000c 80F86330 		strb	r3, [r0, #99]
+ 243:ACE-ECF/Control/Src/Cybergear_Motor.c ****     MI_motor->txMsg.ExtId.motor_id = MI_motor->motor_id;
+ 574              		.loc 1 243 5 is_stmt 1 view .LVU152
+ 575              		.loc 1 243 46 is_stmt 0 view .LVU153
+ 576 0010 4379     		ldrb	r3, [r0, #5]	@ zero_extendqisi2
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s 			page 16
+
+
+ 577              		.loc 1 243 36 view .LVU154
+ 578 0012 80F86030 		strb	r3, [r0, #96]
+ 244:ACE-ECF/Control/Src/Cybergear_Motor.c ****     MI_motor->txMsg.ExtId.data = MI_motor->master_id;
+ 579              		.loc 1 244 5 is_stmt 1 view .LVU155
+ 580              		.loc 1 244 42 is_stmt 0 view .LVU156
+ 581 0016 0379     		ldrb	r3, [r0, #4]	@ zero_extendqisi2
+ 582              		.loc 1 244 32 view .LVU157
+ 583 0018 A0F86130 		strh	r3, [r0, #97]	@ unaligned
+ 245:ACE-ECF/Control/Src/Cybergear_Motor.c ****     MI_motor->txMsg.ExtId.res = 0;
+ 584              		.loc 1 245 5 is_stmt 1 view .LVU158
+ 585              		.loc 1 245 31 is_stmt 0 view .LVU159
+ 586 001c 90F86330 		ldrb	r3, [r0, #99]	@ zero_extendqisi2
+ 587 0020 6FF34713 		bfc	r3, #5, #3
+ 588 0024 80F86330 		strb	r3, [r0, #99]
+ 246:ACE-ECF/Control/Src/Cybergear_Motor.c ****     for(uint8_t i=0; i<8; i++)
+ 589              		.loc 1 246 5 is_stmt 1 view .LVU160
+ 590              	.LBB4:
+ 591              		.loc 1 246 9 view .LVU161
+ 592              	.LVL45:
+ 593              		.loc 1 246 17 is_stmt 0 view .LVU162
+ 594 0028 0023     		movs	r3, #0
+ 595              		.loc 1 246 5 view .LVU163
+ 596 002a 05E0     		b	.L41
+ 597              	.LVL46:
+ 598              	.L42:
+ 247:ACE-ECF/Control/Src/Cybergear_Motor.c ****     {
+ 248:ACE-ECF/Control/Src/Cybergear_Motor.c ****         MI_motor->txMsg.Data[i]=0;
+ 599              		.loc 1 248 9 is_stmt 1 discriminator 3 view .LVU164
+ 600              		.loc 1 248 32 is_stmt 0 discriminator 3 view .LVU165
+ 601 002c C218     		adds	r2, r0, r3
+ 602 002e 0021     		movs	r1, #0
+ 603 0030 82F86410 		strb	r1, [r2, #100]
+ 246:ACE-ECF/Control/Src/Cybergear_Motor.c ****     for(uint8_t i=0; i<8; i++)
+ 604              		.loc 1 246 27 is_stmt 1 discriminator 3 view .LVU166
+ 246:ACE-ECF/Control/Src/Cybergear_Motor.c ****     for(uint8_t i=0; i<8; i++)
+ 605              		.loc 1 246 28 is_stmt 0 discriminator 3 view .LVU167
+ 606 0034 0133     		adds	r3, r3, #1
+ 607              	.LVL47:
+ 246:ACE-ECF/Control/Src/Cybergear_Motor.c ****     for(uint8_t i=0; i<8; i++)
+ 608              		.loc 1 246 28 discriminator 3 view .LVU168
+ 609 0036 DBB2     		uxtb	r3, r3
+ 610              	.LVL48:
+ 611              	.L41:
+ 246:ACE-ECF/Control/Src/Cybergear_Motor.c ****     for(uint8_t i=0; i<8; i++)
+ 612              		.loc 1 246 22 is_stmt 1 discriminator 1 view .LVU169
+ 246:ACE-ECF/Control/Src/Cybergear_Motor.c ****     for(uint8_t i=0; i<8; i++)
+ 613              		.loc 1 246 5 is_stmt 0 discriminator 1 view .LVU170
+ 614 0038 072B     		cmp	r3, #7
+ 615 003a F7D9     		bls	.L42
+ 616              	.LBE4:
+ 249:ACE-ECF/Control/Src/Cybergear_Motor.c ****     }
+ 250:ACE-ECF/Control/Src/Cybergear_Motor.c ****     MI_Motor_CanTx(MI_motor);
+ 617              		.loc 1 250 5 is_stmt 1 view .LVU171
+ 618 003c FFF7FEFF 		bl	MI_Motor_CanTx
+ 619              	.LVL49:
+ 251:ACE-ECF/Control/Src/Cybergear_Motor.c **** }
+ 620              		.loc 1 251 1 is_stmt 0 view .LVU172
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s 			page 17
+
+
+ 621 0040 08BD     		pop	{r3, pc}
+ 622              		.cfi_endproc
+ 623              	.LFE140:
+ 625              		.section	.text.MI_motor_get_ID,"ax",%progbits
+ 626              		.align	1
+ 627              		.global	MI_motor_get_ID
+ 628              		.syntax unified
+ 629              		.thumb
+ 630              		.thumb_func
+ 632              	MI_motor_get_ID:
+ 633              	.LVL50:
+ 634              	.LFB141:
+ 252:ACE-ECF/Control/Src/Cybergear_Motor.c **** 
+ 253:ACE-ECF/Control/Src/Cybergear_Motor.c **** /**
+ 254:ACE-ECF/Control/Src/Cybergear_Motor.c ****   * @brief  »ñÈ¡Éè±¸ID £¨Í¨ÐÅÀàÐÍ0£©£¬ÐèÔÚµç»úÊ¹ÄÜÇ°Ê¹ÓÃ
+ 255:ACE-ECF/Control/Src/Cybergear_Motor.c ****   * @param  hmotor µç»ú½á¹¹Ìå
+ 256:ACE-ECF/Control/Src/Cybergear_Motor.c ****   * @retval null 
+ 257:ACE-ECF/Control/Src/Cybergear_Motor.c ****   */
+ 258:ACE-ECF/Control/Src/Cybergear_Motor.c **** void MI_motor_get_ID(MI_Motor_t* MI_motor)
+ 259:ACE-ECF/Control/Src/Cybergear_Motor.c **** {
+ 635              		.loc 1 259 1 is_stmt 1 view -0
+ 636              		.cfi_startproc
+ 637              		@ args = 0, pretend = 0, frame = 0
+ 638              		@ frame_needed = 0, uses_anonymous_args = 0
+ 639              		.loc 1 259 1 is_stmt 0 view .LVU174
+ 640 0000 10B5     		push	{r4, lr}
+ 641              	.LCFI8:
+ 642              		.cfi_def_cfa_offset 8
+ 643              		.cfi_offset 4, -8
+ 644              		.cfi_offset 14, -4
+ 645 0002 0446     		mov	r4, r0
+ 260:ACE-ECF/Control/Src/Cybergear_Motor.c ****     MI_motor->txMsg.ExtId.mode = 0;
+ 646              		.loc 1 260 5 is_stmt 1 view .LVU175
+ 647              		.loc 1 260 32 is_stmt 0 view .LVU176
+ 648 0004 90F86330 		ldrb	r3, [r0, #99]	@ zero_extendqisi2
+ 649 0008 6FF30403 		bfc	r3, #0, #5
+ 650 000c 80F86330 		strb	r3, [r0, #99]
+ 261:ACE-ECF/Control/Src/Cybergear_Motor.c ****     MI_motor->txMsg.ExtId.data = 0;
+ 651              		.loc 1 261 5 is_stmt 1 view .LVU177
+ 652              		.loc 1 261 32 is_stmt 0 view .LVU178
+ 653 0010 036E     		ldr	r3, [r0, #96]
+ 654 0012 6FF31723 		bfc	r3, #8, #16
+ 655 0016 0366     		str	r3, [r0, #96]
+ 262:ACE-ECF/Control/Src/Cybergear_Motor.c ****     MI_motor->txMsg.ExtId.motor_id = 0;
+ 656              		.loc 1 262 5 is_stmt 1 view .LVU179
+ 657              		.loc 1 262 36 is_stmt 0 view .LVU180
+ 658 0018 0023     		movs	r3, #0
+ 659 001a 80F86030 		strb	r3, [r0, #96]
+ 263:ACE-ECF/Control/Src/Cybergear_Motor.c ****     MI_motor->txMsg.ExtId.res = 0;
+ 660              		.loc 1 263 5 is_stmt 1 view .LVU181
+ 661              		.loc 1 263 31 is_stmt 0 view .LVU182
+ 662 001e 90F86320 		ldrb	r2, [r0, #99]	@ zero_extendqisi2
+ 663 0022 63F34712 		bfi	r2, r3, #5, #3
+ 664 0026 80F86320 		strb	r2, [r0, #99]
+ 264:ACE-ECF/Control/Src/Cybergear_Motor.c ****     
+ 265:ACE-ECF/Control/Src/Cybergear_Motor.c ****     get_can_id = true;
+ 665              		.loc 1 265 5 is_stmt 1 view .LVU183
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s 			page 18
+
+
+ 666              		.loc 1 265 16 is_stmt 0 view .LVU184
+ 667 002a 0B4A     		ldr	r2, .L49
+ 668 002c 0121     		movs	r1, #1
+ 669 002e 1170     		strb	r1, [r2]
+ 266:ACE-ECF/Control/Src/Cybergear_Motor.c ****     for(uint8_t i=0; i<8; i++)
+ 670              		.loc 1 266 5 is_stmt 1 view .LVU185
+ 671              	.LBB5:
+ 672              		.loc 1 266 9 view .LVU186
+ 673              	.LVL51:
+ 674              		.loc 1 266 5 is_stmt 0 view .LVU187
+ 675 0030 05E0     		b	.L45
+ 676              	.LVL52:
+ 677              	.L46:
+ 267:ACE-ECF/Control/Src/Cybergear_Motor.c ****     {
+ 268:ACE-ECF/Control/Src/Cybergear_Motor.c ****         MI_motor->txMsg.Data[i]=0;
+ 678              		.loc 1 268 9 is_stmt 1 discriminator 3 view .LVU188
+ 679              		.loc 1 268 32 is_stmt 0 discriminator 3 view .LVU189
+ 680 0032 E218     		adds	r2, r4, r3
+ 681 0034 0021     		movs	r1, #0
+ 682 0036 82F86410 		strb	r1, [r2, #100]
+ 266:ACE-ECF/Control/Src/Cybergear_Motor.c ****     for(uint8_t i=0; i<8; i++)
+ 683              		.loc 1 266 27 is_stmt 1 discriminator 3 view .LVU190
+ 266:ACE-ECF/Control/Src/Cybergear_Motor.c ****     for(uint8_t i=0; i<8; i++)
+ 684              		.loc 1 266 28 is_stmt 0 discriminator 3 view .LVU191
+ 685 003a 0133     		adds	r3, r3, #1
+ 686              	.LVL53:
+ 266:ACE-ECF/Control/Src/Cybergear_Motor.c ****     for(uint8_t i=0; i<8; i++)
+ 687              		.loc 1 266 28 discriminator 3 view .LVU192
+ 688 003c DBB2     		uxtb	r3, r3
+ 689              	.LVL54:
+ 690              	.L45:
+ 266:ACE-ECF/Control/Src/Cybergear_Motor.c ****     for(uint8_t i=0; i<8; i++)
+ 691              		.loc 1 266 22 is_stmt 1 discriminator 1 view .LVU193
+ 266:ACE-ECF/Control/Src/Cybergear_Motor.c ****     for(uint8_t i=0; i<8; i++)
+ 692              		.loc 1 266 5 is_stmt 0 discriminator 1 view .LVU194
+ 693 003e 072B     		cmp	r3, #7
+ 694 0040 F7D9     		bls	.L46
+ 695              	.LBE5:
+ 269:ACE-ECF/Control/Src/Cybergear_Motor.c ****     }
+ 270:ACE-ECF/Control/Src/Cybergear_Motor.c ****     MI_Motor_CanTx(MI_motor);
+ 696              		.loc 1 270 5 is_stmt 1 view .LVU195
+ 697 0042 2046     		mov	r0, r4
+ 698              	.LVL55:
+ 699              		.loc 1 270 5 is_stmt 0 view .LVU196
+ 700 0044 FFF7FEFF 		bl	MI_Motor_CanTx
+ 701              	.LVL56:
+ 271:ACE-ECF/Control/Src/Cybergear_Motor.c ****     while(get_can_id);//µÈ´ýcanÖÐ¶Ï½ÓÊÕµ½µç»úÄ¿Ç°id
+ 702              		.loc 1 271 5 is_stmt 1 view .LVU197
+ 703              	.L47:
+ 704              		.loc 1 271 22 discriminator 1 view .LVU198
+ 705              		.loc 1 271 10 discriminator 1 view .LVU199
+ 706              		.loc 1 271 11 is_stmt 0 discriminator 1 view .LVU200
+ 707 0048 034B     		ldr	r3, .L49
+ 708 004a 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 709              		.loc 1 271 10 discriminator 1 view .LVU201
+ 710 004c 002B     		cmp	r3, #0
+ 711 004e FBD1     		bne	.L47
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s 			page 19
+
+
+ 272:ACE-ECF/Control/Src/Cybergear_Motor.c ****     MI_motor->motor_id = MI_id;
+ 712              		.loc 1 272 5 is_stmt 1 view .LVU202
+ 713              		.loc 1 272 24 is_stmt 0 view .LVU203
+ 714 0050 024B     		ldr	r3, .L49+4
+ 715 0052 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 716 0054 6371     		strb	r3, [r4, #5]
+ 273:ACE-ECF/Control/Src/Cybergear_Motor.c ****     
+ 274:ACE-ECF/Control/Src/Cybergear_Motor.c **** }
+ 717              		.loc 1 274 1 view .LVU204
+ 718 0056 10BD     		pop	{r4, pc}
+ 719              	.LVL57:
+ 720              	.L50:
+ 721              		.loc 1 274 1 view .LVU205
+ 722              		.align	2
+ 723              	.L49:
+ 724 0058 00000000 		.word	.LANCHOR5
+ 725 005c 00000000 		.word	.LANCHOR6
+ 726              		.cfi_endproc
+ 727              	.LFE141:
+ 729              		.section	.text.MI_motor_controlmode,"ax",%progbits
+ 730              		.align	1
+ 731              		.global	MI_motor_controlmode
+ 732              		.syntax unified
+ 733              		.thumb
+ 734              		.thumb_func
+ 736              	MI_motor_controlmode:
+ 737              	.LVL58:
+ 738              	.LFB142:
+ 275:ACE-ECF/Control/Src/Cybergear_Motor.c **** 
+ 276:ACE-ECF/Control/Src/Cybergear_Motor.c **** /**
+ 277:ACE-ECF/Control/Src/Cybergear_Motor.c ****   * @brief  ÔË¿ØÄ£Ê½µç»ú¿ØÖÆÖ¸Áî£¨Í¨ÐÅÀàÐÍ1£©
+ 278:ACE-ECF/Control/Src/Cybergear_Motor.c ****   * @param  hmotor µç»ú½á¹¹Ìå
+ 279:ACE-ECF/Control/Src/Cybergear_Motor.c ****   * @param  torque Á¦¾Ø
+ 280:ACE-ECF/Control/Src/Cybergear_Motor.c ****   * @param  MechPosition Ä¿±êÎ»ÖÃ
+ 281:ACE-ECF/Control/Src/Cybergear_Motor.c ****   * @param  speed ×ªËÙ
+ 282:ACE-ECF/Control/Src/Cybergear_Motor.c ****   * @param  kp 
+ 283:ACE-ECF/Control/Src/Cybergear_Motor.c ****   * @param  kd 
+ 284:ACE-ECF/Control/Src/Cybergear_Motor.c ****   * @retval null
+ 285:ACE-ECF/Control/Src/Cybergear_Motor.c ****   */
+ 286:ACE-ECF/Control/Src/Cybergear_Motor.c **** void MI_motor_controlmode(MI_Motor_t* MI_motor, float torque, float MechPosition , float speed , fl
+ 287:ACE-ECF/Control/Src/Cybergear_Motor.c **** {
+ 739              		.loc 1 287 1 is_stmt 1 view -0
+ 740              		.cfi_startproc
+ 741              		@ args = 0, pretend = 0, frame = 0
+ 742              		@ frame_needed = 0, uses_anonymous_args = 0
+ 743              		.loc 1 287 1 is_stmt 0 view .LVU207
+ 744 0000 10B5     		push	{r4, lr}
+ 745              	.LCFI9:
+ 746              		.cfi_def_cfa_offset 8
+ 747              		.cfi_offset 4, -8
+ 748              		.cfi_offset 14, -4
+ 749 0002 2DED048B 		vpush.64	{d8, d9}
+ 750              	.LCFI10:
+ 751              		.cfi_def_cfa_offset 24
+ 752              		.cfi_offset 80, -24
+ 753              		.cfi_offset 81, -20
+ 754              		.cfi_offset 82, -16
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s 			page 20
+
+
+ 755              		.cfi_offset 83, -12
+ 756 0006 0446     		mov	r4, r0
+ 757 0008 F0EE609A 		vmov.f32	s19, s1
+ 758 000c B0EE419A 		vmov.f32	s18, s2
+ 759 0010 F0EE618A 		vmov.f32	s17, s3
+ 760 0014 B0EE428A 		vmov.f32	s16, s4
+ 288:ACE-ECF/Control/Src/Cybergear_Motor.c ****     MI_motor->txMsg.ExtId.mode = 1;
+ 761              		.loc 1 288 5 is_stmt 1 view .LVU208
+ 762              		.loc 1 288 32 is_stmt 0 view .LVU209
+ 763 0018 90F86330 		ldrb	r3, [r0, #99]	@ zero_extendqisi2
+ 764 001c 0122     		movs	r2, #1
+ 765 001e 62F30403 		bfi	r3, r2, #0, #5
+ 766 0022 80F86330 		strb	r3, [r0, #99]
+ 289:ACE-ECF/Control/Src/Cybergear_Motor.c ****     MI_motor->txMsg.ExtId.data = float_to_uint(torque,T_MIN,T_MAX,16);
+ 767              		.loc 1 289 5 is_stmt 1 view .LVU210
+ 768              		.loc 1 289 34 is_stmt 0 view .LVU211
+ 769 0026 1020     		movs	r0, #16
+ 770              	.LVL59:
+ 771              		.loc 1 289 34 view .LVU212
+ 772 0028 B2EE081A 		vmov.f32	s2, #1.2e+1
+ 773              	.LVL60:
+ 774              		.loc 1 289 34 view .LVU213
+ 775 002c FAEE080A 		vmov.f32	s1, #-1.2e+1
+ 776              	.LVL61:
+ 777              		.loc 1 289 34 view .LVU214
+ 778 0030 FFF7FEFF 		bl	float_to_uint
+ 779              	.LVL62:
+ 780              		.loc 1 289 32 view .LVU215
+ 781 0034 A4F86100 		strh	r0, [r4, #97]	@ unaligned
+ 290:ACE-ECF/Control/Src/Cybergear_Motor.c ****     MI_motor->txMsg.ExtId.res = 0;
+ 782              		.loc 1 290 5 is_stmt 1 view .LVU216
+ 783              		.loc 1 290 31 is_stmt 0 view .LVU217
+ 784 0038 94F86330 		ldrb	r3, [r4, #99]	@ zero_extendqisi2
+ 785 003c 6FF34713 		bfc	r3, #5, #3
+ 786 0040 84F86330 		strb	r3, [r4, #99]
+ 291:ACE-ECF/Control/Src/Cybergear_Motor.c ****  
+ 292:ACE-ECF/Control/Src/Cybergear_Motor.c ****     MI_motor->txMsg.Data[0]=float_to_uint(MechPosition,P_MIN,P_MAX,16)>>8;
+ 787              		.loc 1 292 5 is_stmt 1 view .LVU218
+ 788              		.loc 1 292 29 is_stmt 0 view .LVU219
+ 789 0044 1020     		movs	r0, #16
+ 790 0046 B2EE091A 		vmov.f32	s2, #1.25e+1
+ 791 004a FAEE090A 		vmov.f32	s1, #-1.25e+1
+ 792 004e B0EE690A 		vmov.f32	s0, s19
+ 793 0052 FFF7FEFF 		bl	float_to_uint
+ 794              	.LVL63:
+ 795              		.loc 1 292 71 view .LVU220
+ 796 0056 0312     		asrs	r3, r0, #8
+ 797              		.loc 1 292 28 view .LVU221
+ 798 0058 84F86430 		strb	r3, [r4, #100]
+ 293:ACE-ECF/Control/Src/Cybergear_Motor.c ****     MI_motor->txMsg.Data[1]=float_to_uint(MechPosition,P_MIN,P_MAX,16);
+ 799              		.loc 1 293 5 is_stmt 1 view .LVU222
+ 800              		.loc 1 293 28 is_stmt 0 view .LVU223
+ 801 005c 84F86500 		strb	r0, [r4, #101]
+ 294:ACE-ECF/Control/Src/Cybergear_Motor.c ****     MI_motor->txMsg.Data[2]=float_to_uint(speed,V_MIN,V_MAX,16)>>8;
+ 802              		.loc 1 294 5 is_stmt 1 view .LVU224
+ 803              		.loc 1 294 29 is_stmt 0 view .LVU225
+ 804 0060 1020     		movs	r0, #16
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s 			page 21
+
+
+ 805 0062 B3EE0E1A 		vmov.f32	s2, #3.0e+1
+ 806 0066 FBEE0E0A 		vmov.f32	s1, #-3.0e+1
+ 807 006a B0EE490A 		vmov.f32	s0, s18
+ 808 006e FFF7FEFF 		bl	float_to_uint
+ 809              	.LVL64:
+ 810              		.loc 1 294 64 view .LVU226
+ 811 0072 0312     		asrs	r3, r0, #8
+ 812              		.loc 1 294 28 view .LVU227
+ 813 0074 84F86630 		strb	r3, [r4, #102]
+ 295:ACE-ECF/Control/Src/Cybergear_Motor.c ****     MI_motor->txMsg.Data[3]=float_to_uint(speed,V_MIN,V_MAX,16);
+ 814              		.loc 1 295 5 is_stmt 1 view .LVU228
+ 815              		.loc 1 295 28 is_stmt 0 view .LVU229
+ 816 0078 84F86700 		strb	r0, [r4, #103]
+ 296:ACE-ECF/Control/Src/Cybergear_Motor.c ****     MI_motor->txMsg.Data[4]=float_to_uint(kp,KP_MIN,KP_MAX,16)>>8;
+ 817              		.loc 1 296 5 is_stmt 1 view .LVU230
+ 818              		.loc 1 296 29 is_stmt 0 view .LVU231
+ 819 007c 9FED119A 		vldr.32	s18, .L53
+ 820              	.LVL65:
+ 821              		.loc 1 296 29 view .LVU232
+ 822 0080 1020     		movs	r0, #16
+ 823 0082 9FED111A 		vldr.32	s2, .L53+4
+ 824 0086 F0EE490A 		vmov.f32	s1, s18
+ 825 008a B0EE680A 		vmov.f32	s0, s17
+ 826 008e FFF7FEFF 		bl	float_to_uint
+ 827              	.LVL66:
+ 828              		.loc 1 296 63 view .LVU233
+ 829 0092 0312     		asrs	r3, r0, #8
+ 830              		.loc 1 296 28 view .LVU234
+ 831 0094 84F86830 		strb	r3, [r4, #104]
+ 297:ACE-ECF/Control/Src/Cybergear_Motor.c ****     MI_motor->txMsg.Data[5]=float_to_uint(kp,KP_MIN,KP_MAX,16);
+ 832              		.loc 1 297 5 is_stmt 1 view .LVU235
+ 833              		.loc 1 297 28 is_stmt 0 view .LVU236
+ 834 0098 84F86900 		strb	r0, [r4, #105]
+ 298:ACE-ECF/Control/Src/Cybergear_Motor.c ****     MI_motor->txMsg.Data[6]=float_to_uint(kd,KD_MIN,KD_MAX,16)>>8;
+ 835              		.loc 1 298 5 is_stmt 1 view .LVU237
+ 836              		.loc 1 298 29 is_stmt 0 view .LVU238
+ 837 009c 1020     		movs	r0, #16
+ 838 009e B1EE041A 		vmov.f32	s2, #5.0e+0
+ 839 00a2 F0EE490A 		vmov.f32	s1, s18
+ 840 00a6 B0EE480A 		vmov.f32	s0, s16
+ 841 00aa FFF7FEFF 		bl	float_to_uint
+ 842              	.LVL67:
+ 843              		.loc 1 298 63 view .LVU239
+ 844 00ae 0312     		asrs	r3, r0, #8
+ 845              		.loc 1 298 28 view .LVU240
+ 846 00b0 84F86A30 		strb	r3, [r4, #106]
+ 299:ACE-ECF/Control/Src/Cybergear_Motor.c ****     MI_motor->txMsg.Data[7]=float_to_uint(kd,KD_MIN,KD_MAX,16);
+ 847              		.loc 1 299 5 is_stmt 1 view .LVU241
+ 848              		.loc 1 299 28 is_stmt 0 view .LVU242
+ 849 00b4 84F86B00 		strb	r0, [r4, #107]
+ 300:ACE-ECF/Control/Src/Cybergear_Motor.c ****     MI_Motor_CanTx(MI_motor);
+ 850              		.loc 1 300 5 is_stmt 1 view .LVU243
+ 851 00b8 2046     		mov	r0, r4
+ 852 00ba FFF7FEFF 		bl	MI_Motor_CanTx
+ 853              	.LVL68:
+ 301:ACE-ECF/Control/Src/Cybergear_Motor.c **** }
+ 854              		.loc 1 301 1 is_stmt 0 view .LVU244
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s 			page 22
+
+
+ 855 00be BDEC048B 		vldm	sp!, {d8-d9}
+ 856              	.LCFI11:
+ 857              		.cfi_restore 82
+ 858              		.cfi_restore 83
+ 859              		.cfi_restore 80
+ 860              		.cfi_restore 81
+ 861              		.cfi_def_cfa_offset 8
+ 862              	.LVL69:
+ 863              		.loc 1 301 1 view .LVU245
+ 864 00c2 10BD     		pop	{r4, pc}
+ 865              	.LVL70:
+ 866              	.L54:
+ 867              		.loc 1 301 1 view .LVU246
+ 868              		.align	2
+ 869              	.L53:
+ 870 00c4 00000000 		.word	0
+ 871 00c8 0000FA43 		.word	1140457472
+ 872              		.cfi_endproc
+ 873              	.LFE142:
+ 875              		.section	.text.MI_motor_stop,"ax",%progbits
+ 876              		.align	1
+ 877              		.global	MI_motor_stop
+ 878              		.syntax unified
+ 879              		.thumb
+ 880              		.thumb_func
+ 882              	MI_motor_stop:
+ 883              	.LVL71:
+ 884              	.LFB143:
+ 302:ACE-ECF/Control/Src/Cybergear_Motor.c **** 
+ 303:ACE-ECF/Control/Src/Cybergear_Motor.c **** /**
+ 304:ACE-ECF/Control/Src/Cybergear_Motor.c ****   * @brief  µç»úÍ£Ö¹ÔËÐÐÖ¡£¨Í¨ÐÅÀàÐÍ4£©
+ 305:ACE-ECF/Control/Src/Cybergear_Motor.c ****   * @param  hmotor µç»ú½á¹¹Ìå
+ 306:ACE-ECF/Control/Src/Cybergear_Motor.c ****   * @retval null
+ 307:ACE-ECF/Control/Src/Cybergear_Motor.c ****   */
+ 308:ACE-ECF/Control/Src/Cybergear_Motor.c **** void MI_motor_stop(MI_Motor_t* MI_motor)
+ 309:ACE-ECF/Control/Src/Cybergear_Motor.c **** {
+ 885              		.loc 1 309 1 is_stmt 1 view -0
+ 886              		.cfi_startproc
+ 887              		@ args = 0, pretend = 0, frame = 0
+ 888              		@ frame_needed = 0, uses_anonymous_args = 0
+ 889              		.loc 1 309 1 is_stmt 0 view .LVU248
+ 890 0000 08B5     		push	{r3, lr}
+ 891              	.LCFI12:
+ 892              		.cfi_def_cfa_offset 8
+ 893              		.cfi_offset 3, -8
+ 894              		.cfi_offset 14, -4
+ 310:ACE-ECF/Control/Src/Cybergear_Motor.c ****     MI_motor->txMsg.ExtId.mode = 4;
+ 895              		.loc 1 310 5 is_stmt 1 view .LVU249
+ 896              		.loc 1 310 32 is_stmt 0 view .LVU250
+ 897 0002 90F86330 		ldrb	r3, [r0, #99]	@ zero_extendqisi2
+ 898 0006 0422     		movs	r2, #4
+ 899 0008 62F30403 		bfi	r3, r2, #0, #5
+ 900 000c 80F86330 		strb	r3, [r0, #99]
+ 311:ACE-ECF/Control/Src/Cybergear_Motor.c ****     MI_motor->txMsg.ExtId.data = MI_motor->master_id;
+ 901              		.loc 1 311 5 is_stmt 1 view .LVU251
+ 902              		.loc 1 311 42 is_stmt 0 view .LVU252
+ 903 0010 0379     		ldrb	r3, [r0, #4]	@ zero_extendqisi2
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s 			page 23
+
+
+ 904              		.loc 1 311 32 view .LVU253
+ 905 0012 A0F86130 		strh	r3, [r0, #97]	@ unaligned
+ 312:ACE-ECF/Control/Src/Cybergear_Motor.c ****     MI_motor->txMsg.ExtId.res = 0;
+ 906              		.loc 1 312 5 is_stmt 1 view .LVU254
+ 907              		.loc 1 312 31 is_stmt 0 view .LVU255
+ 908 0016 90F86330 		ldrb	r3, [r0, #99]	@ zero_extendqisi2
+ 909 001a 6FF34713 		bfc	r3, #5, #3
+ 910 001e 80F86330 		strb	r3, [r0, #99]
+ 313:ACE-ECF/Control/Src/Cybergear_Motor.c ****  
+ 314:ACE-ECF/Control/Src/Cybergear_Motor.c ****     for(uint8_t i=0; i<8; i++)
+ 911              		.loc 1 314 5 is_stmt 1 view .LVU256
+ 912              	.LBB6:
+ 913              		.loc 1 314 9 view .LVU257
+ 914              	.LVL72:
+ 915              		.loc 1 314 17 is_stmt 0 view .LVU258
+ 916 0022 0023     		movs	r3, #0
+ 917              		.loc 1 314 5 view .LVU259
+ 918 0024 05E0     		b	.L56
+ 919              	.LVL73:
+ 920              	.L57:
+ 315:ACE-ECF/Control/Src/Cybergear_Motor.c ****     {
+ 316:ACE-ECF/Control/Src/Cybergear_Motor.c ****         MI_motor->txMsg.Data[i]=0;
+ 921              		.loc 1 316 9 is_stmt 1 discriminator 3 view .LVU260
+ 922              		.loc 1 316 32 is_stmt 0 discriminator 3 view .LVU261
+ 923 0026 C218     		adds	r2, r0, r3
+ 924 0028 0021     		movs	r1, #0
+ 925 002a 82F86410 		strb	r1, [r2, #100]
+ 314:ACE-ECF/Control/Src/Cybergear_Motor.c ****     {
+ 926              		.loc 1 314 27 is_stmt 1 discriminator 3 view .LVU262
+ 314:ACE-ECF/Control/Src/Cybergear_Motor.c ****     {
+ 927              		.loc 1 314 28 is_stmt 0 discriminator 3 view .LVU263
+ 928 002e 0133     		adds	r3, r3, #1
+ 929              	.LVL74:
+ 314:ACE-ECF/Control/Src/Cybergear_Motor.c ****     {
+ 930              		.loc 1 314 28 discriminator 3 view .LVU264
+ 931 0030 DBB2     		uxtb	r3, r3
+ 932              	.LVL75:
+ 933              	.L56:
+ 314:ACE-ECF/Control/Src/Cybergear_Motor.c ****     {
+ 934              		.loc 1 314 22 is_stmt 1 discriminator 1 view .LVU265
+ 314:ACE-ECF/Control/Src/Cybergear_Motor.c ****     {
+ 935              		.loc 1 314 5 is_stmt 0 discriminator 1 view .LVU266
+ 936 0032 072B     		cmp	r3, #7
+ 937 0034 F7D9     		bls	.L57
+ 938              	.LBE6:
+ 317:ACE-ECF/Control/Src/Cybergear_Motor.c ****     }
+ 318:ACE-ECF/Control/Src/Cybergear_Motor.c ****     MI_Motor_CanTx(MI_motor);
+ 939              		.loc 1 318 5 is_stmt 1 view .LVU267
+ 940 0036 FFF7FEFF 		bl	MI_Motor_CanTx
+ 941              	.LVL76:
+ 319:ACE-ECF/Control/Src/Cybergear_Motor.c **** }
+ 942              		.loc 1 319 1 is_stmt 0 view .LVU268
+ 943 003a 08BD     		pop	{r3, pc}
+ 944              		.cfi_endproc
+ 945              	.LFE143:
+ 947              		.section	.text.MI_motor_setMechPosition2Zero,"ax",%progbits
+ 948              		.align	1
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s 			page 24
+
+
+ 949              		.global	MI_motor_setMechPosition2Zero
+ 950              		.syntax unified
+ 951              		.thumb
+ 952              		.thumb_func
+ 954              	MI_motor_setMechPosition2Zero:
+ 955              	.LVL77:
+ 956              	.LFB144:
+ 320:ACE-ECF/Control/Src/Cybergear_Motor.c **** 
+ 321:ACE-ECF/Control/Src/Cybergear_Motor.c **** /**
+ 322:ACE-ECF/Control/Src/Cybergear_Motor.c ****   * @brief  ÉèÖÃµç»ú»úÐµÁãÎ»£¨Í¨ÐÅÀàÐÍ6£©»á°Ñµ±Ç°µç»úÎ»ÖÃÉèÎª»úÐµÁãÎ»£¨µôµç¶ªÊ§£©
+ 323:ACE-ECF/Control/Src/Cybergear_Motor.c ****   * @param  hmotor µç»ú½á¹¹Ìå
+ 324:ACE-ECF/Control/Src/Cybergear_Motor.c ****   * @retval null
+ 325:ACE-ECF/Control/Src/Cybergear_Motor.c ****   */
+ 326:ACE-ECF/Control/Src/Cybergear_Motor.c **** void MI_motor_setMechPosition2Zero(MI_Motor_t* MI_motor)
+ 327:ACE-ECF/Control/Src/Cybergear_Motor.c **** {
+ 957              		.loc 1 327 1 is_stmt 1 view -0
+ 958              		.cfi_startproc
+ 959              		@ args = 0, pretend = 0, frame = 0
+ 960              		@ frame_needed = 0, uses_anonymous_args = 0
+ 961              		.loc 1 327 1 is_stmt 0 view .LVU270
+ 962 0000 08B5     		push	{r3, lr}
+ 963              	.LCFI13:
+ 964              		.cfi_def_cfa_offset 8
+ 965              		.cfi_offset 3, -8
+ 966              		.cfi_offset 14, -4
+ 328:ACE-ECF/Control/Src/Cybergear_Motor.c ****     MI_motor->txMsg.ExtId.mode = 6;
+ 967              		.loc 1 328 5 is_stmt 1 view .LVU271
+ 968              		.loc 1 328 32 is_stmt 0 view .LVU272
+ 969 0002 90F86330 		ldrb	r3, [r0, #99]	@ zero_extendqisi2
+ 970 0006 0622     		movs	r2, #6
+ 971 0008 62F30403 		bfi	r3, r2, #0, #5
+ 972 000c 80F86330 		strb	r3, [r0, #99]
+ 329:ACE-ECF/Control/Src/Cybergear_Motor.c ****     MI_motor->txMsg.ExtId.data = MASTER_ID;
+ 973              		.loc 1 329 5 is_stmt 1 view .LVU273
+ 974              		.loc 1 329 32 is_stmt 0 view .LVU274
+ 975 0010 036E     		ldr	r3, [r0, #96]
+ 976 0012 6FF31723 		bfc	r3, #8, #16
+ 977 0016 0366     		str	r3, [r0, #96]
+ 330:ACE-ECF/Control/Src/Cybergear_Motor.c ****     MI_motor->txMsg.ExtId.res = 0;
+ 978              		.loc 1 330 5 is_stmt 1 view .LVU275
+ 979              		.loc 1 330 31 is_stmt 0 view .LVU276
+ 980 0018 90F86330 		ldrb	r3, [r0, #99]	@ zero_extendqisi2
+ 981 001c 6FF34713 		bfc	r3, #5, #3
+ 982 0020 80F86330 		strb	r3, [r0, #99]
+ 331:ACE-ECF/Control/Src/Cybergear_Motor.c ****     MI_motor->txMsg.Data[0]=1;
+ 983              		.loc 1 331 5 is_stmt 1 view .LVU277
+ 984              		.loc 1 331 28 is_stmt 0 view .LVU278
+ 985 0024 0123     		movs	r3, #1
+ 986 0026 80F86430 		strb	r3, [r0, #100]
+ 332:ACE-ECF/Control/Src/Cybergear_Motor.c ****  
+ 333:ACE-ECF/Control/Src/Cybergear_Motor.c ****     for(uint8_t i=1; i<8; i++)
+ 987              		.loc 1 333 5 is_stmt 1 view .LVU279
+ 988              	.LBB7:
+ 989              		.loc 1 333 9 view .LVU280
+ 990              	.LVL78:
+ 991              		.loc 1 333 5 is_stmt 0 view .LVU281
+ 992 002a 05E0     		b	.L60
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s 			page 25
+
+
+ 993              	.LVL79:
+ 994              	.L61:
+ 334:ACE-ECF/Control/Src/Cybergear_Motor.c ****     {
+ 335:ACE-ECF/Control/Src/Cybergear_Motor.c ****         MI_motor->txMsg.Data[i]=0;
+ 995              		.loc 1 335 9 is_stmt 1 discriminator 3 view .LVU282
+ 996              		.loc 1 335 32 is_stmt 0 discriminator 3 view .LVU283
+ 997 002c C218     		adds	r2, r0, r3
+ 998 002e 0021     		movs	r1, #0
+ 999 0030 82F86410 		strb	r1, [r2, #100]
+ 333:ACE-ECF/Control/Src/Cybergear_Motor.c ****     {
+ 1000              		.loc 1 333 27 is_stmt 1 discriminator 3 view .LVU284
+ 333:ACE-ECF/Control/Src/Cybergear_Motor.c ****     {
+ 1001              		.loc 1 333 28 is_stmt 0 discriminator 3 view .LVU285
+ 1002 0034 0133     		adds	r3, r3, #1
+ 1003              	.LVL80:
+ 333:ACE-ECF/Control/Src/Cybergear_Motor.c ****     {
+ 1004              		.loc 1 333 28 discriminator 3 view .LVU286
+ 1005 0036 DBB2     		uxtb	r3, r3
+ 1006              	.LVL81:
+ 1007              	.L60:
+ 333:ACE-ECF/Control/Src/Cybergear_Motor.c ****     {
+ 1008              		.loc 1 333 22 is_stmt 1 discriminator 1 view .LVU287
+ 333:ACE-ECF/Control/Src/Cybergear_Motor.c ****     {
+ 1009              		.loc 1 333 5 is_stmt 0 discriminator 1 view .LVU288
+ 1010 0038 072B     		cmp	r3, #7
+ 1011 003a F7D9     		bls	.L61
+ 1012              	.LBE7:
+ 336:ACE-ECF/Control/Src/Cybergear_Motor.c ****     }
+ 337:ACE-ECF/Control/Src/Cybergear_Motor.c ****     MI_Motor_CanTx(MI_motor);
+ 1013              		.loc 1 337 5 is_stmt 1 view .LVU289
+ 1014 003c FFF7FEFF 		bl	MI_Motor_CanTx
+ 1015              	.LVL82:
+ 338:ACE-ECF/Control/Src/Cybergear_Motor.c **** }
+ 1016              		.loc 1 338 1 is_stmt 0 view .LVU290
+ 1017 0040 08BD     		pop	{r3, pc}
+ 1018              		.cfi_endproc
+ 1019              	.LFE144:
+ 1021              		.section	.text.MI_motor_changeID,"ax",%progbits
+ 1022              		.align	1
+ 1023              		.global	MI_motor_changeID
+ 1024              		.syntax unified
+ 1025              		.thumb
+ 1026              		.thumb_func
+ 1028              	MI_motor_changeID:
+ 1029              	.LVL83:
+ 1030              	.LFB145:
+ 339:ACE-ECF/Control/Src/Cybergear_Motor.c **** 
+ 340:ACE-ECF/Control/Src/Cybergear_Motor.c **** /**
+ 341:ACE-ECF/Control/Src/Cybergear_Motor.c ****   * @brief  ÉèÖÃµç»úCAN_ID£¨Í¨ÐÅÀàÐÍ7£©¸ü¸Äµ±Ç°µç»úCAN_ID , Á¢¼´ÉúÐ§£¬ÐèÔÚµç»úÊ¹ÄÜÇ°Ê¹ÓÃ
+ 342:ACE-ECF/Control/Src/Cybergear_Motor.c ****   * @param  MI_motor µç»ú½á¹¹Ìå
+ 343:ACE-ECF/Control/Src/Cybergear_Motor.c ****   * @param  Target_ID ÏëÒª¸Ä³ÉµÄµç»úID
+ 344:ACE-ECF/Control/Src/Cybergear_Motor.c ****   * @retval null
+ 345:ACE-ECF/Control/Src/Cybergear_Motor.c ****   */
+ 346:ACE-ECF/Control/Src/Cybergear_Motor.c **** void MI_motor_changeID(MI_Motor_t* MI_motor,uint8_t Target_ID)
+ 347:ACE-ECF/Control/Src/Cybergear_Motor.c **** {
+ 1031              		.loc 1 347 1 is_stmt 1 view -0
+ 1032              		.cfi_startproc
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s 			page 26
+
+
+ 1033              		@ args = 0, pretend = 0, frame = 0
+ 1034              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1035              		.loc 1 347 1 is_stmt 0 view .LVU292
+ 1036 0000 08B5     		push	{r3, lr}
+ 1037              	.LCFI14:
+ 1038              		.cfi_def_cfa_offset 8
+ 1039              		.cfi_offset 3, -8
+ 1040              		.cfi_offset 14, -4
+ 348:ACE-ECF/Control/Src/Cybergear_Motor.c ****     MI_motor->txMsg.ExtId.mode = 7;	
+ 1041              		.loc 1 348 5 is_stmt 1 view .LVU293
+ 1042              		.loc 1 348 32 is_stmt 0 view .LVU294
+ 1043 0002 90F86330 		ldrb	r3, [r0, #99]	@ zero_extendqisi2
+ 1044 0006 0722     		movs	r2, #7
+ 1045 0008 62F30403 		bfi	r3, r2, #0, #5
+ 1046 000c 80F86330 		strb	r3, [r0, #99]
+ 349:ACE-ECF/Control/Src/Cybergear_Motor.c ****     MI_motor->txMsg.ExtId.motor_id = MI_motor->motor_id;
+ 1047              		.loc 1 349 5 is_stmt 1 view .LVU295
+ 1048              		.loc 1 349 46 is_stmt 0 view .LVU296
+ 1049 0010 4379     		ldrb	r3, [r0, #5]	@ zero_extendqisi2
+ 1050              		.loc 1 349 36 view .LVU297
+ 1051 0012 80F86030 		strb	r3, [r0, #96]
+ 350:ACE-ECF/Control/Src/Cybergear_Motor.c ****     MI_motor->txMsg.ExtId.data = Target_ID << 8 | MI_motor->master_id;
+ 1052              		.loc 1 350 5 is_stmt 1 view .LVU298
+ 1053              		.loc 1 350 59 is_stmt 0 view .LVU299
+ 1054 0016 0379     		ldrb	r3, [r0, #4]	@ zero_extendqisi2
+ 1055              		.loc 1 350 49 view .LVU300
+ 1056 0018 43EA0123 		orr	r3, r3, r1, lsl #8
+ 1057              		.loc 1 350 32 view .LVU301
+ 1058 001c A0F86130 		strh	r3, [r0, #97]	@ unaligned
+ 351:ACE-ECF/Control/Src/Cybergear_Motor.c ****     MI_motor->txMsg.ExtId.res = 0;
+ 1059              		.loc 1 351 5 is_stmt 1 view .LVU302
+ 1060              		.loc 1 351 31 is_stmt 0 view .LVU303
+ 1061 0020 90F86330 		ldrb	r3, [r0, #99]	@ zero_extendqisi2
+ 1062 0024 6FF34713 		bfc	r3, #5, #3
+ 1063 0028 80F86330 		strb	r3, [r0, #99]
+ 352:ACE-ECF/Control/Src/Cybergear_Motor.c ****     
+ 353:ACE-ECF/Control/Src/Cybergear_Motor.c ****     MI_motor->motor_id = Target_ID;//¸ü¸Ä±¾µç»úcanID
+ 1064              		.loc 1 353 5 is_stmt 1 view .LVU304
+ 1065              		.loc 1 353 24 is_stmt 0 view .LVU305
+ 1066 002c 4171     		strb	r1, [r0, #5]
+ 354:ACE-ECF/Control/Src/Cybergear_Motor.c ****  
+ 355:ACE-ECF/Control/Src/Cybergear_Motor.c ****     for(uint8_t i=0; i<8; i++)
+ 1067              		.loc 1 355 5 is_stmt 1 view .LVU306
+ 1068              	.LBB8:
+ 1069              		.loc 1 355 9 view .LVU307
+ 1070              	.LVL84:
+ 1071              		.loc 1 355 17 is_stmt 0 view .LVU308
+ 1072 002e 0023     		movs	r3, #0
+ 1073              		.loc 1 355 5 view .LVU309
+ 1074 0030 05E0     		b	.L64
+ 1075              	.LVL85:
+ 1076              	.L65:
+ 356:ACE-ECF/Control/Src/Cybergear_Motor.c ****     {
+ 357:ACE-ECF/Control/Src/Cybergear_Motor.c ****         MI_motor->txMsg.Data[i]=0;
+ 1077              		.loc 1 357 9 is_stmt 1 discriminator 3 view .LVU310
+ 1078              		.loc 1 357 32 is_stmt 0 discriminator 3 view .LVU311
+ 1079 0032 C218     		adds	r2, r0, r3
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s 			page 27
+
+
+ 1080 0034 0021     		movs	r1, #0
+ 1081 0036 82F86410 		strb	r1, [r2, #100]
+ 355:ACE-ECF/Control/Src/Cybergear_Motor.c ****     {
+ 1082              		.loc 1 355 27 is_stmt 1 discriminator 3 view .LVU312
+ 355:ACE-ECF/Control/Src/Cybergear_Motor.c ****     {
+ 1083              		.loc 1 355 28 is_stmt 0 discriminator 3 view .LVU313
+ 1084 003a 0133     		adds	r3, r3, #1
+ 1085              	.LVL86:
+ 355:ACE-ECF/Control/Src/Cybergear_Motor.c ****     {
+ 1086              		.loc 1 355 28 discriminator 3 view .LVU314
+ 1087 003c DBB2     		uxtb	r3, r3
+ 1088              	.LVL87:
+ 1089              	.L64:
+ 355:ACE-ECF/Control/Src/Cybergear_Motor.c ****     {
+ 1090              		.loc 1 355 22 is_stmt 1 discriminator 1 view .LVU315
+ 355:ACE-ECF/Control/Src/Cybergear_Motor.c ****     {
+ 1091              		.loc 1 355 5 is_stmt 0 discriminator 1 view .LVU316
+ 1092 003e 072B     		cmp	r3, #7
+ 1093 0040 F7D9     		bls	.L65
+ 1094              	.LBE8:
+ 358:ACE-ECF/Control/Src/Cybergear_Motor.c ****     }
+ 359:ACE-ECF/Control/Src/Cybergear_Motor.c ****     MI_Motor_CanTx(MI_motor);
+ 1095              		.loc 1 359 5 is_stmt 1 view .LVU317
+ 1096 0042 FFF7FEFF 		bl	MI_Motor_CanTx
+ 1097              	.LVL88:
+ 360:ACE-ECF/Control/Src/Cybergear_Motor.c **** }
+ 1098              		.loc 1 360 1 is_stmt 0 view .LVU318
+ 1099 0046 08BD     		pop	{r3, pc}
+ 1100              		.cfi_endproc
+ 1101              	.LFE145:
+ 1103              		.section	.text.MI_motor_Read_One_Para,"ax",%progbits
+ 1104              		.align	1
+ 1105              		.global	MI_motor_Read_One_Para
+ 1106              		.syntax unified
+ 1107              		.thumb
+ 1108              		.thumb_func
+ 1110              	MI_motor_Read_One_Para:
+ 1111              	.LVL89:
+ 1112              	.LFB146:
+ 361:ACE-ECF/Control/Src/Cybergear_Motor.c **** 
+ 362:ACE-ECF/Control/Src/Cybergear_Motor.c **** /**
+ 363:ACE-ECF/Control/Src/Cybergear_Motor.c ****   * @brief  µ¥¸ö²ÎÊý¶ÁÈ¡£¨Í¨ÐÅÀàÐÍ17£©
+ 364:ACE-ECF/Control/Src/Cybergear_Motor.c ****   * @param  MI_motor µç»ú½á¹¹ÌåÖ¸Õë
+ 365:ACE-ECF/Control/Src/Cybergear_Motor.c ****   * @param  parameter_index_e ¶ÁÈ¡µÄ²ÎÊý
+ 366:ACE-ECF/Control/Src/Cybergear_Motor.c ****   * @retval null
+ 367:ACE-ECF/Control/Src/Cybergear_Motor.c ****   * @note   Ä¿Ç°·´À¡½ÓÊÕ´æÔÚÐ¡bug
+ 368:ACE-ECF/Control/Src/Cybergear_Motor.c ****   */
+ 369:ACE-ECF/Control/Src/Cybergear_Motor.c **** void MI_motor_Read_One_Para(MI_Motor_t* MI_motor, parameter_index_e index)
+ 370:ACE-ECF/Control/Src/Cybergear_Motor.c **** {
+ 1113              		.loc 1 370 1 is_stmt 1 view -0
+ 1114              		.cfi_startproc
+ 1115              		@ args = 0, pretend = 0, frame = 0
+ 1116              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1117              		.loc 1 370 1 is_stmt 0 view .LVU320
+ 1118 0000 08B5     		push	{r3, lr}
+ 1119              	.LCFI15:
+ 1120              		.cfi_def_cfa_offset 8
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s 			page 28
+
+
+ 1121              		.cfi_offset 3, -8
+ 1122              		.cfi_offset 14, -4
+ 371:ACE-ECF/Control/Src/Cybergear_Motor.c ****     MI_motor->txMsg.ExtId.mode = 17;
+ 1123              		.loc 1 371 5 is_stmt 1 view .LVU321
+ 1124              		.loc 1 371 32 is_stmt 0 view .LVU322
+ 1125 0002 90F86330 		ldrb	r3, [r0, #99]	@ zero_extendqisi2
+ 1126 0006 1122     		movs	r2, #17
+ 1127 0008 62F30403 		bfi	r3, r2, #0, #5
+ 1128 000c 80F86330 		strb	r3, [r0, #99]
+ 372:ACE-ECF/Control/Src/Cybergear_Motor.c ****     MI_motor->txMsg.ExtId.data = MASTER_ID;
+ 1129              		.loc 1 372 5 is_stmt 1 view .LVU323
+ 1130              		.loc 1 372 32 is_stmt 0 view .LVU324
+ 1131 0010 036E     		ldr	r3, [r0, #96]
+ 1132 0012 6FF31723 		bfc	r3, #8, #16
+ 1133 0016 0366     		str	r3, [r0, #96]
+ 373:ACE-ECF/Control/Src/Cybergear_Motor.c ****     MI_motor->txMsg.ExtId.res = 0;
+ 1134              		.loc 1 373 5 is_stmt 1 view .LVU325
+ 1135              		.loc 1 373 31 is_stmt 0 view .LVU326
+ 1136 0018 90F86330 		ldrb	r3, [r0, #99]	@ zero_extendqisi2
+ 1137 001c 6FF34713 		bfc	r3, #5, #3
+ 1138 0020 80F86330 		strb	r3, [r0, #99]
+ 374:ACE-ECF/Control/Src/Cybergear_Motor.c ****     MI_motor->txMsg.Data[0]=index;
+ 1139              		.loc 1 374 5 is_stmt 1 view .LVU327
+ 1140              		.loc 1 374 28 is_stmt 0 view .LVU328
+ 1141 0024 80F86410 		strb	r1, [r0, #100]
+ 375:ACE-ECF/Control/Src/Cybergear_Motor.c ****     memcpy(&MI_motor->txMsg.Data[0],&index,2);
+ 1142              		.loc 1 375 5 is_stmt 1 view .LVU329
+ 1143 0028 A0F86410 		strh	r1, [r0, #100]	@ unaligned
+ 376:ACE-ECF/Control/Src/Cybergear_Motor.c ****     for(uint8_t i=2; i<8; i++)
+ 1144              		.loc 1 376 5 view .LVU330
+ 1145              	.LBB9:
+ 1146              		.loc 1 376 9 view .LVU331
+ 1147              	.LVL90:
+ 1148              		.loc 1 376 17 is_stmt 0 view .LVU332
+ 1149 002c 0223     		movs	r3, #2
+ 1150              		.loc 1 376 5 view .LVU333
+ 1151 002e 05E0     		b	.L68
+ 1152              	.LVL91:
+ 1153              	.L69:
+ 377:ACE-ECF/Control/Src/Cybergear_Motor.c ****     {
+ 378:ACE-ECF/Control/Src/Cybergear_Motor.c ****         MI_motor->txMsg.Data[i]=0;
+ 1154              		.loc 1 378 9 is_stmt 1 discriminator 3 view .LVU334
+ 1155              		.loc 1 378 32 is_stmt 0 discriminator 3 view .LVU335
+ 1156 0030 C218     		adds	r2, r0, r3
+ 1157 0032 0021     		movs	r1, #0
+ 1158 0034 82F86410 		strb	r1, [r2, #100]
+ 376:ACE-ECF/Control/Src/Cybergear_Motor.c ****     for(uint8_t i=2; i<8; i++)
+ 1159              		.loc 1 376 27 is_stmt 1 discriminator 3 view .LVU336
+ 376:ACE-ECF/Control/Src/Cybergear_Motor.c ****     for(uint8_t i=2; i<8; i++)
+ 1160              		.loc 1 376 28 is_stmt 0 discriminator 3 view .LVU337
+ 1161 0038 0133     		adds	r3, r3, #1
+ 1162              	.LVL92:
+ 376:ACE-ECF/Control/Src/Cybergear_Motor.c ****     for(uint8_t i=2; i<8; i++)
+ 1163              		.loc 1 376 28 discriminator 3 view .LVU338
+ 1164 003a DBB2     		uxtb	r3, r3
+ 1165              	.LVL93:
+ 1166              	.L68:
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s 			page 29
+
+
+ 376:ACE-ECF/Control/Src/Cybergear_Motor.c ****     for(uint8_t i=2; i<8; i++)
+ 1167              		.loc 1 376 22 is_stmt 1 discriminator 1 view .LVU339
+ 376:ACE-ECF/Control/Src/Cybergear_Motor.c ****     for(uint8_t i=2; i<8; i++)
+ 1168              		.loc 1 376 5 is_stmt 0 discriminator 1 view .LVU340
+ 1169 003c 072B     		cmp	r3, #7
+ 1170 003e F7D9     		bls	.L69
+ 1171              	.LBE9:
+ 379:ACE-ECF/Control/Src/Cybergear_Motor.c ****     }
+ 380:ACE-ECF/Control/Src/Cybergear_Motor.c ****     MI_Motor_CanTx(MI_motor);
+ 1172              		.loc 1 380 5 is_stmt 1 view .LVU341
+ 1173 0040 FFF7FEFF 		bl	MI_Motor_CanTx
+ 1174              	.LVL94:
+ 381:ACE-ECF/Control/Src/Cybergear_Motor.c **** }
+ 1175              		.loc 1 381 1 is_stmt 0 view .LVU342
+ 1176 0044 08BD     		pop	{r3, pc}
+ 1177              		.cfi_endproc
+ 1178              	.LFE146:
+ 1180              		.section	.text.MI_motor_Write_One_Para,"ax",%progbits
+ 1181              		.align	1
+ 1182              		.global	MI_motor_Write_One_Para
+ 1183              		.syntax unified
+ 1184              		.thumb
+ 1185              		.thumb_func
+ 1187              	MI_motor_Write_One_Para:
+ 1188              	.LVL95:
+ 1189              	.LFB147:
+ 382:ACE-ECF/Control/Src/Cybergear_Motor.c **** 
+ 383:ACE-ECF/Control/Src/Cybergear_Motor.c **** /**
+ 384:ACE-ECF/Control/Src/Cybergear_Motor.c ****   * @brief  µ¥¸ö²ÎÊýÐ´Èë£¨Í¨ÐÅÀàÐÍ18£© £¨µôµç¶ªÊ§£©
+ 385:ACE-ECF/Control/Src/Cybergear_Motor.c ****   * @param  µç»ú½á¹¹ÌåÖ¸Õë
+ 386:ACE-ECF/Control/Src/Cybergear_Motor.c ****   * @param  Ð´ÈëµÄ²ÎÊý
+ 387:ACE-ECF/Control/Src/Cybergear_Motor.c ****   * @param  Ð´ÈëµÄÖµ
+ 388:ACE-ECF/Control/Src/Cybergear_Motor.c ****   * @retval null
+ 389:ACE-ECF/Control/Src/Cybergear_Motor.c ****   * @note   µçÁ÷ Î»ÖÃ ËÙ¶ÈÄ£Ê½µÚÒ»´ÎÐ´ÈëÎÞ·´Ó¦£¿
+ 390:ACE-ECF/Control/Src/Cybergear_Motor.c ****   */
+ 391:ACE-ECF/Control/Src/Cybergear_Motor.c **** void MI_motor_Write_One_Para(MI_Motor_t* MI_motor, parameter_index_e index , float Value)
+ 392:ACE-ECF/Control/Src/Cybergear_Motor.c **** {
+ 1190              		.loc 1 392 1 is_stmt 1 view -0
+ 1191              		.cfi_startproc
+ 1192              		@ args = 0, pretend = 0, frame = 0
+ 1193              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1194              		.loc 1 392 1 is_stmt 0 view .LVU344
+ 1195 0000 10B5     		push	{r4, lr}
+ 1196              	.LCFI16:
+ 1197              		.cfi_def_cfa_offset 8
+ 1198              		.cfi_offset 4, -8
+ 1199              		.cfi_offset 14, -4
+ 1200 0002 0446     		mov	r4, r0
+ 393:ACE-ECF/Control/Src/Cybergear_Motor.c ****     MI_motor->txMsg.ExtId.mode = 0x12;
+ 1201              		.loc 1 393 5 is_stmt 1 view .LVU345
+ 1202              		.loc 1 393 32 is_stmt 0 view .LVU346
+ 1203 0004 90F86330 		ldrb	r3, [r0, #99]	@ zero_extendqisi2
+ 1204 0008 1222     		movs	r2, #18
+ 1205 000a 62F30403 		bfi	r3, r2, #0, #5
+ 1206 000e 80F86330 		strb	r3, [r0, #99]
+ 394:ACE-ECF/Control/Src/Cybergear_Motor.c ****     MI_motor->txMsg.ExtId.data = MI_motor->master_id;
+ 1207              		.loc 1 394 5 is_stmt 1 view .LVU347
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s 			page 30
+
+
+ 1208              		.loc 1 394 42 is_stmt 0 view .LVU348
+ 1209 0012 0379     		ldrb	r3, [r0, #4]	@ zero_extendqisi2
+ 1210              		.loc 1 394 32 view .LVU349
+ 1211 0014 A0F86130 		strh	r3, [r0, #97]	@ unaligned
+ 395:ACE-ECF/Control/Src/Cybergear_Motor.c ****     MI_motor->txMsg.ExtId.res = 0;
+ 1212              		.loc 1 395 5 is_stmt 1 view .LVU350
+ 1213              		.loc 1 395 31 is_stmt 0 view .LVU351
+ 1214 0018 90F86330 		ldrb	r3, [r0, #99]	@ zero_extendqisi2
+ 1215 001c 6FF34713 		bfc	r3, #5, #3
+ 1216 0020 80F86330 		strb	r3, [r0, #99]
+ 396:ACE-ECF/Control/Src/Cybergear_Motor.c ****     for(uint8_t i=2; i<8; i++)
+ 1217              		.loc 1 396 5 is_stmt 1 view .LVU352
+ 1218              	.LBB10:
+ 1219              		.loc 1 396 9 view .LVU353
+ 1220              	.LVL96:
+ 1221              		.loc 1 396 17 is_stmt 0 view .LVU354
+ 1222 0024 0223     		movs	r3, #2
+ 1223              		.loc 1 396 5 view .LVU355
+ 1224 0026 05E0     		b	.L72
+ 1225              	.LVL97:
+ 1226              	.L73:
+ 397:ACE-ECF/Control/Src/Cybergear_Motor.c ****     {
+ 398:ACE-ECF/Control/Src/Cybergear_Motor.c ****         MI_motor->txMsg.Data[i] = 0;
+ 1227              		.loc 1 398 9 is_stmt 1 discriminator 3 view .LVU356
+ 1228              		.loc 1 398 33 is_stmt 0 discriminator 3 view .LVU357
+ 1229 0028 E218     		adds	r2, r4, r3
+ 1230 002a 0020     		movs	r0, #0
+ 1231 002c 82F86400 		strb	r0, [r2, #100]
+ 396:ACE-ECF/Control/Src/Cybergear_Motor.c ****     for(uint8_t i=2; i<8; i++)
+ 1232              		.loc 1 396 27 is_stmt 1 discriminator 3 view .LVU358
+ 396:ACE-ECF/Control/Src/Cybergear_Motor.c ****     for(uint8_t i=2; i<8; i++)
+ 1233              		.loc 1 396 28 is_stmt 0 discriminator 3 view .LVU359
+ 1234 0030 0133     		adds	r3, r3, #1
+ 1235              	.LVL98:
+ 396:ACE-ECF/Control/Src/Cybergear_Motor.c ****     for(uint8_t i=2; i<8; i++)
+ 1236              		.loc 1 396 28 discriminator 3 view .LVU360
+ 1237 0032 DBB2     		uxtb	r3, r3
+ 1238              	.LVL99:
+ 1239              	.L72:
+ 396:ACE-ECF/Control/Src/Cybergear_Motor.c ****     for(uint8_t i=2; i<8; i++)
+ 1240              		.loc 1 396 22 is_stmt 1 discriminator 1 view .LVU361
+ 396:ACE-ECF/Control/Src/Cybergear_Motor.c ****     for(uint8_t i=2; i<8; i++)
+ 1241              		.loc 1 396 5 is_stmt 0 discriminator 1 view .LVU362
+ 1242 0034 072B     		cmp	r3, #7
+ 1243 0036 F7D9     		bls	.L73
+ 1244              	.LBE10:
+ 399:ACE-ECF/Control/Src/Cybergear_Motor.c ****     }
+ 400:ACE-ECF/Control/Src/Cybergear_Motor.c **** 
+ 401:ACE-ECF/Control/Src/Cybergear_Motor.c ****     memcpy(&MI_motor->txMsg.Data[0],&index,2);
+ 1245              		.loc 1 401 5 is_stmt 1 view .LVU363
+ 1246 0038 A4F86410 		strh	r1, [r4, #100]	@ unaligned
+ 402:ACE-ECF/Control/Src/Cybergear_Motor.c **** //    memcpy(&MI_motor->txMsg.Data[4],data, 4);
+ 403:ACE-ECF/Control/Src/Cybergear_Motor.c ****     if (index == run_mode)
+ 1247              		.loc 1 403 5 view .LVU364
+ 1248              		.loc 1 403 8 is_stmt 0 view .LVU365
+ 1249 003c 47F20503 		movw	r3, #28677
+ 1250              	.LVL100:
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s 			page 31
+
+
+ 1251              		.loc 1 403 8 view .LVU366
+ 1252 0040 9942     		cmp	r1, r3
+ 1253 0042 10D1     		bne	.L74
+ 404:ACE-ECF/Control/Src/Cybergear_Motor.c ****     {
+ 405:ACE-ECF/Control/Src/Cybergear_Motor.c ****         MI_motor->txMsg.Data[4]=(uint8_t)Value;
+ 1254              		.loc 1 405 9 is_stmt 1 view .LVU367
+ 1255              		.loc 1 405 33 is_stmt 0 view .LVU368
+ 1256 0044 FCEEC07A 		vcvt.u32.f32	s15, s0
+ 1257 0048 17EE903A 		vmov	r3, s15	@ int
+ 1258              		.loc 1 405 32 view .LVU369
+ 1259 004c 84F86830 		strb	r3, [r4, #104]
+ 406:ACE-ECF/Control/Src/Cybergear_Motor.c **** 		MI_motor->txMsg.Data[5]=0x00;
+ 1260              		.loc 1 406 3 is_stmt 1 view .LVU370
+ 1261              		.loc 1 406 26 is_stmt 0 view .LVU371
+ 1262 0050 0023     		movs	r3, #0
+ 1263 0052 84F86930 		strb	r3, [r4, #105]
+ 407:ACE-ECF/Control/Src/Cybergear_Motor.c **** 		MI_motor->txMsg.Data[6]=0x00;
+ 1264              		.loc 1 407 3 is_stmt 1 view .LVU372
+ 1265              		.loc 1 407 26 is_stmt 0 view .LVU373
+ 1266 0056 84F86A30 		strb	r3, [r4, #106]
+ 408:ACE-ECF/Control/Src/Cybergear_Motor.c **** 		MI_motor->txMsg.Data[7]=0x00;	
+ 1267              		.loc 1 408 3 is_stmt 1 view .LVU374
+ 1268              		.loc 1 408 26 is_stmt 0 view .LVU375
+ 1269 005a 84F86B30 		strb	r3, [r4, #107]
+ 1270              	.LVL101:
+ 1271              	.L75:
+ 409:ACE-ECF/Control/Src/Cybergear_Motor.c ****     }
+ 410:ACE-ECF/Control/Src/Cybergear_Motor.c ****     else
+ 411:ACE-ECF/Control/Src/Cybergear_Motor.c ****     {
+ 412:ACE-ECF/Control/Src/Cybergear_Motor.c **** 		Float_to_Byte(Value);
+ 413:ACE-ECF/Control/Src/Cybergear_Motor.c **** 		MI_motor->txMsg.Data[4]=byte[3];
+ 414:ACE-ECF/Control/Src/Cybergear_Motor.c **** 		MI_motor->txMsg.Data[5]=byte[2];
+ 415:ACE-ECF/Control/Src/Cybergear_Motor.c **** 		MI_motor->txMsg.Data[6]=byte[1];
+ 416:ACE-ECF/Control/Src/Cybergear_Motor.c **** 		MI_motor->txMsg.Data[7]=byte[0];		
+ 417:ACE-ECF/Control/Src/Cybergear_Motor.c **** 	}
+ 418:ACE-ECF/Control/Src/Cybergear_Motor.c ****     MI_Motor_CanTx(MI_motor);
+ 1272              		.loc 1 418 5 is_stmt 1 view .LVU376
+ 1273 005e 2046     		mov	r0, r4
+ 1274 0060 FFF7FEFF 		bl	MI_Motor_CanTx
+ 1275              	.LVL102:
+ 419:ACE-ECF/Control/Src/Cybergear_Motor.c **** }
+ 1276              		.loc 1 419 1 is_stmt 0 view .LVU377
+ 1277 0064 10BD     		pop	{r4, pc}
+ 1278              	.LVL103:
+ 1279              	.L74:
+ 412:ACE-ECF/Control/Src/Cybergear_Motor.c **** 		MI_motor->txMsg.Data[4]=byte[3];
+ 1280              		.loc 1 412 3 is_stmt 1 view .LVU378
+ 1281 0066 FFF7FEFF 		bl	Float_to_Byte
+ 1282              	.LVL104:
+ 413:ACE-ECF/Control/Src/Cybergear_Motor.c **** 		MI_motor->txMsg.Data[5]=byte[2];
+ 1283              		.loc 1 413 3 view .LVU379
+ 413:ACE-ECF/Control/Src/Cybergear_Motor.c **** 		MI_motor->txMsg.Data[5]=byte[2];
+ 1284              		.loc 1 413 31 is_stmt 0 view .LVU380
+ 1285 006a 074B     		ldr	r3, .L77
+ 1286 006c DA78     		ldrb	r2, [r3, #3]	@ zero_extendqisi2
+ 413:ACE-ECF/Control/Src/Cybergear_Motor.c **** 		MI_motor->txMsg.Data[5]=byte[2];
+ 1287              		.loc 1 413 26 view .LVU381
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s 			page 32
+
+
+ 1288 006e 84F86820 		strb	r2, [r4, #104]
+ 414:ACE-ECF/Control/Src/Cybergear_Motor.c **** 		MI_motor->txMsg.Data[6]=byte[1];
+ 1289              		.loc 1 414 3 is_stmt 1 view .LVU382
+ 414:ACE-ECF/Control/Src/Cybergear_Motor.c **** 		MI_motor->txMsg.Data[6]=byte[1];
+ 1290              		.loc 1 414 31 is_stmt 0 view .LVU383
+ 1291 0072 9A78     		ldrb	r2, [r3, #2]	@ zero_extendqisi2
+ 414:ACE-ECF/Control/Src/Cybergear_Motor.c **** 		MI_motor->txMsg.Data[6]=byte[1];
+ 1292              		.loc 1 414 26 view .LVU384
+ 1293 0074 84F86920 		strb	r2, [r4, #105]
+ 415:ACE-ECF/Control/Src/Cybergear_Motor.c **** 		MI_motor->txMsg.Data[7]=byte[0];		
+ 1294              		.loc 1 415 3 is_stmt 1 view .LVU385
+ 415:ACE-ECF/Control/Src/Cybergear_Motor.c **** 		MI_motor->txMsg.Data[7]=byte[0];		
+ 1295              		.loc 1 415 31 is_stmt 0 view .LVU386
+ 1296 0078 5A78     		ldrb	r2, [r3, #1]	@ zero_extendqisi2
+ 415:ACE-ECF/Control/Src/Cybergear_Motor.c **** 		MI_motor->txMsg.Data[7]=byte[0];		
+ 1297              		.loc 1 415 26 view .LVU387
+ 1298 007a 84F86A20 		strb	r2, [r4, #106]
+ 416:ACE-ECF/Control/Src/Cybergear_Motor.c **** 	}
+ 1299              		.loc 1 416 3 is_stmt 1 view .LVU388
+ 416:ACE-ECF/Control/Src/Cybergear_Motor.c **** 	}
+ 1300              		.loc 1 416 31 is_stmt 0 view .LVU389
+ 1301 007e 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 416:ACE-ECF/Control/Src/Cybergear_Motor.c **** 	}
+ 1302              		.loc 1 416 26 view .LVU390
+ 1303 0080 84F86B30 		strb	r3, [r4, #107]
+ 1304 0084 EBE7     		b	.L75
+ 1305              	.L78:
+ 1306 0086 00BF     		.align	2
+ 1307              	.L77:
+ 1308 0088 00000000 		.word	.LANCHOR0
+ 1309              		.cfi_endproc
+ 1310              	.LFE147:
+ 1312              		.section	.text.MI_motor_Set_Mode,"ax",%progbits
+ 1313              		.align	1
+ 1314              		.global	MI_motor_Set_Mode
+ 1315              		.syntax unified
+ 1316              		.thumb
+ 1317              		.thumb_func
+ 1319              	MI_motor_Set_Mode:
+ 1320              	.LVL105:
+ 1321              	.LFB148:
+ 420:ACE-ECF/Control/Src/Cybergear_Motor.c **** 
+ 421:ACE-ECF/Control/Src/Cybergear_Motor.c **** /**
+ 422:ACE-ECF/Control/Src/Cybergear_Motor.c ****   * @function     : ÉèÖÃµç»ú¿ØÖÆÄ£Ê½
+ 423:ACE-ECF/Control/Src/Cybergear_Motor.c ****   * @param        : µç»ú¿ØÖÆÄ£Ê½
+ 424:ACE-ECF/Control/Src/Cybergear_Motor.c ****   * @return       : null
+ 425:ACE-ECF/Control/Src/Cybergear_Motor.c ****   */
+ 426:ACE-ECF/Control/Src/Cybergear_Motor.c **** void MI_motor_Set_Mode(MI_Motor_t *MI_motor,Mode_rum_mode_t Mode)
+ 427:ACE-ECF/Control/Src/Cybergear_Motor.c **** {
+ 1322              		.loc 1 427 1 is_stmt 1 view -0
+ 1323              		.cfi_startproc
+ 1324              		@ args = 0, pretend = 0, frame = 0
+ 1325              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1326              		.loc 1 427 1 is_stmt 0 view .LVU392
+ 1327 0000 08B5     		push	{r3, lr}
+ 1328              	.LCFI17:
+ 1329              		.cfi_def_cfa_offset 8
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s 			page 33
+
+
+ 1330              		.cfi_offset 3, -8
+ 1331              		.cfi_offset 14, -4
+ 1332 0002 00EE101A 		vmov	s0, r1	@ int
+ 428:ACE-ECF/Control/Src/Cybergear_Motor.c **** 	MI_motor_Write_One_Para(MI_motor,run_mode,Mode);
+ 1333              		.loc 1 428 2 is_stmt 1 view .LVU393
+ 1334 0006 B8EE400A 		vcvt.f32.u32	s0, s0
+ 1335 000a 47F20501 		movw	r1, #28677
+ 1336              	.LVL106:
+ 1337              		.loc 1 428 2 is_stmt 0 view .LVU394
+ 1338 000e FFF7FEFF 		bl	MI_motor_Write_One_Para
+ 1339              	.LVL107:
+ 429:ACE-ECF/Control/Src/Cybergear_Motor.c **** }
+ 1340              		.loc 1 429 1 view .LVU395
+ 1341 0012 08BD     		pop	{r3, pc}
+ 1342              		.cfi_endproc
+ 1343              	.LFE148:
+ 1345              		.global	__aeabi_i2d
+ 1346              		.global	__aeabi_dmul
+ 1347              		.global	__aeabi_d2f
+ 1348              		.section	.text.MI_motor_recive_callback,"ax",%progbits
+ 1349              		.align	1
+ 1350              		.global	MI_motor_recive_callback
+ 1351              		.syntax unified
+ 1352              		.thumb
+ 1353              		.thumb_func
+ 1355              	MI_motor_recive_callback:
+ 1356              	.LVL108:
+ 1357              	.LFB149:
+ 430:ACE-ECF/Control/Src/Cybergear_Motor.c **** 
+ 431:ACE-ECF/Control/Src/Cybergear_Motor.c **** 
+ 432:ACE-ECF/Control/Src/Cybergear_Motor.c **** /**
+ 433:ACE-ECF/Control/Src/Cybergear_Motor.c ****   * @brief  Ð¡Ã×µç»ú½ÓÊÕ´¦Àíº¯Êý
+ 434:ACE-ECF/Control/Src/Cybergear_Motor.c ****   * @param  MI_motor µç»ú½á¹¹ÌåÖ¸Õë
+ 435:ACE-ECF/Control/Src/Cybergear_Motor.c ****   * @param  receive_ExtId ½ÓÊÕµÄcanÍØÕ¹±êÊ¶·û
+ 436:ACE-ECF/Control/Src/Cybergear_Motor.c ****   * @param  Rx_Data[8] ½ÓÊÕµÄ8×Ö½ÚÊý¾Ý
+ 437:ACE-ECF/Control/Src/Cybergear_Motor.c ****   * @retval null
+ 438:ACE-ECF/Control/Src/Cybergear_Motor.c ****   * @note   ÅÐ¶ÏµÄÊý¾Ý½á¹¹ÌåÄÚ±¾µç»úidÐèÒª×Ô¼ºÊÖ¶¯ÉèÖÃ
+ 439:ACE-ECF/Control/Src/Cybergear_Motor.c ****   */
+ 440:ACE-ECF/Control/Src/Cybergear_Motor.c **** void MI_motor_recive_callback(MI_Motor_t* MI_motor, uint32_t receive_ExtId, uint8_t Rx_Data[8])
+ 441:ACE-ECF/Control/Src/Cybergear_Motor.c **** {
+ 1358              		.loc 1 441 1 is_stmt 1 view -0
+ 1359              		.cfi_startproc
+ 1360              		@ args = 0, pretend = 0, frame = 8
+ 1361              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1362              		.loc 1 441 1 is_stmt 0 view .LVU397
+ 1363 0000 30B5     		push	{r4, r5, lr}
+ 1364              	.LCFI18:
+ 1365              		.cfi_def_cfa_offset 12
+ 1366              		.cfi_offset 4, -12
+ 1367              		.cfi_offset 5, -8
+ 1368              		.cfi_offset 14, -4
+ 1369 0002 83B0     		sub	sp, sp, #12
+ 1370              	.LCFI19:
+ 1371              		.cfi_def_cfa_offset 24
+ 1372 0004 0191     		str	r1, [sp, #4]
+ 1373 0006 1546     		mov	r5, r2
+ 442:ACE-ECF/Control/Src/Cybergear_Motor.c **** //    uint16_t temp;
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s 			page 34
+
+
+ 443:ACE-ECF/Control/Src/Cybergear_Motor.c ****     MI_motor->rxMsg.ExtId = *((rxExtId_t*)&receive_ExtId);
+ 1374              		.loc 1 443 5 is_stmt 1 view .LVU398
+ 1375              		.loc 1 443 27 is_stmt 0 view .LVU399
+ 1376 0008 C166     		str	r1, [r0, #108]
+ 444:ACE-ECF/Control/Src/Cybergear_Motor.c ****     if (MI_motor->rxMsg.ExtId.motor_id != MI_motor->master_id)       return;//·Ç±¾µç»ú
+ 1377              		.loc 1 444 5 is_stmt 1 view .LVU400
+ 1378              		.loc 1 444 30 is_stmt 0 view .LVU401
+ 1379 000a 90F86C30 		ldrb	r3, [r0, #108]	@ zero_extendqisi2
+ 1380              		.loc 1 444 51 view .LVU402
+ 1381 000e 0279     		ldrb	r2, [r0, #4]	@ zero_extendqisi2
+ 1382              	.LVL109:
+ 1383              		.loc 1 444 8 view .LVU403
+ 1384 0010 9342     		cmp	r3, r2
+ 1385 0012 40F0D080 		bne	.L81
+ 1386 0016 0446     		mov	r4, r0
+ 445:ACE-ECF/Control/Src/Cybergear_Motor.c ****     if (MI_motor->rxMsg.ExtId.motor_now_id != MI_motor->motor_id)    return;//·Ç±¾Ö÷»ú
+ 1387              		.loc 1 445 5 is_stmt 1 view .LVU404
+ 1388              		.loc 1 445 30 is_stmt 0 view .LVU405
+ 1389 0018 90F86D10 		ldrb	r1, [r0, #109]	@ zero_extendqisi2
+ 1390              	.LVL110:
+ 1391              		.loc 1 445 55 view .LVU406
+ 1392 001c 4279     		ldrb	r2, [r0, #5]	@ zero_extendqisi2
+ 1393              		.loc 1 445 8 view .LVU407
+ 1394 001e 9142     		cmp	r1, r2
+ 1395 0020 40F0C980 		bne	.L81
+ 446:ACE-ECF/Control/Src/Cybergear_Motor.c ****     //ÒÔÉÏ²Ù×÷·½±ãÁËcanÍøÂçÉÏ´îÔØ¶à¸öÃ×¹·µç»úµÄÇé¿ö,Ã¿Ê¹ÓÃÒ»¸öÃ×¹·µç»ú¾Í¶ªÒ»¸öÕâ¸öµ½can½ÓÊÕÖÐ¶Ï´¦Àí
+ 447:ACE-ECF/Control/Src/Cybergear_Motor.c ****     
+ 448:ACE-ECF/Control/Src/Cybergear_Motor.c ****     switch (MI_motor->rxMsg.ExtId.mode)
+ 1396              		.loc 1 448 5 is_stmt 1 view .LVU408
+ 1397              		.loc 1 448 34 is_stmt 0 view .LVU409
+ 1398 0024 90F86F20 		ldrb	r2, [r0, #111]	@ zero_extendqisi2
+ 1399 0028 02F01F02 		and	r2, r2, #31
+ 1400              		.loc 1 448 5 view .LVU410
+ 1401 002c 152A     		cmp	r2, #21
+ 1402 002e 00F2C280 		bhi	.L81
+ 1403 0032 DFE802F0 		tbb	[pc, r2]
+ 1404              	.L84:
+ 1405 0036 0B       		.byte	(.L87-.L84)/2
+ 1406 0037 C0       		.byte	(.L81-.L84)/2
+ 1407 0038 14       		.byte	(.L86-.L84)/2
+ 1408 0039 C0       		.byte	(.L81-.L84)/2
+ 1409 003a C0       		.byte	(.L81-.L84)/2
+ 1410 003b C0       		.byte	(.L81-.L84)/2
+ 1411 003c C0       		.byte	(.L81-.L84)/2
+ 1412 003d C0       		.byte	(.L81-.L84)/2
+ 1413 003e C0       		.byte	(.L81-.L84)/2
+ 1414 003f C0       		.byte	(.L81-.L84)/2
+ 1415 0040 C0       		.byte	(.L81-.L84)/2
+ 1416 0041 C0       		.byte	(.L81-.L84)/2
+ 1417 0042 C0       		.byte	(.L81-.L84)/2
+ 1418 0043 C0       		.byte	(.L81-.L84)/2
+ 1419 0044 C0       		.byte	(.L81-.L84)/2
+ 1420 0045 C0       		.byte	(.L81-.L84)/2
+ 1421 0046 C0       		.byte	(.L81-.L84)/2
+ 1422 0047 6E       		.byte	(.L85-.L84)/2
+ 1423 0048 C0       		.byte	(.L81-.L84)/2
+ 1424 0049 C0       		.byte	(.L81-.L84)/2
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s 			page 35
+
+
+ 1425 004a C0       		.byte	(.L81-.L84)/2
+ 1426 004b 8F       		.byte	(.L83-.L84)/2
+ 1427              		.p2align 1
+ 1428              	.L87:
+ 449:ACE-ECF/Control/Src/Cybergear_Motor.c ****     {
+ 450:ACE-ECF/Control/Src/Cybergear_Motor.c ****         case 0:{//»ñÈ¡Éè±¸µÄIDºÍ64Î»MCUÎ¨Ò»±êÊ¶·û(Í¨ÐÅÀàÐÍ0)
+ 451:ACE-ECF/Control/Src/Cybergear_Motor.c ****             if (MI_motor->rxMsg.ExtId.motor_id == 0xFE){
+ 1429              		.loc 1 451 13 is_stmt 1 view .LVU411
+ 1430              		.loc 1 451 16 is_stmt 0 view .LVU412
+ 1431 004c FE2B     		cmp	r3, #254
+ 1432 004e 40F0B280 		bne	.L81
+ 452:ACE-ECF/Control/Src/Cybergear_Motor.c ****                 get_can_id = true;//MI_motor_get_IDÓÃµÃµ½
+ 1433              		.loc 1 452 17 is_stmt 1 view .LVU413
+ 1434              		.loc 1 452 28 is_stmt 0 view .LVU414
+ 1435 0052 714A     		ldr	r2, .L102+8
+ 1436 0054 0121     		movs	r1, #1
+ 1437 0056 1170     		strb	r1, [r2]
+ 453:ACE-ECF/Control/Src/Cybergear_Motor.c ****                 MI_id = MI_motor->rxMsg.ExtId.motor_id;
+ 1438              		.loc 1 453 17 is_stmt 1 view .LVU415
+ 1439              		.loc 1 453 23 is_stmt 0 view .LVU416
+ 1440 0058 704A     		ldr	r2, .L102+12
+ 1441 005a 1370     		strb	r3, [r2]
+ 1442 005c ABE0     		b	.L81
+ 1443              	.L86:
+ 454:ACE-ECF/Control/Src/Cybergear_Motor.c ****             };     //ºóÃæµÄÊÇ64Î»MCUÎ¨Ò»±êÊ¶·û,ÔÝ²»Ìí¼Ó
+ 455:ACE-ECF/Control/Src/Cybergear_Motor.c ****             break;
+ 456:ACE-ECF/Control/Src/Cybergear_Motor.c ****         }
+ 457:ACE-ECF/Control/Src/Cybergear_Motor.c ****         case 2:{//µç»ú·´À¡Êý¾ÝÖ¡,ÓÃÀ´ÏòÖ÷»ú·´À¡µç»úÔËÐÐ×´Ì¬(Í¨ÐÅÀàÐÍ2)
+ 458:ACE-ECF/Control/Src/Cybergear_Motor.c ****             
+ 459:ACE-ECF/Control/Src/Cybergear_Motor.c ****             //ÍØÕ¹Ö¡bit16~23ÐÅÏ¢
+ 460:ACE-ECF/Control/Src/Cybergear_Motor.c ****             MI_motor->motor_parameter_list.Mode_rum_mode = (Mode_rum_mode_t)MI_motor->rxMsg.ExtId.M
+ 1444              		.loc 1 460 13 is_stmt 1 view .LVU417
+ 1445              		.loc 1 460 98 is_stmt 0 view .LVU418
+ 1446 005e 90F86E30 		ldrb	r3, [r0, #110]	@ zero_extendqisi2
+ 1447 0062 C3F38112 		ubfx	r2, r3, #6, #2
+ 1448              		.loc 1 460 58 view .LVU419
+ 1449 0066 80F82420 		strb	r2, [r0, #36]
+ 461:ACE-ECF/Control/Src/Cybergear_Motor.c ****             MI_motor->motor_error_list.Encoder_not_calibrated_fault = MI_motor->rxMsg.ExtId.Uncalib
+ 1450              		.loc 1 461 13 is_stmt 1 view .LVU420
+ 1451              		.loc 1 461 92 is_stmt 0 view .LVU421
+ 1452 006a C3F34012 		ubfx	r2, r3, #5, #1
+ 1453              		.loc 1 461 69 view .LVU422
+ 1454 006e 80F85220 		strb	r2, [r0, #82]
+ 462:ACE-ECF/Control/Src/Cybergear_Motor.c ****             MI_motor->motor_error_list.HALL_encoding_fault = MI_motor->rxMsg.ExtId.HALL_encoding_fa
+ 1455              		.loc 1 462 13 is_stmt 1 view .LVU423
+ 1456              		.loc 1 462 83 is_stmt 0 view .LVU424
+ 1457 0072 C3F30012 		ubfx	r2, r3, #4, #1
+ 1458              		.loc 1 462 60 view .LVU425
+ 1459 0076 80F85420 		strb	r2, [r0, #84]
+ 463:ACE-ECF/Control/Src/Cybergear_Motor.c ****             MI_motor->motor_error_list.Magnetic_encoding_fault = MI_motor->rxMsg.ExtId.Magnetic_enc
+ 1460              		.loc 1 463 13 is_stmt 1 view .LVU426
+ 1461              		.loc 1 463 87 is_stmt 0 view .LVU427
+ 1462 007a C3F3C002 		ubfx	r2, r3, #3, #1
+ 1463              		.loc 1 463 64 view .LVU428
+ 1464 007e 80F85320 		strb	r2, [r0, #83]
+ 464:ACE-ECF/Control/Src/Cybergear_Motor.c ****             MI_motor->motor_error_list.Over_temperature_fault = MI_motor->rxMsg.ExtId.Over_temperat
+ 1465              		.loc 1 464 13 is_stmt 1 view .LVU429
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s 			page 36
+
+
+ 1466              		.loc 1 464 86 is_stmt 0 view .LVU430
+ 1467 0082 C3F38002 		ubfx	r2, r3, #2, #1
+ 1468              		.loc 1 464 63 view .LVU431
+ 1469 0086 80F84D20 		strb	r2, [r0, #77]
+ 465:ACE-ECF/Control/Src/Cybergear_Motor.c ****             MI_motor->motor_error_list.Over_current_fault = MI_motor->rxMsg.ExtId.Over_current;
+ 1470              		.loc 1 465 13 is_stmt 1 view .LVU432
+ 1471              		.loc 1 465 82 is_stmt 0 view .LVU433
+ 1472 008a C3F34002 		ubfx	r2, r3, #1, #1
+ 1473              		.loc 1 465 59 view .LVU434
+ 1474 008e 80F84F20 		strb	r2, [r0, #79]
+ 466:ACE-ECF/Control/Src/Cybergear_Motor.c ****             MI_motor->motor_error_list.Under_voltage_fault = MI_motor->rxMsg.ExtId.Under_voltage_fa
+ 1475              		.loc 1 466 13 is_stmt 1 view .LVU435
+ 1476              		.loc 1 466 83 is_stmt 0 view .LVU436
+ 1477 0092 C3F30003 		ubfx	r3, r3, #0, #1
+ 1478              		.loc 1 466 60 view .LVU437
+ 1479 0096 80F85130 		strb	r3, [r0, #81]
+ 467:ACE-ECF/Control/Src/Cybergear_Motor.c **** 
+ 468:ACE-ECF/Control/Src/Cybergear_Motor.c ****             MI_motor->postion=uint16_to_float(Rx_Data[0]<<8|Rx_Data[1],MIN_P,MAX_P,16);
+ 1480              		.loc 1 468 13 is_stmt 1 view .LVU438
+ 1481              		.loc 1 468 54 is_stmt 0 view .LVU439
+ 1482 009a 2878     		ldrb	r0, [r5]	@ zero_extendqisi2
+ 1483              	.LVL111:
+ 1484              		.loc 1 468 68 view .LVU440
+ 1485 009c 6B78     		ldrb	r3, [r5, #1]	@ zero_extendqisi2
+ 1486              		.loc 1 468 31 view .LVU441
+ 1487 009e 1021     		movs	r1, #16
+ 1488 00a0 DFED5F0A 		vldr.32	s1, .L102+16
+ 1489 00a4 9FED5F0A 		vldr.32	s0, .L102+20
+ 1490 00a8 43EA0020 		orr	r0, r3, r0, lsl #8
+ 1491 00ac FFF7FEFF 		bl	uint16_to_float
+ 1492              	.LVL112:
+ 1493              		.loc 1 468 30 view .LVU442
+ 1494 00b0 84ED040A 		vstr.32	s0, [r4, #16]
+ 469:ACE-ECF/Control/Src/Cybergear_Motor.c **** 
+ 470:ACE-ECF/Control/Src/Cybergear_Motor.c ****             MI_motor->speed=uint16_to_float(Rx_Data[2]<<8|Rx_Data[3],MIN_S,MAX_S,16);			
+ 1495              		.loc 1 470 13 is_stmt 1 view .LVU443
+ 1496              		.loc 1 470 52 is_stmt 0 view .LVU444
+ 1497 00b4 A878     		ldrb	r0, [r5, #2]	@ zero_extendqisi2
+ 1498              		.loc 1 470 66 view .LVU445
+ 1499 00b6 EB78     		ldrb	r3, [r5, #3]	@ zero_extendqisi2
+ 1500              		.loc 1 470 29 view .LVU446
+ 1501 00b8 1021     		movs	r1, #16
+ 1502 00ba F3EE0E0A 		vmov.f32	s1, #3.0e+1
+ 1503 00be BBEE0E0A 		vmov.f32	s0, #-3.0e+1
+ 1504 00c2 43EA0020 		orr	r0, r3, r0, lsl #8
+ 1505 00c6 FFF7FEFF 		bl	uint16_to_float
+ 1506              	.LVL113:
+ 1507              		.loc 1 470 28 view .LVU447
+ 1508 00ca 84ED050A 		vstr.32	s0, [r4, #20]
+ 471:ACE-ECF/Control/Src/Cybergear_Motor.c **** 
+ 472:ACE-ECF/Control/Src/Cybergear_Motor.c ****             MI_motor->torque=uint16_to_float(Rx_Data[4]<<8|Rx_Data[5],MIN_T,MAX_T,16);				
+ 1509              		.loc 1 472 13 is_stmt 1 view .LVU448
+ 1510              		.loc 1 472 53 is_stmt 0 view .LVU449
+ 1511 00ce 2879     		ldrb	r0, [r5, #4]	@ zero_extendqisi2
+ 1512              		.loc 1 472 67 view .LVU450
+ 1513 00d0 6B79     		ldrb	r3, [r5, #5]	@ zero_extendqisi2
+ 1514              		.loc 1 472 30 view .LVU451
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s 			page 37
+
+
+ 1515 00d2 1021     		movs	r1, #16
+ 1516 00d4 F2EE080A 		vmov.f32	s1, #1.2e+1
+ 1517 00d8 BAEE080A 		vmov.f32	s0, #-1.2e+1
+ 1518 00dc 43EA0020 		orr	r0, r3, r0, lsl #8
+ 1519 00e0 FFF7FEFF 		bl	uint16_to_float
+ 1520              	.LVL114:
+ 1521              		.loc 1 472 29 view .LVU452
+ 1522 00e4 84ED060A 		vstr.32	s0, [r4, #24]
+ 473:ACE-ECF/Control/Src/Cybergear_Motor.c **** 
+ 474:ACE-ECF/Control/Src/Cybergear_Motor.c ****             MI_motor->temperture=(Rx_Data[6]<<8|Rx_Data[7])*Temp_Gain;
+ 1523              		.loc 1 474 13 is_stmt 1 view .LVU453
+ 1524              		.loc 1 474 42 is_stmt 0 view .LVU454
+ 1525 00e8 A879     		ldrb	r0, [r5, #6]	@ zero_extendqisi2
+ 1526              		.loc 1 474 56 view .LVU455
+ 1527 00ea EB79     		ldrb	r3, [r5, #7]	@ zero_extendqisi2
+ 1528              		.loc 1 474 60 view .LVU456
+ 1529 00ec 43EA0020 		orr	r0, r3, r0, lsl #8
+ 1530 00f0 FFF7FEFF 		bl	__aeabi_i2d
+ 1531              	.LVL115:
+ 1532 00f4 46A3     		adr	r3, .L102
+ 1533 00f6 D3E90023 		ldrd	r2, [r3]
+ 1534 00fa FFF7FEFF 		bl	__aeabi_dmul
+ 1535              	.LVL116:
+ 1536 00fe FFF7FEFF 		bl	__aeabi_d2f
+ 1537              	.LVL117:
+ 1538              		.loc 1 474 33 view .LVU457
+ 1539 0102 E061     		str	r0, [r4, #28]	@ float
+ 475:ACE-ECF/Control/Src/Cybergear_Motor.c ****             if (MI_motor->have_pos_flag < 1000) MI_motor->have_pos_flag++;
+ 1540              		.loc 1 475 13 is_stmt 1 view .LVU458
+ 1541              		.loc 1 475 25 is_stmt 0 view .LVU459
+ 1542 0104 2368     		ldr	r3, [r4]
+ 1543              		.loc 1 475 16 view .LVU460
+ 1544 0106 B3F57A7F 		cmp	r3, #1000
+ 1545 010a 54D2     		bcs	.L81
+ 1546              		.loc 1 475 49 is_stmt 1 discriminator 1 view .LVU461
+ 1547              		.loc 1 475 72 is_stmt 0 discriminator 1 view .LVU462
+ 1548 010c 0133     		adds	r3, r3, #1
+ 1549 010e 2360     		str	r3, [r4]
+ 1550 0110 51E0     		b	.L81
+ 1551              	.LVL118:
+ 1552              	.L85:
+ 1553              	.LBB11:
+ 476:ACE-ECF/Control/Src/Cybergear_Motor.c ****             break;
+ 477:ACE-ECF/Control/Src/Cybergear_Motor.c ****         }
+ 478:ACE-ECF/Control/Src/Cybergear_Motor.c ****         case 17:{//·¢ËÍ¶ÁÈ¡µ¥¸ö²ÎÊýµÄÓ¦´ðÖ¡,¸ù¾Ýindex²ÎÊýÏÂ±êÅÐ¶Ï»Ø´«²ÎÊýÀàÐÍ(Í¨ÐÅÀàÐÍ17)
+ 479:ACE-ECF/Control/Src/Cybergear_Motor.c ****             parameter_index_e index = (parameter_index_e)(Rx_Data[1]<<8| Rx_Data[0]);//
+ 1554              		.loc 1 479 13 is_stmt 1 view .LVU463
+ 1555              		.loc 1 479 66 is_stmt 0 view .LVU464
+ 1556 0112 6A78     		ldrb	r2, [r5, #1]	@ zero_extendqisi2
+ 1557              		.loc 1 479 81 view .LVU465
+ 1558 0114 2B78     		ldrb	r3, [r5]	@ zero_extendqisi2
+ 1559              		.loc 1 479 72 view .LVU466
+ 1560 0116 43EA0223 		orr	r3, r3, r2, lsl #8
+ 1561 011a 1BB2     		sxth	r3, r3
+ 1562              	.LVL119:
+ 480:ACE-ECF/Control/Src/Cybergear_Motor.c **** 
+ 481:ACE-ECF/Control/Src/Cybergear_Motor.c ****             //¹²ÓÃÌå4¸öu8×ªfloat
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s 			page 38
+
+
+ 482:ACE-ECF/Control/Src/Cybergear_Motor.c ****             FloatAndBytes.byteValue[0] = Rx_Data[4];
+ 1563              		.loc 1 482 13 is_stmt 1 view .LVU467
+ 1564              		.loc 1 482 40 is_stmt 0 view .LVU468
+ 1565 011c 2979     		ldrb	r1, [r5, #4]	@ zero_extendqisi2
+ 1566 011e 424A     		ldr	r2, .L102+24
+ 1567 0120 1170     		strb	r1, [r2]
+ 483:ACE-ECF/Control/Src/Cybergear_Motor.c ****             FloatAndBytes.byteValue[1] = Rx_Data[5];
+ 1568              		.loc 1 483 13 is_stmt 1 view .LVU469
+ 1569              		.loc 1 483 40 is_stmt 0 view .LVU470
+ 1570 0122 6879     		ldrb	r0, [r5, #5]	@ zero_extendqisi2
+ 1571              	.LVL120:
+ 1572              		.loc 1 483 40 view .LVU471
+ 1573 0124 5070     		strb	r0, [r2, #1]
+ 484:ACE-ECF/Control/Src/Cybergear_Motor.c ****             FloatAndBytes.byteValue[2] = Rx_Data[6];
+ 1574              		.loc 1 484 13 is_stmt 1 view .LVU472
+ 1575              		.loc 1 484 40 is_stmt 0 view .LVU473
+ 1576 0126 A879     		ldrb	r0, [r5, #6]	@ zero_extendqisi2
+ 1577 0128 9070     		strb	r0, [r2, #2]
+ 485:ACE-ECF/Control/Src/Cybergear_Motor.c ****             FloatAndBytes.byteValue[3] = Rx_Data[7];
+ 1578              		.loc 1 485 13 is_stmt 1 view .LVU474
+ 1579              		.loc 1 485 40 is_stmt 0 view .LVU475
+ 1580 012a E879     		ldrb	r0, [r5, #7]	@ zero_extendqisi2
+ 1581 012c D070     		strb	r0, [r2, #3]
+ 486:ACE-ECF/Control/Src/Cybergear_Motor.c **** 
+ 487:ACE-ECF/Control/Src/Cybergear_Motor.c ****             switch (index){
+ 1582              		.loc 1 487 13 is_stmt 1 view .LVU476
+ 1583 012e A3F5E043 		sub	r3, r3, #28672
+ 1584              	.LVL121:
+ 1585              		.loc 1 487 13 is_stmt 0 view .LVU477
+ 1586 0132 053B     		subs	r3, r3, #5
+ 1587              	.LVL122:
+ 1588              		.loc 1 487 13 view .LVU478
+ 1589 0134 132B     		cmp	r3, #19
+ 1590 0136 0DD8     		bhi	.L83
+ 1591 0138 DFE803F0 		tbb	[pc, r3]
+ 1592              	.L89:
+ 1593 013c 0A       		.byte	(.L98-.L89)/2
+ 1594 013d 3F       		.byte	(.L97-.L89)/2
+ 1595 013e 0C       		.byte	(.L83-.L89)/2
+ 1596 013f 0C       		.byte	(.L83-.L89)/2
+ 1597 0140 0C       		.byte	(.L83-.L89)/2
+ 1598 0141 43       		.byte	(.L96-.L89)/2
+ 1599 0142 47       		.byte	(.L95-.L89)/2
+ 1600 0143 0C       		.byte	(.L83-.L89)/2
+ 1601 0144 0C       		.byte	(.L83-.L89)/2
+ 1602 0145 0C       		.byte	(.L83-.L89)/2
+ 1603 0146 0C       		.byte	(.L83-.L89)/2
+ 1604 0147 4B       		.byte	(.L94-.L89)/2
+ 1605 0148 4F       		.byte	(.L93-.L89)/2
+ 1606 0149 0C       		.byte	(.L83-.L89)/2
+ 1607 014a 0C       		.byte	(.L83-.L89)/2
+ 1608 014b 53       		.byte	(.L92-.L89)/2
+ 1609 014c 0C       		.byte	(.L83-.L89)/2
+ 1610 014d 57       		.byte	(.L91-.L89)/2
+ 1611 014e 5B       		.byte	(.L90-.L89)/2
+ 1612 014f 5F       		.byte	(.L88-.L89)/2
+ 1613              		.p2align 1
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s 			page 39
+
+
+ 1614              	.L98:
+ 488:ACE-ECF/Control/Src/Cybergear_Motor.c ****                 case run_mode:
+ 489:ACE-ECF/Control/Src/Cybergear_Motor.c ****                     MI_motor->motor_parameter_list.Mode_rum_mode = (Mode_rum_mode_t) Rx_Data[4];//
+ 1615              		.loc 1 489 21 is_stmt 1 view .LVU479
+ 1616              		.loc 1 489 66 is_stmt 0 view .LVU480
+ 1617 0150 84F82410 		strb	r1, [r4, #36]
+ 490:ACE-ECF/Control/Src/Cybergear_Motor.c ****                     break;
+ 1618              		.loc 1 490 21 is_stmt 1 view .LVU481
+ 1619              	.LVL123:
+ 1620              	.L83:
+ 1621              		.loc 1 490 21 is_stmt 0 view .LVU482
+ 1622              	.LBE11:
+ 1623              	.LBB12:
+ 491:ACE-ECF/Control/Src/Cybergear_Motor.c ****                 case iq_ref:
+ 492:ACE-ECF/Control/Src/Cybergear_Motor.c ****                     MI_motor->motor_parameter_list.iq_ref = FloatAndBytes.floatValue;
+ 493:ACE-ECF/Control/Src/Cybergear_Motor.c ****                     break;
+ 494:ACE-ECF/Control/Src/Cybergear_Motor.c ****                 case spd_ref:
+ 495:ACE-ECF/Control/Src/Cybergear_Motor.c ****                     MI_motor->motor_parameter_list.spd_ref = FloatAndBytes.floatValue;
+ 496:ACE-ECF/Control/Src/Cybergear_Motor.c ****                     break;
+ 497:ACE-ECF/Control/Src/Cybergear_Motor.c ****                 case imit_torque:
+ 498:ACE-ECF/Control/Src/Cybergear_Motor.c ****                     MI_motor->motor_parameter_list.imit_torque = FloatAndBytes.floatValue;
+ 499:ACE-ECF/Control/Src/Cybergear_Motor.c ****                     break;
+ 500:ACE-ECF/Control/Src/Cybergear_Motor.c ****                 case cur_kp:
+ 501:ACE-ECF/Control/Src/Cybergear_Motor.c ****                     MI_motor->motor_parameter_list.cur_kp = FloatAndBytes.floatValue;
+ 502:ACE-ECF/Control/Src/Cybergear_Motor.c ****                     break;
+ 503:ACE-ECF/Control/Src/Cybergear_Motor.c ****                 case cur_ki:
+ 504:ACE-ECF/Control/Src/Cybergear_Motor.c ****                     MI_motor->motor_parameter_list.cur_ki = FloatAndBytes.floatValue;
+ 505:ACE-ECF/Control/Src/Cybergear_Motor.c ****                     break;
+ 506:ACE-ECF/Control/Src/Cybergear_Motor.c ****                 case cur_filt_gain:
+ 507:ACE-ECF/Control/Src/Cybergear_Motor.c ****                     MI_motor->motor_parameter_list.cur_filt_gain = FloatAndBytes.floatValue;
+ 508:ACE-ECF/Control/Src/Cybergear_Motor.c ****                     break;
+ 509:ACE-ECF/Control/Src/Cybergear_Motor.c ****                 case loc_ref:
+ 510:ACE-ECF/Control/Src/Cybergear_Motor.c ****                     MI_motor->motor_parameter_list.loc_ref = FloatAndBytes.floatValue;
+ 511:ACE-ECF/Control/Src/Cybergear_Motor.c ****                     break;
+ 512:ACE-ECF/Control/Src/Cybergear_Motor.c ****                 case limit_spd:
+ 513:ACE-ECF/Control/Src/Cybergear_Motor.c ****                     MI_motor->motor_parameter_list.limit_spd = FloatAndBytes.floatValue;
+ 514:ACE-ECF/Control/Src/Cybergear_Motor.c ****                     break;
+ 515:ACE-ECF/Control/Src/Cybergear_Motor.c ****                 case limit_cur:
+ 516:ACE-ECF/Control/Src/Cybergear_Motor.c ****                     MI_motor->motor_parameter_list.limit_cur = FloatAndBytes.floatValue;
+ 517:ACE-ECF/Control/Src/Cybergear_Motor.c ****                     break;
+ 518:ACE-ECF/Control/Src/Cybergear_Motor.c ****                 default :
+ 519:ACE-ECF/Control/Src/Cybergear_Motor.c ****                     break;
+ 520:ACE-ECF/Control/Src/Cybergear_Motor.c ****             }
+ 521:ACE-ECF/Control/Src/Cybergear_Motor.c ****         }
+ 522:ACE-ECF/Control/Src/Cybergear_Motor.c ****         case 21:{//¹ÊÕÏ·´À¡Ö¡
+ 523:ACE-ECF/Control/Src/Cybergear_Motor.c ****             //Byte0
+ 524:ACE-ECF/Control/Src/Cybergear_Motor.c ****             MI_motor->motor_error_list.Over_temperature_fault = Rx_Data[0] & 0x01;//È¡bit0
+ 1624              		.loc 1 524 13 is_stmt 1 view .LVU483
+ 1625              		.loc 1 524 72 is_stmt 0 view .LVU484
+ 1626 0154 2B78     		ldrb	r3, [r5]	@ zero_extendqisi2
+ 1627              		.loc 1 524 76 view .LVU485
+ 1628 0156 03F00103 		and	r3, r3, #1
+ 1629              		.loc 1 524 63 view .LVU486
+ 1630 015a 84F84D30 		strb	r3, [r4, #77]
+ 525:ACE-ECF/Control/Src/Cybergear_Motor.c ****             MI_motor->motor_error_list.Drive_core_fault = (Rx_Data[0]>>1) & 0x01;//È¡bit1
+ 1631              		.loc 1 525 13 is_stmt 1 view .LVU487
+ 1632              		.loc 1 525 67 is_stmt 0 view .LVU488
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s 			page 40
+
+
+ 1633 015e 2B78     		ldrb	r3, [r5]	@ zero_extendqisi2
+ 1634              		.loc 1 525 75 view .LVU489
+ 1635 0160 C3F34003 		ubfx	r3, r3, #1, #1
+ 1636              		.loc 1 525 57 view .LVU490
+ 1637 0164 84F85530 		strb	r3, [r4, #85]
+ 526:ACE-ECF/Control/Src/Cybergear_Motor.c ****             MI_motor->motor_error_list.Under_voltage_fault = (Rx_Data[0]>>2) & 0x01;//È¡bit2
+ 1638              		.loc 1 526 13 is_stmt 1 view .LVU491
+ 1639              		.loc 1 526 70 is_stmt 0 view .LVU492
+ 1640 0168 2B78     		ldrb	r3, [r5]	@ zero_extendqisi2
+ 1641              		.loc 1 526 78 view .LVU493
+ 1642 016a C3F38003 		ubfx	r3, r3, #2, #1
+ 1643              		.loc 1 526 60 view .LVU494
+ 1644 016e 84F85130 		strb	r3, [r4, #81]
+ 527:ACE-ECF/Control/Src/Cybergear_Motor.c ****             MI_motor->motor_error_list.Over_voltage_fault =  (Rx_Data[0]>>3) & 0x01;//È¡bit3
+ 1645              		.loc 1 527 13 is_stmt 1 view .LVU495
+ 1646              		.loc 1 527 70 is_stmt 0 view .LVU496
+ 1647 0172 2B78     		ldrb	r3, [r5]	@ zero_extendqisi2
+ 1648              		.loc 1 527 78 view .LVU497
+ 1649 0174 C3F3C003 		ubfx	r3, r3, #3, #1
+ 1650              		.loc 1 527 59 view .LVU498
+ 1651 0178 84F84E30 		strb	r3, [r4, #78]
+ 528:ACE-ECF/Control/Src/Cybergear_Motor.c ****             MI_motor->motor_error_list.B_phase_current_sampling_overcurrent = (Rx_Data[0]>>4) & 0x0
+ 1652              		.loc 1 528 13 is_stmt 1 view .LVU499
+ 1653              		.loc 1 528 87 is_stmt 0 view .LVU500
+ 1654 017c 2B78     		ldrb	r3, [r5]	@ zero_extendqisi2
+ 1655              		.loc 1 528 95 view .LVU501
+ 1656 017e C3F30013 		ubfx	r3, r3, #4, #1
+ 1657              		.loc 1 528 77 view .LVU502
+ 1658 0182 84F85730 		strb	r3, [r4, #87]
+ 529:ACE-ECF/Control/Src/Cybergear_Motor.c ****             MI_motor->motor_error_list.C_phase_current_sampling_overcurrent = (Rx_Data[0]>>5) & 0x0
+ 1659              		.loc 1 529 13 is_stmt 1 view .LVU503
+ 1660              		.loc 1 529 87 is_stmt 0 view .LVU504
+ 1661 0186 2B78     		ldrb	r3, [r5]	@ zero_extendqisi2
+ 1662              		.loc 1 529 95 view .LVU505
+ 1663 0188 C3F34013 		ubfx	r3, r3, #5, #1
+ 1664              		.loc 1 529 77 view .LVU506
+ 1665 018c 84F85830 		strb	r3, [r4, #88]
+ 530:ACE-ECF/Control/Src/Cybergear_Motor.c ****             MI_motor->motor_error_list.Magnetic_encoding_fault = (Rx_Data[0]>>7) ;//È¡bit7
+ 1666              		.loc 1 530 13 is_stmt 1 view .LVU507
+ 1667              		.loc 1 530 74 is_stmt 0 view .LVU508
+ 1668 0190 2B78     		ldrb	r3, [r5]	@ zero_extendqisi2
+ 1669              		.loc 1 530 77 view .LVU509
+ 1670 0192 DB09     		lsrs	r3, r3, #7
+ 1671              		.loc 1 530 64 view .LVU510
+ 1672 0194 84F85330 		strb	r3, [r4, #83]
+ 531:ACE-ECF/Control/Src/Cybergear_Motor.c ****             
+ 532:ACE-ECF/Control/Src/Cybergear_Motor.c ****             uint16_t Byte1_2 = ((uint16_t)Rx_Data[1] << 8) | Rx_Data[2];//È¡bit8~bit15
+ 1673              		.loc 1 532 13 is_stmt 1 view .LVU511
+ 1674              		.loc 1 532 50 is_stmt 0 view .LVU512
+ 1675 0198 6A78     		ldrb	r2, [r5, #1]	@ zero_extendqisi2
+ 1676              		.loc 1 532 69 view .LVU513
+ 1677 019a AB78     		ldrb	r3, [r5, #2]	@ zero_extendqisi2
+ 1678              		.loc 1 532 60 view .LVU514
+ 1679 019c 43EA0223 		orr	r3, r3, r2, lsl #8
+ 1680 01a0 1BB2     		sxth	r3, r3
+ 1681              	.LVL124:
+ 533:ACE-ECF/Control/Src/Cybergear_Motor.c ****             if (Byte1_2 != 0)   MI_motor->motor_error_list.Overload_fault = true;
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s 			page 41
+
+
+ 1682              		.loc 1 533 13 is_stmt 1 view .LVU515
+ 1683              		.loc 1 533 16 is_stmt 0 view .LVU516
+ 1684 01a2 002B     		cmp	r3, #0
+ 1685 01a4 2DD0     		beq	.L99
+ 1686              		.loc 1 533 33 is_stmt 1 discriminator 1 view .LVU517
+ 1687              		.loc 1 533 75 is_stmt 0 discriminator 1 view .LVU518
+ 1688 01a6 0123     		movs	r3, #1
+ 1689              	.LVL125:
+ 1690              		.loc 1 533 75 discriminator 1 view .LVU519
+ 1691 01a8 84F85030 		strb	r3, [r4, #80]
+ 1692              	.LVL126:
+ 1693              	.L100:
+ 534:ACE-ECF/Control/Src/Cybergear_Motor.c ****             else                MI_motor->motor_error_list.Overload_fault = false;
+ 535:ACE-ECF/Control/Src/Cybergear_Motor.c ****             
+ 536:ACE-ECF/Control/Src/Cybergear_Motor.c ****             MI_motor->motor_error_list.A_phase_current_sampling_overcurrent = Rx_Data[3] & 0x01;//È
+ 1694              		.loc 1 536 13 is_stmt 1 view .LVU520
+ 1695              		.loc 1 536 86 is_stmt 0 view .LVU521
+ 1696 01ac EB78     		ldrb	r3, [r5, #3]	@ zero_extendqisi2
+ 1697              		.loc 1 536 90 view .LVU522
+ 1698 01ae 03F00103 		and	r3, r3, #1
+ 1699              		.loc 1 536 77 view .LVU523
+ 1700 01b2 84F85630 		strb	r3, [r4, #86]
+ 1701              	.LVL127:
+ 1702              	.L81:
+ 1703              		.loc 1 536 77 view .LVU524
+ 1704              	.LBE12:
+ 537:ACE-ECF/Control/Src/Cybergear_Motor.c ****         }
+ 538:ACE-ECF/Control/Src/Cybergear_Motor.c ****     }
+ 539:ACE-ECF/Control/Src/Cybergear_Motor.c **** }
+ 1705              		.loc 1 539 1 view .LVU525
+ 1706 01b6 03B0     		add	sp, sp, #12
+ 1707              	.LCFI20:
+ 1708              		.cfi_remember_state
+ 1709              		.cfi_def_cfa_offset 12
+ 1710              		@ sp needed
+ 1711 01b8 30BD     		pop	{r4, r5, pc}
+ 1712              	.LVL128:
+ 1713              	.L97:
+ 1714              	.LCFI21:
+ 1715              		.cfi_restore_state
+ 1716              	.LBB13:
+ 492:ACE-ECF/Control/Src/Cybergear_Motor.c ****                     break;
+ 1717              		.loc 1 492 21 is_stmt 1 view .LVU526
+ 492:ACE-ECF/Control/Src/Cybergear_Motor.c ****                     break;
+ 1718              		.loc 1 492 74 is_stmt 0 view .LVU527
+ 1719 01ba 1B4B     		ldr	r3, .L102+24
+ 1720              	.LVL129:
+ 492:ACE-ECF/Control/Src/Cybergear_Motor.c ****                     break;
+ 1721              		.loc 1 492 74 view .LVU528
+ 1722 01bc 1B68     		ldr	r3, [r3]	@ float
+ 492:ACE-ECF/Control/Src/Cybergear_Motor.c ****                     break;
+ 1723              		.loc 1 492 59 view .LVU529
+ 1724 01be A362     		str	r3, [r4, #40]	@ float
+ 493:ACE-ECF/Control/Src/Cybergear_Motor.c ****                 case spd_ref:
+ 1725              		.loc 1 493 21 is_stmt 1 view .LVU530
+ 1726 01c0 C8E7     		b	.L83
+ 1727              	.LVL130:
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s 			page 42
+
+
+ 1728              	.L96:
+ 495:ACE-ECF/Control/Src/Cybergear_Motor.c ****                     break;
+ 1729              		.loc 1 495 21 view .LVU531
+ 495:ACE-ECF/Control/Src/Cybergear_Motor.c ****                     break;
+ 1730              		.loc 1 495 75 is_stmt 0 view .LVU532
+ 1731 01c2 194B     		ldr	r3, .L102+24
+ 1732              	.LVL131:
+ 495:ACE-ECF/Control/Src/Cybergear_Motor.c ****                     break;
+ 1733              		.loc 1 495 75 view .LVU533
+ 1734 01c4 1B68     		ldr	r3, [r3]	@ float
+ 495:ACE-ECF/Control/Src/Cybergear_Motor.c ****                     break;
+ 1735              		.loc 1 495 60 view .LVU534
+ 1736 01c6 E362     		str	r3, [r4, #44]	@ float
+ 496:ACE-ECF/Control/Src/Cybergear_Motor.c ****                 case imit_torque:
+ 1737              		.loc 1 496 21 is_stmt 1 view .LVU535
+ 1738 01c8 C4E7     		b	.L83
+ 1739              	.LVL132:
+ 1740              	.L95:
+ 498:ACE-ECF/Control/Src/Cybergear_Motor.c ****                     break;
+ 1741              		.loc 1 498 21 view .LVU536
+ 498:ACE-ECF/Control/Src/Cybergear_Motor.c ****                     break;
+ 1742              		.loc 1 498 79 is_stmt 0 view .LVU537
+ 1743 01ca 174B     		ldr	r3, .L102+24
+ 1744              	.LVL133:
+ 498:ACE-ECF/Control/Src/Cybergear_Motor.c ****                     break;
+ 1745              		.loc 1 498 79 view .LVU538
+ 1746 01cc 1B68     		ldr	r3, [r3]	@ float
+ 498:ACE-ECF/Control/Src/Cybergear_Motor.c ****                     break;
+ 1747              		.loc 1 498 64 view .LVU539
+ 1748 01ce 2363     		str	r3, [r4, #48]	@ float
+ 499:ACE-ECF/Control/Src/Cybergear_Motor.c ****                 case cur_kp:
+ 1749              		.loc 1 499 21 is_stmt 1 view .LVU540
+ 1750 01d0 C0E7     		b	.L83
+ 1751              	.LVL134:
+ 1752              	.L94:
+ 501:ACE-ECF/Control/Src/Cybergear_Motor.c ****                     break;
+ 1753              		.loc 1 501 21 view .LVU541
+ 501:ACE-ECF/Control/Src/Cybergear_Motor.c ****                     break;
+ 1754              		.loc 1 501 74 is_stmt 0 view .LVU542
+ 1755 01d2 154B     		ldr	r3, .L102+24
+ 1756              	.LVL135:
+ 501:ACE-ECF/Control/Src/Cybergear_Motor.c ****                     break;
+ 1757              		.loc 1 501 74 view .LVU543
+ 1758 01d4 1B68     		ldr	r3, [r3]	@ float
+ 501:ACE-ECF/Control/Src/Cybergear_Motor.c ****                     break;
+ 1759              		.loc 1 501 59 view .LVU544
+ 1760 01d6 6363     		str	r3, [r4, #52]	@ float
+ 502:ACE-ECF/Control/Src/Cybergear_Motor.c ****                 case cur_ki:
+ 1761              		.loc 1 502 21 is_stmt 1 view .LVU545
+ 1762 01d8 BCE7     		b	.L83
+ 1763              	.LVL136:
+ 1764              	.L93:
+ 504:ACE-ECF/Control/Src/Cybergear_Motor.c ****                     break;
+ 1765              		.loc 1 504 21 view .LVU546
+ 504:ACE-ECF/Control/Src/Cybergear_Motor.c ****                     break;
+ 1766              		.loc 1 504 74 is_stmt 0 view .LVU547
+ 1767 01da 134B     		ldr	r3, .L102+24
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s 			page 43
+
+
+ 1768              	.LVL137:
+ 504:ACE-ECF/Control/Src/Cybergear_Motor.c ****                     break;
+ 1769              		.loc 1 504 74 view .LVU548
+ 1770 01dc 1B68     		ldr	r3, [r3]	@ float
+ 504:ACE-ECF/Control/Src/Cybergear_Motor.c ****                     break;
+ 1771              		.loc 1 504 59 view .LVU549
+ 1772 01de A363     		str	r3, [r4, #56]	@ float
+ 505:ACE-ECF/Control/Src/Cybergear_Motor.c ****                 case cur_filt_gain:
+ 1773              		.loc 1 505 21 is_stmt 1 view .LVU550
+ 1774 01e0 B8E7     		b	.L83
+ 1775              	.LVL138:
+ 1776              	.L92:
+ 507:ACE-ECF/Control/Src/Cybergear_Motor.c ****                     break;
+ 1777              		.loc 1 507 21 view .LVU551
+ 507:ACE-ECF/Control/Src/Cybergear_Motor.c ****                     break;
+ 1778              		.loc 1 507 81 is_stmt 0 view .LVU552
+ 1779 01e2 114B     		ldr	r3, .L102+24
+ 1780              	.LVL139:
+ 507:ACE-ECF/Control/Src/Cybergear_Motor.c ****                     break;
+ 1781              		.loc 1 507 81 view .LVU553
+ 1782 01e4 1B68     		ldr	r3, [r3]	@ float
+ 507:ACE-ECF/Control/Src/Cybergear_Motor.c ****                     break;
+ 1783              		.loc 1 507 66 view .LVU554
+ 1784 01e6 E363     		str	r3, [r4, #60]	@ float
+ 508:ACE-ECF/Control/Src/Cybergear_Motor.c ****                 case loc_ref:
+ 1785              		.loc 1 508 21 is_stmt 1 view .LVU555
+ 1786 01e8 B4E7     		b	.L83
+ 1787              	.LVL140:
+ 1788              	.L91:
+ 510:ACE-ECF/Control/Src/Cybergear_Motor.c ****                     break;
+ 1789              		.loc 1 510 21 view .LVU556
+ 510:ACE-ECF/Control/Src/Cybergear_Motor.c ****                     break;
+ 1790              		.loc 1 510 75 is_stmt 0 view .LVU557
+ 1791 01ea 0F4B     		ldr	r3, .L102+24
+ 1792              	.LVL141:
+ 510:ACE-ECF/Control/Src/Cybergear_Motor.c ****                     break;
+ 1793              		.loc 1 510 75 view .LVU558
+ 1794 01ec 1B68     		ldr	r3, [r3]	@ float
+ 510:ACE-ECF/Control/Src/Cybergear_Motor.c ****                     break;
+ 1795              		.loc 1 510 60 view .LVU559
+ 1796 01ee 2364     		str	r3, [r4, #64]	@ float
+ 511:ACE-ECF/Control/Src/Cybergear_Motor.c ****                 case limit_spd:
+ 1797              		.loc 1 511 21 is_stmt 1 view .LVU560
+ 1798 01f0 B0E7     		b	.L83
+ 1799              	.LVL142:
+ 1800              	.L90:
+ 513:ACE-ECF/Control/Src/Cybergear_Motor.c ****                     break;
+ 1801              		.loc 1 513 21 view .LVU561
+ 513:ACE-ECF/Control/Src/Cybergear_Motor.c ****                     break;
+ 1802              		.loc 1 513 77 is_stmt 0 view .LVU562
+ 1803 01f2 0D4B     		ldr	r3, .L102+24
+ 1804              	.LVL143:
+ 513:ACE-ECF/Control/Src/Cybergear_Motor.c ****                     break;
+ 1805              		.loc 1 513 77 view .LVU563
+ 1806 01f4 1B68     		ldr	r3, [r3]	@ float
+ 513:ACE-ECF/Control/Src/Cybergear_Motor.c ****                     break;
+ 1807              		.loc 1 513 62 view .LVU564
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s 			page 44
+
+
+ 1808 01f6 6364     		str	r3, [r4, #68]	@ float
+ 514:ACE-ECF/Control/Src/Cybergear_Motor.c ****                 case limit_cur:
+ 1809              		.loc 1 514 21 is_stmt 1 view .LVU565
+ 1810 01f8 ACE7     		b	.L83
+ 1811              	.LVL144:
+ 1812              	.L88:
+ 516:ACE-ECF/Control/Src/Cybergear_Motor.c ****                     break;
+ 1813              		.loc 1 516 21 view .LVU566
+ 516:ACE-ECF/Control/Src/Cybergear_Motor.c ****                     break;
+ 1814              		.loc 1 516 77 is_stmt 0 view .LVU567
+ 1815 01fa 0B4B     		ldr	r3, .L102+24
+ 1816              	.LVL145:
+ 516:ACE-ECF/Control/Src/Cybergear_Motor.c ****                     break;
+ 1817              		.loc 1 516 77 view .LVU568
+ 1818 01fc 1B68     		ldr	r3, [r3]	@ float
+ 516:ACE-ECF/Control/Src/Cybergear_Motor.c ****                     break;
+ 1819              		.loc 1 516 62 view .LVU569
+ 1820 01fe A364     		str	r3, [r4, #72]	@ float
+ 517:ACE-ECF/Control/Src/Cybergear_Motor.c ****                 default :
+ 1821              		.loc 1 517 21 is_stmt 1 view .LVU570
+ 1822 0200 A8E7     		b	.L83
+ 1823              	.LVL146:
+ 1824              	.L99:
+ 517:ACE-ECF/Control/Src/Cybergear_Motor.c ****                 default :
+ 1825              		.loc 1 517 21 is_stmt 0 view .LVU571
+ 1826              	.LBE13:
+ 1827              	.LBB14:
+ 534:ACE-ECF/Control/Src/Cybergear_Motor.c ****             
+ 1828              		.loc 1 534 33 is_stmt 1 view .LVU572
+ 534:ACE-ECF/Control/Src/Cybergear_Motor.c ****             
+ 1829              		.loc 1 534 75 is_stmt 0 view .LVU573
+ 1830 0202 0023     		movs	r3, #0
+ 1831              	.LVL147:
+ 534:ACE-ECF/Control/Src/Cybergear_Motor.c ****             
+ 1832              		.loc 1 534 75 view .LVU574
+ 1833 0204 84F85030 		strb	r3, [r4, #80]
+ 1834              	.LVL148:
+ 534:ACE-ECF/Control/Src/Cybergear_Motor.c ****             
+ 1835              		.loc 1 534 75 view .LVU575
+ 1836 0208 D0E7     		b	.L100
+ 1837              	.L103:
+ 1838 020a 00BFAFF3 		.align	3
+ 1838      0080
+ 1839              	.L102:
+ 1840 0210 9A999999 		.word	-1717986918
+ 1841 0214 9999B93F 		.word	1069128089
+ 1842 0218 00000000 		.word	.LANCHOR5
+ 1843 021c 00000000 		.word	.LANCHOR6
+ 1844 0220 00003444 		.word	1144258560
+ 1845 0224 000034C4 		.word	-1003225088
+ 1846 0228 00000000 		.word	.LANCHOR7
+ 1847              	.LBE14:
+ 1848              		.cfi_endproc
+ 1849              	.LFE149:
+ 1851              		.section	.text.MI_Motor_Can1_Call_Back,"ax",%progbits
+ 1852              		.align	1
+ 1853              		.global	MI_Motor_Can1_Call_Back
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s 			page 45
+
+
+ 1854              		.syntax unified
+ 1855              		.thumb
+ 1856              		.thumb_func
+ 1858              	MI_Motor_Can1_Call_Back:
+ 1859              	.LVL149:
+ 1860              	.LFB136:
+ 200:ACE-ECF/Control/Src/Cybergear_Motor.c ****     for (int i = 0; i < 10; i++)
+ 1861              		.loc 1 200 1 is_stmt 1 view -0
+ 1862              		.cfi_startproc
+ 1863              		@ args = 0, pretend = 0, frame = 0
+ 1864              		@ frame_needed = 0, uses_anonymous_args = 0
+ 200:ACE-ECF/Control/Src/Cybergear_Motor.c ****     for (int i = 0; i < 10; i++)
+ 1865              		.loc 1 200 1 is_stmt 0 view .LVU577
+ 1866 0000 70B5     		push	{r4, r5, r6, lr}
+ 1867              	.LCFI22:
+ 1868              		.cfi_def_cfa_offset 16
+ 1869              		.cfi_offset 4, -16
+ 1870              		.cfi_offset 5, -12
+ 1871              		.cfi_offset 6, -8
+ 1872              		.cfi_offset 14, -4
+ 1873 0002 0646     		mov	r6, r0
+ 1874 0004 0D46     		mov	r5, r1
+ 201:ACE-ECF/Control/Src/Cybergear_Motor.c ****     {
+ 1875              		.loc 1 201 5 is_stmt 1 view .LVU578
+ 1876              	.LBB15:
+ 201:ACE-ECF/Control/Src/Cybergear_Motor.c ****     {
+ 1877              		.loc 1 201 10 view .LVU579
+ 1878              	.LVL150:
+ 201:ACE-ECF/Control/Src/Cybergear_Motor.c ****     {
+ 1879              		.loc 1 201 14 is_stmt 0 view .LVU580
+ 1880 0006 0024     		movs	r4, #0
+ 201:ACE-ECF/Control/Src/Cybergear_Motor.c ****     {
+ 1881              		.loc 1 201 5 view .LVU581
+ 1882 0008 00E0     		b	.L105
+ 1883              	.LVL151:
+ 1884              	.L107:
+ 201:ACE-ECF/Control/Src/Cybergear_Motor.c ****     {
+ 1885              		.loc 1 201 29 is_stmt 1 discriminator 2 view .LVU582
+ 201:ACE-ECF/Control/Src/Cybergear_Motor.c ****     {
+ 1886              		.loc 1 201 30 is_stmt 0 discriminator 2 view .LVU583
+ 1887 000a 0134     		adds	r4, r4, #1
+ 1888              	.LVL152:
+ 1889              	.L105:
+ 201:ACE-ECF/Control/Src/Cybergear_Motor.c ****     {
+ 1890              		.loc 1 201 21 is_stmt 1 discriminator 1 view .LVU584
+ 201:ACE-ECF/Control/Src/Cybergear_Motor.c ****     {
+ 1891              		.loc 1 201 5 is_stmt 0 discriminator 1 view .LVU585
+ 1892 000c 092C     		cmp	r4, #9
+ 1893 000e 0FDC     		bgt	.L104
+ 203:ACE-ECF/Control/Src/Cybergear_Motor.c ****         MI_motor_recive_callback(Now_Malloc_Can1_MI_Motor_Groud[i], CAN_Rxmessage->ExtId, MI_Motor_
+ 1894              		.loc 1 203 9 is_stmt 1 view .LVU586
+ 203:ACE-ECF/Control/Src/Cybergear_Motor.c ****         MI_motor_recive_callback(Now_Malloc_Can1_MI_Motor_Groud[i], CAN_Rxmessage->ExtId, MI_Motor_
+ 1895              		.loc 1 203 43 is_stmt 0 view .LVU587
+ 1896 0010 084B     		ldr	r3, .L110
+ 1897 0012 53F82400 		ldr	r0, [r3, r4, lsl #2]
+ 203:ACE-ECF/Control/Src/Cybergear_Motor.c ****         MI_motor_recive_callback(Now_Malloc_Can1_MI_Motor_Groud[i], CAN_Rxmessage->ExtId, MI_Motor_
+ 1898              		.loc 1 203 12 view .LVU588
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s 			page 46
+
+
+ 1899 0016 58B1     		cbz	r0, .L104
+ 204:ACE-ECF/Control/Src/Cybergear_Motor.c ****         if (Now_Malloc_Can1_MI_Motor_Groud[i]->CanRxCallBack != NULL)
+ 1900              		.loc 1 204 9 is_stmt 1 view .LVU589
+ 1901 0018 2A46     		mov	r2, r5
+ 1902 001a 7168     		ldr	r1, [r6, #4]
+ 1903 001c FFF7FEFF 		bl	MI_motor_recive_callback
+ 1904              	.LVL153:
+ 205:ACE-ECF/Control/Src/Cybergear_Motor.c ****             Now_Malloc_Can1_MI_Motor_Groud[i]->CanRxCallBack();
+ 1905              		.loc 1 205 9 view .LVU590
+ 205:ACE-ECF/Control/Src/Cybergear_Motor.c ****             Now_Malloc_Can1_MI_Motor_Groud[i]->CanRxCallBack();
+ 1906              		.loc 1 205 43 is_stmt 0 view .LVU591
+ 1907 0020 044B     		ldr	r3, .L110
+ 1908 0022 53F82430 		ldr	r3, [r3, r4, lsl #2]
+ 205:ACE-ECF/Control/Src/Cybergear_Motor.c ****             Now_Malloc_Can1_MI_Motor_Groud[i]->CanRxCallBack();
+ 1909              		.loc 1 205 46 view .LVU592
+ 1910 0026 9B6F     		ldr	r3, [r3, #120]
+ 205:ACE-ECF/Control/Src/Cybergear_Motor.c ****             Now_Malloc_Can1_MI_Motor_Groud[i]->CanRxCallBack();
+ 1911              		.loc 1 205 12 view .LVU593
+ 1912 0028 002B     		cmp	r3, #0
+ 1913 002a EED0     		beq	.L107
+ 206:ACE-ECF/Control/Src/Cybergear_Motor.c ****     }
+ 1914              		.loc 1 206 13 is_stmt 1 view .LVU594
+ 1915 002c 9847     		blx	r3
+ 1916              	.LVL154:
+ 1917 002e ECE7     		b	.L107
+ 1918              	.L104:
+ 206:ACE-ECF/Control/Src/Cybergear_Motor.c ****     }
+ 1919              		.loc 1 206 13 is_stmt 0 view .LVU595
+ 1920              	.LBE15:
+ 208:ACE-ECF/Control/Src/Cybergear_Motor.c **** void MI_Motor_Can2_Call_Back(CAN_RxHeaderTypeDef *CAN_Rxmessage, uint8_t *MI_Motor_Rx_Data)
+ 1921              		.loc 1 208 1 view .LVU596
+ 1922 0030 70BD     		pop	{r4, r5, r6, pc}
+ 1923              	.LVL155:
+ 1924              	.L111:
+ 208:ACE-ECF/Control/Src/Cybergear_Motor.c **** void MI_Motor_Can2_Call_Back(CAN_RxHeaderTypeDef *CAN_Rxmessage, uint8_t *MI_Motor_Rx_Data)
+ 1925              		.loc 1 208 1 view .LVU597
+ 1926 0032 00BF     		.align	2
+ 1927              	.L110:
+ 1928 0034 00000000 		.word	.LANCHOR2
+ 1929              		.cfi_endproc
+ 1930              	.LFE136:
+ 1932              		.section	.text.MI_Motor_Can2_Call_Back,"ax",%progbits
+ 1933              		.align	1
+ 1934              		.global	MI_Motor_Can2_Call_Back
+ 1935              		.syntax unified
+ 1936              		.thumb
+ 1937              		.thumb_func
+ 1939              	MI_Motor_Can2_Call_Back:
+ 1940              	.LVL156:
+ 1941              	.LFB137:
+ 210:ACE-ECF/Control/Src/Cybergear_Motor.c ****     for (int i = 0; i < 10; i++)
+ 1942              		.loc 1 210 1 is_stmt 1 view -0
+ 1943              		.cfi_startproc
+ 1944              		@ args = 0, pretend = 0, frame = 0
+ 1945              		@ frame_needed = 0, uses_anonymous_args = 0
+ 210:ACE-ECF/Control/Src/Cybergear_Motor.c ****     for (int i = 0; i < 10; i++)
+ 1946              		.loc 1 210 1 is_stmt 0 view .LVU599
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s 			page 47
+
+
+ 1947 0000 70B5     		push	{r4, r5, r6, lr}
+ 1948              	.LCFI23:
+ 1949              		.cfi_def_cfa_offset 16
+ 1950              		.cfi_offset 4, -16
+ 1951              		.cfi_offset 5, -12
+ 1952              		.cfi_offset 6, -8
+ 1953              		.cfi_offset 14, -4
+ 1954 0002 0646     		mov	r6, r0
+ 1955 0004 0D46     		mov	r5, r1
+ 211:ACE-ECF/Control/Src/Cybergear_Motor.c ****     {
+ 1956              		.loc 1 211 5 is_stmt 1 view .LVU600
+ 1957              	.LBB16:
+ 211:ACE-ECF/Control/Src/Cybergear_Motor.c ****     {
+ 1958              		.loc 1 211 10 view .LVU601
+ 1959              	.LVL157:
+ 211:ACE-ECF/Control/Src/Cybergear_Motor.c ****     {
+ 1960              		.loc 1 211 14 is_stmt 0 view .LVU602
+ 1961 0006 0024     		movs	r4, #0
+ 211:ACE-ECF/Control/Src/Cybergear_Motor.c ****     {
+ 1962              		.loc 1 211 5 view .LVU603
+ 1963 0008 00E0     		b	.L113
+ 1964              	.LVL158:
+ 1965              	.L115:
+ 211:ACE-ECF/Control/Src/Cybergear_Motor.c ****     {
+ 1966              		.loc 1 211 29 is_stmt 1 discriminator 2 view .LVU604
+ 211:ACE-ECF/Control/Src/Cybergear_Motor.c ****     {
+ 1967              		.loc 1 211 30 is_stmt 0 discriminator 2 view .LVU605
+ 1968 000a 0134     		adds	r4, r4, #1
+ 1969              	.LVL159:
+ 1970              	.L113:
+ 211:ACE-ECF/Control/Src/Cybergear_Motor.c ****     {
+ 1971              		.loc 1 211 21 is_stmt 1 discriminator 1 view .LVU606
+ 211:ACE-ECF/Control/Src/Cybergear_Motor.c ****     {
+ 1972              		.loc 1 211 5 is_stmt 0 discriminator 1 view .LVU607
+ 1973 000c 092C     		cmp	r4, #9
+ 1974 000e 0FDC     		bgt	.L112
+ 213:ACE-ECF/Control/Src/Cybergear_Motor.c ****         MI_motor_recive_callback(Now_Malloc_Can2_MI_Motor_Groud[i], CAN_Rxmessage->ExtId, MI_Motor_
+ 1975              		.loc 1 213 9 is_stmt 1 view .LVU608
+ 213:ACE-ECF/Control/Src/Cybergear_Motor.c ****         MI_motor_recive_callback(Now_Malloc_Can2_MI_Motor_Groud[i], CAN_Rxmessage->ExtId, MI_Motor_
+ 1976              		.loc 1 213 43 is_stmt 0 view .LVU609
+ 1977 0010 084B     		ldr	r3, .L118
+ 1978 0012 53F82400 		ldr	r0, [r3, r4, lsl #2]
+ 213:ACE-ECF/Control/Src/Cybergear_Motor.c ****         MI_motor_recive_callback(Now_Malloc_Can2_MI_Motor_Groud[i], CAN_Rxmessage->ExtId, MI_Motor_
+ 1979              		.loc 1 213 12 view .LVU610
+ 1980 0016 58B1     		cbz	r0, .L112
+ 214:ACE-ECF/Control/Src/Cybergear_Motor.c ****         if (Now_Malloc_Can2_MI_Motor_Groud[i]->CanRxCallBack != NULL)
+ 1981              		.loc 1 214 9 is_stmt 1 view .LVU611
+ 1982 0018 2A46     		mov	r2, r5
+ 1983 001a 7168     		ldr	r1, [r6, #4]
+ 1984 001c FFF7FEFF 		bl	MI_motor_recive_callback
+ 1985              	.LVL160:
+ 215:ACE-ECF/Control/Src/Cybergear_Motor.c ****             Now_Malloc_Can2_MI_Motor_Groud[i]->CanRxCallBack();
+ 1986              		.loc 1 215 9 view .LVU612
+ 215:ACE-ECF/Control/Src/Cybergear_Motor.c ****             Now_Malloc_Can2_MI_Motor_Groud[i]->CanRxCallBack();
+ 1987              		.loc 1 215 43 is_stmt 0 view .LVU613
+ 1988 0020 044B     		ldr	r3, .L118
+ 1989 0022 53F82430 		ldr	r3, [r3, r4, lsl #2]
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s 			page 48
+
+
+ 215:ACE-ECF/Control/Src/Cybergear_Motor.c ****             Now_Malloc_Can2_MI_Motor_Groud[i]->CanRxCallBack();
+ 1990              		.loc 1 215 46 view .LVU614
+ 1991 0026 9B6F     		ldr	r3, [r3, #120]
+ 215:ACE-ECF/Control/Src/Cybergear_Motor.c ****             Now_Malloc_Can2_MI_Motor_Groud[i]->CanRxCallBack();
+ 1992              		.loc 1 215 12 view .LVU615
+ 1993 0028 002B     		cmp	r3, #0
+ 1994 002a EED0     		beq	.L115
+ 216:ACE-ECF/Control/Src/Cybergear_Motor.c ****     }
+ 1995              		.loc 1 216 13 is_stmt 1 view .LVU616
+ 1996 002c 9847     		blx	r3
+ 1997              	.LVL161:
+ 1998 002e ECE7     		b	.L115
+ 1999              	.L112:
+ 216:ACE-ECF/Control/Src/Cybergear_Motor.c ****     }
+ 2000              		.loc 1 216 13 is_stmt 0 view .LVU617
+ 2001              	.LBE16:
+ 218:ACE-ECF/Control/Src/Cybergear_Motor.c **** void MI_Motor_CAN_Recive_init(void)
+ 2002              		.loc 1 218 1 view .LVU618
+ 2003 0030 70BD     		pop	{r4, r5, r6, pc}
+ 2004              	.LVL162:
+ 2005              	.L119:
+ 218:ACE-ECF/Control/Src/Cybergear_Motor.c **** void MI_Motor_CAN_Recive_init(void)
+ 2006              		.loc 1 218 1 view .LVU619
+ 2007 0032 00BF     		.align	2
+ 2008              	.L118:
+ 2009 0034 00000000 		.word	.LANCHOR3
+ 2010              		.cfi_endproc
+ 2011              	.LFE137:
+ 2013              		.global	Now_Malloc_Can2_MI_Motor_Groud
+ 2014              		.global	Now_Malloc_Can1_MI_Motor_Groud
+ 2015              		.global	CAN_TxHeader_MI
+ 2016              		.global	byte
+ 2017              		.global	MI_id
+ 2018              		.global	get_can_id
+ 2019              		.global	FloatAndBytes
+ 2020              		.section	.bss.CAN_TxHeader_MI,"aw",%nobits
+ 2021              		.align	2
+ 2022              		.set	.LANCHOR1,. + 0
+ 2025              	CAN_TxHeader_MI:
+ 2026 0000 00000000 		.space	24
+ 2026      00000000 
+ 2026      00000000 
+ 2026      00000000 
+ 2026      00000000 
+ 2027              		.section	.bss.FloatAndBytes,"aw",%nobits
+ 2028              		.align	2
+ 2029              		.set	.LANCHOR7,. + 0
+ 2032              	FloatAndBytes:
+ 2033 0000 00000000 		.space	4
+ 2034              		.section	.bss.MI_Motor_CallBack_Init_Flag.0,"aw",%nobits
+ 2035              		.set	.LANCHOR4,. + 0
+ 2038              	MI_Motor_CallBack_Init_Flag.0:
+ 2039 0000 00       		.space	1
+ 2040              		.section	.bss.MI_id,"aw",%nobits
+ 2041              		.set	.LANCHOR6,. + 0
+ 2044              	MI_id:
+ 2045 0000 00       		.space	1
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s 			page 49
+
+
+ 2046              		.section	.bss.Now_Malloc_Can1_MI_Motor_Groud,"aw",%nobits
+ 2047              		.align	2
+ 2048              		.set	.LANCHOR2,. + 0
+ 2051              	Now_Malloc_Can1_MI_Motor_Groud:
+ 2052 0000 00000000 		.space	40
+ 2052      00000000 
+ 2052      00000000 
+ 2052      00000000 
+ 2052      00000000 
+ 2053              		.section	.bss.Now_Malloc_Can2_MI_Motor_Groud,"aw",%nobits
+ 2054              		.align	2
+ 2055              		.set	.LANCHOR3,. + 0
+ 2058              	Now_Malloc_Can2_MI_Motor_Groud:
+ 2059 0000 00000000 		.space	40
+ 2059      00000000 
+ 2059      00000000 
+ 2059      00000000 
+ 2059      00000000 
+ 2060              		.section	.bss.byte,"aw",%nobits
+ 2061              		.align	2
+ 2062              		.set	.LANCHOR0,. + 0
+ 2065              	byte:
+ 2066 0000 00000000 		.space	4
+ 2067              		.section	.bss.get_can_id,"aw",%nobits
+ 2068              		.set	.LANCHOR5,. + 0
+ 2071              	get_can_id:
+ 2072 0000 00       		.space	1
+ 2073              		.text
+ 2074              	.Letext0:
+ 2075              		.file 2 "d:\\gcc-arm-none-eabi-10.3-2021.10\\arm-none-eabi\\include\\machine\\_default_types.h"
+ 2076              		.file 3 "d:\\gcc-arm-none-eabi-10.3-2021.10\\arm-none-eabi\\include\\sys\\_stdint.h"
+ 2077              		.file 4 "Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f407xx.h"
+ 2078              		.file 5 "Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h"
+ 2079              		.file 6 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h"
+ 2080              		.file 7 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_can.h"
+ 2081              		.file 8 "ACE-ECF/Algorithm/inc/struct_typedef.h"
+ 2082              		.file 9 "ACE-ECF/Control/Inc/Cybergear_Motor.h"
+ 2083              		.file 10 "Core/Inc/can.h"
+ 2084              		.file 11 "ACE-ECF/Bsp/Inc/bsp_can.h"
+ 2085              		.file 12 "d:\\gcc-arm-none-eabi-10.3-2021.10\\arm-none-eabi\\include\\stdlib.h"
+ 2086              		.file 13 "<built-in>"
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s 			page 50
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 Cybergear_Motor.c
+C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s:20     .text.Float_to_Byte:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s:26     .text.Float_to_Byte:00000000 Float_to_Byte
+C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s:75     .text.Float_to_Byte:0000001c $d
+C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s:80     .text.Byte_to_Float:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s:86     .text.Byte_to_Float:00000000 Byte_to_Float
+C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s:131    .text.float_to_uint:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s:137    .text.float_to_uint:00000000 float_to_uint
+C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s:196    .text.uint16_to_float:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s:202    .text.uint16_to_float:00000000 uint16_to_float
+C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s:241    .text.MI_Motor_CanTx:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s:247    .text.MI_Motor_CanTx:00000000 MI_Motor_CanTx
+C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s:324    .text.MI_Motor_CanTx:0000003c $d
+C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s:329    .text.MI_Motor_CAN_Recive_init:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s:335    .text.MI_Motor_CAN_Recive_init:00000000 MI_Motor_CAN_Recive_init
+C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s:365    .text.MI_Motor_CAN_Recive_init:0000001c $d
+C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s:1858   .text.MI_Motor_Can1_Call_Back:00000000 MI_Motor_Can1_Call_Back
+C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s:1939   .text.MI_Motor_Can2_Call_Back:00000000 MI_Motor_Can2_Call_Back
+C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s:371    .text.MI_motor_init:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s:377    .text.MI_motor_init:00000000 MI_motor_init
+C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s:517    .text.MI_motor_init:00000074 $d
+C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s:526    .text.MI_Motor_CanRx_Callback:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s:532    .text.MI_Motor_CanRx_Callback:00000000 MI_Motor_CanRx_Callback
+C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s:549    .text.MI_motor_enable:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s:555    .text.MI_motor_enable:00000000 MI_motor_enable
+C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s:626    .text.MI_motor_get_ID:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s:632    .text.MI_motor_get_ID:00000000 MI_motor_get_ID
+C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s:724    .text.MI_motor_get_ID:00000058 $d
+C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s:730    .text.MI_motor_controlmode:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s:736    .text.MI_motor_controlmode:00000000 MI_motor_controlmode
+C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s:870    .text.MI_motor_controlmode:000000c4 $d
+C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s:876    .text.MI_motor_stop:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s:882    .text.MI_motor_stop:00000000 MI_motor_stop
+C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s:948    .text.MI_motor_setMechPosition2Zero:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s:954    .text.MI_motor_setMechPosition2Zero:00000000 MI_motor_setMechPosition2Zero
+C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s:1022   .text.MI_motor_changeID:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s:1028   .text.MI_motor_changeID:00000000 MI_motor_changeID
+C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s:1104   .text.MI_motor_Read_One_Para:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s:1110   .text.MI_motor_Read_One_Para:00000000 MI_motor_Read_One_Para
+C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s:1181   .text.MI_motor_Write_One_Para:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s:1187   .text.MI_motor_Write_One_Para:00000000 MI_motor_Write_One_Para
+C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s:1308   .text.MI_motor_Write_One_Para:00000088 $d
+C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s:1313   .text.MI_motor_Set_Mode:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s:1319   .text.MI_motor_Set_Mode:00000000 MI_motor_Set_Mode
+C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s:1349   .text.MI_motor_recive_callback:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s:1355   .text.MI_motor_recive_callback:00000000 MI_motor_recive_callback
+C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s:1405   .text.MI_motor_recive_callback:00000036 $d
+C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s:1427   .text.MI_motor_recive_callback:0000004c $t
+C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s:1593   .text.MI_motor_recive_callback:0000013c $d
+C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s:1613   .text.MI_motor_recive_callback:00000150 $t
+C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s:1840   .text.MI_motor_recive_callback:00000210 $d
+C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s:1852   .text.MI_Motor_Can1_Call_Back:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s:1928   .text.MI_Motor_Can1_Call_Back:00000034 $d
+C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s:1933   .text.MI_Motor_Can2_Call_Back:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s:2009   .text.MI_Motor_Can2_Call_Back:00000034 $d
+C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s:2058   .bss.Now_Malloc_Can2_MI_Motor_Groud:00000000 Now_Malloc_Can2_MI_Motor_Groud
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s 			page 51
+
+
+C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s:2051   .bss.Now_Malloc_Can1_MI_Motor_Groud:00000000 Now_Malloc_Can1_MI_Motor_Groud
+C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s:2025   .bss.CAN_TxHeader_MI:00000000 CAN_TxHeader_MI
+C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s:2065   .bss.byte:00000000 byte
+C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s:2044   .bss.MI_id:00000000 MI_id
+C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s:2071   .bss.get_can_id:00000000 get_can_id
+C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s:2032   .bss.FloatAndBytes:00000000 FloatAndBytes
+C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s:2021   .bss.CAN_TxHeader_MI:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s:2028   .bss.FloatAndBytes:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s:2038   .bss.MI_Motor_CallBack_Init_Flag.0:00000000 MI_Motor_CallBack_Init_Flag.0
+C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s:2039   .bss.MI_Motor_CallBack_Init_Flag.0:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s:2045   .bss.MI_id:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s:2047   .bss.Now_Malloc_Can1_MI_Motor_Groud:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s:2054   .bss.Now_Malloc_Can2_MI_Motor_Groud:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s:2061   .bss.byte:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccNQpTIc.s:2072   .bss.get_can_id:00000000 $d
+
+UNDEFINED SYMBOLS
+HAL_CAN_AddTxMessage
+ECF_CAN_Rx_Callback_Register
+malloc
+memset
+hcan1
+hcan2
+__aeabi_i2d
+__aeabi_dmul
+__aeabi_d2f

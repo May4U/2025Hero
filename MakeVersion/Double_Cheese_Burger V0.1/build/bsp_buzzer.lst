@@ -1,0 +1,172 @@
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccpHR3Q8.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.arch armv7e-m
+   3              		.fpu fpv4-sp-d16
+   4              		.eabi_attribute 27, 1
+   5              		.eabi_attribute 28, 1
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.file	"bsp_buzzer.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.buzzer_on,"ax",%progbits
+  20              		.align	1
+  21              		.global	buzzer_on
+  22              		.syntax unified
+  23              		.thumb
+  24              		.thumb_func
+  26              	buzzer_on:
+  27              	.LVL0:
+  28              	.LFB130:
+  29              		.file 1 "ACE-ECF/Bsp/Src/bsp_buzzer.c"
+   1:ACE-ECF/Bsp/Src/bsp_buzzer.c **** 
+   2:ACE-ECF/Bsp/Src/bsp_buzzer.c **** /* C板蜂鸣器是挂载在 TIM4 CH3上的，查表可知挂载在APB1总线上
+   3:ACE-ECF/Bsp/Src/bsp_buzzer.c ****  * APB1频率为84MHz,ARR为重装载值auto reload resister
+   4:ACE-ECF/Bsp/Src/bsp_buzzer.c ****  * PWM输出频率 = APB1/ARR+1 = (84*10^6) / 21000 = 4000Hz
+   5:ACE-ECF/Bsp/Src/bsp_buzzer.c ****  * */
+   6:ACE-ECF/Bsp/Src/bsp_buzzer.c **** #include "bsp_buzzer.h"
+   7:ACE-ECF/Bsp/Src/bsp_buzzer.c **** #include "main.h"
+   8:ACE-ECF/Bsp/Src/bsp_buzzer.c **** extern TIM_HandleTypeDef htim4;
+   9:ACE-ECF/Bsp/Src/bsp_buzzer.c **** void buzzer_on(uint16_t psc, uint16_t pwm)
+  10:ACE-ECF/Bsp/Src/bsp_buzzer.c **** {
+  30              		.loc 1 10 1 view -0
+  31              		.cfi_startproc
+  32              		@ args = 0, pretend = 0, frame = 0
+  33              		@ frame_needed = 0, uses_anonymous_args = 0
+  34              		@ link register save eliminated.
+  11:ACE-ECF/Bsp/Src/bsp_buzzer.c ****     __HAL_TIM_PRESCALER(&htim4, psc);
+  35              		.loc 1 11 5 view .LVU1
+  36 0000 024B     		ldr	r3, .L2
+  37 0002 1B68     		ldr	r3, [r3]
+  38 0004 9862     		str	r0, [r3, #40]
+  12:ACE-ECF/Bsp/Src/bsp_buzzer.c ****     __HAL_TIM_SetCompare(&htim4, TIM_CHANNEL_3, pwm);
+  39              		.loc 1 12 5 view .LVU2
+  40 0006 D963     		str	r1, [r3, #60]
+  13:ACE-ECF/Bsp/Src/bsp_buzzer.c **** 
+  14:ACE-ECF/Bsp/Src/bsp_buzzer.c **** }
+  41              		.loc 1 14 1 is_stmt 0 view .LVU3
+  42 0008 7047     		bx	lr
+  43              	.L3:
+  44 000a 00BF     		.align	2
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccpHR3Q8.s 			page 2
+
+
+  45              	.L2:
+  46 000c 00000000 		.word	htim4
+  47              		.cfi_endproc
+  48              	.LFE130:
+  50              		.section	.text.buzzer_off,"ax",%progbits
+  51              		.align	1
+  52              		.global	buzzer_off
+  53              		.syntax unified
+  54              		.thumb
+  55              		.thumb_func
+  57              	buzzer_off:
+  58              	.LFB131:
+  15:ACE-ECF/Bsp/Src/bsp_buzzer.c **** 
+  16:ACE-ECF/Bsp/Src/bsp_buzzer.c **** void buzzer_off(void)
+  17:ACE-ECF/Bsp/Src/bsp_buzzer.c **** {
+  59              		.loc 1 17 1 is_stmt 1 view -0
+  60              		.cfi_startproc
+  61              		@ args = 0, pretend = 0, frame = 0
+  62              		@ frame_needed = 0, uses_anonymous_args = 0
+  63              		@ link register save eliminated.
+  18:ACE-ECF/Bsp/Src/bsp_buzzer.c ****     __HAL_TIM_SetCompare(&htim4, TIM_CHANNEL_3, 0);
+  64              		.loc 1 18 5 view .LVU5
+  65 0000 024B     		ldr	r3, .L5
+  66 0002 1B68     		ldr	r3, [r3]
+  67 0004 0022     		movs	r2, #0
+  68 0006 DA63     		str	r2, [r3, #60]
+  19:ACE-ECF/Bsp/Src/bsp_buzzer.c **** }
+  69              		.loc 1 19 1 is_stmt 0 view .LVU6
+  70 0008 7047     		bx	lr
+  71              	.L6:
+  72 000a 00BF     		.align	2
+  73              	.L5:
+  74 000c 00000000 		.word	htim4
+  75              		.cfi_endproc
+  76              	.LFE131:
+  78              		.section	.text.buzzer_test,"ax",%progbits
+  79              		.align	1
+  80              		.global	buzzer_test
+  81              		.syntax unified
+  82              		.thumb
+  83              		.thumb_func
+  85              	buzzer_test:
+  86              	.LVL1:
+  87              	.LFB132:
+  20:ACE-ECF/Bsp/Src/bsp_buzzer.c **** 
+  21:ACE-ECF/Bsp/Src/bsp_buzzer.c **** void buzzer_test(uint16_t psc, uint16_t arr)
+  22:ACE-ECF/Bsp/Src/bsp_buzzer.c **** {
+  88              		.loc 1 22 1 is_stmt 1 view -0
+  89              		.cfi_startproc
+  90              		@ args = 0, pretend = 0, frame = 0
+  91              		@ frame_needed = 0, uses_anonymous_args = 0
+  92              		@ link register save eliminated.
+  23:ACE-ECF/Bsp/Src/bsp_buzzer.c ****     __HAL_TIM_PRESCALER(&htim4, psc);
+  93              		.loc 1 23 5 view .LVU8
+  94 0000 034A     		ldr	r2, .L8
+  95 0002 1368     		ldr	r3, [r2]
+  96 0004 9862     		str	r0, [r3, #40]
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccpHR3Q8.s 			page 3
+
+
+  24:ACE-ECF/Bsp/Src/bsp_buzzer.c **** 		__HAL_TIM_SetAutoreload(&htim4, arr);
+  97              		.loc 1 24 3 view .LVU9
+  98              		.loc 1 24 3 view .LVU10
+  99 0006 D962     		str	r1, [r3, #44]
+ 100              		.loc 1 24 3 view .LVU11
+ 101 0008 D160     		str	r1, [r2, #12]
+ 102              		.loc 1 24 3 view .LVU12
+  25:ACE-ECF/Bsp/Src/bsp_buzzer.c ****     __HAL_TIM_SetCompare(&htim4, TIM_CHANNEL_3, arr/2);
+ 103              		.loc 1 25 5 view .LVU13
+ 104 000a 4908     		lsrs	r1, r1, #1
+ 105              	.LVL2:
+ 106              		.loc 1 25 5 is_stmt 0 view .LVU14
+ 107 000c D963     		str	r1, [r3, #60]
+  26:ACE-ECF/Bsp/Src/bsp_buzzer.c **** 
+  27:ACE-ECF/Bsp/Src/bsp_buzzer.c **** }
+ 108              		.loc 1 27 1 view .LVU15
+ 109 000e 7047     		bx	lr
+ 110              	.L9:
+ 111              		.align	2
+ 112              	.L8:
+ 113 0010 00000000 		.word	htim4
+ 114              		.cfi_endproc
+ 115              	.LFE132:
+ 117              		.text
+ 118              	.Letext0:
+ 119              		.file 2 "ACE-ECF/Algorithm/inc/struct_typedef.h"
+ 120              		.file 3 "d:\\gcc-arm-none-eabi-10.3-2021.10\\arm-none-eabi\\include\\machine\\_default_types.h"
+ 121              		.file 4 "d:\\gcc-arm-none-eabi-10.3-2021.10\\arm-none-eabi\\include\\sys\\_stdint.h"
+ 122              		.file 5 "Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f407xx.h"
+ 123              		.file 6 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h"
+ 124              		.file 7 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_dma.h"
+ 125              		.file 8 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h"
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccpHR3Q8.s 			page 4
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 bsp_buzzer.c
+C:\Users\28212\AppData\Local\Temp\ccpHR3Q8.s:20     .text.buzzer_on:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccpHR3Q8.s:26     .text.buzzer_on:00000000 buzzer_on
+C:\Users\28212\AppData\Local\Temp\ccpHR3Q8.s:46     .text.buzzer_on:0000000c $d
+C:\Users\28212\AppData\Local\Temp\ccpHR3Q8.s:51     .text.buzzer_off:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccpHR3Q8.s:57     .text.buzzer_off:00000000 buzzer_off
+C:\Users\28212\AppData\Local\Temp\ccpHR3Q8.s:74     .text.buzzer_off:0000000c $d
+C:\Users\28212\AppData\Local\Temp\ccpHR3Q8.s:79     .text.buzzer_test:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccpHR3Q8.s:85     .text.buzzer_test:00000000 buzzer_test
+C:\Users\28212\AppData\Local\Temp\ccpHR3Q8.s:113    .text.buzzer_test:00000010 $d
+
+UNDEFINED SYMBOLS
+htim4

@@ -1,0 +1,7 @@
+# environment variable file used by stm32-for-vscode and the STM32Make.make makefile
+# Other environment variables can be added here. If wanting to use the generated makefile in CI/CD context please
+# configure the following variables: GCC_PATH, OPENOCD
+
+ARM_GCC_PATH = D:\GCC-ARM-NONE-EABI-10.3-2021.10\BIN
+OPENOCD = D:\OPENOCD-20231002-0.12.0\BIN\OPENOCD.EXE
+ 

@@ -1,0 +1,3267 @@
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccuocjhf.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.arch armv7e-m
+   3              		.fpu fpv4-sp-d16
+   4              		.eabi_attribute 27, 1
+   5              		.eabi_attribute 28, 1
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.file	"BMI088driver.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.BMI088_read_muli_reg,"ax",%progbits
+  20              		.align	1
+  21              		.syntax unified
+  22              		.thumb
+  23              		.thumb_func
+  25              	BMI088_read_muli_reg:
+  26              	.LVL0:
+  27              	.LFB138:
+  28              		.file 1 "ACE-ECF/Application/src/IMU_Driver/BMI088driver.c"
+   1:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** /**
+   2:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****  ******************************************************************************
+   3:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****  * @file    BMI088driver.c
+   4:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****  * @author
+   5:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****  * @version V1.2.0
+   6:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****  * @date    2022/3/8
+   7:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****  * @brief
+   8:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****  ******************************************************************************
+   9:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****  * @attention
+  10:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****  *
+  11:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****  ******************************************************************************
+  12:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****  */
+  13:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** #include "BMI088driver.h"
+  14:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** #include "BMI088reg.h"
+  15:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** #include "BMI088Middleware.h"
+  16:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** #include "bsp_dwt.h"
+  17:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** #include <math.h>
+  18:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+  19:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** float BMI088_ACCEL_SEN = BMI088_ACCEL_6G_SEN;
+  20:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** float BMI088_GYRO_SEN = BMI088_GYRO_2000_SEN;
+  21:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+  22:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** static uint8_t res = 0;
+  23:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** static uint8_t write_reg_num = 0;
+  24:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** static uint8_t error = BMI088_NO_ERROR;
+  25:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** float gyroDiff[3], gNormDiff;
+  26:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+  27:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** uint8_t caliOffset = 1;
+  28:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** int16_t caliCount = 0;
+  29:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+  30:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** IMU_Data_t BMI088;
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccuocjhf.s 			page 2
+
+
+  31:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+  32:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** #if defined(BMI088_USE_SPI)
+  33:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+  34:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** #define BMI088_accel_write_single_reg(reg, data) \
+  35:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     {                                            \
+  36:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         BMI088_ACCEL_NS_L();                     \
+  37:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         BMI088_write_single_reg((reg), (data));  \
+  38:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         BMI088_ACCEL_NS_H();                     \
+  39:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     }
+  40:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** #define BMI088_accel_read_single_reg(reg, data) \
+  41:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     {                                           \
+  42:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         BMI088_ACCEL_NS_L();                    \
+  43:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         BMI088_read_write_byte((reg) | 0x80);   \
+  44:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         BMI088_read_write_byte(0x55);           \
+  45:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         (data) = BMI088_read_write_byte(0x55);  \
+  46:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         BMI088_ACCEL_NS_H();                    \
+  47:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     }
+  48:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** //#define BMI088_accel_write_muli_reg( reg,  data, len) { BMI088_ACCEL_NS_L(); BMI088_write_muli_re
+  49:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** #define BMI088_accel_read_muli_reg(reg, data, len) \
+  50:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     {                                              \
+  51:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         BMI088_ACCEL_NS_L();                       \
+  52:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         BMI088_read_write_byte((reg) | 0x80);      \
+  53:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         BMI088_read_muli_reg(reg, data, len);      \
+  54:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         BMI088_ACCEL_NS_H();                       \
+  55:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     }
+  56:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+  57:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** #define BMI088_gyro_write_single_reg(reg, data) \
+  58:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     {                                           \
+  59:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         BMI088_GYRO_NS_L();                     \
+  60:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         BMI088_write_single_reg((reg), (data)); \
+  61:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         BMI088_GYRO_NS_H();                     \
+  62:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     }
+  63:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** #define BMI088_gyro_read_single_reg(reg, data)  \
+  64:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     {                                           \
+  65:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         BMI088_GYRO_NS_L();                     \
+  66:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         BMI088_read_single_reg((reg), &(data)); \
+  67:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         BMI088_GYRO_NS_H();                     \
+  68:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     }
+  69:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** //#define BMI088_gyro_write_muli_reg( reg,  data, len) { BMI088_GYRO_NS_L(); BMI088_write_muli_reg(
+  70:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** #define BMI088_gyro_read_muli_reg(reg, data, len)   \
+  71:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     {                                               \
+  72:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         BMI088_GYRO_NS_L();                         \
+  73:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         BMI088_read_muli_reg((reg), (data), (len)); \
+  74:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         BMI088_GYRO_NS_H();                         \
+  75:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     }
+  76:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+  77:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** static void
+  78:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** BMI088_write_single_reg(uint8_t reg, uint8_t data);
+  79:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** static void BMI088_read_single_reg(uint8_t reg, uint8_t *return_data);
+  80:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** // static void BMI088_write_muli_reg(uint8_t reg, uint8_t* buf, uint8_t len );
+  81:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** static void BMI088_read_muli_reg(uint8_t reg, uint8_t *buf, uint8_t len);
+  82:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+  83:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** #elif defined(BMI088_USE_IIC)
+  84:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+  85:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** #endif
+  86:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+  87:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** static uint8_t write_BMI088_accel_reg_data_error[BMI088_WRITE_ACCEL_REG_NUM][3] =
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccuocjhf.s 			page 3
+
+
+  88:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     {
+  89:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         {BMI088_ACC_PWR_CTRL, BMI088_ACC_ENABLE_ACC_ON, BMI088_ACC_PWR_CTRL_ERROR},
+  90:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         {BMI088_ACC_PWR_CONF, BMI088_ACC_PWR_ACTIVE_MODE, BMI088_ACC_PWR_CONF_ERROR},
+  91:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         {BMI088_ACC_CONF, BMI088_ACC_NORMAL | BMI088_ACC_800_HZ | BMI088_ACC_CONF_MUST_Set, BMI088_
+  92:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         {BMI088_ACC_RANGE, BMI088_ACC_RANGE_6G, BMI088_ACC_RANGE_ERROR},
+  93:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         {BMI088_INT1_IO_CTRL, BMI088_ACC_INT1_IO_ENABLE | BMI088_ACC_INT1_GPIO_PP | BMI088_ACC_INT1
+  94:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         {BMI088_INT_MAP_DATA, BMI088_ACC_INT1_DRDY_INTERRUPT, BMI088_INT_MAP_DATA_ERROR}
+  95:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+  96:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** };
+  97:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+  98:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** static uint8_t write_BMI088_gyro_reg_data_error[BMI088_WRITE_GYRO_REG_NUM][3] =
+  99:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     {
+ 100:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         {BMI088_GYRO_RANGE, BMI088_GYRO_2000, BMI088_GYRO_RANGE_ERROR},
+ 101:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         {BMI088_GYRO_BANDWIDTH, BMI088_GYRO_2000_230_HZ | BMI088_GYRO_BANDWIDTH_MUST_Set, BMI088_GY
+ 102:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         {BMI088_GYRO_LPM1, BMI088_GYRO_NORMAL_MODE, BMI088_GYRO_LPM1_ERROR},
+ 103:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         {BMI088_GYRO_CTRL, BMI088_DRDY_ON, BMI088_GYRO_CTRL_ERROR},
+ 104:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         {BMI088_GYRO_INT3_INT4_IO_CONF, BMI088_GYRO_INT3_GPIO_PP | BMI088_GYRO_INT3_GPIO_LOW, BMI08
+ 105:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         {BMI088_GYRO_INT3_INT4_IO_MAP, BMI088_GYRO_DRDY_IO_INT3, BMI088_GYRO_INT3_INT4_IO_MAP_ERROR
+ 106:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 107:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** };
+ 108:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 109:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** static void Calibrate_MPU_Offset(IMU_Data_t *bmi088);
+ 110:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 111:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** void BMI088_Init(SPI_HandleTypeDef *bmi088_SPI, uint8_t calibrate)
+ 112:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** {
+ 113:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     while (BMI088_init(bmi088_SPI, calibrate))
+ 114:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     {
+ 115:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         ;
+ 116:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     }
+ 117:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** }
+ 118:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 119:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** uint8_t BMI088_init(SPI_HandleTypeDef *bmi088_SPI, uint8_t calibrate)
+ 120:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** {
+ 121:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     BMI088_SPI = bmi088_SPI;
+ 122:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     error = BMI088_NO_ERROR;
+ 123:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 124:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     error |= bmi088_accel_init();
+ 125:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     error |= bmi088_gyro_init();
+ 126:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     if (calibrate)
+ 127:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         Calibrate_MPU_Offset(&BMI088);
+ 128:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     else
+ 129:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     {
+ 130:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         BMI088.GyroOffset[0] = GxOFFSET;
+ 131:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         BMI088.GyroOffset[1] = GyOFFSET;
+ 132:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         BMI088.GyroOffset[2] = GzOFFSET;
+ 133:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         BMI088.gNorm = gNORM;
+ 134:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         BMI088.AccelScale = 9.81f / BMI088.gNorm;
+ 135:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         BMI088.TempWhenCali = 40;
+ 136:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     }
+ 137:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 138:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     return error;
+ 139:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** }
+ 140:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 141:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** // 较准零飘
+ 142:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** void Calibrate_MPU_Offset(IMU_Data_t *bmi088)
+ 143:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** {
+ 144:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     static float startTime;
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccuocjhf.s 			page 4
+
+
+ 145:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     static uint16_t CaliTimes = 6000; // 需要足够多的数据才能得到有效陀螺仪零偏校准结果
+ 146:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     uint8_t buf[8] = {0, 0, 0, 0, 0, 0};
+ 147:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     int16_t bmi088_raw_temp;
+ 148:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     float gyroMax[3], gyroMin[3];
+ 149:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     float gNormTemp, gNormMax, gNormMin;
+ 150:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 151:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     startTime = DWT_GetTimeline_s();
+ 152:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     do
+ 153:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     {
+ 154:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         if (DWT_GetTimeline_s() - startTime > 10)
+ 155:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         {
+ 156:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             // 校准超时
+ 157:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->GyroOffset[0] = GxOFFSET;
+ 158:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->GyroOffset[1] = GyOFFSET;
+ 159:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->GyroOffset[2] = GzOFFSET;
+ 160:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->gNorm = gNORM;
+ 161:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->TempWhenCali = 40;
+ 162:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             break;
+ 163:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         }
+ 164:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 165:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         DWT_Delay(0.005);
+ 166:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         bmi088->gNorm = 0;
+ 167:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         bmi088->GyroOffset[0] = 0;
+ 168:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         bmi088->GyroOffset[1] = 0;
+ 169:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         bmi088->GyroOffset[2] = 0;
+ 170:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 171:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         for (uint16_t i = 0; i < CaliTimes; i++)
+ 172:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         {
+ 173:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             BMI088_accel_read_muli_reg(BMI088_ACCEL_XOUT_L, buf, 6);
+ 174:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088_raw_temp = (int16_t)((buf[1]) << 8) | buf[0];
+ 175:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->Accel[0] = bmi088_raw_temp * BMI088_ACCEL_SEN;
+ 176:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088_raw_temp = (int16_t)((buf[3]) << 8) | buf[2];
+ 177:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->Accel[1] = bmi088_raw_temp * BMI088_ACCEL_SEN;
+ 178:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088_raw_temp = (int16_t)((buf[5]) << 8) | buf[4];
+ 179:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->Accel[2] = bmi088_raw_temp * BMI088_ACCEL_SEN;
+ 180:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             gNormTemp = sqrtf(bmi088->Accel[0] * bmi088->Accel[0] +
+ 181:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                               bmi088->Accel[1] * bmi088->Accel[1] +
+ 182:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                               bmi088->Accel[2] * bmi088->Accel[2]);
+ 183:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->gNorm += gNormTemp;
+ 184:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 185:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             BMI088_gyro_read_muli_reg(BMI088_GYRO_CHIP_ID, buf, 8);
+ 186:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             if (buf[0] == BMI088_GYRO_CHIP_ID_VALUE)
+ 187:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             {
+ 188:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 bmi088_raw_temp = (int16_t)((buf[3]) << 8) | buf[2];
+ 189:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 bmi088->Gyro[0] = bmi088_raw_temp * BMI088_GYRO_SEN;
+ 190:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 bmi088->GyroOffset[0] += bmi088->Gyro[0];
+ 191:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 bmi088_raw_temp = (int16_t)((buf[5]) << 8) | buf[4];
+ 192:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 bmi088->Gyro[1] = bmi088_raw_temp * BMI088_GYRO_SEN;
+ 193:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 bmi088->GyroOffset[1] += bmi088->Gyro[1];
+ 194:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 bmi088_raw_temp = (int16_t)((buf[7]) << 8) | buf[6];
+ 195:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 bmi088->Gyro[2] = bmi088_raw_temp * BMI088_GYRO_SEN;
+ 196:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 bmi088->GyroOffset[2] += bmi088->Gyro[2];
+ 197:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             }
+ 198:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 199:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             // 记录数据极差
+ 200:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             if (i == 0)
+ 201:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             {
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccuocjhf.s 			page 5
+
+
+ 202:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 gNormMax = gNormTemp;
+ 203:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 gNormMin = gNormTemp;
+ 204:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 for (uint8_t j = 0; j < 3; j++)
+ 205:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 {
+ 206:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                     gyroMax[j] = bmi088->Gyro[j];
+ 207:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                     gyroMin[j] = bmi088->Gyro[j];
+ 208:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 }
+ 209:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             }
+ 210:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             else
+ 211:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             {
+ 212:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 if (gNormTemp > gNormMax)
+ 213:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                     gNormMax = gNormTemp;
+ 214:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 if (gNormTemp < gNormMin)
+ 215:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                     gNormMin = gNormTemp;
+ 216:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 for (uint8_t j = 0; j < 3; j++)
+ 217:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 {
+ 218:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                     if (bmi088->Gyro[j] > gyroMax[j])
+ 219:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                         gyroMax[j] = bmi088->Gyro[j];
+ 220:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                     if (bmi088->Gyro[j] < gyroMin[j])
+ 221:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                         gyroMin[j] = bmi088->Gyro[j];
+ 222:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 }
+ 223:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             }
+ 224:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 225:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             // 数据差异过大认为收到外界干扰，需重新校准
+ 226:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             gNormDiff = gNormMax - gNormMin;
+ 227:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             for (uint8_t j = 0; j < 3; j++)
+ 228:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 gyroDiff[j] = gyroMax[j] - gyroMin[j];
+ 229:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             if (gNormDiff > 0.5f ||
+ 230:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 gyroDiff[0] > 0.15f ||
+ 231:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 gyroDiff[1] > 0.15f ||
+ 232:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 gyroDiff[2] > 0.15f)
+ 233:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 break;
+ 234:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             DWT_Delay(0.0005);
+ 235:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         }
+ 236:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 237:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         // 取平均值得到标定结果
+ 238:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         bmi088->gNorm /= (float)CaliTimes;
+ 239:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         for (uint8_t i = 0; i < 3; i++)
+ 240:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->GyroOffset[i] /= (float)CaliTimes;
+ 241:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 242:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         // 记录标定时IMU温度
+ 243:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         BMI088_accel_read_muli_reg(BMI088_TEMP_M, buf, 2);
+ 244:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         bmi088_raw_temp = (int16_t)((buf[0] << 3) | (buf[1] >> 5));
+ 245:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         if (bmi088_raw_temp > 1023)
+ 246:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088_raw_temp -= 2048;
+ 247:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         bmi088->TempWhenCali = bmi088_raw_temp * BMI088_TEMP_FACTOR + BMI088_TEMP_OFFSET;
+ 248:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 249:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         caliCount++;
+ 250:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     } while (gNormDiff > 0.5f ||
+ 251:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****              fabsf(bmi088->gNorm - 9.8f) > 0.5f ||
+ 252:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****              gyroDiff[0] > 0.15f ||
+ 253:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****              gyroDiff[1] > 0.15f ||
+ 254:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****              gyroDiff[2] > 0.15f ||
+ 255:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****              fabsf(bmi088->GyroOffset[0]) > 0.01f ||
+ 256:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****              fabsf(bmi088->GyroOffset[1]) > 0.01f ||
+ 257:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****              fabsf(bmi088->GyroOffset[2]) > 0.01f);
+ 258:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccuocjhf.s 			page 6
+
+
+ 259:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     // 根据标定结果校准加速度计标度因数
+ 260:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     bmi088->AccelScale = 9.81f / bmi088->gNorm;
+ 261:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** }
+ 262:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 263:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** uint8_t bmi088_accel_init(void)
+ 264:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** {
+ 265:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     // check commiunication
+ 266:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     BMI088_accel_read_single_reg(BMI088_ACC_CHIP_ID, res);
+ 267:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     HAL_Delay(1);
+ 268:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     BMI088_accel_read_single_reg(BMI088_ACC_CHIP_ID, res);
+ 269:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     HAL_Delay(1);
+ 270:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 271:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     // accel software reset
+ 272:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     BMI088_accel_write_single_reg(BMI088_ACC_SOFTRESET, BMI088_ACC_SOFTRESET_VALUE);
+ 273:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     HAL_Delay(BMI088_LONG_DELAY_TIME);
+ 274:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 275:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     // check commiunication is normal after reset
+ 276:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     BMI088_accel_read_single_reg(BMI088_ACC_CHIP_ID, res);
+ 277:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     HAL_Delay(1);
+ 278:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     BMI088_accel_read_single_reg(BMI088_ACC_CHIP_ID, res);
+ 279:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     HAL_Delay(1);
+ 280:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 281:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     // check the "who am I"
+ 282:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     if (res != BMI088_ACC_CHIP_ID_VALUE)
+ 283:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         return BMI088_NO_SENSOR;
+ 284:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     // do
+ 285:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     // {
+ 286:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     //     BMI088_accel_read_single_reg(BMI088_ACC_CHIP_ID, res);
+ 287:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     // } while (res != BMI088_ACC_CHIP_ID_VALUE);
+ 288:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 289:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     // set accel sonsor config and check
+ 290:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     for (write_reg_num = 0; write_reg_num < BMI088_WRITE_ACCEL_REG_NUM; write_reg_num++)
+ 291:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     {
+ 292:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 293:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         BMI088_accel_write_single_reg(write_BMI088_accel_reg_data_error[write_reg_num][0], write_BM
+ 294:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         HAL_Delay(1);
+ 295:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 296:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         BMI088_accel_read_single_reg(write_BMI088_accel_reg_data_error[write_reg_num][0], res);
+ 297:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         HAL_Delay(1);
+ 298:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 299:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         if (res != write_BMI088_accel_reg_data_error[write_reg_num][1])
+ 300:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         {
+ 301:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             // write_reg_num--;
+ 302:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             // return write_BMI088_accel_reg_data_error[write_reg_num][2];
+ 303:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             error |= write_BMI088_accel_reg_data_error[write_reg_num][2];
+ 304:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         }
+ 305:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     }
+ 306:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     return BMI088_NO_ERROR;
+ 307:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** }
+ 308:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 309:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** uint8_t bmi088_gyro_init(void)
+ 310:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** {
+ 311:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     // check commiunication
+ 312:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     BMI088_gyro_read_single_reg(BMI088_GYRO_CHIP_ID, res);
+ 313:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     HAL_Delay(1);
+ 314:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     BMI088_gyro_read_single_reg(BMI088_GYRO_CHIP_ID, res);
+ 315:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     HAL_Delay(1);
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccuocjhf.s 			page 7
+
+
+ 316:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 317:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     // reset the gyro sensor
+ 318:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     BMI088_gyro_write_single_reg(BMI088_GYRO_SOFTRESET, BMI088_GYRO_SOFTRESET_VALUE);
+ 319:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     HAL_Delay(BMI088_LONG_DELAY_TIME);
+ 320:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     // check commiunication is normal after reset
+ 321:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     BMI088_gyro_read_single_reg(BMI088_GYRO_CHIP_ID, res);
+ 322:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     HAL_Delay(1);
+ 323:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     BMI088_gyro_read_single_reg(BMI088_GYRO_CHIP_ID, res);
+ 324:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     HAL_Delay(1);
+ 325:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 326:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     // check the "who am I"
+ 327:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     if (res != BMI088_GYRO_CHIP_ID_VALUE)
+ 328:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         return BMI088_NO_SENSOR;
+ 329:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 330:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     // set gyro sonsor config and check
+ 331:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     for (write_reg_num = 0; write_reg_num < BMI088_WRITE_GYRO_REG_NUM; write_reg_num++)
+ 332:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     {
+ 333:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 334:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         BMI088_gyro_write_single_reg(write_BMI088_gyro_reg_data_error[write_reg_num][0], write_BMI0
+ 335:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         HAL_Delay(1);
+ 336:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 337:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         BMI088_gyro_read_single_reg(write_BMI088_gyro_reg_data_error[write_reg_num][0], res);
+ 338:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         HAL_Delay(1);
+ 339:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 340:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         if (res != write_BMI088_gyro_reg_data_error[write_reg_num][1])
+ 341:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         {
+ 342:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             write_reg_num--;
+ 343:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             // return write_BMI088_gyro_reg_data_error[write_reg_num][2];
+ 344:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             error |= write_BMI088_accel_reg_data_error[write_reg_num][2];
+ 345:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         }
+ 346:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     }
+ 347:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 348:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     return BMI088_NO_ERROR;
+ 349:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** }
+ 350:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 351:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** void BMI088_Read(IMU_Data_t *bmi088)
+ 352:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** {
+ 353:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     uint8_t buf[8] = {0, 0, 0, 0, 0, 0};
+ 354:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     static int16_t bmi088_raw_temp;
+ 355:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 356:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     BMI088_accel_read_muli_reg(BMI088_ACCEL_XOUT_L, buf, 6);
+ 357:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 358:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     bmi088_raw_temp = (int16_t)((buf[1]) << 8) | buf[0];
+ 359:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     bmi088->Accel[0] = bmi088_raw_temp * BMI088_ACCEL_SEN * bmi088->AccelScale;
+ 360:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     bmi088_raw_temp = (int16_t)((buf[3]) << 8) | buf[2];
+ 361:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     bmi088->Accel[1] = bmi088_raw_temp * BMI088_ACCEL_SEN * bmi088->AccelScale;
+ 362:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     bmi088_raw_temp = (int16_t)((buf[5]) << 8) | buf[4];
+ 363:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     bmi088->Accel[2] = bmi088_raw_temp * BMI088_ACCEL_SEN * bmi088->AccelScale;
+ 364:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 365:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     BMI088_gyro_read_muli_reg(BMI088_GYRO_CHIP_ID, buf, 8);
+ 366:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     if (buf[0] == BMI088_GYRO_CHIP_ID_VALUE)
+ 367:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     {
+ 368:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         if (caliOffset)
+ 369:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         {
+ 370:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088_raw_temp = (int16_t)((buf[3]) << 8) | buf[2];
+ 371:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->Gyro[0] = bmi088_raw_temp * BMI088_GYRO_SEN - bmi088->GyroOffset[0];
+ 372:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088_raw_temp = (int16_t)((buf[5]) << 8) | buf[4];
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccuocjhf.s 			page 8
+
+
+ 373:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->Gyro[1] = bmi088_raw_temp * BMI088_GYRO_SEN - bmi088->GyroOffset[1];
+ 374:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088_raw_temp = (int16_t)((buf[7]) << 8) | buf[6];
+ 375:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->Gyro[2] = bmi088_raw_temp * BMI088_GYRO_SEN - bmi088->GyroOffset[2];
+ 376:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         }
+ 377:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         else
+ 378:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         {
+ 379:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088_raw_temp = (int16_t)((buf[3]) << 8) | buf[2];
+ 380:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->Gyro[0] = bmi088_raw_temp * BMI088_GYRO_SEN;
+ 381:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088_raw_temp = (int16_t)((buf[5]) << 8) | buf[4];
+ 382:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->Gyro[1] = bmi088_raw_temp * BMI088_GYRO_SEN;
+ 383:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088_raw_temp = (int16_t)((buf[7]) << 8) | buf[6];
+ 384:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->Gyro[2] = bmi088_raw_temp * BMI088_GYRO_SEN;
+ 385:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         }
+ 386:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     }
+ 387:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     BMI088_accel_read_muli_reg(BMI088_TEMP_M, buf, 2);
+ 388:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 389:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     bmi088_raw_temp = (int16_t)((buf[0] << 3) | (buf[1] >> 5));
+ 390:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 391:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     if (bmi088_raw_temp > 1023)
+ 392:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     {
+ 393:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         bmi088_raw_temp -= 2048;
+ 394:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     }
+ 395:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 396:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     bmi088->Temperature = bmi088_raw_temp * BMI088_TEMP_FACTOR + BMI088_TEMP_OFFSET;
+ 397:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** }
+ 398:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 399:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** #if defined(BMI088_USE_SPI)
+ 400:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 401:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** static void BMI088_write_single_reg(uint8_t reg, uint8_t data)
+ 402:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** {
+ 403:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     BMI088_read_write_byte(reg);
+ 404:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     BMI088_read_write_byte(data);
+ 405:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** }
+ 406:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 407:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** static void BMI088_read_single_reg(uint8_t reg, uint8_t *return_data)
+ 408:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** {
+ 409:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     BMI088_read_write_byte(reg | 0x80);
+ 410:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     *return_data = BMI088_read_write_byte(0x55);
+ 411:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** }
+ 412:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 413:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** // static void BMI088_write_muli_reg(uint8_t reg, uint8_t* buf, uint8_t len )
+ 414:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** //{
+ 415:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** //     BMI088_read_write_byte( reg );
+ 416:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** //     while( len != 0 )
+ 417:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** //     {
+ 418:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 419:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** //        BMI088_read_write_byte( *buf );
+ 420:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** //        buf ++;
+ 421:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** //        len --;
+ 422:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** //    }
+ 423:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 424:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** //}
+ 425:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 426:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** static void BMI088_read_muli_reg(uint8_t reg, uint8_t *buf, uint8_t len)
+ 427:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** {
+  29              		.loc 1 427 1 view -0
+  30              		.cfi_startproc
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccuocjhf.s 			page 9
+
+
+  31              		@ args = 0, pretend = 0, frame = 0
+  32              		@ frame_needed = 0, uses_anonymous_args = 0
+  33              		.loc 1 427 1 is_stmt 0 view .LVU1
+  34 0000 38B5     		push	{r3, r4, r5, lr}
+  35              	.LCFI0:
+  36              		.cfi_def_cfa_offset 16
+  37              		.cfi_offset 3, -16
+  38              		.cfi_offset 4, -12
+  39              		.cfi_offset 5, -8
+  40              		.cfi_offset 14, -4
+  41 0002 0D46     		mov	r5, r1
+  42 0004 1446     		mov	r4, r2
+ 428:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     BMI088_read_write_byte(reg | 0x80);
+  43              		.loc 1 428 5 is_stmt 1 view .LVU2
+  44 0006 40F08000 		orr	r0, r0, #128
+  45              	.LVL1:
+  46              		.loc 1 428 5 is_stmt 0 view .LVU3
+  47 000a FFF7FEFF 		bl	BMI088_read_write_byte
+  48              	.LVL2:
+ 429:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 430:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     while (len != 0)
+  49              		.loc 1 430 5 is_stmt 1 view .LVU4
+  50              		.loc 1 430 11 is_stmt 0 view .LVU5
+  51 000e 06E0     		b	.L2
+  52              	.LVL3:
+  53              	.L3:
+ 431:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     {
+ 432:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 433:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         *buf = BMI088_read_write_byte(0x55);
+  54              		.loc 1 433 9 is_stmt 1 view .LVU6
+  55              		.loc 1 433 16 is_stmt 0 view .LVU7
+  56 0010 5520     		movs	r0, #85
+  57 0012 FFF7FEFF 		bl	BMI088_read_write_byte
+  58              	.LVL4:
+  59              		.loc 1 433 14 view .LVU8
+  60 0016 05F8010B 		strb	r0, [r5], #1
+  61              	.LVL5:
+ 434:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         buf++;
+  62              		.loc 1 434 9 is_stmt 1 view .LVU9
+ 435:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         len--;
+  63              		.loc 1 435 9 view .LVU10
+  64              		.loc 1 435 12 is_stmt 0 view .LVU11
+  65 001a 013C     		subs	r4, r4, #1
+  66              	.LVL6:
+  67              		.loc 1 435 12 view .LVU12
+  68 001c E4B2     		uxtb	r4, r4
+  69              	.LVL7:
+  70              	.L2:
+ 430:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     {
+  71              		.loc 1 430 11 is_stmt 1 view .LVU13
+  72 001e 002C     		cmp	r4, #0
+  73 0020 F6D1     		bne	.L3
+ 436:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     }
+ 437:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** }
+  74              		.loc 1 437 1 is_stmt 0 view .LVU14
+  75 0022 38BD     		pop	{r3, r4, r5, pc}
+  76              		.loc 1 437 1 view .LVU15
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccuocjhf.s 			page 10
+
+
+  77              		.cfi_endproc
+  78              	.LFE138:
+  80              		.section	.text.BMI088_write_single_reg,"ax",%progbits
+  81              		.align	1
+  82              		.syntax unified
+  83              		.thumb
+  84              		.thumb_func
+  86              	BMI088_write_single_reg:
+  87              	.LVL8:
+  88              	.LFB136:
+ 402:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     BMI088_read_write_byte(reg);
+  89              		.loc 1 402 1 is_stmt 1 view -0
+  90              		.cfi_startproc
+  91              		@ args = 0, pretend = 0, frame = 0
+  92              		@ frame_needed = 0, uses_anonymous_args = 0
+ 402:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     BMI088_read_write_byte(reg);
+  93              		.loc 1 402 1 is_stmt 0 view .LVU17
+  94 0000 10B5     		push	{r4, lr}
+  95              	.LCFI1:
+  96              		.cfi_def_cfa_offset 8
+  97              		.cfi_offset 4, -8
+  98              		.cfi_offset 14, -4
+  99 0002 0C46     		mov	r4, r1
+ 403:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     BMI088_read_write_byte(data);
+ 100              		.loc 1 403 5 is_stmt 1 view .LVU18
+ 101 0004 FFF7FEFF 		bl	BMI088_read_write_byte
+ 102              	.LVL9:
+ 404:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** }
+ 103              		.loc 1 404 5 view .LVU19
+ 104 0008 2046     		mov	r0, r4
+ 105 000a FFF7FEFF 		bl	BMI088_read_write_byte
+ 106              	.LVL10:
+ 405:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 107              		.loc 1 405 1 is_stmt 0 view .LVU20
+ 108 000e 10BD     		pop	{r4, pc}
+ 109              		.cfi_endproc
+ 110              	.LFE136:
+ 112              		.section	.text.BMI088_read_single_reg,"ax",%progbits
+ 113              		.align	1
+ 114              		.syntax unified
+ 115              		.thumb
+ 116              		.thumb_func
+ 118              	BMI088_read_single_reg:
+ 119              	.LVL11:
+ 120              	.LFB137:
+ 408:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     BMI088_read_write_byte(reg | 0x80);
+ 121              		.loc 1 408 1 is_stmt 1 view -0
+ 122              		.cfi_startproc
+ 123              		@ args = 0, pretend = 0, frame = 0
+ 124              		@ frame_needed = 0, uses_anonymous_args = 0
+ 408:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     BMI088_read_write_byte(reg | 0x80);
+ 125              		.loc 1 408 1 is_stmt 0 view .LVU22
+ 126 0000 10B5     		push	{r4, lr}
+ 127              	.LCFI2:
+ 128              		.cfi_def_cfa_offset 8
+ 129              		.cfi_offset 4, -8
+ 130              		.cfi_offset 14, -4
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccuocjhf.s 			page 11
+
+
+ 131 0002 0C46     		mov	r4, r1
+ 409:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     *return_data = BMI088_read_write_byte(0x55);
+ 132              		.loc 1 409 5 is_stmt 1 view .LVU23
+ 133 0004 40F08000 		orr	r0, r0, #128
+ 134              	.LVL12:
+ 409:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     *return_data = BMI088_read_write_byte(0x55);
+ 135              		.loc 1 409 5 is_stmt 0 view .LVU24
+ 136 0008 FFF7FEFF 		bl	BMI088_read_write_byte
+ 137              	.LVL13:
+ 410:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** }
+ 138              		.loc 1 410 5 is_stmt 1 view .LVU25
+ 410:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** }
+ 139              		.loc 1 410 20 is_stmt 0 view .LVU26
+ 140 000c 5520     		movs	r0, #85
+ 141 000e FFF7FEFF 		bl	BMI088_read_write_byte
+ 142              	.LVL14:
+ 410:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** }
+ 143              		.loc 1 410 18 view .LVU27
+ 144 0012 2070     		strb	r0, [r4]
+ 411:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 145              		.loc 1 411 1 view .LVU28
+ 146 0014 10BD     		pop	{r4, pc}
+ 411:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 147              		.loc 1 411 1 view .LVU29
+ 148              		.cfi_endproc
+ 149              	.LFE137:
+ 151              		.section	.text.Calibrate_MPU_Offset,"ax",%progbits
+ 152              		.align	1
+ 153              		.syntax unified
+ 154              		.thumb
+ 155              		.thumb_func
+ 157              	Calibrate_MPU_Offset:
+ 158              	.LVL15:
+ 159              	.LFB132:
+ 143:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     static float startTime;
+ 160              		.loc 1 143 1 is_stmt 1 view -0
+ 161              		.cfi_startproc
+ 162              		@ args = 0, pretend = 0, frame = 32
+ 163              		@ frame_needed = 0, uses_anonymous_args = 0
+ 143:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     static float startTime;
+ 164              		.loc 1 143 1 is_stmt 0 view .LVU31
+ 165 0000 30B5     		push	{r4, r5, lr}
+ 166              	.LCFI3:
+ 167              		.cfi_def_cfa_offset 12
+ 168              		.cfi_offset 4, -12
+ 169              		.cfi_offset 5, -8
+ 170              		.cfi_offset 14, -4
+ 171 0002 2DED048B 		vpush.64	{d8, d9}
+ 172              	.LCFI4:
+ 173              		.cfi_def_cfa_offset 28
+ 174              		.cfi_offset 80, -28
+ 175              		.cfi_offset 81, -24
+ 176              		.cfi_offset 82, -20
+ 177              		.cfi_offset 83, -16
+ 178 0006 89B0     		sub	sp, sp, #36
+ 179              	.LCFI5:
+ 180              		.cfi_def_cfa_offset 64
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccuocjhf.s 			page 12
+
+
+ 181 0008 0446     		mov	r4, r0
+ 144:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     static uint16_t CaliTimes = 6000; // 需要足够多的数据才能得到有效陀螺仪零偏校准结果
+ 182              		.loc 1 144 5 is_stmt 1 view .LVU32
+ 145:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     uint8_t buf[8] = {0, 0, 0, 0, 0, 0};
+ 183              		.loc 1 145 5 view .LVU33
+ 146:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     int16_t bmi088_raw_temp;
+ 184              		.loc 1 146 5 view .LVU34
+ 146:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     int16_t bmi088_raw_temp;
+ 185              		.loc 1 146 13 is_stmt 0 view .LVU35
+ 186 000a C54B     		ldr	r3, .L49
+ 187 000c 93E80300 		ldm	r3, {r0, r1}
+ 188              	.LVL16:
+ 146:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     int16_t bmi088_raw_temp;
+ 189              		.loc 1 146 13 view .LVU36
+ 190 0010 0690     		str	r0, [sp, #24]
+ 191 0012 ADF81C10 		strh	r1, [sp, #28]	@ movhi
+ 192 0016 090C     		lsrs	r1, r1, #16
+ 193 0018 8DF81E10 		strb	r1, [sp, #30]
+ 194 001c 0023     		movs	r3, #0
+ 195 001e 8DF81F30 		strb	r3, [sp, #31]
+ 147:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     float gyroMax[3], gyroMin[3];
+ 196              		.loc 1 147 5 is_stmt 1 view .LVU37
+ 148:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     float gNormTemp, gNormMax, gNormMin;
+ 197              		.loc 1 148 5 view .LVU38
+ 149:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 198              		.loc 1 149 5 view .LVU39
+ 151:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     do
+ 199              		.loc 1 151 5 view .LVU40
+ 151:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     do
+ 200              		.loc 1 151 17 is_stmt 0 view .LVU41
+ 201 0022 FFF7FEFF 		bl	DWT_GetTimeline_s
+ 202              	.LVL17:
+ 151:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     do
+ 203              		.loc 1 151 15 view .LVU42
+ 204 0026 BF4B     		ldr	r3, .L49+4
+ 205 0028 83ED000A 		vstr.32	s0, [r3]
+ 206              	.L34:
+ 207              	.LVL18:
+ 152:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     {
+ 208              		.loc 1 152 5 is_stmt 1 view .LVU43
+ 154:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         {
+ 209              		.loc 1 154 9 view .LVU44
+ 154:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         {
+ 210              		.loc 1 154 13 is_stmt 0 view .LVU45
+ 211 002c FFF7FEFF 		bl	DWT_GetTimeline_s
+ 212              	.LVL19:
+ 154:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         {
+ 213              		.loc 1 154 33 view .LVU46
+ 214 0030 BC4B     		ldr	r3, .L49+4
+ 215 0032 D3ED007A 		vldr.32	s15, [r3]
+ 216 0036 30EE670A 		vsub.f32	s0, s0, s15
+ 154:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         {
+ 217              		.loc 1 154 12 view .LVU47
+ 218 003a F2EE047A 		vmov.f32	s15, #1.0e+1
+ 219 003e B4EEE70A 		vcmpe.f32	s0, s15
+ 220 0042 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 221 0046 0CDC     		bgt	.L44
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccuocjhf.s 			page 13
+
+
+ 165:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         bmi088->gNorm = 0;
+ 222              		.loc 1 165 9 is_stmt 1 view .LVU48
+ 223 0048 9FEDB70A 		vldr.32	s0, .L49+8
+ 224 004c FFF7FEFF 		bl	DWT_Delay
+ 225              	.LVL20:
+ 166:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         bmi088->GyroOffset[0] = 0;
+ 226              		.loc 1 166 9 view .LVU49
+ 166:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         bmi088->GyroOffset[0] = 0;
+ 227              		.loc 1 166 23 is_stmt 0 view .LVU50
+ 228 0050 0023     		movs	r3, #0
+ 229 0052 2363     		str	r3, [r4, #48]	@ float
+ 167:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         bmi088->GyroOffset[1] = 0;
+ 230              		.loc 1 167 9 is_stmt 1 view .LVU51
+ 167:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         bmi088->GyroOffset[1] = 0;
+ 231              		.loc 1 167 31 is_stmt 0 view .LVU52
+ 232 0054 6362     		str	r3, [r4, #36]	@ float
+ 168:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         bmi088->GyroOffset[2] = 0;
+ 233              		.loc 1 168 9 is_stmt 1 view .LVU53
+ 168:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         bmi088->GyroOffset[2] = 0;
+ 234              		.loc 1 168 31 is_stmt 0 view .LVU54
+ 235 0056 A362     		str	r3, [r4, #40]	@ float
+ 169:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 236              		.loc 1 169 9 is_stmt 1 view .LVU55
+ 169:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 237              		.loc 1 169 31 is_stmt 0 view .LVU56
+ 238 0058 E362     		str	r3, [r4, #44]	@ float
+ 171:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         {
+ 239              		.loc 1 171 9 is_stmt 1 view .LVU57
+ 240              	.LBB2:
+ 171:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         {
+ 241              		.loc 1 171 14 view .LVU58
+ 242              	.LVL21:
+ 171:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         {
+ 243              		.loc 1 171 9 is_stmt 0 view .LVU59
+ 244 005a B0EE689A 		vmov.f32	s18, s17
+ 171:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         {
+ 245              		.loc 1 171 23 view .LVU60
+ 246 005e 0025     		movs	r5, #0
+ 171:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         {
+ 247              		.loc 1 171 9 view .LVU61
+ 248 0060 DBE0     		b	.L13
+ 249              	.LVL22:
+ 250              	.L44:
+ 171:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         {
+ 251              		.loc 1 171 9 view .LVU62
+ 252              	.LBE2:
+ 157:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->GyroOffset[1] = GyOFFSET;
+ 253              		.loc 1 157 13 is_stmt 1 view .LVU63
+ 157:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->GyroOffset[1] = GyOFFSET;
+ 254              		.loc 1 157 35 is_stmt 0 view .LVU64
+ 255 0062 B24B     		ldr	r3, .L49+12
+ 256 0064 6362     		str	r3, [r4, #36]	@ float
+ 158:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->GyroOffset[2] = GzOFFSET;
+ 257              		.loc 1 158 13 is_stmt 1 view .LVU65
+ 158:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->GyroOffset[2] = GzOFFSET;
+ 258              		.loc 1 158 35 is_stmt 0 view .LVU66
+ 259 0066 B24B     		ldr	r3, .L49+16
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccuocjhf.s 			page 14
+
+
+ 260 0068 A362     		str	r3, [r4, #40]	@ float
+ 159:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->gNorm = gNORM;
+ 261              		.loc 1 159 13 is_stmt 1 view .LVU67
+ 159:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->gNorm = gNORM;
+ 262              		.loc 1 159 35 is_stmt 0 view .LVU68
+ 263 006a B24B     		ldr	r3, .L49+20
+ 264 006c E362     		str	r3, [r4, #44]	@ float
+ 160:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->TempWhenCali = 40;
+ 265              		.loc 1 160 13 is_stmt 1 view .LVU69
+ 160:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->TempWhenCali = 40;
+ 266              		.loc 1 160 27 is_stmt 0 view .LVU70
+ 267 006e B24B     		ldr	r3, .L49+24
+ 268 0070 2363     		str	r3, [r4, #48]	@ float
+ 161:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             break;
+ 269              		.loc 1 161 13 is_stmt 1 view .LVU71
+ 161:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             break;
+ 270              		.loc 1 161 34 is_stmt 0 view .LVU72
+ 271 0072 B24B     		ldr	r3, .L49+28
+ 272 0074 A361     		str	r3, [r4, #24]	@ float
+ 162:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         }
+ 273              		.loc 1 162 13 is_stmt 1 view .LVU73
+ 274              	.L12:
+ 260:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** }
+ 275              		.loc 1 260 5 view .LVU74
+ 260:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** }
+ 276              		.loc 1 260 40 is_stmt 0 view .LVU75
+ 277 0076 94ED0C7A 		vldr.32	s14, [r4, #48]
+ 260:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** }
+ 278              		.loc 1 260 32 view .LVU76
+ 279 007a DFEDB16A 		vldr.32	s13, .L49+32
+ 280 007e C6EE877A 		vdiv.f32	s15, s13, s14
+ 260:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** }
+ 281              		.loc 1 260 24 view .LVU77
+ 282 0082 C4ED087A 		vstr.32	s15, [r4, #32]
+ 261:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 283              		.loc 1 261 1 view .LVU78
+ 284 0086 09B0     		add	sp, sp, #36
+ 285              	.LCFI6:
+ 286              		.cfi_remember_state
+ 287              		.cfi_def_cfa_offset 28
+ 288              		@ sp needed
+ 289 0088 BDEC048B 		vldm	sp!, {d8-d9}
+ 290              	.LCFI7:
+ 291              		.cfi_restore 82
+ 292              		.cfi_restore 83
+ 293              		.cfi_restore 80
+ 294              		.cfi_restore 81
+ 295              		.cfi_def_cfa_offset 12
+ 296              	.LVL23:
+ 261:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 297              		.loc 1 261 1 view .LVU79
+ 298 008c 30BD     		pop	{r4, r5, pc}
+ 299              	.LVL24:
+ 300              	.L48:
+ 301              	.LCFI8:
+ 302              		.cfi_restore_state
+ 303              	.LBB8:
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccuocjhf.s 			page 15
+
+
+ 188:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 bmi088->Gyro[0] = bmi088_raw_temp * BMI088_GYRO_SEN;
+ 304              		.loc 1 188 17 is_stmt 1 view .LVU80
+ 188:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 bmi088->Gyro[0] = bmi088_raw_temp * BMI088_GYRO_SEN;
+ 305              		.loc 1 188 49 is_stmt 0 view .LVU81
+ 306 008e 9DF81B30 		ldrb	r3, [sp, #27]	@ zero_extendqisi2
+ 188:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 bmi088->Gyro[0] = bmi088_raw_temp * BMI088_GYRO_SEN;
+ 307              		.loc 1 188 54 view .LVU82
+ 308 0092 1B02     		lsls	r3, r3, #8
+ 188:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 bmi088->Gyro[0] = bmi088_raw_temp * BMI088_GYRO_SEN;
+ 309              		.loc 1 188 35 view .LVU83
+ 310 0094 1BB2     		sxth	r3, r3
+ 188:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 bmi088->Gyro[0] = bmi088_raw_temp * BMI088_GYRO_SEN;
+ 311              		.loc 1 188 65 view .LVU84
+ 312 0096 9DF81A20 		ldrb	r2, [sp, #26]	@ zero_extendqisi2
+ 188:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 bmi088->Gyro[0] = bmi088_raw_temp * BMI088_GYRO_SEN;
+ 313              		.loc 1 188 33 view .LVU85
+ 314 009a 1343     		orrs	r3, r3, r2
+ 315 009c 07EE103A 		vmov	s14, r3	@ int
+ 316              	.LVL25:
+ 189:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 bmi088->GyroOffset[0] += bmi088->Gyro[0];
+ 317              		.loc 1 189 17 is_stmt 1 view .LVU86
+ 189:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 bmi088->GyroOffset[0] += bmi088->Gyro[0];
+ 318              		.loc 1 189 51 is_stmt 0 view .LVU87
+ 319 00a0 A84B     		ldr	r3, .L49+36
+ 320 00a2 D3ED006A 		vldr.32	s13, [r3]
+ 321 00a6 B8EEC77A 		vcvt.f32.s32	s14, s14
+ 322              	.LVL26:
+ 189:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 bmi088->GyroOffset[0] += bmi088->Gyro[0];
+ 323              		.loc 1 189 51 view .LVU88
+ 324 00aa 27EE267A 		vmul.f32	s14, s14, s13
+ 189:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 bmi088->GyroOffset[0] += bmi088->Gyro[0];
+ 325              		.loc 1 189 33 view .LVU89
+ 326 00ae 84ED037A 		vstr.32	s14, [r4, #12]
+ 190:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 bmi088_raw_temp = (int16_t)((buf[5]) << 8) | buf[4];
+ 327              		.loc 1 190 17 is_stmt 1 view .LVU90
+ 190:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 bmi088_raw_temp = (int16_t)((buf[5]) << 8) | buf[4];
+ 328              		.loc 1 190 39 is_stmt 0 view .LVU91
+ 329 00b2 D4ED097A 		vldr.32	s15, [r4, #36]
+ 330 00b6 37EE877A 		vadd.f32	s14, s15, s14
+ 331 00ba 84ED097A 		vstr.32	s14, [r4, #36]
+ 191:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 bmi088->Gyro[1] = bmi088_raw_temp * BMI088_GYRO_SEN;
+ 332              		.loc 1 191 17 is_stmt 1 view .LVU92
+ 191:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 bmi088->Gyro[1] = bmi088_raw_temp * BMI088_GYRO_SEN;
+ 333              		.loc 1 191 49 is_stmt 0 view .LVU93
+ 334 00be 9DF81D30 		ldrb	r3, [sp, #29]	@ zero_extendqisi2
+ 191:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 bmi088->Gyro[1] = bmi088_raw_temp * BMI088_GYRO_SEN;
+ 335              		.loc 1 191 54 view .LVU94
+ 336 00c2 1B02     		lsls	r3, r3, #8
+ 191:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 bmi088->Gyro[1] = bmi088_raw_temp * BMI088_GYRO_SEN;
+ 337              		.loc 1 191 35 view .LVU95
+ 338 00c4 1BB2     		sxth	r3, r3
+ 191:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 bmi088->Gyro[1] = bmi088_raw_temp * BMI088_GYRO_SEN;
+ 339              		.loc 1 191 65 view .LVU96
+ 340 00c6 9DF81C20 		ldrb	r2, [sp, #28]	@ zero_extendqisi2
+ 341              	.LVL27:
+ 191:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 bmi088->Gyro[1] = bmi088_raw_temp * BMI088_GYRO_SEN;
+ 342              		.loc 1 191 33 view .LVU97
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccuocjhf.s 			page 16
+
+
+ 343 00ca 1343     		orrs	r3, r3, r2
+ 344 00cc 07EE103A 		vmov	s14, r3	@ int
+ 345              	.LVL28:
+ 192:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 bmi088->GyroOffset[1] += bmi088->Gyro[1];
+ 346              		.loc 1 192 17 is_stmt 1 view .LVU98
+ 192:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 bmi088->GyroOffset[1] += bmi088->Gyro[1];
+ 347              		.loc 1 192 51 is_stmt 0 view .LVU99
+ 348 00d0 B8EEC77A 		vcvt.f32.s32	s14, s14
+ 349              	.LVL29:
+ 192:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 bmi088->GyroOffset[1] += bmi088->Gyro[1];
+ 350              		.loc 1 192 51 view .LVU100
+ 351 00d4 27EE267A 		vmul.f32	s14, s14, s13
+ 192:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 bmi088->GyroOffset[1] += bmi088->Gyro[1];
+ 352              		.loc 1 192 33 view .LVU101
+ 353 00d8 84ED047A 		vstr.32	s14, [r4, #16]
+ 193:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 bmi088_raw_temp = (int16_t)((buf[7]) << 8) | buf[6];
+ 354              		.loc 1 193 17 is_stmt 1 view .LVU102
+ 193:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 bmi088_raw_temp = (int16_t)((buf[7]) << 8) | buf[6];
+ 355              		.loc 1 193 39 is_stmt 0 view .LVU103
+ 356 00dc D4ED0A7A 		vldr.32	s15, [r4, #40]
+ 357 00e0 37EE877A 		vadd.f32	s14, s15, s14
+ 358 00e4 84ED0A7A 		vstr.32	s14, [r4, #40]
+ 194:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 bmi088->Gyro[2] = bmi088_raw_temp * BMI088_GYRO_SEN;
+ 359              		.loc 1 194 17 is_stmt 1 view .LVU104
+ 194:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 bmi088->Gyro[2] = bmi088_raw_temp * BMI088_GYRO_SEN;
+ 360              		.loc 1 194 49 is_stmt 0 view .LVU105
+ 361 00e8 9DF81F30 		ldrb	r3, [sp, #31]	@ zero_extendqisi2
+ 362              	.LVL30:
+ 194:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 bmi088->Gyro[2] = bmi088_raw_temp * BMI088_GYRO_SEN;
+ 363              		.loc 1 194 54 view .LVU106
+ 364 00ec 1B02     		lsls	r3, r3, #8
+ 194:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 bmi088->Gyro[2] = bmi088_raw_temp * BMI088_GYRO_SEN;
+ 365              		.loc 1 194 35 view .LVU107
+ 366 00ee 1BB2     		sxth	r3, r3
+ 194:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 bmi088->Gyro[2] = bmi088_raw_temp * BMI088_GYRO_SEN;
+ 367              		.loc 1 194 65 view .LVU108
+ 368 00f0 9DF81E20 		ldrb	r2, [sp, #30]	@ zero_extendqisi2
+ 369              	.LVL31:
+ 194:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 bmi088->Gyro[2] = bmi088_raw_temp * BMI088_GYRO_SEN;
+ 370              		.loc 1 194 33 view .LVU109
+ 371 00f4 1343     		orrs	r3, r3, r2
+ 372 00f6 07EE903A 		vmov	s15, r3	@ int
+ 373              	.LVL32:
+ 195:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 bmi088->GyroOffset[2] += bmi088->Gyro[2];
+ 374              		.loc 1 195 17 is_stmt 1 view .LVU110
+ 195:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 bmi088->GyroOffset[2] += bmi088->Gyro[2];
+ 375              		.loc 1 195 51 is_stmt 0 view .LVU111
+ 376 00fa F8EEE77A 		vcvt.f32.s32	s15, s15
+ 377              	.LVL33:
+ 195:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 bmi088->GyroOffset[2] += bmi088->Gyro[2];
+ 378              		.loc 1 195 51 view .LVU112
+ 379 00fe 67EEA67A 		vmul.f32	s15, s15, s13
+ 195:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 bmi088->GyroOffset[2] += bmi088->Gyro[2];
+ 380              		.loc 1 195 33 view .LVU113
+ 381 0102 C4ED057A 		vstr.32	s15, [r4, #20]
+ 196:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             }
+ 382              		.loc 1 196 17 is_stmt 1 view .LVU114
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccuocjhf.s 			page 17
+
+
+ 196:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             }
+ 383              		.loc 1 196 39 is_stmt 0 view .LVU115
+ 384 0106 94ED0B7A 		vldr.32	s14, [r4, #44]
+ 385 010a 77EE277A 		vadd.f32	s15, s14, s15
+ 386 010e C4ED0B7A 		vstr.32	s15, [r4, #44]
+ 387 0112 E6E0     		b	.L14
+ 388              	.LVL34:
+ 389              	.L35:
+ 390              	.LBB3:
+ 204:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 {
+ 391              		.loc 1 204 30 view .LVU116
+ 392 0114 0023     		movs	r3, #0
+ 393              	.LVL35:
+ 394              	.L15:
+ 204:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 {
+ 395              		.loc 1 204 37 is_stmt 1 discriminator 1 view .LVU117
+ 204:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 {
+ 396              		.loc 1 204 17 is_stmt 0 discriminator 1 view .LVU118
+ 397 0116 022B     		cmp	r3, #2
+ 398 0118 0DD8     		bhi	.L45
+ 206:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                     gyroMin[j] = bmi088->Gyro[j];
+ 399              		.loc 1 206 21 is_stmt 1 discriminator 3 view .LVU119
+ 206:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                     gyroMin[j] = bmi088->Gyro[j];
+ 400              		.loc 1 206 46 is_stmt 0 discriminator 3 view .LVU120
+ 401 011a 9A1C     		adds	r2, r3, #2
+ 402 011c 04EB8202 		add	r2, r4, r2, lsl #2
+ 403 0120 5168     		ldr	r1, [r2, #4]	@ float
+ 206:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                     gyroMin[j] = bmi088->Gyro[j];
+ 404              		.loc 1 206 32 discriminator 3 view .LVU121
+ 405 0122 08AA     		add	r2, sp, #32
+ 406 0124 02EB8302 		add	r2, r2, r3, lsl #2
+ 407 0128 42F8141C 		str	r1, [r2, #-20]	@ float
+ 207:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 }
+ 408              		.loc 1 207 21 is_stmt 1 discriminator 3 view .LVU122
+ 207:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 }
+ 409              		.loc 1 207 32 is_stmt 0 discriminator 3 view .LVU123
+ 410 012c 42F8201C 		str	r1, [r2, #-32]	@ float
+ 204:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 {
+ 411              		.loc 1 204 44 is_stmt 1 discriminator 3 view .LVU124
+ 204:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 {
+ 412              		.loc 1 204 45 is_stmt 0 discriminator 3 view .LVU125
+ 413 0130 0133     		adds	r3, r3, #1
+ 414              	.LVL36:
+ 204:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 {
+ 415              		.loc 1 204 45 discriminator 3 view .LVU126
+ 416 0132 DBB2     		uxtb	r3, r3
+ 417              	.LVL37:
+ 204:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 {
+ 418              		.loc 1 204 45 discriminator 3 view .LVU127
+ 419 0134 EFE7     		b	.L15
+ 420              	.L45:
+ 204:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 {
+ 421              		.loc 1 204 45 discriminator 3 view .LVU128
+ 422              	.LBE3:
+ 203:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 for (uint8_t j = 0; j < 3; j++)
+ 423              		.loc 1 203 26 view .LVU129
+ 424 0136 B0EE688A 		vmov.f32	s16, s17
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccuocjhf.s 			page 18
+
+
+ 425              	.LVL38:
+ 426              	.L18:
+ 226:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             for (uint8_t j = 0; j < 3; j++)
+ 427              		.loc 1 226 13 is_stmt 1 view .LVU130
+ 226:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             for (uint8_t j = 0; j < 3; j++)
+ 428              		.loc 1 226 34 is_stmt 0 view .LVU131
+ 429 013a 78EEC86A 		vsub.f32	s13, s17, s16
+ 226:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             for (uint8_t j = 0; j < 3; j++)
+ 430              		.loc 1 226 23 view .LVU132
+ 431 013e 824B     		ldr	r3, .L49+40
+ 432 0140 C3ED006A 		vstr.32	s13, [r3]
+ 227:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 gyroDiff[j] = gyroMax[j] - gyroMin[j];
+ 433              		.loc 1 227 13 is_stmt 1 view .LVU133
+ 434              	.LBB4:
+ 227:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 gyroDiff[j] = gyroMax[j] - gyroMin[j];
+ 435              		.loc 1 227 18 view .LVU134
+ 436              	.LVL39:
+ 227:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 gyroDiff[j] = gyroMax[j] - gyroMin[j];
+ 437              		.loc 1 227 26 is_stmt 0 view .LVU135
+ 438 0144 0023     		movs	r3, #0
+ 227:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 gyroDiff[j] = gyroMax[j] - gyroMin[j];
+ 439              		.loc 1 227 13 view .LVU136
+ 440 0146 3BE0     		b	.L27
+ 441              	.LVL40:
+ 442              	.L24:
+ 227:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 gyroDiff[j] = gyroMax[j] - gyroMin[j];
+ 443              		.loc 1 227 13 view .LVU137
+ 444              	.LBE4:
+ 445              	.LBB5:
+ 216:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 {
+ 446              		.loc 1 216 44 is_stmt 1 discriminator 2 view .LVU138
+ 216:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 {
+ 447              		.loc 1 216 45 is_stmt 0 discriminator 2 view .LVU139
+ 448 0148 0133     		adds	r3, r3, #1
+ 449              	.LVL41:
+ 216:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 {
+ 450              		.loc 1 216 45 discriminator 2 view .LVU140
+ 451 014a DBB2     		uxtb	r3, r3
+ 452              	.LVL42:
+ 453              	.L21:
+ 216:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 {
+ 454              		.loc 1 216 37 is_stmt 1 discriminator 1 view .LVU141
+ 216:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 {
+ 455              		.loc 1 216 17 is_stmt 0 discriminator 1 view .LVU142
+ 456 014c 022B     		cmp	r3, #2
+ 457 014e 24D8     		bhi	.L46
+ 218:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                         gyroMax[j] = bmi088->Gyro[j];
+ 458              		.loc 1 218 21 is_stmt 1 view .LVU143
+ 218:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                         gyroMax[j] = bmi088->Gyro[j];
+ 459              		.loc 1 218 37 is_stmt 0 view .LVU144
+ 460 0150 1946     		mov	r1, r3
+ 461 0152 9A1C     		adds	r2, r3, #2
+ 462 0154 04EB8202 		add	r2, r4, r2, lsl #2
+ 463 0158 D2ED017A 		vldr.32	s15, [r2, #4]
+ 218:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                         gyroMax[j] = bmi088->Gyro[j];
+ 464              		.loc 1 218 50 view .LVU145
+ 465 015c 08AA     		add	r2, sp, #32
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccuocjhf.s 			page 19
+
+
+ 466 015e 02EB8302 		add	r2, r2, r3, lsl #2
+ 467 0162 12ED057A 		vldr.32	s14, [r2, #-20]
+ 218:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                         gyroMax[j] = bmi088->Gyro[j];
+ 468              		.loc 1 218 24 view .LVU146
+ 469 0166 F4EEC77A 		vcmpe.f32	s15, s14
+ 470 016a F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 471 016e 04DD     		ble	.L22
+ 219:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                     if (bmi088->Gyro[j] < gyroMin[j])
+ 472              		.loc 1 219 25 is_stmt 1 view .LVU147
+ 219:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                     if (bmi088->Gyro[j] < gyroMin[j])
+ 473              		.loc 1 219 36 is_stmt 0 view .LVU148
+ 474 0170 08AA     		add	r2, sp, #32
+ 475 0172 02EB8302 		add	r2, r2, r3, lsl #2
+ 476 0176 42ED057A 		vstr.32	s15, [r2, #-20]
+ 477              	.L22:
+ 220:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                         gyroMin[j] = bmi088->Gyro[j];
+ 478              		.loc 1 220 21 is_stmt 1 view .LVU149
+ 220:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                         gyroMin[j] = bmi088->Gyro[j];
+ 479              		.loc 1 220 50 is_stmt 0 view .LVU150
+ 480 017a 08AA     		add	r2, sp, #32
+ 481 017c 02EB8102 		add	r2, r2, r1, lsl #2
+ 482 0180 12ED087A 		vldr.32	s14, [r2, #-32]
+ 220:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                         gyroMin[j] = bmi088->Gyro[j];
+ 483              		.loc 1 220 24 view .LVU151
+ 484 0184 F4EEC77A 		vcmpe.f32	s15, s14
+ 485 0188 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 486 018c DCD5     		bpl	.L24
+ 221:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 }
+ 487              		.loc 1 221 25 is_stmt 1 view .LVU152
+ 221:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 }
+ 488              		.loc 1 221 36 is_stmt 0 view .LVU153
+ 489 018e 08AA     		add	r2, sp, #32
+ 490 0190 02EB8101 		add	r1, r2, r1, lsl #2
+ 491 0194 41ED087A 		vstr.32	s15, [r1, #-32]
+ 492 0198 D6E7     		b	.L24
+ 493              	.L46:
+ 221:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 }
+ 494              		.loc 1 221 36 view .LVU154
+ 495 019a F0EE498A 		vmov.f32	s17, s18
+ 496              	.LVL43:
+ 221:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 }
+ 497              		.loc 1 221 36 view .LVU155
+ 498 019e CCE7     		b	.L18
+ 499              	.LVL44:
+ 500              	.L28:
+ 221:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 }
+ 501              		.loc 1 221 36 view .LVU156
+ 502              	.LBE5:
+ 503              	.LBB6:
+ 228:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             if (gNormDiff > 0.5f ||
+ 504              		.loc 1 228 17 is_stmt 1 discriminator 3 view .LVU157
+ 228:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             if (gNormDiff > 0.5f ||
+ 505              		.loc 1 228 38 is_stmt 0 discriminator 3 view .LVU158
+ 506 01a0 08AA     		add	r2, sp, #32
+ 507 01a2 02EB8302 		add	r2, r2, r3, lsl #2
+ 508 01a6 52ED057A 		vldr.32	s15, [r2, #-20]
+ 228:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             if (gNormDiff > 0.5f ||
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccuocjhf.s 			page 20
+
+
+ 509              		.loc 1 228 51 discriminator 3 view .LVU159
+ 510 01aa 12ED087A 		vldr.32	s14, [r2, #-32]
+ 228:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             if (gNormDiff > 0.5f ||
+ 511              		.loc 1 228 42 discriminator 3 view .LVU160
+ 512 01ae 77EEC77A 		vsub.f32	s15, s15, s14
+ 228:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             if (gNormDiff > 0.5f ||
+ 513              		.loc 1 228 29 discriminator 3 view .LVU161
+ 514 01b2 664A     		ldr	r2, .L49+44
+ 515 01b4 02EB8302 		add	r2, r2, r3, lsl #2
+ 516 01b8 C2ED007A 		vstr.32	s15, [r2]
+ 227:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 gyroDiff[j] = gyroMax[j] - gyroMin[j];
+ 517              		.loc 1 227 40 is_stmt 1 discriminator 3 view .LVU162
+ 227:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 gyroDiff[j] = gyroMax[j] - gyroMin[j];
+ 518              		.loc 1 227 41 is_stmt 0 discriminator 3 view .LVU163
+ 519 01bc 0133     		adds	r3, r3, #1
+ 520              	.LVL45:
+ 227:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 gyroDiff[j] = gyroMax[j] - gyroMin[j];
+ 521              		.loc 1 227 41 discriminator 3 view .LVU164
+ 522 01be DBB2     		uxtb	r3, r3
+ 523              	.LVL46:
+ 524              	.L27:
+ 227:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 gyroDiff[j] = gyroMax[j] - gyroMin[j];
+ 525              		.loc 1 227 33 is_stmt 1 discriminator 1 view .LVU165
+ 227:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 gyroDiff[j] = gyroMax[j] - gyroMin[j];
+ 526              		.loc 1 227 13 is_stmt 0 discriminator 1 view .LVU166
+ 527 01c0 022B     		cmp	r3, #2
+ 528 01c2 EDD9     		bls	.L28
+ 529              	.LBE6:
+ 229:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 gyroDiff[0] > 0.15f ||
+ 530              		.loc 1 229 13 is_stmt 1 view .LVU167
+ 229:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 gyroDiff[0] > 0.15f ||
+ 531              		.loc 1 229 16 is_stmt 0 view .LVU168
+ 532 01c4 F6EE007A 		vmov.f32	s15, #5.0e-1
+ 533 01c8 F4EEE76A 		vcmpe.f32	s13, s15
+ 534 01cc F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 535 01d0 00F39C80 		bgt	.L29
+ 230:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 gyroDiff[1] > 0.15f ||
+ 536              		.loc 1 230 25 discriminator 1 view .LVU169
+ 537 01d4 5D4B     		ldr	r3, .L49+44
+ 538              	.LVL47:
+ 230:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 gyroDiff[1] > 0.15f ||
+ 539              		.loc 1 230 25 discriminator 1 view .LVU170
+ 540 01d6 93ED007A 		vldr.32	s14, [r3]
+ 229:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 gyroDiff[0] > 0.15f ||
+ 541              		.loc 1 229 34 discriminator 1 view .LVU171
+ 542 01da DFED5D7A 		vldr.32	s15, .L49+48
+ 543 01de B4EEE77A 		vcmpe.f32	s14, s15
+ 544 01e2 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 545 01e6 00F39180 		bgt	.L29
+ 231:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 gyroDiff[2] > 0.15f)
+ 546              		.loc 1 231 25 view .LVU172
+ 547 01ea 93ED017A 		vldr.32	s14, [r3, #4]
+ 230:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 gyroDiff[1] > 0.15f ||
+ 548              		.loc 1 230 37 view .LVU173
+ 549 01ee B4EEE77A 		vcmpe.f32	s14, s15
+ 550 01f2 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 551 01f6 00F38980 		bgt	.L29
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccuocjhf.s 			page 21
+
+
+ 232:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 break;
+ 552              		.loc 1 232 25 view .LVU174
+ 553 01fa 93ED027A 		vldr.32	s14, [r3, #8]
+ 231:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 gyroDiff[2] > 0.15f)
+ 554              		.loc 1 231 37 view .LVU175
+ 555 01fe B4EEE77A 		vcmpe.f32	s14, s15
+ 556 0202 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 557 0206 00F38180 		bgt	.L29
+ 234:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         }
+ 558              		.loc 1 234 13 is_stmt 1 discriminator 2 view .LVU176
+ 559 020a 9FED520A 		vldr.32	s0, .L49+52
+ 560 020e FFF7FEFF 		bl	DWT_Delay
+ 561              	.LVL48:
+ 171:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         {
+ 562              		.loc 1 171 45 discriminator 2 view .LVU177
+ 171:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         {
+ 563              		.loc 1 171 46 is_stmt 0 discriminator 2 view .LVU178
+ 564 0212 0135     		adds	r5, r5, #1
+ 565              	.LVL49:
+ 171:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         {
+ 566              		.loc 1 171 46 discriminator 2 view .LVU179
+ 567 0214 ADB2     		uxth	r5, r5
+ 568              	.LVL50:
+ 171:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         {
+ 569              		.loc 1 171 46 discriminator 2 view .LVU180
+ 570 0216 B0EE689A 		vmov.f32	s18, s17
+ 571              	.LVL51:
+ 572              	.L13:
+ 171:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         {
+ 573              		.loc 1 171 30 is_stmt 1 discriminator 1 view .LVU181
+ 171:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         {
+ 574              		.loc 1 171 9 is_stmt 0 discriminator 1 view .LVU182
+ 575 021a 41F26F73 		movw	r3, #5999
+ 576 021e 9D42     		cmp	r5, r3
+ 577 0220 72D8     		bhi	.L47
+ 173:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088_raw_temp = (int16_t)((buf[1]) << 8) | buf[0];
+ 578              		.loc 1 173 13 is_stmt 1 view .LVU183
+ 579 0222 FFF7FEFF 		bl	BMI088_ACCEL_NS_L
+ 580              	.LVL52:
+ 173:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088_raw_temp = (int16_t)((buf[1]) << 8) | buf[0];
+ 581              		.loc 1 173 13 view .LVU184
+ 582 0226 9220     		movs	r0, #146
+ 583 0228 FFF7FEFF 		bl	BMI088_read_write_byte
+ 584              	.LVL53:
+ 173:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088_raw_temp = (int16_t)((buf[1]) << 8) | buf[0];
+ 585              		.loc 1 173 13 view .LVU185
+ 586 022c 0622     		movs	r2, #6
+ 587 022e 06A9     		add	r1, sp, #24
+ 588 0230 1220     		movs	r0, #18
+ 589 0232 FFF7FEFF 		bl	BMI088_read_muli_reg
+ 590              	.LVL54:
+ 173:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088_raw_temp = (int16_t)((buf[1]) << 8) | buf[0];
+ 591              		.loc 1 173 13 view .LVU186
+ 592 0236 FFF7FEFF 		bl	BMI088_ACCEL_NS_H
+ 593              	.LVL55:
+ 173:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088_raw_temp = (int16_t)((buf[1]) << 8) | buf[0];
+ 594              		.loc 1 173 68 view .LVU187
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccuocjhf.s 			page 22
+
+
+ 174:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->Accel[0] = bmi088_raw_temp * BMI088_ACCEL_SEN;
+ 595              		.loc 1 174 13 view .LVU188
+ 174:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->Accel[0] = bmi088_raw_temp * BMI088_ACCEL_SEN;
+ 596              		.loc 1 174 45 is_stmt 0 view .LVU189
+ 597 023a 9DF81930 		ldrb	r3, [sp, #25]	@ zero_extendqisi2
+ 174:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->Accel[0] = bmi088_raw_temp * BMI088_ACCEL_SEN;
+ 598              		.loc 1 174 50 view .LVU190
+ 599 023e 1B02     		lsls	r3, r3, #8
+ 174:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->Accel[0] = bmi088_raw_temp * BMI088_ACCEL_SEN;
+ 600              		.loc 1 174 31 view .LVU191
+ 601 0240 1BB2     		sxth	r3, r3
+ 174:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->Accel[0] = bmi088_raw_temp * BMI088_ACCEL_SEN;
+ 602              		.loc 1 174 61 view .LVU192
+ 603 0242 9DF81820 		ldrb	r2, [sp, #24]	@ zero_extendqisi2
+ 174:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->Accel[0] = bmi088_raw_temp * BMI088_ACCEL_SEN;
+ 604              		.loc 1 174 29 view .LVU193
+ 605 0246 1343     		orrs	r3, r3, r2
+ 606 0248 00EE103A 		vmov	s0, r3	@ int
+ 607              	.LVL56:
+ 175:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088_raw_temp = (int16_t)((buf[3]) << 8) | buf[2];
+ 608              		.loc 1 175 13 is_stmt 1 view .LVU194
+ 175:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088_raw_temp = (int16_t)((buf[3]) << 8) | buf[2];
+ 609              		.loc 1 175 48 is_stmt 0 view .LVU195
+ 610 024c B8EEC00A 		vcvt.f32.s32	s0, s0
+ 611              	.LVL57:
+ 175:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088_raw_temp = (int16_t)((buf[3]) << 8) | buf[2];
+ 612              		.loc 1 175 48 view .LVU196
+ 613 0250 414A     		ldr	r2, .L49+56
+ 614 0252 D2ED007A 		vldr.32	s15, [r2]
+ 615 0256 20EE270A 		vmul.f32	s0, s0, s15
+ 175:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088_raw_temp = (int16_t)((buf[3]) << 8) | buf[2];
+ 616              		.loc 1 175 30 view .LVU197
+ 617 025a 84ED000A 		vstr.32	s0, [r4]
+ 176:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->Accel[1] = bmi088_raw_temp * BMI088_ACCEL_SEN;
+ 618              		.loc 1 176 13 is_stmt 1 view .LVU198
+ 176:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->Accel[1] = bmi088_raw_temp * BMI088_ACCEL_SEN;
+ 619              		.loc 1 176 45 is_stmt 0 view .LVU199
+ 620 025e 9DF81B30 		ldrb	r3, [sp, #27]	@ zero_extendqisi2
+ 621              	.LVL58:
+ 176:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->Accel[1] = bmi088_raw_temp * BMI088_ACCEL_SEN;
+ 622              		.loc 1 176 50 view .LVU200
+ 623 0262 1B02     		lsls	r3, r3, #8
+ 176:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->Accel[1] = bmi088_raw_temp * BMI088_ACCEL_SEN;
+ 624              		.loc 1 176 31 view .LVU201
+ 625 0264 1BB2     		sxth	r3, r3
+ 176:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->Accel[1] = bmi088_raw_temp * BMI088_ACCEL_SEN;
+ 626              		.loc 1 176 61 view .LVU202
+ 627 0266 9DF81A10 		ldrb	r1, [sp, #26]	@ zero_extendqisi2
+ 176:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->Accel[1] = bmi088_raw_temp * BMI088_ACCEL_SEN;
+ 628              		.loc 1 176 29 view .LVU203
+ 629 026a 0B43     		orrs	r3, r3, r1
+ 630 026c 07EE103A 		vmov	s14, r3	@ int
+ 631              	.LVL59:
+ 177:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088_raw_temp = (int16_t)((buf[5]) << 8) | buf[4];
+ 632              		.loc 1 177 13 is_stmt 1 view .LVU204
+ 177:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088_raw_temp = (int16_t)((buf[5]) << 8) | buf[4];
+ 633              		.loc 1 177 48 is_stmt 0 view .LVU205
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccuocjhf.s 			page 23
+
+
+ 634 0270 D2ED006A 		vldr.32	s13, [r2]
+ 635 0274 B8EEC77A 		vcvt.f32.s32	s14, s14
+ 636              	.LVL60:
+ 177:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088_raw_temp = (int16_t)((buf[5]) << 8) | buf[4];
+ 637              		.loc 1 177 48 view .LVU206
+ 638 0278 27EE267A 		vmul.f32	s14, s14, s13
+ 177:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088_raw_temp = (int16_t)((buf[5]) << 8) | buf[4];
+ 639              		.loc 1 177 30 view .LVU207
+ 640 027c 84ED017A 		vstr.32	s14, [r4, #4]
+ 178:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->Accel[2] = bmi088_raw_temp * BMI088_ACCEL_SEN;
+ 641              		.loc 1 178 13 is_stmt 1 view .LVU208
+ 178:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->Accel[2] = bmi088_raw_temp * BMI088_ACCEL_SEN;
+ 642              		.loc 1 178 45 is_stmt 0 view .LVU209
+ 643 0280 9DF81D30 		ldrb	r3, [sp, #29]	@ zero_extendqisi2
+ 644              	.LVL61:
+ 178:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->Accel[2] = bmi088_raw_temp * BMI088_ACCEL_SEN;
+ 645              		.loc 1 178 50 view .LVU210
+ 646 0284 1B02     		lsls	r3, r3, #8
+ 178:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->Accel[2] = bmi088_raw_temp * BMI088_ACCEL_SEN;
+ 647              		.loc 1 178 31 view .LVU211
+ 648 0286 1BB2     		sxth	r3, r3
+ 178:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->Accel[2] = bmi088_raw_temp * BMI088_ACCEL_SEN;
+ 649              		.loc 1 178 61 view .LVU212
+ 650 0288 9DF81C20 		ldrb	r2, [sp, #28]	@ zero_extendqisi2
+ 178:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->Accel[2] = bmi088_raw_temp * BMI088_ACCEL_SEN;
+ 651              		.loc 1 178 29 view .LVU213
+ 652 028c 1343     		orrs	r3, r3, r2
+ 653 028e 07EE903A 		vmov	s15, r3	@ int
+ 654              	.LVL62:
+ 179:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             gNormTemp = sqrtf(bmi088->Accel[0] * bmi088->Accel[0] +
+ 655              		.loc 1 179 13 is_stmt 1 view .LVU214
+ 179:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             gNormTemp = sqrtf(bmi088->Accel[0] * bmi088->Accel[0] +
+ 656              		.loc 1 179 48 is_stmt 0 view .LVU215
+ 657 0292 F8EEE77A 		vcvt.f32.s32	s15, s15
+ 658              	.LVL63:
+ 179:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             gNormTemp = sqrtf(bmi088->Accel[0] * bmi088->Accel[0] +
+ 659              		.loc 1 179 48 view .LVU216
+ 660 0296 67EEA67A 		vmul.f32	s15, s15, s13
+ 179:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             gNormTemp = sqrtf(bmi088->Accel[0] * bmi088->Accel[0] +
+ 661              		.loc 1 179 30 view .LVU217
+ 662 029a C4ED027A 		vstr.32	s15, [r4, #8]
+ 180:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                               bmi088->Accel[1] * bmi088->Accel[1] +
+ 663              		.loc 1 180 13 is_stmt 1 view .LVU218
+ 180:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                               bmi088->Accel[1] * bmi088->Accel[1] +
+ 664              		.loc 1 180 48 is_stmt 0 view .LVU219
+ 665 029e 20EE000A 		vmul.f32	s0, s0, s0
+ 181:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                               bmi088->Accel[2] * bmi088->Accel[2]);
+ 666              		.loc 1 181 48 view .LVU220
+ 667 02a2 27EE077A 		vmul.f32	s14, s14, s14
+ 180:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                               bmi088->Accel[1] * bmi088->Accel[1] +
+ 668              		.loc 1 180 67 view .LVU221
+ 669 02a6 30EE070A 		vadd.f32	s0, s0, s14
+ 182:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->gNorm += gNormTemp;
+ 670              		.loc 1 182 48 view .LVU222
+ 671 02aa 67EEA77A 		vmul.f32	s15, s15, s15
+ 180:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                               bmi088->Accel[1] * bmi088->Accel[1] +
+ 672              		.loc 1 180 25 view .LVU223
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccuocjhf.s 			page 24
+
+
+ 673 02ae 30EE270A 		vadd.f32	s0, s0, s15
+ 674 02b2 FFF7FEFF 		bl	sqrtf
+ 675              	.LVL64:
+ 180:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                               bmi088->Accel[1] * bmi088->Accel[1] +
+ 676              		.loc 1 180 25 view .LVU224
+ 677 02b6 F0EE408A 		vmov.f32	s17, s0
+ 678              	.LVL65:
+ 183:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 679              		.loc 1 183 13 is_stmt 1 view .LVU225
+ 183:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 680              		.loc 1 183 27 is_stmt 0 view .LVU226
+ 681 02ba D4ED0C7A 		vldr.32	s15, [r4, #48]
+ 682 02be 77EE807A 		vadd.f32	s15, s15, s0
+ 683 02c2 C4ED0C7A 		vstr.32	s15, [r4, #48]
+ 185:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             if (buf[0] == BMI088_GYRO_CHIP_ID_VALUE)
+ 684              		.loc 1 185 13 is_stmt 1 view .LVU227
+ 685 02c6 FFF7FEFF 		bl	BMI088_GYRO_NS_L
+ 686              	.LVL66:
+ 185:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             if (buf[0] == BMI088_GYRO_CHIP_ID_VALUE)
+ 687              		.loc 1 185 13 view .LVU228
+ 688 02ca 0822     		movs	r2, #8
+ 689 02cc 06A9     		add	r1, sp, #24
+ 690 02ce 0020     		movs	r0, #0
+ 691 02d0 FFF7FEFF 		bl	BMI088_read_muli_reg
+ 692              	.LVL67:
+ 185:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             if (buf[0] == BMI088_GYRO_CHIP_ID_VALUE)
+ 693              		.loc 1 185 13 view .LVU229
+ 694 02d4 FFF7FEFF 		bl	BMI088_GYRO_NS_H
+ 695              	.LVL68:
+ 185:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             if (buf[0] == BMI088_GYRO_CHIP_ID_VALUE)
+ 696              		.loc 1 185 67 view .LVU230
+ 186:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             {
+ 697              		.loc 1 186 13 view .LVU231
+ 186:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             {
+ 698              		.loc 1 186 20 is_stmt 0 view .LVU232
+ 699 02d8 9DF81830 		ldrb	r3, [sp, #24]	@ zero_extendqisi2
+ 186:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             {
+ 700              		.loc 1 186 16 view .LVU233
+ 701 02dc 0F2B     		cmp	r3, #15
+ 702 02de 3FF4D6AE 		beq	.L48
+ 703              	.L14:
+ 200:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             {
+ 704              		.loc 1 200 13 is_stmt 1 view .LVU234
+ 200:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             {
+ 705              		.loc 1 200 16 is_stmt 0 view .LVU235
+ 706 02e2 002D     		cmp	r5, #0
+ 707 02e4 3FF416AF 		beq	.L35
+ 212:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                     gNormMax = gNormTemp;
+ 708              		.loc 1 212 17 is_stmt 1 view .LVU236
+ 212:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                     gNormMax = gNormTemp;
+ 709              		.loc 1 212 20 is_stmt 0 view .LVU237
+ 710 02e8 B4EEE89A 		vcmpe.f32	s18, s17
+ 711 02ec F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 712 02f0 01D5     		bpl	.L19
+ 213:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 if (gNormTemp < gNormMin)
+ 713              		.loc 1 213 30 view .LVU238
+ 714 02f2 B0EE689A 		vmov.f32	s18, s17
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccuocjhf.s 			page 25
+
+
+ 715              	.LVL69:
+ 716              	.L19:
+ 214:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                     gNormMin = gNormTemp;
+ 717              		.loc 1 214 17 is_stmt 1 view .LVU239
+ 214:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                     gNormMin = gNormTemp;
+ 718              		.loc 1 214 20 is_stmt 0 view .LVU240
+ 719 02f6 B4EEE88A 		vcmpe.f32	s16, s17
+ 720 02fa F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 721 02fe 01DD     		ble	.L20
+ 215:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 for (uint8_t j = 0; j < 3; j++)
+ 722              		.loc 1 215 30 view .LVU241
+ 723 0300 B0EE688A 		vmov.f32	s16, s17
+ 724              	.LVL70:
+ 725              	.L20:
+ 216:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 {
+ 726              		.loc 1 216 17 is_stmt 1 view .LVU242
+ 727              	.LBB7:
+ 216:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 {
+ 728              		.loc 1 216 22 view .LVU243
+ 216:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 {
+ 729              		.loc 1 216 30 is_stmt 0 view .LVU244
+ 730 0304 0023     		movs	r3, #0
+ 216:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 {
+ 731              		.loc 1 216 17 view .LVU245
+ 732 0306 21E7     		b	.L21
+ 733              	.LVL71:
+ 734              	.L47:
+ 216:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 {
+ 735              		.loc 1 216 17 view .LVU246
+ 736              	.LBE7:
+ 737 0308 F0EE498A 		vmov.f32	s17, s18
+ 738              	.LVL72:
+ 739              	.L29:
+ 216:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****                 {
+ 740              		.loc 1 216 17 view .LVU247
+ 741              	.LBE8:
+ 238:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         for (uint8_t i = 0; i < 3; i++)
+ 742              		.loc 1 238 9 is_stmt 1 view .LVU248
+ 238:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         for (uint8_t i = 0; i < 3; i++)
+ 743              		.loc 1 238 23 is_stmt 0 view .LVU249
+ 744 030c D4ED0C6A 		vldr.32	s13, [r4, #48]
+ 745 0310 9FED127A 		vldr.32	s14, .L49+60
+ 746 0314 C6EE877A 		vdiv.f32	s15, s13, s14
+ 747 0318 C4ED0C7A 		vstr.32	s15, [r4, #48]
+ 239:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->GyroOffset[i] /= (float)CaliTimes;
+ 748              		.loc 1 239 9 is_stmt 1 view .LVU250
+ 749              	.LBB9:
+ 239:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->GyroOffset[i] /= (float)CaliTimes;
+ 750              		.loc 1 239 14 view .LVU251
+ 751              	.LVL73:
+ 239:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->GyroOffset[i] /= (float)CaliTimes;
+ 752              		.loc 1 239 22 is_stmt 0 view .LVU252
+ 753 031c 0023     		movs	r3, #0
+ 239:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->GyroOffset[i] /= (float)CaliTimes;
+ 754              		.loc 1 239 9 view .LVU253
+ 755 031e 2DE0     		b	.L31
+ 756              	.L50:
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccuocjhf.s 			page 26
+
+
+ 757              		.align	2
+ 758              	.L49:
+ 759 0320 00000000 		.word	.LANCHOR0
+ 760 0324 00000000 		.word	.LANCHOR1
+ 761 0328 0AD7A33B 		.word	1000593162
+ 762 032c 9A0AB03B 		.word	1001392794
+ 763 0330 53F92EBB 		.word	-1154549421
+ 764 0334 B0ECA9BA 		.word	-1163268944
+ 765 0338 B3D61B41 		.word	1092343475
+ 766 033c 00002042 		.word	1109393408
+ 767 0340 C3F51C41 		.word	1092416963
+ 768 0344 00000000 		.word	.LANCHOR3
+ 769 0348 00000000 		.word	.LANCHOR4
+ 770 034c 00000000 		.word	.LANCHOR5
+ 771 0350 9A99193E 		.word	1041865114
+ 772 0354 6F12033A 		.word	973279855
+ 773 0358 00000000 		.word	.LANCHOR2
+ 774 035c 0080BB45 		.word	1169915904
+ 775              	.LVL74:
+ 776              	.L32:
+ 240:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 777              		.loc 1 240 13 is_stmt 1 discriminator 3 view .LVU254
+ 240:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 778              		.loc 1 240 35 is_stmt 0 discriminator 3 view .LVU255
+ 779 0360 03F10802 		add	r2, r3, #8
+ 780 0364 04EB8202 		add	r2, r4, r2, lsl #2
+ 781 0368 D2ED016A 		vldr.32	s13, [r2, #4]
+ 782 036c 1FED057A 		vldr.32	s14, .L49+60
+ 783 0370 C6EE877A 		vdiv.f32	s15, s13, s14
+ 784 0374 C2ED017A 		vstr.32	s15, [r2, #4]
+ 239:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->GyroOffset[i] /= (float)CaliTimes;
+ 785              		.loc 1 239 36 is_stmt 1 discriminator 3 view .LVU256
+ 239:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->GyroOffset[i] /= (float)CaliTimes;
+ 786              		.loc 1 239 37 is_stmt 0 discriminator 3 view .LVU257
+ 787 0378 0133     		adds	r3, r3, #1
+ 788              	.LVL75:
+ 239:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->GyroOffset[i] /= (float)CaliTimes;
+ 789              		.loc 1 239 37 discriminator 3 view .LVU258
+ 790 037a DBB2     		uxtb	r3, r3
+ 791              	.LVL76:
+ 792              	.L31:
+ 239:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->GyroOffset[i] /= (float)CaliTimes;
+ 793              		.loc 1 239 29 is_stmt 1 discriminator 1 view .LVU259
+ 239:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->GyroOffset[i] /= (float)CaliTimes;
+ 794              		.loc 1 239 9 is_stmt 0 discriminator 1 view .LVU260
+ 795 037c 022B     		cmp	r3, #2
+ 796 037e EFD9     		bls	.L32
+ 797              	.LBE9:
+ 243:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         bmi088_raw_temp = (int16_t)((buf[0] << 3) | (buf[1] >> 5));
+ 798              		.loc 1 243 9 is_stmt 1 view .LVU261
+ 799 0380 FFF7FEFF 		bl	BMI088_ACCEL_NS_L
+ 800              	.LVL77:
+ 243:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         bmi088_raw_temp = (int16_t)((buf[0] << 3) | (buf[1] >> 5));
+ 801              		.loc 1 243 9 view .LVU262
+ 802 0384 A220     		movs	r0, #162
+ 803 0386 FFF7FEFF 		bl	BMI088_read_write_byte
+ 804              	.LVL78:
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccuocjhf.s 			page 27
+
+
+ 243:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         bmi088_raw_temp = (int16_t)((buf[0] << 3) | (buf[1] >> 5));
+ 805              		.loc 1 243 9 view .LVU263
+ 806 038a 0222     		movs	r2, #2
+ 807 038c 06A9     		add	r1, sp, #24
+ 808 038e 2220     		movs	r0, #34
+ 809 0390 FFF7FEFF 		bl	BMI088_read_muli_reg
+ 810              	.LVL79:
+ 243:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         bmi088_raw_temp = (int16_t)((buf[0] << 3) | (buf[1] >> 5));
+ 811              		.loc 1 243 9 view .LVU264
+ 812 0394 FFF7FEFF 		bl	BMI088_ACCEL_NS_H
+ 813              	.LVL80:
+ 243:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         bmi088_raw_temp = (int16_t)((buf[0] << 3) | (buf[1] >> 5));
+ 814              		.loc 1 243 58 view .LVU265
+ 244:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         if (bmi088_raw_temp > 1023)
+ 815              		.loc 1 244 9 view .LVU266
+ 244:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         if (bmi088_raw_temp > 1023)
+ 816              		.loc 1 244 41 is_stmt 0 view .LVU267
+ 817 0398 9DF81820 		ldrb	r2, [sp, #24]	@ zero_extendqisi2
+ 244:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         if (bmi088_raw_temp > 1023)
+ 818              		.loc 1 244 57 view .LVU268
+ 819 039c 9DF81930 		ldrb	r3, [sp, #25]	@ zero_extendqisi2
+ 244:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         if (bmi088_raw_temp > 1023)
+ 820              		.loc 1 244 27 view .LVU269
+ 821 03a0 5B09     		lsrs	r3, r3, #5
+ 244:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         if (bmi088_raw_temp > 1023)
+ 822              		.loc 1 244 25 view .LVU270
+ 823 03a2 43EAC203 		orr	r3, r3, r2, lsl #3
+ 824              	.LVL81:
+ 245:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088_raw_temp -= 2048;
+ 825              		.loc 1 245 9 is_stmt 1 view .LVU271
+ 245:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088_raw_temp -= 2048;
+ 826              		.loc 1 245 12 is_stmt 0 view .LVU272
+ 827 03a6 B3F5806F 		cmp	r3, #1024
+ 828 03aa 01DB     		blt	.L33
+ 246:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         bmi088->TempWhenCali = bmi088_raw_temp * BMI088_TEMP_FACTOR + BMI088_TEMP_OFFSET;
+ 829              		.loc 1 246 13 is_stmt 1 view .LVU273
+ 246:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         bmi088->TempWhenCali = bmi088_raw_temp * BMI088_TEMP_FACTOR + BMI088_TEMP_OFFSET;
+ 830              		.loc 1 246 29 is_stmt 0 view .LVU274
+ 831 03ac A3F50063 		sub	r3, r3, #2048
+ 832              	.LVL82:
+ 833              	.L33:
+ 247:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 834              		.loc 1 247 9 is_stmt 1 view .LVU275
+ 247:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 835              		.loc 1 247 48 is_stmt 0 view .LVU276
+ 836 03b0 07EE903A 		vmov	s15, r3	@ int
+ 837 03b4 F8EEE77A 		vcvt.f32.s32	s15, s15
+ 838 03b8 B4EE007A 		vmov.f32	s14, #1.25e-1
+ 839 03bc 67EE877A 		vmul.f32	s15, s15, s14
+ 247:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 840              		.loc 1 247 69 view .LVU277
+ 841 03c0 B3EE077A 		vmov.f32	s14, #2.3e+1
+ 842 03c4 77EE877A 		vadd.f32	s15, s15, s14
+ 247:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 843              		.loc 1 247 30 view .LVU278
+ 844 03c8 C4ED067A 		vstr.32	s15, [r4, #24]
+ 249:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     } while (gNormDiff > 0.5f ||
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccuocjhf.s 			page 28
+
+
+ 845              		.loc 1 249 9 is_stmt 1 view .LVU279
+ 249:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     } while (gNormDiff > 0.5f ||
+ 846              		.loc 1 249 18 is_stmt 0 view .LVU280
+ 847 03cc 2D4A     		ldr	r2, .L51
+ 848 03ce 1388     		ldrh	r3, [r2]
+ 849              	.LVL83:
+ 249:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     } while (gNormDiff > 0.5f ||
+ 850              		.loc 1 249 18 view .LVU281
+ 851 03d0 0133     		adds	r3, r3, #1
+ 852 03d2 1380     		strh	r3, [r2]	@ movhi
+ 250:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****              fabsf(bmi088->gNorm - 9.8f) > 0.5f ||
+ 853              		.loc 1 250 13 is_stmt 1 view .LVU282
+ 250:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****              fabsf(bmi088->gNorm - 9.8f) > 0.5f ||
+ 854              		.loc 1 250 24 is_stmt 0 view .LVU283
+ 855 03d4 2C4B     		ldr	r3, .L51+4
+ 856 03d6 93ED007A 		vldr.32	s14, [r3]
+ 257:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 857              		.loc 1 257 14 view .LVU284
+ 858 03da F6EE007A 		vmov.f32	s15, #5.0e-1
+ 859 03de B4EEE77A 		vcmpe.f32	s14, s15
+ 860 03e2 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 861 03e6 3FF721AE 		bgt	.L34
+ 251:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****              gyroDiff[0] > 0.15f ||
+ 862              		.loc 1 251 26 view .LVU285
+ 863 03ea D4ED0C7A 		vldr.32	s15, [r4, #48]
+ 251:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****              gyroDiff[0] > 0.15f ||
+ 864              		.loc 1 251 34 view .LVU286
+ 865 03ee 9FED277A 		vldr.32	s14, .L51+8
+ 866 03f2 77EEC77A 		vsub.f32	s15, s15, s14
+ 251:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****              gyroDiff[0] > 0.15f ||
+ 867              		.loc 1 251 14 view .LVU287
+ 868 03f6 F0EEE77A 		vabs.f32	s15, s15
+ 250:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****              fabsf(bmi088->gNorm - 9.8f) > 0.5f ||
+ 869              		.loc 1 250 31 view .LVU288
+ 870 03fa B6EE007A 		vmov.f32	s14, #5.0e-1
+ 871 03fe F4EEC77A 		vcmpe.f32	s15, s14
+ 872 0402 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 873 0406 3FF711AE 		bgt	.L34
+ 252:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****              gyroDiff[1] > 0.15f ||
+ 874              		.loc 1 252 22 view .LVU289
+ 875 040a 214B     		ldr	r3, .L51+12
+ 876 040c 93ED007A 		vldr.32	s14, [r3]
+ 251:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****              gyroDiff[0] > 0.15f ||
+ 877              		.loc 1 251 49 view .LVU290
+ 878 0410 DFED207A 		vldr.32	s15, .L51+16
+ 879 0414 B4EEE77A 		vcmpe.f32	s14, s15
+ 880 0418 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 881 041c 3FF706AE 		bgt	.L34
+ 253:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****              gyroDiff[2] > 0.15f ||
+ 882              		.loc 1 253 22 view .LVU291
+ 883 0420 93ED017A 		vldr.32	s14, [r3, #4]
+ 252:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****              gyroDiff[1] > 0.15f ||
+ 884              		.loc 1 252 34 view .LVU292
+ 885 0424 B4EEE77A 		vcmpe.f32	s14, s15
+ 886 0428 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 887 042c 3FF7FEAD 		bgt	.L34
+ 254:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****              fabsf(bmi088->GyroOffset[0]) > 0.01f ||
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccuocjhf.s 			page 29
+
+
+ 888              		.loc 1 254 22 view .LVU293
+ 889 0430 93ED027A 		vldr.32	s14, [r3, #8]
+ 253:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****              gyroDiff[2] > 0.15f ||
+ 890              		.loc 1 253 34 view .LVU294
+ 891 0434 B4EEE77A 		vcmpe.f32	s14, s15
+ 892 0438 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 893 043c 3FF7F6AD 		bgt	.L34
+ 255:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****              fabsf(bmi088->GyroOffset[1]) > 0.01f ||
+ 894              		.loc 1 255 38 view .LVU295
+ 895 0440 D4ED097A 		vldr.32	s15, [r4, #36]
+ 255:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****              fabsf(bmi088->GyroOffset[1]) > 0.01f ||
+ 896              		.loc 1 255 14 view .LVU296
+ 897 0444 F0EEE77A 		vabs.f32	s15, s15
+ 254:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****              fabsf(bmi088->GyroOffset[0]) > 0.01f ||
+ 898              		.loc 1 254 34 view .LVU297
+ 899 0448 9FED137A 		vldr.32	s14, .L51+20
+ 900 044c F4EEC77A 		vcmpe.f32	s15, s14
+ 901 0450 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 902 0454 3FF7EAAD 		bgt	.L34
+ 256:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****              fabsf(bmi088->GyroOffset[2]) > 0.01f);
+ 903              		.loc 1 256 38 view .LVU298
+ 904 0458 D4ED0A7A 		vldr.32	s15, [r4, #40]
+ 256:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****              fabsf(bmi088->GyroOffset[2]) > 0.01f);
+ 905              		.loc 1 256 14 view .LVU299
+ 906 045c F0EEE77A 		vabs.f32	s15, s15
+ 255:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****              fabsf(bmi088->GyroOffset[1]) > 0.01f ||
+ 907              		.loc 1 255 51 view .LVU300
+ 908 0460 F4EEC77A 		vcmpe.f32	s15, s14
+ 909 0464 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 910 0468 3FF7E0AD 		bgt	.L34
+ 257:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 911              		.loc 1 257 38 view .LVU301
+ 912 046c D4ED0B7A 		vldr.32	s15, [r4, #44]
+ 257:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 913              		.loc 1 257 14 view .LVU302
+ 914 0470 F0EEE77A 		vabs.f32	s15, s15
+ 256:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****              fabsf(bmi088->GyroOffset[2]) > 0.01f);
+ 915              		.loc 1 256 51 view .LVU303
+ 916 0474 F4EEC77A 		vcmpe.f32	s15, s14
+ 917 0478 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 918 047c 3FF7D6AD 		bgt	.L34
+ 919 0480 F9E5     		b	.L12
+ 920              	.L52:
+ 921 0482 00BF     		.align	2
+ 922              	.L51:
+ 923 0484 00000000 		.word	.LANCHOR6
+ 924 0488 00000000 		.word	.LANCHOR4
+ 925 048c CDCC1C41 		.word	1092406477
+ 926 0490 00000000 		.word	.LANCHOR5
+ 927 0494 9A99193E 		.word	1041865114
+ 928 0498 0AD7233C 		.word	1008981770
+ 929              		.cfi_endproc
+ 930              	.LFE132:
+ 932              		.section	.text.bmi088_accel_init,"ax",%progbits
+ 933              		.align	1
+ 934              		.global	bmi088_accel_init
+ 935              		.syntax unified
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccuocjhf.s 			page 30
+
+
+ 936              		.thumb
+ 937              		.thumb_func
+ 939              	bmi088_accel_init:
+ 940              	.LFB133:
+ 264:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     // check commiunication
+ 941              		.loc 1 264 1 is_stmt 1 view -0
+ 942              		.cfi_startproc
+ 943              		@ args = 0, pretend = 0, frame = 0
+ 944              		@ frame_needed = 0, uses_anonymous_args = 0
+ 945 0000 70B5     		push	{r4, r5, r6, lr}
+ 946              	.LCFI9:
+ 947              		.cfi_def_cfa_offset 16
+ 948              		.cfi_offset 4, -16
+ 949              		.cfi_offset 5, -12
+ 950              		.cfi_offset 6, -8
+ 951              		.cfi_offset 14, -4
+ 266:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     HAL_Delay(1);
+ 952              		.loc 1 266 5 view .LVU305
+ 953 0002 FFF7FEFF 		bl	BMI088_ACCEL_NS_L
+ 954              	.LVL84:
+ 266:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     HAL_Delay(1);
+ 955              		.loc 1 266 5 view .LVU306
+ 956 0006 8020     		movs	r0, #128
+ 957 0008 FFF7FEFF 		bl	BMI088_read_write_byte
+ 958              	.LVL85:
+ 266:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     HAL_Delay(1);
+ 959              		.loc 1 266 5 view .LVU307
+ 960 000c 5520     		movs	r0, #85
+ 961 000e FFF7FEFF 		bl	BMI088_read_write_byte
+ 962              	.LVL86:
+ 266:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     HAL_Delay(1);
+ 963              		.loc 1 266 5 view .LVU308
+ 964 0012 5520     		movs	r0, #85
+ 965 0014 FFF7FEFF 		bl	BMI088_read_write_byte
+ 966              	.LVL87:
+ 967 0018 464C     		ldr	r4, .L61
+ 968 001a 2070     		strb	r0, [r4]
+ 266:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     HAL_Delay(1);
+ 969              		.loc 1 266 5 view .LVU309
+ 970 001c FFF7FEFF 		bl	BMI088_ACCEL_NS_H
+ 971              	.LVL88:
+ 266:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     HAL_Delay(1);
+ 972              		.loc 1 266 58 view .LVU310
+ 267:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     BMI088_accel_read_single_reg(BMI088_ACC_CHIP_ID, res);
+ 973              		.loc 1 267 5 view .LVU311
+ 974 0020 0120     		movs	r0, #1
+ 975 0022 FFF7FEFF 		bl	HAL_Delay
+ 976              	.LVL89:
+ 268:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     HAL_Delay(1);
+ 977              		.loc 1 268 5 view .LVU312
+ 978 0026 FFF7FEFF 		bl	BMI088_ACCEL_NS_L
+ 979              	.LVL90:
+ 268:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     HAL_Delay(1);
+ 980              		.loc 1 268 5 view .LVU313
+ 981 002a 8020     		movs	r0, #128
+ 982 002c FFF7FEFF 		bl	BMI088_read_write_byte
+ 983              	.LVL91:
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccuocjhf.s 			page 31
+
+
+ 268:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     HAL_Delay(1);
+ 984              		.loc 1 268 5 view .LVU314
+ 985 0030 5520     		movs	r0, #85
+ 986 0032 FFF7FEFF 		bl	BMI088_read_write_byte
+ 987              	.LVL92:
+ 268:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     HAL_Delay(1);
+ 988              		.loc 1 268 5 view .LVU315
+ 989 0036 5520     		movs	r0, #85
+ 990 0038 FFF7FEFF 		bl	BMI088_read_write_byte
+ 991              	.LVL93:
+ 992 003c 2070     		strb	r0, [r4]
+ 268:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     HAL_Delay(1);
+ 993              		.loc 1 268 5 view .LVU316
+ 994 003e FFF7FEFF 		bl	BMI088_ACCEL_NS_H
+ 995              	.LVL94:
+ 268:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     HAL_Delay(1);
+ 996              		.loc 1 268 58 view .LVU317
+ 269:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 997              		.loc 1 269 5 view .LVU318
+ 998 0042 0120     		movs	r0, #1
+ 999 0044 FFF7FEFF 		bl	HAL_Delay
+ 1000              	.LVL95:
+ 272:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     HAL_Delay(BMI088_LONG_DELAY_TIME);
+ 1001              		.loc 1 272 5 view .LVU319
+ 1002 0048 FFF7FEFF 		bl	BMI088_ACCEL_NS_L
+ 1003              	.LVL96:
+ 272:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     HAL_Delay(BMI088_LONG_DELAY_TIME);
+ 1004              		.loc 1 272 5 view .LVU320
+ 1005 004c B621     		movs	r1, #182
+ 1006 004e 7E20     		movs	r0, #126
+ 1007 0050 FFF7FEFF 		bl	BMI088_write_single_reg
+ 1008              	.LVL97:
+ 272:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     HAL_Delay(BMI088_LONG_DELAY_TIME);
+ 1009              		.loc 1 272 5 view .LVU321
+ 1010 0054 FFF7FEFF 		bl	BMI088_ACCEL_NS_H
+ 1011              	.LVL98:
+ 272:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     HAL_Delay(BMI088_LONG_DELAY_TIME);
+ 1012              		.loc 1 272 84 view .LVU322
+ 273:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 1013              		.loc 1 273 5 view .LVU323
+ 1014 0058 5020     		movs	r0, #80
+ 1015 005a FFF7FEFF 		bl	HAL_Delay
+ 1016              	.LVL99:
+ 276:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     HAL_Delay(1);
+ 1017              		.loc 1 276 5 view .LVU324
+ 1018 005e FFF7FEFF 		bl	BMI088_ACCEL_NS_L
+ 1019              	.LVL100:
+ 276:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     HAL_Delay(1);
+ 1020              		.loc 1 276 5 view .LVU325
+ 1021 0062 8020     		movs	r0, #128
+ 1022 0064 FFF7FEFF 		bl	BMI088_read_write_byte
+ 1023              	.LVL101:
+ 276:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     HAL_Delay(1);
+ 1024              		.loc 1 276 5 view .LVU326
+ 1025 0068 5520     		movs	r0, #85
+ 1026 006a FFF7FEFF 		bl	BMI088_read_write_byte
+ 1027              	.LVL102:
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccuocjhf.s 			page 32
+
+
+ 276:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     HAL_Delay(1);
+ 1028              		.loc 1 276 5 view .LVU327
+ 1029 006e 5520     		movs	r0, #85
+ 1030 0070 FFF7FEFF 		bl	BMI088_read_write_byte
+ 1031              	.LVL103:
+ 1032 0074 2070     		strb	r0, [r4]
+ 276:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     HAL_Delay(1);
+ 1033              		.loc 1 276 5 view .LVU328
+ 1034 0076 FFF7FEFF 		bl	BMI088_ACCEL_NS_H
+ 1035              	.LVL104:
+ 276:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     HAL_Delay(1);
+ 1036              		.loc 1 276 58 view .LVU329
+ 277:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     BMI088_accel_read_single_reg(BMI088_ACC_CHIP_ID, res);
+ 1037              		.loc 1 277 5 view .LVU330
+ 1038 007a 0120     		movs	r0, #1
+ 1039 007c FFF7FEFF 		bl	HAL_Delay
+ 1040              	.LVL105:
+ 278:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     HAL_Delay(1);
+ 1041              		.loc 1 278 5 view .LVU331
+ 1042 0080 FFF7FEFF 		bl	BMI088_ACCEL_NS_L
+ 1043              	.LVL106:
+ 278:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     HAL_Delay(1);
+ 1044              		.loc 1 278 5 view .LVU332
+ 1045 0084 8020     		movs	r0, #128
+ 1046 0086 FFF7FEFF 		bl	BMI088_read_write_byte
+ 1047              	.LVL107:
+ 278:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     HAL_Delay(1);
+ 1048              		.loc 1 278 5 view .LVU333
+ 1049 008a 5520     		movs	r0, #85
+ 1050 008c FFF7FEFF 		bl	BMI088_read_write_byte
+ 1051              	.LVL108:
+ 278:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     HAL_Delay(1);
+ 1052              		.loc 1 278 5 view .LVU334
+ 1053 0090 5520     		movs	r0, #85
+ 1054 0092 FFF7FEFF 		bl	BMI088_read_write_byte
+ 1055              	.LVL109:
+ 1056 0096 2070     		strb	r0, [r4]
+ 278:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     HAL_Delay(1);
+ 1057              		.loc 1 278 5 view .LVU335
+ 1058 0098 FFF7FEFF 		bl	BMI088_ACCEL_NS_H
+ 1059              	.LVL110:
+ 278:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     HAL_Delay(1);
+ 1060              		.loc 1 278 58 view .LVU336
+ 279:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 1061              		.loc 1 279 5 view .LVU337
+ 1062 009c 0120     		movs	r0, #1
+ 1063 009e FFF7FEFF 		bl	HAL_Delay
+ 1064              	.LVL111:
+ 282:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         return BMI088_NO_SENSOR;
+ 1065              		.loc 1 282 5 view .LVU338
+ 282:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         return BMI088_NO_SENSOR;
+ 1066              		.loc 1 282 13 is_stmt 0 view .LVU339
+ 1067 00a2 2378     		ldrb	r3, [r4]	@ zero_extendqisi2
+ 282:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         return BMI088_NO_SENSOR;
+ 1068              		.loc 1 282 8 view .LVU340
+ 1069 00a4 1E2B     		cmp	r3, #30
+ 1070 00a6 42D1     		bne	.L58
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccuocjhf.s 			page 33
+
+
+ 290:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     {
+ 1071              		.loc 1 290 5 is_stmt 1 view .LVU341
+ 290:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     {
+ 1072              		.loc 1 290 24 is_stmt 0 view .LVU342
+ 1073 00a8 234B     		ldr	r3, .L61+4
+ 1074 00aa 0022     		movs	r2, #0
+ 1075 00ac 1A70     		strb	r2, [r3]
+ 290:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     {
+ 1076              		.loc 1 290 5 view .LVU343
+ 1077 00ae 02E0     		b	.L55
+ 1078              	.L56:
+ 290:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     {
+ 1079              		.loc 1 290 73 is_stmt 1 discriminator 2 view .LVU344
+ 290:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     {
+ 1080              		.loc 1 290 86 is_stmt 0 discriminator 2 view .LVU345
+ 1081 00b0 0133     		adds	r3, r3, #1
+ 1082 00b2 214A     		ldr	r2, .L61+4
+ 1083 00b4 1370     		strb	r3, [r2]
+ 1084              	.L55:
+ 290:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     {
+ 1085              		.loc 1 290 29 is_stmt 1 discriminator 1 view .LVU346
+ 290:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     {
+ 1086              		.loc 1 290 43 is_stmt 0 discriminator 1 view .LVU347
+ 1087 00b6 204B     		ldr	r3, .L61+4
+ 1088 00b8 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 290:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     {
+ 1089              		.loc 1 290 5 discriminator 1 view .LVU348
+ 1090 00ba 052B     		cmp	r3, #5
+ 1091 00bc 35D8     		bhi	.L60
+ 293:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         HAL_Delay(1);
+ 1092              		.loc 1 293 9 is_stmt 1 view .LVU349
+ 1093 00be FFF7FEFF 		bl	BMI088_ACCEL_NS_L
+ 1094              	.LVL112:
+ 293:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         HAL_Delay(1);
+ 1095              		.loc 1 293 9 view .LVU350
+ 1096 00c2 1D4D     		ldr	r5, .L61+4
+ 1097 00c4 2B78     		ldrb	r3, [r5]	@ zero_extendqisi2
+ 1098 00c6 1D4C     		ldr	r4, .L61+8
+ 1099 00c8 03EB4303 		add	r3, r3, r3, lsl #1
+ 1100 00cc E218     		adds	r2, r4, r3
+ 1101 00ce 5178     		ldrb	r1, [r2, #1]	@ zero_extendqisi2
+ 1102 00d0 E05C     		ldrb	r0, [r4, r3]	@ zero_extendqisi2
+ 1103 00d2 FFF7FEFF 		bl	BMI088_write_single_reg
+ 1104              	.LVL113:
+ 293:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         HAL_Delay(1);
+ 1105              		.loc 1 293 9 view .LVU351
+ 1106 00d6 FFF7FEFF 		bl	BMI088_ACCEL_NS_H
+ 1107              	.LVL114:
+ 293:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         HAL_Delay(1);
+ 1108              		.loc 1 293 144 view .LVU352
+ 294:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 1109              		.loc 1 294 9 view .LVU353
+ 1110 00da 0120     		movs	r0, #1
+ 1111 00dc FFF7FEFF 		bl	HAL_Delay
+ 1112              	.LVL115:
+ 296:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         HAL_Delay(1);
+ 1113              		.loc 1 296 9 view .LVU354
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccuocjhf.s 			page 34
+
+
+ 1114 00e0 FFF7FEFF 		bl	BMI088_ACCEL_NS_L
+ 1115              	.LVL116:
+ 296:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         HAL_Delay(1);
+ 1116              		.loc 1 296 9 view .LVU355
+ 1117 00e4 2B78     		ldrb	r3, [r5]	@ zero_extendqisi2
+ 1118 00e6 03EB4303 		add	r3, r3, r3, lsl #1
+ 1119 00ea E05C     		ldrb	r0, [r4, r3]	@ zero_extendqisi2
+ 1120 00ec 40F08000 		orr	r0, r0, #128
+ 1121 00f0 FFF7FEFF 		bl	BMI088_read_write_byte
+ 1122              	.LVL117:
+ 296:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         HAL_Delay(1);
+ 1123              		.loc 1 296 9 view .LVU356
+ 1124 00f4 5520     		movs	r0, #85
+ 1125 00f6 FFF7FEFF 		bl	BMI088_read_write_byte
+ 1126              	.LVL118:
+ 296:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         HAL_Delay(1);
+ 1127              		.loc 1 296 9 view .LVU357
+ 1128 00fa 5520     		movs	r0, #85
+ 1129 00fc FFF7FEFF 		bl	BMI088_read_write_byte
+ 1130              	.LVL119:
+ 1131 0100 0C4E     		ldr	r6, .L61
+ 1132 0102 3070     		strb	r0, [r6]
+ 296:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         HAL_Delay(1);
+ 1133              		.loc 1 296 9 view .LVU358
+ 1134 0104 FFF7FEFF 		bl	BMI088_ACCEL_NS_H
+ 1135              	.LVL120:
+ 296:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         HAL_Delay(1);
+ 1136              		.loc 1 296 95 view .LVU359
+ 297:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 1137              		.loc 1 297 9 view .LVU360
+ 1138 0108 0120     		movs	r0, #1
+ 1139 010a FFF7FEFF 		bl	HAL_Delay
+ 1140              	.LVL121:
+ 299:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         {
+ 1141              		.loc 1 299 9 view .LVU361
+ 299:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         {
+ 1142              		.loc 1 299 68 is_stmt 0 view .LVU362
+ 1143 010e 2B78     		ldrb	r3, [r5]	@ zero_extendqisi2
+ 1144 0110 03EB4302 		add	r2, r3, r3, lsl #1
+ 1145 0114 1444     		add	r4, r4, r2
+ 1146 0116 6178     		ldrb	r1, [r4, #1]	@ zero_extendqisi2
+ 299:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         {
+ 1147              		.loc 1 299 17 view .LVU363
+ 1148 0118 3278     		ldrb	r2, [r6]	@ zero_extendqisi2
+ 299:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         {
+ 1149              		.loc 1 299 12 view .LVU364
+ 1150 011a 9142     		cmp	r1, r2
+ 1151 011c C8D0     		beq	.L56
+ 303:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         }
+ 1152              		.loc 1 303 13 is_stmt 1 view .LVU365
+ 303:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         }
+ 1153              		.loc 1 303 70 is_stmt 0 view .LVU366
+ 1154 011e A278     		ldrb	r2, [r4, #2]	@ zero_extendqisi2
+ 303:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         }
+ 1155              		.loc 1 303 19 view .LVU367
+ 1156 0120 0749     		ldr	r1, .L61+12
+ 1157 0122 0878     		ldrb	r0, [r1]	@ zero_extendqisi2
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccuocjhf.s 			page 35
+
+
+ 1158 0124 0243     		orrs	r2, r2, r0
+ 1159 0126 0A70     		strb	r2, [r1]
+ 1160 0128 C2E7     		b	.L56
+ 1161              	.L60:
+ 306:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** }
+ 1162              		.loc 1 306 12 view .LVU368
+ 1163 012a 0020     		movs	r0, #0
+ 1164              	.L54:
+ 307:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 1165              		.loc 1 307 1 view .LVU369
+ 1166 012c 70BD     		pop	{r4, r5, r6, pc}
+ 1167              	.L58:
+ 283:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     // do
+ 1168              		.loc 1 283 16 view .LVU370
+ 1169 012e FF20     		movs	r0, #255
+ 1170 0130 FCE7     		b	.L54
+ 1171              	.L62:
+ 1172 0132 00BF     		.align	2
+ 1173              	.L61:
+ 1174 0134 00000000 		.word	.LANCHOR7
+ 1175 0138 00000000 		.word	.LANCHOR8
+ 1176 013c 00000000 		.word	.LANCHOR9
+ 1177 0140 00000000 		.word	.LANCHOR10
+ 1178              		.cfi_endproc
+ 1179              	.LFE133:
+ 1181              		.section	.text.bmi088_gyro_init,"ax",%progbits
+ 1182              		.align	1
+ 1183              		.global	bmi088_gyro_init
+ 1184              		.syntax unified
+ 1185              		.thumb
+ 1186              		.thumb_func
+ 1188              	bmi088_gyro_init:
+ 1189              	.LFB134:
+ 310:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     // check commiunication
+ 1190              		.loc 1 310 1 is_stmt 1 view -0
+ 1191              		.cfi_startproc
+ 1192              		@ args = 0, pretend = 0, frame = 0
+ 1193              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1194 0000 70B5     		push	{r4, r5, r6, lr}
+ 1195              	.LCFI10:
+ 1196              		.cfi_def_cfa_offset 16
+ 1197              		.cfi_offset 4, -16
+ 1198              		.cfi_offset 5, -12
+ 1199              		.cfi_offset 6, -8
+ 1200              		.cfi_offset 14, -4
+ 312:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     HAL_Delay(1);
+ 1201              		.loc 1 312 5 view .LVU372
+ 1202 0002 FFF7FEFF 		bl	BMI088_GYRO_NS_L
+ 1203              	.LVL122:
+ 312:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     HAL_Delay(1);
+ 1204              		.loc 1 312 5 view .LVU373
+ 1205 0006 3F4C     		ldr	r4, .L71
+ 1206 0008 2146     		mov	r1, r4
+ 1207 000a 0020     		movs	r0, #0
+ 1208 000c FFF7FEFF 		bl	BMI088_read_single_reg
+ 1209              	.LVL123:
+ 312:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     HAL_Delay(1);
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccuocjhf.s 			page 36
+
+
+ 1210              		.loc 1 312 5 view .LVU374
+ 1211 0010 FFF7FEFF 		bl	BMI088_GYRO_NS_H
+ 1212              	.LVL124:
+ 312:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     HAL_Delay(1);
+ 1213              		.loc 1 312 58 view .LVU375
+ 313:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     BMI088_gyro_read_single_reg(BMI088_GYRO_CHIP_ID, res);
+ 1214              		.loc 1 313 5 view .LVU376
+ 1215 0014 0120     		movs	r0, #1
+ 1216 0016 FFF7FEFF 		bl	HAL_Delay
+ 1217              	.LVL125:
+ 314:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     HAL_Delay(1);
+ 1218              		.loc 1 314 5 view .LVU377
+ 1219 001a FFF7FEFF 		bl	BMI088_GYRO_NS_L
+ 1220              	.LVL126:
+ 314:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     HAL_Delay(1);
+ 1221              		.loc 1 314 5 view .LVU378
+ 1222 001e 2146     		mov	r1, r4
+ 1223 0020 0020     		movs	r0, #0
+ 1224 0022 FFF7FEFF 		bl	BMI088_read_single_reg
+ 1225              	.LVL127:
+ 314:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     HAL_Delay(1);
+ 1226              		.loc 1 314 5 view .LVU379
+ 1227 0026 FFF7FEFF 		bl	BMI088_GYRO_NS_H
+ 1228              	.LVL128:
+ 314:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     HAL_Delay(1);
+ 1229              		.loc 1 314 58 view .LVU380
+ 315:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 1230              		.loc 1 315 5 view .LVU381
+ 1231 002a 0120     		movs	r0, #1
+ 1232 002c FFF7FEFF 		bl	HAL_Delay
+ 1233              	.LVL129:
+ 318:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     HAL_Delay(BMI088_LONG_DELAY_TIME);
+ 1234              		.loc 1 318 5 view .LVU382
+ 1235 0030 FFF7FEFF 		bl	BMI088_GYRO_NS_L
+ 1236              	.LVL130:
+ 318:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     HAL_Delay(BMI088_LONG_DELAY_TIME);
+ 1237              		.loc 1 318 5 view .LVU383
+ 1238 0034 B621     		movs	r1, #182
+ 1239 0036 1420     		movs	r0, #20
+ 1240 0038 FFF7FEFF 		bl	BMI088_write_single_reg
+ 1241              	.LVL131:
+ 318:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     HAL_Delay(BMI088_LONG_DELAY_TIME);
+ 1242              		.loc 1 318 5 view .LVU384
+ 1243 003c FFF7FEFF 		bl	BMI088_GYRO_NS_H
+ 1244              	.LVL132:
+ 318:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     HAL_Delay(BMI088_LONG_DELAY_TIME);
+ 1245              		.loc 1 318 85 view .LVU385
+ 319:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     // check commiunication is normal after reset
+ 1246              		.loc 1 319 5 view .LVU386
+ 1247 0040 5020     		movs	r0, #80
+ 1248 0042 FFF7FEFF 		bl	HAL_Delay
+ 1249              	.LVL133:
+ 321:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     HAL_Delay(1);
+ 1250              		.loc 1 321 5 view .LVU387
+ 1251 0046 FFF7FEFF 		bl	BMI088_GYRO_NS_L
+ 1252              	.LVL134:
+ 321:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     HAL_Delay(1);
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccuocjhf.s 			page 37
+
+
+ 1253              		.loc 1 321 5 view .LVU388
+ 1254 004a 2146     		mov	r1, r4
+ 1255 004c 0020     		movs	r0, #0
+ 1256 004e FFF7FEFF 		bl	BMI088_read_single_reg
+ 1257              	.LVL135:
+ 321:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     HAL_Delay(1);
+ 1258              		.loc 1 321 5 view .LVU389
+ 1259 0052 FFF7FEFF 		bl	BMI088_GYRO_NS_H
+ 1260              	.LVL136:
+ 321:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     HAL_Delay(1);
+ 1261              		.loc 1 321 58 view .LVU390
+ 322:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     BMI088_gyro_read_single_reg(BMI088_GYRO_CHIP_ID, res);
+ 1262              		.loc 1 322 5 view .LVU391
+ 1263 0056 0120     		movs	r0, #1
+ 1264 0058 FFF7FEFF 		bl	HAL_Delay
+ 1265              	.LVL137:
+ 323:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     HAL_Delay(1);
+ 1266              		.loc 1 323 5 view .LVU392
+ 1267 005c FFF7FEFF 		bl	BMI088_GYRO_NS_L
+ 1268              	.LVL138:
+ 323:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     HAL_Delay(1);
+ 1269              		.loc 1 323 5 view .LVU393
+ 1270 0060 2146     		mov	r1, r4
+ 1271 0062 0020     		movs	r0, #0
+ 1272 0064 FFF7FEFF 		bl	BMI088_read_single_reg
+ 1273              	.LVL139:
+ 323:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     HAL_Delay(1);
+ 1274              		.loc 1 323 5 view .LVU394
+ 1275 0068 FFF7FEFF 		bl	BMI088_GYRO_NS_H
+ 1276              	.LVL140:
+ 323:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     HAL_Delay(1);
+ 1277              		.loc 1 323 58 view .LVU395
+ 324:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 1278              		.loc 1 324 5 view .LVU396
+ 1279 006c 0120     		movs	r0, #1
+ 1280 006e FFF7FEFF 		bl	HAL_Delay
+ 1281              	.LVL141:
+ 327:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         return BMI088_NO_SENSOR;
+ 1282              		.loc 1 327 5 view .LVU397
+ 327:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         return BMI088_NO_SENSOR;
+ 1283              		.loc 1 327 13 is_stmt 0 view .LVU398
+ 1284 0072 2378     		ldrb	r3, [r4]	@ zero_extendqisi2
+ 327:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         return BMI088_NO_SENSOR;
+ 1285              		.loc 1 327 8 view .LVU399
+ 1286 0074 0F2B     		cmp	r3, #15
+ 1287 0076 42D1     		bne	.L68
+ 331:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     {
+ 1288              		.loc 1 331 5 is_stmt 1 view .LVU400
+ 331:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     {
+ 1289              		.loc 1 331 24 is_stmt 0 view .LVU401
+ 1290 0078 234B     		ldr	r3, .L71+4
+ 1291 007a 0022     		movs	r2, #0
+ 1292 007c 1A70     		strb	r2, [r3]
+ 331:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     {
+ 1293              		.loc 1 331 5 view .LVU402
+ 1294 007e 03E0     		b	.L65
+ 1295              	.L66:
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccuocjhf.s 			page 38
+
+
+ 331:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     {
+ 1296              		.loc 1 331 72 is_stmt 1 discriminator 2 view .LVU403
+ 331:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     {
+ 1297              		.loc 1 331 85 is_stmt 0 discriminator 2 view .LVU404
+ 1298 0080 214A     		ldr	r2, .L71+4
+ 1299 0082 1378     		ldrb	r3, [r2]	@ zero_extendqisi2
+ 1300 0084 0133     		adds	r3, r3, #1
+ 1301 0086 1370     		strb	r3, [r2]
+ 1302              	.L65:
+ 331:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     {
+ 1303              		.loc 1 331 29 is_stmt 1 discriminator 1 view .LVU405
+ 331:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     {
+ 1304              		.loc 1 331 43 is_stmt 0 discriminator 1 view .LVU406
+ 1305 0088 1F4B     		ldr	r3, .L71+4
+ 1306 008a 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 331:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     {
+ 1307              		.loc 1 331 5 discriminator 1 view .LVU407
+ 1308 008c 052B     		cmp	r3, #5
+ 1309 008e 34D8     		bhi	.L70
+ 334:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         HAL_Delay(1);
+ 1310              		.loc 1 334 9 is_stmt 1 view .LVU408
+ 1311 0090 FFF7FEFF 		bl	BMI088_GYRO_NS_L
+ 1312              	.LVL142:
+ 334:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         HAL_Delay(1);
+ 1313              		.loc 1 334 9 view .LVU409
+ 1314 0094 1C4D     		ldr	r5, .L71+4
+ 1315 0096 2B78     		ldrb	r3, [r5]	@ zero_extendqisi2
+ 1316 0098 1C4C     		ldr	r4, .L71+8
+ 1317 009a 03EB4303 		add	r3, r3, r3, lsl #1
+ 1318 009e E218     		adds	r2, r4, r3
+ 1319 00a0 5178     		ldrb	r1, [r2, #1]	@ zero_extendqisi2
+ 1320 00a2 E05C     		ldrb	r0, [r4, r3]	@ zero_extendqisi2
+ 1321 00a4 FFF7FEFF 		bl	BMI088_write_single_reg
+ 1322              	.LVL143:
+ 334:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         HAL_Delay(1);
+ 1323              		.loc 1 334 9 view .LVU410
+ 1324 00a8 FFF7FEFF 		bl	BMI088_GYRO_NS_H
+ 1325              	.LVL144:
+ 334:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         HAL_Delay(1);
+ 1326              		.loc 1 334 141 view .LVU411
+ 335:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 1327              		.loc 1 335 9 view .LVU412
+ 1328 00ac 0120     		movs	r0, #1
+ 1329 00ae FFF7FEFF 		bl	HAL_Delay
+ 1330              	.LVL145:
+ 337:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         HAL_Delay(1);
+ 1331              		.loc 1 337 9 view .LVU413
+ 1332 00b2 FFF7FEFF 		bl	BMI088_GYRO_NS_L
+ 1333              	.LVL146:
+ 337:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         HAL_Delay(1);
+ 1334              		.loc 1 337 9 view .LVU414
+ 1335 00b6 134E     		ldr	r6, .L71
+ 1336 00b8 2B78     		ldrb	r3, [r5]	@ zero_extendqisi2
+ 1337 00ba 03EB4303 		add	r3, r3, r3, lsl #1
+ 1338 00be 3146     		mov	r1, r6
+ 1339 00c0 E05C     		ldrb	r0, [r4, r3]	@ zero_extendqisi2
+ 1340 00c2 FFF7FEFF 		bl	BMI088_read_single_reg
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccuocjhf.s 			page 39
+
+
+ 1341              	.LVL147:
+ 337:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         HAL_Delay(1);
+ 1342              		.loc 1 337 9 view .LVU415
+ 1343 00c6 FFF7FEFF 		bl	BMI088_GYRO_NS_H
+ 1344              	.LVL148:
+ 337:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         HAL_Delay(1);
+ 1345              		.loc 1 337 93 view .LVU416
+ 338:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 1346              		.loc 1 338 9 view .LVU417
+ 1347 00ca 0120     		movs	r0, #1
+ 1348 00cc FFF7FEFF 		bl	HAL_Delay
+ 1349              	.LVL149:
+ 340:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         {
+ 1350              		.loc 1 340 9 view .LVU418
+ 340:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         {
+ 1351              		.loc 1 340 67 is_stmt 0 view .LVU419
+ 1352 00d0 2B78     		ldrb	r3, [r5]	@ zero_extendqisi2
+ 1353 00d2 03EB4302 		add	r2, r3, r3, lsl #1
+ 1354 00d6 1444     		add	r4, r4, r2
+ 1355 00d8 6178     		ldrb	r1, [r4, #1]	@ zero_extendqisi2
+ 340:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         {
+ 1356              		.loc 1 340 17 view .LVU420
+ 1357 00da 3278     		ldrb	r2, [r6]	@ zero_extendqisi2
+ 340:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         {
+ 1358              		.loc 1 340 12 view .LVU421
+ 1359 00dc 9142     		cmp	r1, r2
+ 1360 00de CFD0     		beq	.L66
+ 342:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             // return write_BMI088_gyro_reg_data_error[write_reg_num][2];
+ 1361              		.loc 1 342 13 is_stmt 1 view .LVU422
+ 342:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             // return write_BMI088_gyro_reg_data_error[write_reg_num][2];
+ 1362              		.loc 1 342 26 is_stmt 0 view .LVU423
+ 1363 00e0 013B     		subs	r3, r3, #1
+ 1364 00e2 DBB2     		uxtb	r3, r3
+ 1365 00e4 2B70     		strb	r3, [r5]
+ 344:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         }
+ 1366              		.loc 1 344 13 is_stmt 1 view .LVU424
+ 344:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         }
+ 1367              		.loc 1 344 70 is_stmt 0 view .LVU425
+ 1368 00e6 03EB4303 		add	r3, r3, r3, lsl #1
+ 1369 00ea 094A     		ldr	r2, .L71+12
+ 1370 00ec 1344     		add	r3, r3, r2
+ 1371 00ee 9B78     		ldrb	r3, [r3, #2]	@ zero_extendqisi2
+ 344:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         }
+ 1372              		.loc 1 344 19 view .LVU426
+ 1373 00f0 084A     		ldr	r2, .L71+16
+ 1374 00f2 1178     		ldrb	r1, [r2]	@ zero_extendqisi2
+ 1375 00f4 0B43     		orrs	r3, r3, r1
+ 1376 00f6 1370     		strb	r3, [r2]
+ 1377 00f8 C2E7     		b	.L66
+ 1378              	.L70:
+ 348:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** }
+ 1379              		.loc 1 348 12 view .LVU427
+ 1380 00fa 0020     		movs	r0, #0
+ 1381              	.L64:
+ 349:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 1382              		.loc 1 349 1 view .LVU428
+ 1383 00fc 70BD     		pop	{r4, r5, r6, pc}
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccuocjhf.s 			page 40
+
+
+ 1384              	.L68:
+ 328:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 1385              		.loc 1 328 16 view .LVU429
+ 1386 00fe FF20     		movs	r0, #255
+ 1387 0100 FCE7     		b	.L64
+ 1388              	.L72:
+ 1389 0102 00BF     		.align	2
+ 1390              	.L71:
+ 1391 0104 00000000 		.word	.LANCHOR7
+ 1392 0108 00000000 		.word	.LANCHOR8
+ 1393 010c 00000000 		.word	.LANCHOR11
+ 1394 0110 00000000 		.word	.LANCHOR9
+ 1395 0114 00000000 		.word	.LANCHOR10
+ 1396              		.cfi_endproc
+ 1397              	.LFE134:
+ 1399              		.section	.text.BMI088_init,"ax",%progbits
+ 1400              		.align	1
+ 1401              		.global	BMI088_init
+ 1402              		.syntax unified
+ 1403              		.thumb
+ 1404              		.thumb_func
+ 1406              	BMI088_init:
+ 1407              	.LVL150:
+ 1408              	.LFB131:
+ 120:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     BMI088_SPI = bmi088_SPI;
+ 1409              		.loc 1 120 1 is_stmt 1 view -0
+ 1410              		.cfi_startproc
+ 1411              		@ args = 0, pretend = 0, frame = 0
+ 1412              		@ frame_needed = 0, uses_anonymous_args = 0
+ 120:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     BMI088_SPI = bmi088_SPI;
+ 1413              		.loc 1 120 1 is_stmt 0 view .LVU431
+ 1414 0000 38B5     		push	{r3, r4, r5, lr}
+ 1415              	.LCFI11:
+ 1416              		.cfi_def_cfa_offset 16
+ 1417              		.cfi_offset 3, -16
+ 1418              		.cfi_offset 4, -12
+ 1419              		.cfi_offset 5, -8
+ 1420              		.cfi_offset 14, -4
+ 1421 0002 0D46     		mov	r5, r1
+ 121:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     error = BMI088_NO_ERROR;
+ 1422              		.loc 1 121 5 is_stmt 1 view .LVU432
+ 121:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     error = BMI088_NO_ERROR;
+ 1423              		.loc 1 121 16 is_stmt 0 view .LVU433
+ 1424 0004 114B     		ldr	r3, .L78
+ 1425 0006 1860     		str	r0, [r3]
+ 122:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 1426              		.loc 1 122 5 is_stmt 1 view .LVU434
+ 122:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 1427              		.loc 1 122 11 is_stmt 0 view .LVU435
+ 1428 0008 114C     		ldr	r4, .L78+4
+ 1429 000a 0023     		movs	r3, #0
+ 1430 000c 2370     		strb	r3, [r4]
+ 124:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     error |= bmi088_gyro_init();
+ 1431              		.loc 1 124 5 is_stmt 1 view .LVU436
+ 124:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     error |= bmi088_gyro_init();
+ 1432              		.loc 1 124 14 is_stmt 0 view .LVU437
+ 1433 000e FFF7FEFF 		bl	bmi088_accel_init
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccuocjhf.s 			page 41
+
+
+ 1434              	.LVL151:
+ 124:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     error |= bmi088_gyro_init();
+ 1435              		.loc 1 124 11 view .LVU438
+ 1436 0012 2378     		ldrb	r3, [r4]	@ zero_extendqisi2
+ 1437 0014 1843     		orrs	r0, r0, r3
+ 1438 0016 2070     		strb	r0, [r4]
+ 125:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     if (calibrate)
+ 1439              		.loc 1 125 5 is_stmt 1 view .LVU439
+ 125:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     if (calibrate)
+ 1440              		.loc 1 125 14 is_stmt 0 view .LVU440
+ 1441 0018 FFF7FEFF 		bl	bmi088_gyro_init
+ 1442              	.LVL152:
+ 125:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     if (calibrate)
+ 1443              		.loc 1 125 11 view .LVU441
+ 1444 001c 2378     		ldrb	r3, [r4]	@ zero_extendqisi2
+ 1445 001e 1843     		orrs	r0, r0, r3
+ 1446 0020 2070     		strb	r0, [r4]
+ 126:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         Calibrate_MPU_Offset(&BMI088);
+ 1447              		.loc 1 126 5 is_stmt 1 view .LVU442
+ 126:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         Calibrate_MPU_Offset(&BMI088);
+ 1448              		.loc 1 126 8 is_stmt 0 view .LVU443
+ 1449 0022 7DB9     		cbnz	r5, .L77
+ 130:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         BMI088.GyroOffset[1] = GyOFFSET;
+ 1450              		.loc 1 130 9 is_stmt 1 view .LVU444
+ 130:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         BMI088.GyroOffset[1] = GyOFFSET;
+ 1451              		.loc 1 130 30 is_stmt 0 view .LVU445
+ 1452 0024 0B4B     		ldr	r3, .L78+8
+ 1453 0026 0C4A     		ldr	r2, .L78+12
+ 1454 0028 5A62     		str	r2, [r3, #36]	@ float
+ 131:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         BMI088.GyroOffset[2] = GzOFFSET;
+ 1455              		.loc 1 131 9 is_stmt 1 view .LVU446
+ 131:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         BMI088.GyroOffset[2] = GzOFFSET;
+ 1456              		.loc 1 131 30 is_stmt 0 view .LVU447
+ 1457 002a 0C4A     		ldr	r2, .L78+16
+ 1458 002c 9A62     		str	r2, [r3, #40]	@ float
+ 132:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         BMI088.gNorm = gNORM;
+ 1459              		.loc 1 132 9 is_stmt 1 view .LVU448
+ 132:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         BMI088.gNorm = gNORM;
+ 1460              		.loc 1 132 30 is_stmt 0 view .LVU449
+ 1461 002e 0C4A     		ldr	r2, .L78+20
+ 1462 0030 DA62     		str	r2, [r3, #44]	@ float
+ 133:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         BMI088.AccelScale = 9.81f / BMI088.gNorm;
+ 1463              		.loc 1 133 9 is_stmt 1 view .LVU450
+ 133:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         BMI088.AccelScale = 9.81f / BMI088.gNorm;
+ 1464              		.loc 1 133 22 is_stmt 0 view .LVU451
+ 1465 0032 0C4A     		ldr	r2, .L78+24
+ 1466 0034 1A63     		str	r2, [r3, #48]	@ float
+ 134:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         BMI088.TempWhenCali = 40;
+ 1467              		.loc 1 134 9 is_stmt 1 view .LVU452
+ 134:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         BMI088.TempWhenCali = 40;
+ 1468              		.loc 1 134 27 is_stmt 0 view .LVU453
+ 1469 0036 0C4A     		ldr	r2, .L78+28
+ 1470 0038 1A62     		str	r2, [r3, #32]	@ float
+ 135:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     }
+ 1471              		.loc 1 135 9 is_stmt 1 view .LVU454
+ 135:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     }
+ 1472              		.loc 1 135 29 is_stmt 0 view .LVU455
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccuocjhf.s 			page 42
+
+
+ 1473 003a 0C4A     		ldr	r2, .L78+32
+ 1474 003c 9A61     		str	r2, [r3, #24]	@ float
+ 1475              	.L75:
+ 138:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** }
+ 1476              		.loc 1 138 5 is_stmt 1 view .LVU456
+ 139:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 1477              		.loc 1 139 1 is_stmt 0 view .LVU457
+ 1478 003e 044B     		ldr	r3, .L78+4
+ 1479 0040 1878     		ldrb	r0, [r3]	@ zero_extendqisi2
+ 1480 0042 38BD     		pop	{r3, r4, r5, pc}
+ 1481              	.L77:
+ 127:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     else
+ 1482              		.loc 1 127 9 is_stmt 1 view .LVU458
+ 1483 0044 0348     		ldr	r0, .L78+8
+ 1484 0046 FFF7FEFF 		bl	Calibrate_MPU_Offset
+ 1485              	.LVL153:
+ 1486 004a F8E7     		b	.L75
+ 1487              	.L79:
+ 1488              		.align	2
+ 1489              	.L78:
+ 1490 004c 00000000 		.word	BMI088_SPI
+ 1491 0050 00000000 		.word	.LANCHOR10
+ 1492 0054 00000000 		.word	.LANCHOR12
+ 1493 0058 9A0AB03B 		.word	1001392794
+ 1494 005c 53F92EBB 		.word	-1154549421
+ 1495 0060 B0ECA9BA 		.word	-1163268944
+ 1496 0064 B3D61B41 		.word	1092343475
+ 1497 0068 C8EB803F 		.word	1065413576
+ 1498 006c 00002042 		.word	1109393408
+ 1499              		.cfi_endproc
+ 1500              	.LFE131:
+ 1502              		.section	.text.BMI088_Init,"ax",%progbits
+ 1503              		.align	1
+ 1504              		.global	BMI088_Init
+ 1505              		.syntax unified
+ 1506              		.thumb
+ 1507              		.thumb_func
+ 1509              	BMI088_Init:
+ 1510              	.LVL154:
+ 1511              	.LFB130:
+ 112:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     while (BMI088_init(bmi088_SPI, calibrate))
+ 1512              		.loc 1 112 1 view -0
+ 1513              		.cfi_startproc
+ 1514              		@ args = 0, pretend = 0, frame = 0
+ 1515              		@ frame_needed = 0, uses_anonymous_args = 0
+ 112:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     while (BMI088_init(bmi088_SPI, calibrate))
+ 1516              		.loc 1 112 1 is_stmt 0 view .LVU460
+ 1517 0000 38B5     		push	{r3, r4, r5, lr}
+ 1518              	.LCFI12:
+ 1519              		.cfi_def_cfa_offset 16
+ 1520              		.cfi_offset 3, -16
+ 1521              		.cfi_offset 4, -12
+ 1522              		.cfi_offset 5, -8
+ 1523              		.cfi_offset 14, -4
+ 1524 0002 0546     		mov	r5, r0
+ 1525 0004 0C46     		mov	r4, r1
+ 113:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     {
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccuocjhf.s 			page 43
+
+
+ 1526              		.loc 1 113 5 is_stmt 1 view .LVU461
+ 1527              	.LVL155:
+ 1528              	.L81:
+ 115:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     }
+ 1529              		.loc 1 115 9 discriminator 1 view .LVU462
+ 113:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     {
+ 1530              		.loc 1 113 11 discriminator 1 view .LVU463
+ 113:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     {
+ 1531              		.loc 1 113 12 is_stmt 0 discriminator 1 view .LVU464
+ 1532 0006 2146     		mov	r1, r4
+ 1533 0008 2846     		mov	r0, r5
+ 1534 000a FFF7FEFF 		bl	BMI088_init
+ 1535              	.LVL156:
+ 113:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     {
+ 1536              		.loc 1 113 11 discriminator 1 view .LVU465
+ 1537 000e 0028     		cmp	r0, #0
+ 1538 0010 F9D1     		bne	.L81
+ 117:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 1539              		.loc 1 117 1 view .LVU466
+ 1540 0012 38BD     		pop	{r3, r4, r5, pc}
+ 117:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 1541              		.loc 1 117 1 view .LVU467
+ 1542              		.cfi_endproc
+ 1543              	.LFE130:
+ 1545              		.section	.text.BMI088_Read,"ax",%progbits
+ 1546              		.align	1
+ 1547              		.global	BMI088_Read
+ 1548              		.syntax unified
+ 1549              		.thumb
+ 1550              		.thumb_func
+ 1552              	BMI088_Read:
+ 1553              	.LVL157:
+ 1554              	.LFB135:
+ 352:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     uint8_t buf[8] = {0, 0, 0, 0, 0, 0};
+ 1555              		.loc 1 352 1 is_stmt 1 view -0
+ 1556              		.cfi_startproc
+ 1557              		@ args = 0, pretend = 0, frame = 8
+ 1558              		@ frame_needed = 0, uses_anonymous_args = 0
+ 352:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     uint8_t buf[8] = {0, 0, 0, 0, 0, 0};
+ 1559              		.loc 1 352 1 is_stmt 0 view .LVU469
+ 1560 0000 30B5     		push	{r4, r5, lr}
+ 1561              	.LCFI13:
+ 1562              		.cfi_def_cfa_offset 12
+ 1563              		.cfi_offset 4, -12
+ 1564              		.cfi_offset 5, -8
+ 1565              		.cfi_offset 14, -4
+ 1566 0002 83B0     		sub	sp, sp, #12
+ 1567              	.LCFI14:
+ 1568              		.cfi_def_cfa_offset 24
+ 1569 0004 0446     		mov	r4, r0
+ 353:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     static int16_t bmi088_raw_temp;
+ 1570              		.loc 1 353 5 is_stmt 1 view .LVU470
+ 353:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     static int16_t bmi088_raw_temp;
+ 1571              		.loc 1 353 13 is_stmt 0 view .LVU471
+ 1572 0006 854B     		ldr	r3, .L89
+ 1573 0008 93E80300 		ldm	r3, {r0, r1}
+ 1574              	.LVL158:
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccuocjhf.s 			page 44
+
+
+ 353:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     static int16_t bmi088_raw_temp;
+ 1575              		.loc 1 353 13 view .LVU472
+ 1576 000c 0090     		str	r0, [sp]
+ 1577 000e ADF80410 		strh	r1, [sp, #4]	@ movhi
+ 1578 0012 090C     		lsrs	r1, r1, #16
+ 1579 0014 8DF80610 		strb	r1, [sp, #6]
+ 1580 0018 0025     		movs	r5, #0
+ 1581 001a 8DF80750 		strb	r5, [sp, #7]
+ 354:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 1582              		.loc 1 354 5 is_stmt 1 view .LVU473
+ 356:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 1583              		.loc 1 356 5 view .LVU474
+ 1584 001e FFF7FEFF 		bl	BMI088_ACCEL_NS_L
+ 1585              	.LVL159:
+ 356:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 1586              		.loc 1 356 5 view .LVU475
+ 1587 0022 9220     		movs	r0, #146
+ 1588 0024 FFF7FEFF 		bl	BMI088_read_write_byte
+ 1589              	.LVL160:
+ 356:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 1590              		.loc 1 356 5 view .LVU476
+ 1591 0028 0622     		movs	r2, #6
+ 1592 002a 6946     		mov	r1, sp
+ 1593 002c 1220     		movs	r0, #18
+ 1594 002e FFF7FEFF 		bl	BMI088_read_muli_reg
+ 1595              	.LVL161:
+ 356:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 1596              		.loc 1 356 5 view .LVU477
+ 1597 0032 FFF7FEFF 		bl	BMI088_ACCEL_NS_H
+ 1598              	.LVL162:
+ 356:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 1599              		.loc 1 356 60 view .LVU478
+ 358:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     bmi088->Accel[0] = bmi088_raw_temp * BMI088_ACCEL_SEN * bmi088->AccelScale;
+ 1600              		.loc 1 358 5 view .LVU479
+ 358:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     bmi088->Accel[0] = bmi088_raw_temp * BMI088_ACCEL_SEN * bmi088->AccelScale;
+ 1601              		.loc 1 358 37 is_stmt 0 view .LVU480
+ 1602 0036 9DF80130 		ldrb	r3, [sp, #1]	@ zero_extendqisi2
+ 358:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     bmi088->Accel[0] = bmi088_raw_temp * BMI088_ACCEL_SEN * bmi088->AccelScale;
+ 1603              		.loc 1 358 42 view .LVU481
+ 1604 003a 1B02     		lsls	r3, r3, #8
+ 358:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     bmi088->Accel[0] = bmi088_raw_temp * BMI088_ACCEL_SEN * bmi088->AccelScale;
+ 1605              		.loc 1 358 23 view .LVU482
+ 1606 003c 1BB2     		sxth	r3, r3
+ 358:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     bmi088->Accel[0] = bmi088_raw_temp * BMI088_ACCEL_SEN * bmi088->AccelScale;
+ 1607              		.loc 1 358 53 view .LVU483
+ 1608 003e 9DF80020 		ldrb	r2, [sp]	@ zero_extendqisi2
+ 358:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     bmi088->Accel[0] = bmi088_raw_temp * BMI088_ACCEL_SEN * bmi088->AccelScale;
+ 1609              		.loc 1 358 48 view .LVU484
+ 1610 0042 1343     		orrs	r3, r3, r2
+ 358:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     bmi088->Accel[0] = bmi088_raw_temp * BMI088_ACCEL_SEN * bmi088->AccelScale;
+ 1611              		.loc 1 358 21 view .LVU485
+ 1612 0044 764A     		ldr	r2, .L89+4
+ 1613 0046 1380     		strh	r3, [r2]	@ movhi
+ 359:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     bmi088_raw_temp = (int16_t)((buf[3]) << 8) | buf[2];
+ 1614              		.loc 1 359 5 is_stmt 1 view .LVU486
+ 359:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     bmi088_raw_temp = (int16_t)((buf[3]) << 8) | buf[2];
+ 1615              		.loc 1 359 40 is_stmt 0 view .LVU487
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccuocjhf.s 			page 45
+
+
+ 1616 0048 07EE903A 		vmov	s15, r3	@ int
+ 1617 004c F8EEE77A 		vcvt.f32.s32	s15, s15
+ 1618 0050 7449     		ldr	r1, .L89+8
+ 1619 0052 91ED007A 		vldr.32	s14, [r1]
+ 1620 0056 67EE877A 		vmul.f32	s15, s15, s14
+ 359:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     bmi088_raw_temp = (int16_t)((buf[3]) << 8) | buf[2];
+ 1621              		.loc 1 359 67 view .LVU488
+ 1622 005a 94ED087A 		vldr.32	s14, [r4, #32]
+ 359:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     bmi088_raw_temp = (int16_t)((buf[3]) << 8) | buf[2];
+ 1623              		.loc 1 359 59 view .LVU489
+ 1624 005e 67EE877A 		vmul.f32	s15, s15, s14
+ 359:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     bmi088_raw_temp = (int16_t)((buf[3]) << 8) | buf[2];
+ 1625              		.loc 1 359 22 view .LVU490
+ 1626 0062 C4ED007A 		vstr.32	s15, [r4]
+ 360:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     bmi088->Accel[1] = bmi088_raw_temp * BMI088_ACCEL_SEN * bmi088->AccelScale;
+ 1627              		.loc 1 360 5 is_stmt 1 view .LVU491
+ 360:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     bmi088->Accel[1] = bmi088_raw_temp * BMI088_ACCEL_SEN * bmi088->AccelScale;
+ 1628              		.loc 1 360 37 is_stmt 0 view .LVU492
+ 1629 0066 9DF80330 		ldrb	r3, [sp, #3]	@ zero_extendqisi2
+ 360:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     bmi088->Accel[1] = bmi088_raw_temp * BMI088_ACCEL_SEN * bmi088->AccelScale;
+ 1630              		.loc 1 360 42 view .LVU493
+ 1631 006a 1B02     		lsls	r3, r3, #8
+ 360:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     bmi088->Accel[1] = bmi088_raw_temp * BMI088_ACCEL_SEN * bmi088->AccelScale;
+ 1632              		.loc 1 360 23 view .LVU494
+ 1633 006c 1BB2     		sxth	r3, r3
+ 360:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     bmi088->Accel[1] = bmi088_raw_temp * BMI088_ACCEL_SEN * bmi088->AccelScale;
+ 1634              		.loc 1 360 53 view .LVU495
+ 1635 006e 9DF80200 		ldrb	r0, [sp, #2]	@ zero_extendqisi2
+ 360:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     bmi088->Accel[1] = bmi088_raw_temp * BMI088_ACCEL_SEN * bmi088->AccelScale;
+ 1636              		.loc 1 360 48 view .LVU496
+ 1637 0072 0343     		orrs	r3, r3, r0
+ 360:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     bmi088->Accel[1] = bmi088_raw_temp * BMI088_ACCEL_SEN * bmi088->AccelScale;
+ 1638              		.loc 1 360 21 view .LVU497
+ 1639 0074 1380     		strh	r3, [r2]	@ movhi
+ 361:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     bmi088_raw_temp = (int16_t)((buf[5]) << 8) | buf[4];
+ 1640              		.loc 1 361 5 is_stmt 1 view .LVU498
+ 361:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     bmi088_raw_temp = (int16_t)((buf[5]) << 8) | buf[4];
+ 1641              		.loc 1 361 40 is_stmt 0 view .LVU499
+ 1642 0076 D1ED006A 		vldr.32	s13, [r1]
+ 1643 007a 07EE903A 		vmov	s15, r3	@ int
+ 1644 007e F8EEE77A 		vcvt.f32.s32	s15, s15
+ 1645 0082 67EEA67A 		vmul.f32	s15, s15, s13
+ 361:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     bmi088_raw_temp = (int16_t)((buf[5]) << 8) | buf[4];
+ 1646              		.loc 1 361 59 view .LVU500
+ 1647 0086 67EE277A 		vmul.f32	s15, s14, s15
+ 361:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     bmi088_raw_temp = (int16_t)((buf[5]) << 8) | buf[4];
+ 1648              		.loc 1 361 22 view .LVU501
+ 1649 008a C4ED017A 		vstr.32	s15, [r4, #4]
+ 362:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     bmi088->Accel[2] = bmi088_raw_temp * BMI088_ACCEL_SEN * bmi088->AccelScale;
+ 1650              		.loc 1 362 5 is_stmt 1 view .LVU502
+ 362:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     bmi088->Accel[2] = bmi088_raw_temp * BMI088_ACCEL_SEN * bmi088->AccelScale;
+ 1651              		.loc 1 362 37 is_stmt 0 view .LVU503
+ 1652 008e 9DF80530 		ldrb	r3, [sp, #5]	@ zero_extendqisi2
+ 362:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     bmi088->Accel[2] = bmi088_raw_temp * BMI088_ACCEL_SEN * bmi088->AccelScale;
+ 1653              		.loc 1 362 42 view .LVU504
+ 1654 0092 1B02     		lsls	r3, r3, #8
+ 362:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     bmi088->Accel[2] = bmi088_raw_temp * BMI088_ACCEL_SEN * bmi088->AccelScale;
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccuocjhf.s 			page 46
+
+
+ 1655              		.loc 1 362 23 view .LVU505
+ 1656 0094 1BB2     		sxth	r3, r3
+ 362:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     bmi088->Accel[2] = bmi088_raw_temp * BMI088_ACCEL_SEN * bmi088->AccelScale;
+ 1657              		.loc 1 362 53 view .LVU506
+ 1658 0096 9DF80410 		ldrb	r1, [sp, #4]	@ zero_extendqisi2
+ 362:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     bmi088->Accel[2] = bmi088_raw_temp * BMI088_ACCEL_SEN * bmi088->AccelScale;
+ 1659              		.loc 1 362 48 view .LVU507
+ 1660 009a 0B43     		orrs	r3, r3, r1
+ 362:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     bmi088->Accel[2] = bmi088_raw_temp * BMI088_ACCEL_SEN * bmi088->AccelScale;
+ 1661              		.loc 1 362 21 view .LVU508
+ 1662 009c 1380     		strh	r3, [r2]	@ movhi
+ 363:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 1663              		.loc 1 363 5 is_stmt 1 view .LVU509
+ 363:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 1664              		.loc 1 363 40 is_stmt 0 view .LVU510
+ 1665 009e 07EE903A 		vmov	s15, r3	@ int
+ 1666 00a2 F8EEE77A 		vcvt.f32.s32	s15, s15
+ 1667 00a6 67EEA67A 		vmul.f32	s15, s15, s13
+ 363:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 1668              		.loc 1 363 59 view .LVU511
+ 1669 00aa 67EE277A 		vmul.f32	s15, s14, s15
+ 363:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 1670              		.loc 1 363 22 view .LVU512
+ 1671 00ae C4ED027A 		vstr.32	s15, [r4, #8]
+ 365:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     if (buf[0] == BMI088_GYRO_CHIP_ID_VALUE)
+ 1672              		.loc 1 365 5 is_stmt 1 view .LVU513
+ 1673 00b2 FFF7FEFF 		bl	BMI088_GYRO_NS_L
+ 1674              	.LVL163:
+ 365:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     if (buf[0] == BMI088_GYRO_CHIP_ID_VALUE)
+ 1675              		.loc 1 365 5 view .LVU514
+ 1676 00b6 0822     		movs	r2, #8
+ 1677 00b8 6946     		mov	r1, sp
+ 1678 00ba 2846     		mov	r0, r5
+ 1679 00bc FFF7FEFF 		bl	BMI088_read_muli_reg
+ 1680              	.LVL164:
+ 365:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     if (buf[0] == BMI088_GYRO_CHIP_ID_VALUE)
+ 1681              		.loc 1 365 5 view .LVU515
+ 1682 00c0 FFF7FEFF 		bl	BMI088_GYRO_NS_H
+ 1683              	.LVL165:
+ 365:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     if (buf[0] == BMI088_GYRO_CHIP_ID_VALUE)
+ 1684              		.loc 1 365 59 view .LVU516
+ 366:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     {
+ 1685              		.loc 1 366 5 view .LVU517
+ 366:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     {
+ 1686              		.loc 1 366 12 is_stmt 0 view .LVU518
+ 1687 00c4 9DF80030 		ldrb	r3, [sp]	@ zero_extendqisi2
+ 366:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     {
+ 1688              		.loc 1 366 8 view .LVU519
+ 1689 00c8 0F2B     		cmp	r3, #15
+ 1690 00ca 2DD0     		beq	.L88
+ 1691              	.L84:
+ 387:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 1692              		.loc 1 387 5 is_stmt 1 view .LVU520
+ 1693 00cc FFF7FEFF 		bl	BMI088_ACCEL_NS_L
+ 1694              	.LVL166:
+ 387:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 1695              		.loc 1 387 5 view .LVU521
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccuocjhf.s 			page 47
+
+
+ 1696 00d0 A220     		movs	r0, #162
+ 1697 00d2 FFF7FEFF 		bl	BMI088_read_write_byte
+ 1698              	.LVL167:
+ 387:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 1699              		.loc 1 387 5 view .LVU522
+ 1700 00d6 0222     		movs	r2, #2
+ 1701 00d8 6946     		mov	r1, sp
+ 1702 00da 2220     		movs	r0, #34
+ 1703 00dc FFF7FEFF 		bl	BMI088_read_muli_reg
+ 1704              	.LVL168:
+ 387:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 1705              		.loc 1 387 5 view .LVU523
+ 1706 00e0 FFF7FEFF 		bl	BMI088_ACCEL_NS_H
+ 1707              	.LVL169:
+ 387:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 1708              		.loc 1 387 54 view .LVU524
+ 389:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 1709              		.loc 1 389 5 view .LVU525
+ 389:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 1710              		.loc 1 389 37 is_stmt 0 view .LVU526
+ 1711 00e4 9DF80020 		ldrb	r2, [sp]	@ zero_extendqisi2
+ 389:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 1712              		.loc 1 389 53 view .LVU527
+ 1713 00e8 9DF80130 		ldrb	r3, [sp, #1]	@ zero_extendqisi2
+ 389:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 1714              		.loc 1 389 23 view .LVU528
+ 1715 00ec 5B09     		lsrs	r3, r3, #5
+ 1716 00ee 43EAC203 		orr	r3, r3, r2, lsl #3
+ 389:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 1717              		.loc 1 389 21 view .LVU529
+ 1718 00f2 4B4A     		ldr	r2, .L89+4
+ 1719 00f4 1380     		strh	r3, [r2]	@ movhi
+ 391:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     {
+ 1720              		.loc 1 391 5 is_stmt 1 view .LVU530
+ 391:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     {
+ 1721              		.loc 1 391 8 is_stmt 0 view .LVU531
+ 1722 00f6 B3F5806F 		cmp	r3, #1024
+ 1723 00fa 02DB     		blt	.L86
+ 393:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     }
+ 1724              		.loc 1 393 9 is_stmt 1 view .LVU532
+ 393:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****     }
+ 1725              		.loc 1 393 25 is_stmt 0 view .LVU533
+ 1726 00fc A3F50063 		sub	r3, r3, #2048
+ 1727 0100 1380     		strh	r3, [r2]	@ movhi
+ 1728              	.L86:
+ 396:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** }
+ 1729              		.loc 1 396 5 is_stmt 1 view .LVU534
+ 396:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** }
+ 1730              		.loc 1 396 43 is_stmt 0 view .LVU535
+ 1731 0102 474B     		ldr	r3, .L89+4
+ 1732 0104 B3F90030 		ldrsh	r3, [r3]
+ 1733 0108 07EE903A 		vmov	s15, r3	@ int
+ 1734 010c F8EEE77A 		vcvt.f32.s32	s15, s15
+ 1735 0110 B4EE007A 		vmov.f32	s14, #1.25e-1
+ 1736 0114 67EE877A 		vmul.f32	s15, s15, s14
+ 396:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** }
+ 1737              		.loc 1 396 64 view .LVU536
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccuocjhf.s 			page 48
+
+
+ 1738 0118 B3EE077A 		vmov.f32	s14, #2.3e+1
+ 1739 011c 77EE877A 		vadd.f32	s15, s15, s14
+ 396:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** }
+ 1740              		.loc 1 396 25 view .LVU537
+ 1741 0120 C4ED077A 		vstr.32	s15, [r4, #28]
+ 397:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c **** 
+ 1742              		.loc 1 397 1 view .LVU538
+ 1743 0124 03B0     		add	sp, sp, #12
+ 1744              	.LCFI15:
+ 1745              		.cfi_remember_state
+ 1746              		.cfi_def_cfa_offset 12
+ 1747              		@ sp needed
+ 1748 0126 30BD     		pop	{r4, r5, pc}
+ 1749              	.LVL170:
+ 1750              	.L88:
+ 1751              	.LCFI16:
+ 1752              		.cfi_restore_state
+ 368:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         {
+ 1753              		.loc 1 368 9 is_stmt 1 view .LVU539
+ 368:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         {
+ 1754              		.loc 1 368 13 is_stmt 0 view .LVU540
+ 1755 0128 3F4B     		ldr	r3, .L89+12
+ 1756 012a 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 368:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         {
+ 1757              		.loc 1 368 12 view .LVU541
+ 1758 012c 002B     		cmp	r3, #0
+ 1759 012e 40D0     		beq	.L85
+ 370:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->Gyro[0] = bmi088_raw_temp * BMI088_GYRO_SEN - bmi088->GyroOffset[0];
+ 1760              		.loc 1 370 13 is_stmt 1 view .LVU542
+ 370:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->Gyro[0] = bmi088_raw_temp * BMI088_GYRO_SEN - bmi088->GyroOffset[0];
+ 1761              		.loc 1 370 45 is_stmt 0 view .LVU543
+ 1762 0130 9DF80330 		ldrb	r3, [sp, #3]	@ zero_extendqisi2
+ 370:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->Gyro[0] = bmi088_raw_temp * BMI088_GYRO_SEN - bmi088->GyroOffset[0];
+ 1763              		.loc 1 370 50 view .LVU544
+ 1764 0134 1B02     		lsls	r3, r3, #8
+ 370:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->Gyro[0] = bmi088_raw_temp * BMI088_GYRO_SEN - bmi088->GyroOffset[0];
+ 1765              		.loc 1 370 31 view .LVU545
+ 1766 0136 1BB2     		sxth	r3, r3
+ 370:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->Gyro[0] = bmi088_raw_temp * BMI088_GYRO_SEN - bmi088->GyroOffset[0];
+ 1767              		.loc 1 370 61 view .LVU546
+ 1768 0138 9DF80220 		ldrb	r2, [sp, #2]	@ zero_extendqisi2
+ 370:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->Gyro[0] = bmi088_raw_temp * BMI088_GYRO_SEN - bmi088->GyroOffset[0];
+ 1769              		.loc 1 370 56 view .LVU547
+ 1770 013c 1343     		orrs	r3, r3, r2
+ 370:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->Gyro[0] = bmi088_raw_temp * BMI088_GYRO_SEN - bmi088->GyroOffset[0];
+ 1771              		.loc 1 370 29 view .LVU548
+ 1772 013e 384A     		ldr	r2, .L89+4
+ 1773 0140 1380     		strh	r3, [r2]	@ movhi
+ 371:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088_raw_temp = (int16_t)((buf[5]) << 8) | buf[4];
+ 1774              		.loc 1 371 13 is_stmt 1 view .LVU549
+ 371:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088_raw_temp = (int16_t)((buf[5]) << 8) | buf[4];
+ 1775              		.loc 1 371 47 is_stmt 0 view .LVU550
+ 1776 0142 3A49     		ldr	r1, .L89+16
+ 1777 0144 D1ED006A 		vldr.32	s13, [r1]
+ 1778 0148 07EE903A 		vmov	s15, r3	@ int
+ 1779 014c B8EEE77A 		vcvt.f32.s32	s14, s15
+ 1780 0150 27EE267A 		vmul.f32	s14, s14, s13
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccuocjhf.s 			page 49
+
+
+ 371:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088_raw_temp = (int16_t)((buf[5]) << 8) | buf[4];
+ 1781              		.loc 1 371 85 view .LVU551
+ 1782 0154 D4ED097A 		vldr.32	s15, [r4, #36]
+ 371:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088_raw_temp = (int16_t)((buf[5]) << 8) | buf[4];
+ 1783              		.loc 1 371 65 view .LVU552
+ 1784 0158 37EE677A 		vsub.f32	s14, s14, s15
+ 371:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088_raw_temp = (int16_t)((buf[5]) << 8) | buf[4];
+ 1785              		.loc 1 371 29 view .LVU553
+ 1786 015c 84ED037A 		vstr.32	s14, [r4, #12]
+ 372:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->Gyro[1] = bmi088_raw_temp * BMI088_GYRO_SEN - bmi088->GyroOffset[1];
+ 1787              		.loc 1 372 13 is_stmt 1 view .LVU554
+ 372:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->Gyro[1] = bmi088_raw_temp * BMI088_GYRO_SEN - bmi088->GyroOffset[1];
+ 1788              		.loc 1 372 45 is_stmt 0 view .LVU555
+ 1789 0160 9DF80530 		ldrb	r3, [sp, #5]	@ zero_extendqisi2
+ 372:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->Gyro[1] = bmi088_raw_temp * BMI088_GYRO_SEN - bmi088->GyroOffset[1];
+ 1790              		.loc 1 372 50 view .LVU556
+ 1791 0164 1B02     		lsls	r3, r3, #8
+ 372:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->Gyro[1] = bmi088_raw_temp * BMI088_GYRO_SEN - bmi088->GyroOffset[1];
+ 1792              		.loc 1 372 31 view .LVU557
+ 1793 0166 1BB2     		sxth	r3, r3
+ 372:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->Gyro[1] = bmi088_raw_temp * BMI088_GYRO_SEN - bmi088->GyroOffset[1];
+ 1794              		.loc 1 372 61 view .LVU558
+ 1795 0168 9DF80410 		ldrb	r1, [sp, #4]	@ zero_extendqisi2
+ 372:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->Gyro[1] = bmi088_raw_temp * BMI088_GYRO_SEN - bmi088->GyroOffset[1];
+ 1796              		.loc 1 372 56 view .LVU559
+ 1797 016c 0B43     		orrs	r3, r3, r1
+ 372:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->Gyro[1] = bmi088_raw_temp * BMI088_GYRO_SEN - bmi088->GyroOffset[1];
+ 1798              		.loc 1 372 29 view .LVU560
+ 1799 016e 1380     		strh	r3, [r2]	@ movhi
+ 373:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088_raw_temp = (int16_t)((buf[7]) << 8) | buf[6];
+ 1800              		.loc 1 373 13 is_stmt 1 view .LVU561
+ 373:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088_raw_temp = (int16_t)((buf[7]) << 8) | buf[6];
+ 1801              		.loc 1 373 47 is_stmt 0 view .LVU562
+ 1802 0170 07EE903A 		vmov	s15, r3	@ int
+ 1803 0174 B8EEE77A 		vcvt.f32.s32	s14, s15
+ 1804 0178 27EE267A 		vmul.f32	s14, s14, s13
+ 373:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088_raw_temp = (int16_t)((buf[7]) << 8) | buf[6];
+ 1805              		.loc 1 373 85 view .LVU563
+ 1806 017c D4ED0A7A 		vldr.32	s15, [r4, #40]
+ 373:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088_raw_temp = (int16_t)((buf[7]) << 8) | buf[6];
+ 1807              		.loc 1 373 65 view .LVU564
+ 1808 0180 37EE677A 		vsub.f32	s14, s14, s15
+ 373:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088_raw_temp = (int16_t)((buf[7]) << 8) | buf[6];
+ 1809              		.loc 1 373 29 view .LVU565
+ 1810 0184 84ED047A 		vstr.32	s14, [r4, #16]
+ 374:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->Gyro[2] = bmi088_raw_temp * BMI088_GYRO_SEN - bmi088->GyroOffset[2];
+ 1811              		.loc 1 374 13 is_stmt 1 view .LVU566
+ 374:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->Gyro[2] = bmi088_raw_temp * BMI088_GYRO_SEN - bmi088->GyroOffset[2];
+ 1812              		.loc 1 374 45 is_stmt 0 view .LVU567
+ 1813 0188 9DF80730 		ldrb	r3, [sp, #7]	@ zero_extendqisi2
+ 374:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->Gyro[2] = bmi088_raw_temp * BMI088_GYRO_SEN - bmi088->GyroOffset[2];
+ 1814              		.loc 1 374 50 view .LVU568
+ 1815 018c 1B02     		lsls	r3, r3, #8
+ 374:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->Gyro[2] = bmi088_raw_temp * BMI088_GYRO_SEN - bmi088->GyroOffset[2];
+ 1816              		.loc 1 374 31 view .LVU569
+ 1817 018e 1BB2     		sxth	r3, r3
+ 374:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->Gyro[2] = bmi088_raw_temp * BMI088_GYRO_SEN - bmi088->GyroOffset[2];
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccuocjhf.s 			page 50
+
+
+ 1818              		.loc 1 374 61 view .LVU570
+ 1819 0190 9DF80610 		ldrb	r1, [sp, #6]	@ zero_extendqisi2
+ 374:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->Gyro[2] = bmi088_raw_temp * BMI088_GYRO_SEN - bmi088->GyroOffset[2];
+ 1820              		.loc 1 374 56 view .LVU571
+ 1821 0194 0B43     		orrs	r3, r3, r1
+ 374:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->Gyro[2] = bmi088_raw_temp * BMI088_GYRO_SEN - bmi088->GyroOffset[2];
+ 1822              		.loc 1 374 29 view .LVU572
+ 1823 0196 1380     		strh	r3, [r2]	@ movhi
+ 375:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         }
+ 1824              		.loc 1 375 13 is_stmt 1 view .LVU573
+ 375:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         }
+ 1825              		.loc 1 375 47 is_stmt 0 view .LVU574
+ 1826 0198 07EE903A 		vmov	s15, r3	@ int
+ 1827 019c F8EEE77A 		vcvt.f32.s32	s15, s15
+ 1828 01a0 67EEA67A 		vmul.f32	s15, s15, s13
+ 375:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         }
+ 1829              		.loc 1 375 85 view .LVU575
+ 1830 01a4 94ED0B7A 		vldr.32	s14, [r4, #44]
+ 375:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         }
+ 1831              		.loc 1 375 65 view .LVU576
+ 1832 01a8 77EEC77A 		vsub.f32	s15, s15, s14
+ 375:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         }
+ 1833              		.loc 1 375 29 view .LVU577
+ 1834 01ac C4ED057A 		vstr.32	s15, [r4, #20]
+ 1835 01b0 8CE7     		b	.L84
+ 1836              	.L85:
+ 379:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->Gyro[0] = bmi088_raw_temp * BMI088_GYRO_SEN;
+ 1837              		.loc 1 379 13 is_stmt 1 view .LVU578
+ 379:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->Gyro[0] = bmi088_raw_temp * BMI088_GYRO_SEN;
+ 1838              		.loc 1 379 45 is_stmt 0 view .LVU579
+ 1839 01b2 9DF80330 		ldrb	r3, [sp, #3]	@ zero_extendqisi2
+ 379:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->Gyro[0] = bmi088_raw_temp * BMI088_GYRO_SEN;
+ 1840              		.loc 1 379 50 view .LVU580
+ 1841 01b6 1B02     		lsls	r3, r3, #8
+ 379:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->Gyro[0] = bmi088_raw_temp * BMI088_GYRO_SEN;
+ 1842              		.loc 1 379 31 view .LVU581
+ 1843 01b8 1BB2     		sxth	r3, r3
+ 379:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->Gyro[0] = bmi088_raw_temp * BMI088_GYRO_SEN;
+ 1844              		.loc 1 379 61 view .LVU582
+ 1845 01ba 9DF80220 		ldrb	r2, [sp, #2]	@ zero_extendqisi2
+ 379:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->Gyro[0] = bmi088_raw_temp * BMI088_GYRO_SEN;
+ 1846              		.loc 1 379 56 view .LVU583
+ 1847 01be 1343     		orrs	r3, r3, r2
+ 379:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->Gyro[0] = bmi088_raw_temp * BMI088_GYRO_SEN;
+ 1848              		.loc 1 379 29 view .LVU584
+ 1849 01c0 174A     		ldr	r2, .L89+4
+ 1850 01c2 1380     		strh	r3, [r2]	@ movhi
+ 380:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088_raw_temp = (int16_t)((buf[5]) << 8) | buf[4];
+ 1851              		.loc 1 380 13 is_stmt 1 view .LVU585
+ 380:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088_raw_temp = (int16_t)((buf[5]) << 8) | buf[4];
+ 1852              		.loc 1 380 47 is_stmt 0 view .LVU586
+ 1853 01c4 1949     		ldr	r1, .L89+16
+ 1854 01c6 D1ED006A 		vldr.32	s13, [r1]
+ 1855 01ca 07EE903A 		vmov	s15, r3	@ int
+ 1856 01ce B8EEE77A 		vcvt.f32.s32	s14, s15
+ 1857 01d2 27EE267A 		vmul.f32	s14, s14, s13
+ 380:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088_raw_temp = (int16_t)((buf[5]) << 8) | buf[4];
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccuocjhf.s 			page 51
+
+
+ 1858              		.loc 1 380 29 view .LVU587
+ 1859 01d6 84ED037A 		vstr.32	s14, [r4, #12]
+ 381:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->Gyro[1] = bmi088_raw_temp * BMI088_GYRO_SEN;
+ 1860              		.loc 1 381 13 is_stmt 1 view .LVU588
+ 381:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->Gyro[1] = bmi088_raw_temp * BMI088_GYRO_SEN;
+ 1861              		.loc 1 381 45 is_stmt 0 view .LVU589
+ 1862 01da 9DF80530 		ldrb	r3, [sp, #5]	@ zero_extendqisi2
+ 381:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->Gyro[1] = bmi088_raw_temp * BMI088_GYRO_SEN;
+ 1863              		.loc 1 381 50 view .LVU590
+ 1864 01de 1B02     		lsls	r3, r3, #8
+ 381:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->Gyro[1] = bmi088_raw_temp * BMI088_GYRO_SEN;
+ 1865              		.loc 1 381 31 view .LVU591
+ 1866 01e0 1BB2     		sxth	r3, r3
+ 381:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->Gyro[1] = bmi088_raw_temp * BMI088_GYRO_SEN;
+ 1867              		.loc 1 381 61 view .LVU592
+ 1868 01e2 9DF80410 		ldrb	r1, [sp, #4]	@ zero_extendqisi2
+ 381:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->Gyro[1] = bmi088_raw_temp * BMI088_GYRO_SEN;
+ 1869              		.loc 1 381 56 view .LVU593
+ 1870 01e6 0B43     		orrs	r3, r3, r1
+ 381:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->Gyro[1] = bmi088_raw_temp * BMI088_GYRO_SEN;
+ 1871              		.loc 1 381 29 view .LVU594
+ 1872 01e8 1380     		strh	r3, [r2]	@ movhi
+ 382:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088_raw_temp = (int16_t)((buf[7]) << 8) | buf[6];
+ 1873              		.loc 1 382 13 is_stmt 1 view .LVU595
+ 382:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088_raw_temp = (int16_t)((buf[7]) << 8) | buf[6];
+ 1874              		.loc 1 382 47 is_stmt 0 view .LVU596
+ 1875 01ea 07EE903A 		vmov	s15, r3	@ int
+ 1876 01ee B8EEE77A 		vcvt.f32.s32	s14, s15
+ 1877 01f2 27EE267A 		vmul.f32	s14, s14, s13
+ 382:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088_raw_temp = (int16_t)((buf[7]) << 8) | buf[6];
+ 1878              		.loc 1 382 29 view .LVU597
+ 1879 01f6 84ED047A 		vstr.32	s14, [r4, #16]
+ 383:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->Gyro[2] = bmi088_raw_temp * BMI088_GYRO_SEN;
+ 1880              		.loc 1 383 13 is_stmt 1 view .LVU598
+ 383:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->Gyro[2] = bmi088_raw_temp * BMI088_GYRO_SEN;
+ 1881              		.loc 1 383 45 is_stmt 0 view .LVU599
+ 1882 01fa 9DF80730 		ldrb	r3, [sp, #7]	@ zero_extendqisi2
+ 383:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->Gyro[2] = bmi088_raw_temp * BMI088_GYRO_SEN;
+ 1883              		.loc 1 383 50 view .LVU600
+ 1884 01fe 1B02     		lsls	r3, r3, #8
+ 383:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->Gyro[2] = bmi088_raw_temp * BMI088_GYRO_SEN;
+ 1885              		.loc 1 383 31 view .LVU601
+ 1886 0200 1BB2     		sxth	r3, r3
+ 383:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->Gyro[2] = bmi088_raw_temp * BMI088_GYRO_SEN;
+ 1887              		.loc 1 383 61 view .LVU602
+ 1888 0202 9DF80610 		ldrb	r1, [sp, #6]	@ zero_extendqisi2
+ 383:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->Gyro[2] = bmi088_raw_temp * BMI088_GYRO_SEN;
+ 1889              		.loc 1 383 56 view .LVU603
+ 1890 0206 0B43     		orrs	r3, r3, r1
+ 383:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****             bmi088->Gyro[2] = bmi088_raw_temp * BMI088_GYRO_SEN;
+ 1891              		.loc 1 383 29 view .LVU604
+ 1892 0208 1380     		strh	r3, [r2]	@ movhi
+ 384:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         }
+ 1893              		.loc 1 384 13 is_stmt 1 view .LVU605
+ 384:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         }
+ 1894              		.loc 1 384 47 is_stmt 0 view .LVU606
+ 1895 020a 07EE903A 		vmov	s15, r3	@ int
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccuocjhf.s 			page 52
+
+
+ 1896 020e F8EEE77A 		vcvt.f32.s32	s15, s15
+ 1897 0212 67EEA67A 		vmul.f32	s15, s15, s13
+ 384:ACE-ECF/Application/src/IMU_Driver/BMI088driver.c ****         }
+ 1898              		.loc 1 384 29 view .LVU607
+ 1899 0216 C4ED057A 		vstr.32	s15, [r4, #20]
+ 1900 021a 57E7     		b	.L84
+ 1901              	.L90:
+ 1902              		.align	2
+ 1903              	.L89:
+ 1904 021c 00000000 		.word	.LANCHOR0
+ 1905 0220 00000000 		.word	.LANCHOR13
+ 1906 0224 00000000 		.word	.LANCHOR2
+ 1907 0228 00000000 		.word	.LANCHOR14
+ 1908 022c 00000000 		.word	.LANCHOR3
+ 1909              		.cfi_endproc
+ 1910              	.LFE135:
+ 1912              		.global	BMI088
+ 1913              		.global	caliCount
+ 1914              		.global	caliOffset
+ 1915              		.global	gNormDiff
+ 1916              		.global	gyroDiff
+ 1917              		.global	BMI088_GYRO_SEN
+ 1918              		.global	BMI088_ACCEL_SEN
+ 1919              		.section	.rodata
+ 1920              		.align	2
+ 1921              		.set	.LANCHOR0,. + 0
+ 1922              	.LC0:
+ 1923 0000 00000000 		.ascii	"\000\000\000\000\000\000\000"
+ 1923      000000
+ 1924 0007 00       		.space	1
+ 1925              		.section	.bss.BMI088,"aw",%nobits
+ 1926              		.align	2
+ 1927              		.set	.LANCHOR12,. + 0
+ 1930              	BMI088:
+ 1931 0000 00000000 		.space	52
+ 1931      00000000 
+ 1931      00000000 
+ 1931      00000000 
+ 1931      00000000 
+ 1932              		.section	.bss.bmi088_raw_temp.0,"aw",%nobits
+ 1933              		.align	1
+ 1934              		.set	.LANCHOR13,. + 0
+ 1937              	bmi088_raw_temp.0:
+ 1938 0000 0000     		.space	2
+ 1939              		.section	.bss.caliCount,"aw",%nobits
+ 1940              		.align	1
+ 1941              		.set	.LANCHOR6,. + 0
+ 1944              	caliCount:
+ 1945 0000 0000     		.space	2
+ 1946              		.section	.bss.error,"aw",%nobits
+ 1947              		.set	.LANCHOR10,. + 0
+ 1950              	error:
+ 1951 0000 00       		.space	1
+ 1952              		.section	.bss.gNormDiff,"aw",%nobits
+ 1953              		.align	2
+ 1954              		.set	.LANCHOR4,. + 0
+ 1957              	gNormDiff:
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccuocjhf.s 			page 53
+
+
+ 1958 0000 00000000 		.space	4
+ 1959              		.section	.bss.gyroDiff,"aw",%nobits
+ 1960              		.align	2
+ 1961              		.set	.LANCHOR5,. + 0
+ 1964              	gyroDiff:
+ 1965 0000 00000000 		.space	12
+ 1965      00000000 
+ 1965      00000000 
+ 1966              		.section	.bss.res,"aw",%nobits
+ 1967              		.set	.LANCHOR7,. + 0
+ 1970              	res:
+ 1971 0000 00       		.space	1
+ 1972              		.section	.bss.startTime.2,"aw",%nobits
+ 1973              		.align	2
+ 1974              		.set	.LANCHOR1,. + 0
+ 1977              	startTime.2:
+ 1978 0000 00000000 		.space	4
+ 1979              		.section	.bss.write_reg_num,"aw",%nobits
+ 1980              		.set	.LANCHOR8,. + 0
+ 1983              	write_reg_num:
+ 1984 0000 00       		.space	1
+ 1985              		.section	.data.BMI088_ACCEL_SEN,"aw"
+ 1986              		.align	2
+ 1987              		.set	.LANCHOR2,. + 0
+ 1990              	BMI088_ACCEL_SEN:
+ 1991 0000 3333EB3A 		.word	988492595
+ 1992              		.section	.data.BMI088_GYRO_SEN,"aw"
+ 1993              		.align	2
+ 1994              		.set	.LANCHOR3,. + 0
+ 1997              	BMI088_GYRO_SEN:
+ 1998 0000 58A08B3A 		.word	982229080
+ 1999              		.section	.data.caliOffset,"aw"
+ 2000              		.set	.LANCHOR14,. + 0
+ 2003              	caliOffset:
+ 2004 0000 01       		.byte	1
+ 2005              		.section	.rodata.write_BMI088_accel_reg_data_error,"a"
+ 2006              		.align	2
+ 2007              		.set	.LANCHOR9,. + 0
+ 2010              	write_BMI088_accel_reg_data_error:
+ 2011 0000 7D0401   		.ascii	"}\004\001"
+ 2012 0003 7C0002   		.ascii	"|\000\002"
+ 2013 0006 40AB03   		.ascii	"@\253\003"
+ 2014 0009 410105   		.ascii	"A\001\005"
+ 2015 000c 530806   		.ascii	"S\010\006"
+ 2016 000f 580407   		.ascii	"X\004\007"
+ 2017              		.section	.rodata.write_BMI088_gyro_reg_data_error,"a"
+ 2018              		.align	2
+ 2019              		.set	.LANCHOR11,. + 0
+ 2022              	write_BMI088_gyro_reg_data_error:
+ 2023 0000 0F0008   		.ascii	"\017\000\010"
+ 2024 0003 108109   		.ascii	"\020\201\011"
+ 2025 0006 11000A   		.ascii	"\021\000\012"
+ 2026 0009 15800B   		.ascii	"\025\200\013"
+ 2027 000c 16000C   		.ascii	"\026\000\014"
+ 2028 000f 18010D   		.ascii	"\030\001\015"
+ 2029              		.text
+ 2030              	.Letext0:
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccuocjhf.s 			page 54
+
+
+ 2031              		.file 2 "d:\\gcc-arm-none-eabi-10.3-2021.10\\arm-none-eabi\\include\\machine\\_default_types.h"
+ 2032              		.file 3 "d:\\gcc-arm-none-eabi-10.3-2021.10\\arm-none-eabi\\include\\sys\\_stdint.h"
+ 2033              		.file 4 "Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f407xx.h"
+ 2034              		.file 5 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h"
+ 2035              		.file 6 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_dma.h"
+ 2036              		.file 7 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_spi.h"
+ 2037              		.file 8 "ACE-ECF/Application/inc/IMU_Driver/BMI088driver.h"
+ 2038              		.file 9 "ACE-ECF/Application/inc/IMU_Driver/BMI088Middleware.h"
+ 2039              		.file 10 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h"
+ 2040              		.file 11 "ACE-ECF/Application/inc/IMU_Driver/bsp_dwt.h"
+ 2041              		.file 12 "d:\\gcc-arm-none-eabi-10.3-2021.10\\arm-none-eabi\\include\\math.h"
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccuocjhf.s 			page 55
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 BMI088driver.c
+C:\Users\28212\AppData\Local\Temp\ccuocjhf.s:20     .text.BMI088_read_muli_reg:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccuocjhf.s:25     .text.BMI088_read_muli_reg:00000000 BMI088_read_muli_reg
+C:\Users\28212\AppData\Local\Temp\ccuocjhf.s:81     .text.BMI088_write_single_reg:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccuocjhf.s:86     .text.BMI088_write_single_reg:00000000 BMI088_write_single_reg
+C:\Users\28212\AppData\Local\Temp\ccuocjhf.s:113    .text.BMI088_read_single_reg:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccuocjhf.s:118    .text.BMI088_read_single_reg:00000000 BMI088_read_single_reg
+C:\Users\28212\AppData\Local\Temp\ccuocjhf.s:152    .text.Calibrate_MPU_Offset:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccuocjhf.s:157    .text.Calibrate_MPU_Offset:00000000 Calibrate_MPU_Offset
+C:\Users\28212\AppData\Local\Temp\ccuocjhf.s:759    .text.Calibrate_MPU_Offset:00000320 $d
+C:\Users\28212\AppData\Local\Temp\ccuocjhf.s:779    .text.Calibrate_MPU_Offset:00000360 $t
+C:\Users\28212\AppData\Local\Temp\ccuocjhf.s:923    .text.Calibrate_MPU_Offset:00000484 $d
+C:\Users\28212\AppData\Local\Temp\ccuocjhf.s:933    .text.bmi088_accel_init:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccuocjhf.s:939    .text.bmi088_accel_init:00000000 bmi088_accel_init
+C:\Users\28212\AppData\Local\Temp\ccuocjhf.s:1174   .text.bmi088_accel_init:00000134 $d
+C:\Users\28212\AppData\Local\Temp\ccuocjhf.s:1182   .text.bmi088_gyro_init:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccuocjhf.s:1188   .text.bmi088_gyro_init:00000000 bmi088_gyro_init
+C:\Users\28212\AppData\Local\Temp\ccuocjhf.s:1391   .text.bmi088_gyro_init:00000104 $d
+C:\Users\28212\AppData\Local\Temp\ccuocjhf.s:1400   .text.BMI088_init:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccuocjhf.s:1406   .text.BMI088_init:00000000 BMI088_init
+C:\Users\28212\AppData\Local\Temp\ccuocjhf.s:1490   .text.BMI088_init:0000004c $d
+C:\Users\28212\AppData\Local\Temp\ccuocjhf.s:1503   .text.BMI088_Init:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccuocjhf.s:1509   .text.BMI088_Init:00000000 BMI088_Init
+C:\Users\28212\AppData\Local\Temp\ccuocjhf.s:1546   .text.BMI088_Read:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccuocjhf.s:1552   .text.BMI088_Read:00000000 BMI088_Read
+C:\Users\28212\AppData\Local\Temp\ccuocjhf.s:1904   .text.BMI088_Read:0000021c $d
+C:\Users\28212\AppData\Local\Temp\ccuocjhf.s:1930   .bss.BMI088:00000000 BMI088
+C:\Users\28212\AppData\Local\Temp\ccuocjhf.s:1944   .bss.caliCount:00000000 caliCount
+C:\Users\28212\AppData\Local\Temp\ccuocjhf.s:2003   .data.caliOffset:00000000 caliOffset
+C:\Users\28212\AppData\Local\Temp\ccuocjhf.s:1957   .bss.gNormDiff:00000000 gNormDiff
+C:\Users\28212\AppData\Local\Temp\ccuocjhf.s:1964   .bss.gyroDiff:00000000 gyroDiff
+C:\Users\28212\AppData\Local\Temp\ccuocjhf.s:1997   .data.BMI088_GYRO_SEN:00000000 BMI088_GYRO_SEN
+C:\Users\28212\AppData\Local\Temp\ccuocjhf.s:1990   .data.BMI088_ACCEL_SEN:00000000 BMI088_ACCEL_SEN
+C:\Users\28212\AppData\Local\Temp\ccuocjhf.s:1920   .rodata:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccuocjhf.s:1926   .bss.BMI088:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccuocjhf.s:1933   .bss.bmi088_raw_temp.0:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccuocjhf.s:1937   .bss.bmi088_raw_temp.0:00000000 bmi088_raw_temp.0
+C:\Users\28212\AppData\Local\Temp\ccuocjhf.s:1940   .bss.caliCount:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccuocjhf.s:1950   .bss.error:00000000 error
+C:\Users\28212\AppData\Local\Temp\ccuocjhf.s:1951   .bss.error:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccuocjhf.s:1953   .bss.gNormDiff:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccuocjhf.s:1960   .bss.gyroDiff:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccuocjhf.s:1970   .bss.res:00000000 res
+C:\Users\28212\AppData\Local\Temp\ccuocjhf.s:1971   .bss.res:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccuocjhf.s:1973   .bss.startTime.2:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccuocjhf.s:1977   .bss.startTime.2:00000000 startTime.2
+C:\Users\28212\AppData\Local\Temp\ccuocjhf.s:1983   .bss.write_reg_num:00000000 write_reg_num
+C:\Users\28212\AppData\Local\Temp\ccuocjhf.s:1984   .bss.write_reg_num:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccuocjhf.s:1986   .data.BMI088_ACCEL_SEN:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccuocjhf.s:1993   .data.BMI088_GYRO_SEN:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccuocjhf.s:2006   .rodata.write_BMI088_accel_reg_data_error:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccuocjhf.s:2010   .rodata.write_BMI088_accel_reg_data_error:00000000 write_BMI088_accel_reg_data_error
+C:\Users\28212\AppData\Local\Temp\ccuocjhf.s:2018   .rodata.write_BMI088_gyro_reg_data_error:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccuocjhf.s:2022   .rodata.write_BMI088_gyro_reg_data_error:00000000 write_BMI088_gyro_reg_data_error
+
+UNDEFINED SYMBOLS
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccuocjhf.s 			page 56
+
+
+BMI088_read_write_byte
+DWT_GetTimeline_s
+DWT_Delay
+BMI088_ACCEL_NS_L
+BMI088_ACCEL_NS_H
+sqrtf
+BMI088_GYRO_NS_L
+BMI088_GYRO_NS_H
+HAL_Delay
+BMI088_SPI

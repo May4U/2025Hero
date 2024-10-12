@@ -1,0 +1,2237 @@
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.arch armv7e-m
+   3              		.fpu fpv4-sp-d16
+   4              		.eabi_attribute 27, 1
+   5              		.eabi_attribute 28, 1
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.file	"user_lib.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.Sqrt,"ax",%progbits
+  20              		.align	1
+  21              		.global	Sqrt
+  22              		.syntax unified
+  23              		.thumb
+  24              		.thumb_func
+  26              	Sqrt:
+  27              	.LVL0:
+  28              	.LFB135:
+  29              		.file 1 "ACE-ECF/Algorithm/src/user_lib.c"
+   1:ACE-ECF/Algorithm/src/user_lib.c **** /**
+   2:ACE-ECF/Algorithm/src/user_lib.c ****   ******************************************************************************
+   3:ACE-ECF/Algorithm/src/user_lib.c ****   * @file	 user_lib.c
+   4:ACE-ECF/Algorithm/src/user_lib.c ****   * @author  Wang Hongxi
+   5:ACE-ECF/Algorithm/src/user_lib.c ****   * @version V1.0.0
+   6:ACE-ECF/Algorithm/src/user_lib.c ****   * @date    2021/2/18
+   7:ACE-ECF/Algorithm/src/user_lib.c ****   * @brief   
+   8:ACE-ECF/Algorithm/src/user_lib.c ****   ******************************************************************************
+   9:ACE-ECF/Algorithm/src/user_lib.c ****   * @attention
+  10:ACE-ECF/Algorithm/src/user_lib.c ****   *
+  11:ACE-ECF/Algorithm/src/user_lib.c ****   ******************************************************************************
+  12:ACE-ECF/Algorithm/src/user_lib.c ****   */
+  13:ACE-ECF/Algorithm/src/user_lib.c **** #include "stdlib.h"
+  14:ACE-ECF/Algorithm/src/user_lib.c **** #include "string.h"
+  15:ACE-ECF/Algorithm/src/user_lib.c **** #include "user_lib.h"
+  16:ACE-ECF/Algorithm/src/user_lib.c **** #include "math.h"
+  17:ACE-ECF/Algorithm/src/user_lib.c **** #include "main.h"
+  18:ACE-ECF/Algorithm/src/user_lib.c **** 
+  19:ACE-ECF/Algorithm/src/user_lib.c **** #ifdef _CMSIS_OS_H
+  20:ACE-ECF/Algorithm/src/user_lib.c **** #define user_malloc pvPortMalloc
+  21:ACE-ECF/Algorithm/src/user_lib.c **** #else
+  22:ACE-ECF/Algorithm/src/user_lib.c **** #define user_malloc malloc
+  23:ACE-ECF/Algorithm/src/user_lib.c **** #endif
+  24:ACE-ECF/Algorithm/src/user_lib.c **** 
+  25:ACE-ECF/Algorithm/src/user_lib.c **** uint8_t GlobalDebugMode = 7;
+  26:ACE-ECF/Algorithm/src/user_lib.c **** 
+  27:ACE-ECF/Algorithm/src/user_lib.c **** //快速开方
+  28:ACE-ECF/Algorithm/src/user_lib.c **** float Sqrt(float x)
+  29:ACE-ECF/Algorithm/src/user_lib.c **** {
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 2
+
+
+  30              		.loc 1 29 1 view -0
+  31              		.cfi_startproc
+  32              		@ args = 0, pretend = 0, frame = 0
+  33              		@ frame_needed = 0, uses_anonymous_args = 0
+  34              		@ link register save eliminated.
+  35              		.loc 1 29 1 is_stmt 0 view .LVU1
+  36 0000 F0EE405A 		vmov.f32	s11, s0
+  30:ACE-ECF/Algorithm/src/user_lib.c ****     float y;
+  37              		.loc 1 30 5 is_stmt 1 view .LVU2
+  31:ACE-ECF/Algorithm/src/user_lib.c ****     float delta;
+  38              		.loc 1 31 5 view .LVU3
+  32:ACE-ECF/Algorithm/src/user_lib.c ****     float maxError;
+  39              		.loc 1 32 5 view .LVU4
+  33:ACE-ECF/Algorithm/src/user_lib.c **** 
+  34:ACE-ECF/Algorithm/src/user_lib.c ****     if (x <= 0)
+  40              		.loc 1 34 5 view .LVU5
+  41              		.loc 1 34 8 is_stmt 0 view .LVU6
+  42 0004 B5EEC00A 		vcmpe.f32	s0, #0
+  43 0008 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+  44 000c 1ED9     		bls	.L5
+  35:ACE-ECF/Algorithm/src/user_lib.c ****     {
+  36:ACE-ECF/Algorithm/src/user_lib.c ****         return 0;
+  37:ACE-ECF/Algorithm/src/user_lib.c ****     }
+  38:ACE-ECF/Algorithm/src/user_lib.c **** 
+  39:ACE-ECF/Algorithm/src/user_lib.c ****     // initial guess
+  40:ACE-ECF/Algorithm/src/user_lib.c ****     y = x / 2;
+  45              		.loc 1 40 5 is_stmt 1 view .LVU7
+  46              		.loc 1 40 7 is_stmt 0 view .LVU8
+  47 000e F6EE007A 		vmov.f32	s15, #5.0e-1
+  48 0012 20EE270A 		vmul.f32	s0, s0, s15
+  49              	.LVL1:
+  41:ACE-ECF/Algorithm/src/user_lib.c **** 
+  42:ACE-ECF/Algorithm/src/user_lib.c ****     // refine
+  43:ACE-ECF/Algorithm/src/user_lib.c ****     maxError = x * 0.001f;
+  50              		.loc 1 43 5 is_stmt 1 view .LVU9
+  51              		.loc 1 43 14 is_stmt 0 view .LVU10
+  52 0016 9FED0F6A 		vldr.32	s12, .L6
+  53 001a 25EE866A 		vmul.f32	s12, s11, s12
+  54              	.LVL2:
+  55              	.L3:
+  44:ACE-ECF/Algorithm/src/user_lib.c **** 
+  45:ACE-ECF/Algorithm/src/user_lib.c ****     do
+  56              		.loc 1 45 5 is_stmt 1 discriminator 3 view .LVU11
+  46:ACE-ECF/Algorithm/src/user_lib.c ****     {
+  47:ACE-ECF/Algorithm/src/user_lib.c ****         delta = (y * y) - x;
+  57              		.loc 1 47 9 discriminator 3 view .LVU12
+  58              		.loc 1 47 20 is_stmt 0 discriminator 3 view .LVU13
+  59 001e 60EE007A 		vmul.f32	s15, s0, s0
+  60              		.loc 1 47 15 discriminator 3 view .LVU14
+  61 0022 77EEE57A 		vsub.f32	s15, s15, s11
+  62              	.LVL3:
+  48:ACE-ECF/Algorithm/src/user_lib.c ****         y -= delta / (2 * y);
+  63              		.loc 1 48 9 is_stmt 1 discriminator 3 view .LVU15
+  64              		.loc 1 48 25 is_stmt 0 discriminator 3 view .LVU16
+  65 0026 70EE006A 		vadd.f32	s13, s0, s0
+  66              		.loc 1 48 20 discriminator 3 view .LVU17
+  67 002a 87EEA67A 		vdiv.f32	s14, s15, s13
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 3
+
+
+  68              		.loc 1 48 11 discriminator 3 view .LVU18
+  69 002e 30EE470A 		vsub.f32	s0, s0, s14
+  70              	.LVL4:
+  49:ACE-ECF/Algorithm/src/user_lib.c ****     } while (delta > maxError || delta < -maxError);
+  71              		.loc 1 49 13 is_stmt 1 discriminator 3 view .LVU19
+  72              		.loc 1 49 5 is_stmt 0 discriminator 3 view .LVU20
+  73 0032 B4EEE76A 		vcmpe.f32	s12, s15
+  74 0036 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+  75 003a F0D4     		bmi	.L3
+  76              		.loc 1 49 42 discriminator 2 view .LVU21
+  77 003c B1EE467A 		vneg.f32	s14, s12
+  78              		.loc 1 49 31 discriminator 2 view .LVU22
+  79 0040 B4EEE77A 		vcmpe.f32	s14, s15
+  80 0044 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+  81 0048 E9DC     		bgt	.L3
+  82 004a 7047     		bx	lr
+  83              	.LVL5:
+  84              	.L5:
+  36:ACE-ECF/Algorithm/src/user_lib.c ****     }
+  85              		.loc 1 36 16 view .LVU23
+  86 004c 9FED020A 		vldr.32	s0, .L6+4
+  87              	.LVL6:
+  50:ACE-ECF/Algorithm/src/user_lib.c **** 
+  51:ACE-ECF/Algorithm/src/user_lib.c ****     return y;
+  52:ACE-ECF/Algorithm/src/user_lib.c **** }
+  88              		.loc 1 52 1 view .LVU24
+  89 0050 7047     		bx	lr
+  90              	.L7:
+  91 0052 00BF     		.align	2
+  92              	.L6:
+  93 0054 6F12833A 		.word	981668463
+  94 0058 00000000 		.word	0
+  95              		.cfi_endproc
+  96              	.LFE135:
+  98              		.section	.text.ramp_init,"ax",%progbits
+  99              		.align	1
+ 100              		.global	ramp_init
+ 101              		.syntax unified
+ 102              		.thumb
+ 103              		.thumb_func
+ 105              	ramp_init:
+ 106              	.LVL7:
+ 107              	.LFB136:
+  53:ACE-ECF/Algorithm/src/user_lib.c **** 
+  54:ACE-ECF/Algorithm/src/user_lib.c **** //快速求平方根倒数
+  55:ACE-ECF/Algorithm/src/user_lib.c **** /*
+  56:ACE-ECF/Algorithm/src/user_lib.c **** float invSqrt(float num)
+  57:ACE-ECF/Algorithm/src/user_lib.c **** {
+  58:ACE-ECF/Algorithm/src/user_lib.c ****     float halfnum = 0.5f * num;
+  59:ACE-ECF/Algorithm/src/user_lib.c ****     float y = num;
+  60:ACE-ECF/Algorithm/src/user_lib.c ****     long i = *(long *)&y;
+  61:ACE-ECF/Algorithm/src/user_lib.c ****     i = 0x5f375a86- (i >> 1);
+  62:ACE-ECF/Algorithm/src/user_lib.c ****     y = *(float *)&i;
+  63:ACE-ECF/Algorithm/src/user_lib.c ****     y = y * (1.5f - (halfnum * y * y));
+  64:ACE-ECF/Algorithm/src/user_lib.c ****     return y;
+  65:ACE-ECF/Algorithm/src/user_lib.c **** }*/
+  66:ACE-ECF/Algorithm/src/user_lib.c **** 
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 4
+
+
+  67:ACE-ECF/Algorithm/src/user_lib.c **** /**
+  68:ACE-ECF/Algorithm/src/user_lib.c ****   * @brief          斜波函数初始化
+  69:ACE-ECF/Algorithm/src/user_lib.c ****   * @author         RM
+  70:ACE-ECF/Algorithm/src/user_lib.c ****   * @param[in]      斜波函数结构体
+  71:ACE-ECF/Algorithm/src/user_lib.c ****   * @param[in]      间隔的时间，单位 s
+  72:ACE-ECF/Algorithm/src/user_lib.c ****   * @param[in]      最大值
+  73:ACE-ECF/Algorithm/src/user_lib.c ****   * @param[in]      最小值
+  74:ACE-ECF/Algorithm/src/user_lib.c ****   * @retval         返回空
+  75:ACE-ECF/Algorithm/src/user_lib.c ****   */
+  76:ACE-ECF/Algorithm/src/user_lib.c **** void ramp_init(ramp_function_source_t *ramp_source_type, float frame_period, float max, float min)
+  77:ACE-ECF/Algorithm/src/user_lib.c **** {
+ 108              		.loc 1 77 1 is_stmt 1 view -0
+ 109              		.cfi_startproc
+ 110              		@ args = 0, pretend = 0, frame = 0
+ 111              		@ frame_needed = 0, uses_anonymous_args = 0
+ 112              		@ link register save eliminated.
+  78:ACE-ECF/Algorithm/src/user_lib.c ****     ramp_source_type->frame_period = frame_period;
+ 113              		.loc 1 78 5 view .LVU26
+ 114              		.loc 1 78 36 is_stmt 0 view .LVU27
+ 115 0000 80ED040A 		vstr.32	s0, [r0, #16]
+  79:ACE-ECF/Algorithm/src/user_lib.c ****     ramp_source_type->max_value = max;
+ 116              		.loc 1 79 5 is_stmt 1 view .LVU28
+ 117              		.loc 1 79 33 is_stmt 0 view .LVU29
+ 118 0004 C0ED030A 		vstr.32	s1, [r0, #12]
+  80:ACE-ECF/Algorithm/src/user_lib.c ****     ramp_source_type->min_value = min;
+ 119              		.loc 1 80 5 is_stmt 1 view .LVU30
+ 120              		.loc 1 80 33 is_stmt 0 view .LVU31
+ 121 0008 80ED021A 		vstr.32	s2, [r0, #8]
+  81:ACE-ECF/Algorithm/src/user_lib.c ****     ramp_source_type->input = 0.0f;
+ 122              		.loc 1 81 5 is_stmt 1 view .LVU32
+ 123              		.loc 1 81 29 is_stmt 0 view .LVU33
+ 124 000c 0023     		movs	r3, #0
+ 125 000e 0360     		str	r3, [r0]	@ float
+  82:ACE-ECF/Algorithm/src/user_lib.c ****     ramp_source_type->out = 0.0f;
+ 126              		.loc 1 82 5 is_stmt 1 view .LVU34
+ 127              		.loc 1 82 27 is_stmt 0 view .LVU35
+ 128 0010 4360     		str	r3, [r0, #4]	@ float
+  83:ACE-ECF/Algorithm/src/user_lib.c **** }
+ 129              		.loc 1 83 1 view .LVU36
+ 130 0012 7047     		bx	lr
+ 131              		.cfi_endproc
+ 132              	.LFE136:
+ 134              		.section	.text.ramp_calc,"ax",%progbits
+ 135              		.align	1
+ 136              		.global	ramp_calc
+ 137              		.syntax unified
+ 138              		.thumb
+ 139              		.thumb_func
+ 141              	ramp_calc:
+ 142              	.LVL8:
+ 143              	.LFB137:
+  84:ACE-ECF/Algorithm/src/user_lib.c **** 
+  85:ACE-ECF/Algorithm/src/user_lib.c **** /**
+  86:ACE-ECF/Algorithm/src/user_lib.c ****   * @brief          斜波函数计算，根据输入的值进行叠加， 输入单位为 /s 即一秒后增加输入的值
+  87:ACE-ECF/Algorithm/src/user_lib.c ****   * @author         RM
+  88:ACE-ECF/Algorithm/src/user_lib.c ****   * @param[in]      斜波函数结构体
+  89:ACE-ECF/Algorithm/src/user_lib.c ****   * @param[in]      输入值
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 5
+
+
+  90:ACE-ECF/Algorithm/src/user_lib.c ****   * @retval         返回空
+  91:ACE-ECF/Algorithm/src/user_lib.c ****   */
+  92:ACE-ECF/Algorithm/src/user_lib.c **** float ramp_calc(ramp_function_source_t *ramp_source_type, float input)
+  93:ACE-ECF/Algorithm/src/user_lib.c **** {
+ 144              		.loc 1 93 1 is_stmt 1 view -0
+ 145              		.cfi_startproc
+ 146              		@ args = 0, pretend = 0, frame = 0
+ 147              		@ frame_needed = 0, uses_anonymous_args = 0
+ 148              		@ link register save eliminated.
+  94:ACE-ECF/Algorithm/src/user_lib.c ****     ramp_source_type->input = input;
+ 149              		.loc 1 94 5 view .LVU38
+ 150              		.loc 1 94 29 is_stmt 0 view .LVU39
+ 151 0000 80ED000A 		vstr.32	s0, [r0]
+  95:ACE-ECF/Algorithm/src/user_lib.c ****     ramp_source_type->out += ramp_source_type->input * ramp_source_type->frame_period;
+ 152              		.loc 1 95 5 is_stmt 1 view .LVU40
+ 153              		.loc 1 95 72 is_stmt 0 view .LVU41
+ 154 0004 D0ED047A 		vldr.32	s15, [r0, #16]
+ 155              		.loc 1 95 54 view .LVU42
+ 156 0008 27EE800A 		vmul.f32	s0, s15, s0
+ 157              	.LVL9:
+ 158              		.loc 1 95 27 view .LVU43
+ 159 000c D0ED017A 		vldr.32	s15, [r0, #4]
+ 160 0010 30EE270A 		vadd.f32	s0, s0, s15
+ 161 0014 80ED010A 		vstr.32	s0, [r0, #4]
+  96:ACE-ECF/Algorithm/src/user_lib.c ****     if (ramp_source_type->out > ramp_source_type->max_value)
+ 162              		.loc 1 96 5 is_stmt 1 view .LVU44
+ 163              		.loc 1 96 49 is_stmt 0 view .LVU45
+ 164 0018 D0ED037A 		vldr.32	s15, [r0, #12]
+ 165              		.loc 1 96 8 view .LVU46
+ 166 001c B4EEE70A 		vcmpe.f32	s0, s15
+ 167 0020 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 168 0024 04DD     		ble	.L16
+  97:ACE-ECF/Algorithm/src/user_lib.c ****     {
+  98:ACE-ECF/Algorithm/src/user_lib.c ****         ramp_source_type->out = ramp_source_type->max_value;
+ 169              		.loc 1 98 9 is_stmt 1 view .LVU47
+ 170              		.loc 1 98 31 is_stmt 0 view .LVU48
+ 171 0026 C0ED017A 		vstr.32	s15, [r0, #4]
+ 172              	.L12:
+  99:ACE-ECF/Algorithm/src/user_lib.c ****     }
+ 100:ACE-ECF/Algorithm/src/user_lib.c ****     else if (ramp_source_type->out < ramp_source_type->min_value)
+ 101:ACE-ECF/Algorithm/src/user_lib.c ****     {
+ 102:ACE-ECF/Algorithm/src/user_lib.c ****         ramp_source_type->out = ramp_source_type->min_value;
+ 103:ACE-ECF/Algorithm/src/user_lib.c ****     }
+ 104:ACE-ECF/Algorithm/src/user_lib.c ****     return ramp_source_type->out;
+ 173              		.loc 1 104 5 is_stmt 1 view .LVU49
+ 105:ACE-ECF/Algorithm/src/user_lib.c **** }
+ 174              		.loc 1 105 1 is_stmt 0 view .LVU50
+ 175 002a 90ED010A 		vldr.32	s0, [r0, #4]
+ 176 002e 7047     		bx	lr
+ 177              	.L16:
+ 100:ACE-ECF/Algorithm/src/user_lib.c ****     {
+ 178              		.loc 1 100 10 is_stmt 1 view .LVU51
+ 100:ACE-ECF/Algorithm/src/user_lib.c ****     {
+ 179              		.loc 1 100 54 is_stmt 0 view .LVU52
+ 180 0030 D0ED027A 		vldr.32	s15, [r0, #8]
+ 100:ACE-ECF/Algorithm/src/user_lib.c ****     {
+ 181              		.loc 1 100 13 view .LVU53
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 6
+
+
+ 182 0034 B4EEE70A 		vcmpe.f32	s0, s15
+ 183 0038 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 184 003c F5D5     		bpl	.L12
+ 102:ACE-ECF/Algorithm/src/user_lib.c ****     }
+ 185              		.loc 1 102 9 is_stmt 1 view .LVU54
+ 102:ACE-ECF/Algorithm/src/user_lib.c ****     }
+ 186              		.loc 1 102 31 is_stmt 0 view .LVU55
+ 187 003e C0ED017A 		vstr.32	s15, [r0, #4]
+ 188 0042 F2E7     		b	.L12
+ 189              		.cfi_endproc
+ 190              	.LFE137:
+ 192              		.section	.text.abs_limit,"ax",%progbits
+ 193              		.align	1
+ 194              		.global	abs_limit
+ 195              		.syntax unified
+ 196              		.thumb
+ 197              		.thumb_func
+ 199              	abs_limit:
+ 200              	.LVL10:
+ 201              	.LFB138:
+ 106:ACE-ECF/Algorithm/src/user_lib.c **** 
+ 107:ACE-ECF/Algorithm/src/user_lib.c **** //绝对值限制
+ 108:ACE-ECF/Algorithm/src/user_lib.c **** float abs_limit(float num, float Limit)
+ 109:ACE-ECF/Algorithm/src/user_lib.c **** {
+ 202              		.loc 1 109 1 is_stmt 1 view -0
+ 203              		.cfi_startproc
+ 204              		@ args = 0, pretend = 0, frame = 0
+ 205              		@ frame_needed = 0, uses_anonymous_args = 0
+ 206              		@ link register save eliminated.
+ 207              		.loc 1 109 1 is_stmt 0 view .LVU57
+ 208 0000 F0EE407A 		vmov.f32	s15, s0
+ 209 0004 B0EE600A 		vmov.f32	s0, s1
+ 210              	.LVL11:
+ 110:ACE-ECF/Algorithm/src/user_lib.c ****     if (num > Limit)
+ 211              		.loc 1 110 5 is_stmt 1 view .LVU58
+ 212              		.loc 1 110 8 is_stmt 0 view .LVU59
+ 213 0008 F4EEE07A 		vcmpe.f32	s15, s1
+ 214 000c F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 215 0010 08DC     		bgt	.L18
+ 111:ACE-ECF/Algorithm/src/user_lib.c ****     {
+ 112:ACE-ECF/Algorithm/src/user_lib.c ****         num = Limit;
+ 113:ACE-ECF/Algorithm/src/user_lib.c ****     }
+ 114:ACE-ECF/Algorithm/src/user_lib.c ****     else if (num < -Limit)
+ 216              		.loc 1 114 10 is_stmt 1 view .LVU60
+ 217              		.loc 1 114 20 is_stmt 0 view .LVU61
+ 218 0012 B1EE600A 		vneg.f32	s0, s1
+ 219              		.loc 1 114 13 view .LVU62
+ 220 0016 B4EEE70A 		vcmpe.f32	s0, s15
+ 221 001a F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 222 001e 01DC     		bgt	.L18
+ 223 0020 B0EE670A 		vmov.f32	s0, s15
+ 224              	.L18:
+ 225              	.LVL12:
+ 115:ACE-ECF/Algorithm/src/user_lib.c ****     {
+ 116:ACE-ECF/Algorithm/src/user_lib.c ****         num = -Limit;
+ 117:ACE-ECF/Algorithm/src/user_lib.c ****     }
+ 118:ACE-ECF/Algorithm/src/user_lib.c ****     return num;
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 7
+
+
+ 226              		.loc 1 118 5 is_stmt 1 view .LVU63
+ 119:ACE-ECF/Algorithm/src/user_lib.c **** }
+ 227              		.loc 1 119 1 is_stmt 0 view .LVU64
+ 228 0024 7047     		bx	lr
+ 229              		.cfi_endproc
+ 230              	.LFE138:
+ 232              		.section	.text.sign,"ax",%progbits
+ 233              		.align	1
+ 234              		.global	sign
+ 235              		.syntax unified
+ 236              		.thumb
+ 237              		.thumb_func
+ 239              	sign:
+ 240              	.LVL13:
+ 241              	.LFB139:
+ 120:ACE-ECF/Algorithm/src/user_lib.c **** 
+ 121:ACE-ECF/Algorithm/src/user_lib.c **** //判断符号位
+ 122:ACE-ECF/Algorithm/src/user_lib.c **** float sign(float value)
+ 123:ACE-ECF/Algorithm/src/user_lib.c **** {
+ 242              		.loc 1 123 1 is_stmt 1 view -0
+ 243              		.cfi_startproc
+ 244              		@ args = 0, pretend = 0, frame = 0
+ 245              		@ frame_needed = 0, uses_anonymous_args = 0
+ 246              		@ link register save eliminated.
+ 124:ACE-ECF/Algorithm/src/user_lib.c ****     if (value >= 0.0f)
+ 247              		.loc 1 124 5 view .LVU66
+ 248              		.loc 1 124 8 is_stmt 0 view .LVU67
+ 249 0000 B5EEC00A 		vcmpe.f32	s0, #0
+ 250 0004 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 251 0008 02DB     		blt	.L24
+ 125:ACE-ECF/Algorithm/src/user_lib.c ****     {
+ 126:ACE-ECF/Algorithm/src/user_lib.c ****         return 1.0f;
+ 252              		.loc 1 126 16 view .LVU68
+ 253 000a B7EE000A 		vmov.f32	s0, #1.0e+0
+ 254              	.LVL14:
+ 255              		.loc 1 126 16 view .LVU69
+ 256 000e 7047     		bx	lr
+ 257              	.LVL15:
+ 258              	.L24:
+ 127:ACE-ECF/Algorithm/src/user_lib.c ****     }
+ 128:ACE-ECF/Algorithm/src/user_lib.c ****     else
+ 129:ACE-ECF/Algorithm/src/user_lib.c ****     {
+ 130:ACE-ECF/Algorithm/src/user_lib.c ****         return -1.0f;
+ 259              		.loc 1 130 16 view .LVU70
+ 260 0010 BFEE000A 		vmov.f32	s0, #-1.0e+0
+ 261              	.LVL16:
+ 131:ACE-ECF/Algorithm/src/user_lib.c ****     }
+ 132:ACE-ECF/Algorithm/src/user_lib.c **** }
+ 262              		.loc 1 132 1 view .LVU71
+ 263 0014 7047     		bx	lr
+ 264              		.cfi_endproc
+ 265              	.LFE139:
+ 267              		.section	.text.float_deadband,"ax",%progbits
+ 268              		.align	1
+ 269              		.global	float_deadband
+ 270              		.syntax unified
+ 271              		.thumb
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 8
+
+
+ 272              		.thumb_func
+ 274              	float_deadband:
+ 275              	.LVL17:
+ 276              	.LFB140:
+ 133:ACE-ECF/Algorithm/src/user_lib.c **** 
+ 134:ACE-ECF/Algorithm/src/user_lib.c **** //浮点死区
+ 135:ACE-ECF/Algorithm/src/user_lib.c **** float float_deadband(float Value, float minValue, float maxValue)
+ 136:ACE-ECF/Algorithm/src/user_lib.c **** {
+ 277              		.loc 1 136 1 is_stmt 1 view -0
+ 278              		.cfi_startproc
+ 279              		@ args = 0, pretend = 0, frame = 0
+ 280              		@ frame_needed = 0, uses_anonymous_args = 0
+ 281              		@ link register save eliminated.
+ 137:ACE-ECF/Algorithm/src/user_lib.c ****     if (Value < maxValue && Value > minValue)
+ 282              		.loc 1 137 5 view .LVU73
+ 283              		.loc 1 137 8 is_stmt 0 view .LVU74
+ 284 0000 B4EEC10A 		vcmpe.f32	s0, s2
+ 285 0004 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 286 0008 06D5     		bpl	.L26
+ 287              		.loc 1 137 26 discriminator 1 view .LVU75
+ 288 000a B4EEE00A 		vcmpe.f32	s0, s1
+ 289 000e F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 290 0012 01DD     		ble	.L26
+ 138:ACE-ECF/Algorithm/src/user_lib.c ****     {
+ 139:ACE-ECF/Algorithm/src/user_lib.c ****         Value = 0.0f;
+ 291              		.loc 1 139 15 view .LVU76
+ 292 0014 9FED010A 		vldr.32	s0, .L30
+ 293              	.LVL18:
+ 294              	.L26:
+ 140:ACE-ECF/Algorithm/src/user_lib.c ****     }
+ 141:ACE-ECF/Algorithm/src/user_lib.c ****     return Value;
+ 295              		.loc 1 141 5 is_stmt 1 view .LVU77
+ 142:ACE-ECF/Algorithm/src/user_lib.c **** }
+ 296              		.loc 1 142 1 is_stmt 0 view .LVU78
+ 297 0018 7047     		bx	lr
+ 298              	.L31:
+ 299 001a 00BF     		.align	2
+ 300              	.L30:
+ 301 001c 00000000 		.word	0
+ 302              		.cfi_endproc
+ 303              	.LFE140:
+ 305              		.section	.text.int16_deadline,"ax",%progbits
+ 306              		.align	1
+ 307              		.global	int16_deadline
+ 308              		.syntax unified
+ 309              		.thumb
+ 310              		.thumb_func
+ 312              	int16_deadline:
+ 313              	.LVL19:
+ 314              	.LFB141:
+ 143:ACE-ECF/Algorithm/src/user_lib.c **** 
+ 144:ACE-ECF/Algorithm/src/user_lib.c **** //int26死区
+ 145:ACE-ECF/Algorithm/src/user_lib.c **** int16_t int16_deadline(int16_t Value, int16_t minValue, int16_t maxValue)
+ 146:ACE-ECF/Algorithm/src/user_lib.c **** {
+ 315              		.loc 1 146 1 is_stmt 1 view -0
+ 316              		.cfi_startproc
+ 317              		@ args = 0, pretend = 0, frame = 0
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 9
+
+
+ 318              		@ frame_needed = 0, uses_anonymous_args = 0
+ 319              		@ link register save eliminated.
+ 147:ACE-ECF/Algorithm/src/user_lib.c ****     if (Value < maxValue && Value > minValue)
+ 320              		.loc 1 147 5 view .LVU80
+ 321              		.loc 1 147 8 is_stmt 0 view .LVU81
+ 322 0000 9042     		cmp	r0, r2
+ 323 0002 02DA     		bge	.L33
+ 324              		.loc 1 147 26 discriminator 1 view .LVU82
+ 325 0004 8842     		cmp	r0, r1
+ 326 0006 00DD     		ble	.L33
+ 148:ACE-ECF/Algorithm/src/user_lib.c ****     {
+ 149:ACE-ECF/Algorithm/src/user_lib.c ****         Value = 0;
+ 327              		.loc 1 149 15 view .LVU83
+ 328 0008 0020     		movs	r0, #0
+ 329              	.LVL20:
+ 330              	.L33:
+ 150:ACE-ECF/Algorithm/src/user_lib.c ****     }
+ 151:ACE-ECF/Algorithm/src/user_lib.c ****     return Value;
+ 331              		.loc 1 151 5 is_stmt 1 view .LVU84
+ 152:ACE-ECF/Algorithm/src/user_lib.c **** }
+ 332              		.loc 1 152 1 is_stmt 0 view .LVU85
+ 333 000a 7047     		bx	lr
+ 334              		.cfi_endproc
+ 335              	.LFE141:
+ 337              		.section	.text.float_constrain,"ax",%progbits
+ 338              		.align	1
+ 339              		.global	float_constrain
+ 340              		.syntax unified
+ 341              		.thumb
+ 342              		.thumb_func
+ 344              	float_constrain:
+ 345              	.LVL21:
+ 346              	.LFB142:
+ 153:ACE-ECF/Algorithm/src/user_lib.c **** 
+ 154:ACE-ECF/Algorithm/src/user_lib.c **** //限幅函数
+ 155:ACE-ECF/Algorithm/src/user_lib.c **** float float_constrain(float Value, float minValue, float maxValue)
+ 156:ACE-ECF/Algorithm/src/user_lib.c **** {
+ 347              		.loc 1 156 1 is_stmt 1 view -0
+ 348              		.cfi_startproc
+ 349              		@ args = 0, pretend = 0, frame = 0
+ 350              		@ frame_needed = 0, uses_anonymous_args = 0
+ 351              		@ link register save eliminated.
+ 157:ACE-ECF/Algorithm/src/user_lib.c ****     if (Value < minValue)
+ 352              		.loc 1 157 5 view .LVU87
+ 353              		.loc 1 157 8 is_stmt 0 view .LVU88
+ 354 0000 B4EEE00A 		vcmpe.f32	s0, s1
+ 355 0004 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 356 0008 07D4     		bmi	.L38
+ 158:ACE-ECF/Algorithm/src/user_lib.c ****         return minValue;
+ 159:ACE-ECF/Algorithm/src/user_lib.c ****     else if (Value > maxValue)
+ 357              		.loc 1 159 10 is_stmt 1 view .LVU89
+ 358              		.loc 1 159 13 is_stmt 0 view .LVU90
+ 359 000a B4EEC10A 		vcmpe.f32	s0, s2
+ 360 000e F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 361 0012 04DD     		ble	.L35
+ 160:ACE-ECF/Algorithm/src/user_lib.c ****         return maxValue;
+ 362              		.loc 1 160 16 view .LVU91
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 10
+
+
+ 363 0014 B0EE410A 		vmov.f32	s0, s2
+ 364              	.LVL22:
+ 365              		.loc 1 160 16 view .LVU92
+ 366 0018 7047     		bx	lr
+ 367              	.LVL23:
+ 368              	.L38:
+ 158:ACE-ECF/Algorithm/src/user_lib.c ****         return minValue;
+ 369              		.loc 1 158 16 view .LVU93
+ 370 001a B0EE600A 		vmov.f32	s0, s1
+ 371              	.LVL24:
+ 372              	.L35:
+ 161:ACE-ECF/Algorithm/src/user_lib.c ****     else
+ 162:ACE-ECF/Algorithm/src/user_lib.c ****         return Value;
+ 163:ACE-ECF/Algorithm/src/user_lib.c **** }
+ 373              		.loc 1 163 1 view .LVU94
+ 374 001e 7047     		bx	lr
+ 375              		.cfi_endproc
+ 376              	.LFE142:
+ 378              		.section	.text.int16_constrain,"ax",%progbits
+ 379              		.align	1
+ 380              		.global	int16_constrain
+ 381              		.syntax unified
+ 382              		.thumb
+ 383              		.thumb_func
+ 385              	int16_constrain:
+ 386              	.LVL25:
+ 387              	.LFB143:
+ 164:ACE-ECF/Algorithm/src/user_lib.c **** 
+ 165:ACE-ECF/Algorithm/src/user_lib.c **** //限幅函数
+ 166:ACE-ECF/Algorithm/src/user_lib.c **** int16_t int16_constrain(int16_t Value, int16_t minValue, int16_t maxValue)
+ 167:ACE-ECF/Algorithm/src/user_lib.c **** {
+ 388              		.loc 1 167 1 is_stmt 1 view -0
+ 389              		.cfi_startproc
+ 390              		@ args = 0, pretend = 0, frame = 0
+ 391              		@ frame_needed = 0, uses_anonymous_args = 0
+ 392              		@ link register save eliminated.
+ 168:ACE-ECF/Algorithm/src/user_lib.c ****     if (Value < minValue)
+ 393              		.loc 1 168 5 view .LVU96
+ 394              		.loc 1 168 8 is_stmt 0 view .LVU97
+ 395 0000 8842     		cmp	r0, r1
+ 396 0002 03DB     		blt	.L44
+ 169:ACE-ECF/Algorithm/src/user_lib.c ****         return minValue;
+ 170:ACE-ECF/Algorithm/src/user_lib.c ****     else if (Value > maxValue)
+ 397              		.loc 1 170 10 is_stmt 1 view .LVU98
+ 398              		.loc 1 170 13 is_stmt 0 view .LVU99
+ 399 0004 9042     		cmp	r0, r2
+ 400 0006 02DD     		ble	.L43
+ 171:ACE-ECF/Algorithm/src/user_lib.c ****         return maxValue;
+ 401              		.loc 1 171 16 view .LVU100
+ 402 0008 1046     		mov	r0, r2
+ 403              	.LVL26:
+ 404              		.loc 1 171 16 view .LVU101
+ 405 000a 7047     		bx	lr
+ 406              	.LVL27:
+ 407              	.L44:
+ 169:ACE-ECF/Algorithm/src/user_lib.c ****         return minValue;
+ 408              		.loc 1 169 16 view .LVU102
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 11
+
+
+ 409 000c 0846     		mov	r0, r1
+ 410              	.LVL28:
+ 411              	.L43:
+ 172:ACE-ECF/Algorithm/src/user_lib.c ****     else
+ 173:ACE-ECF/Algorithm/src/user_lib.c ****         return Value;
+ 174:ACE-ECF/Algorithm/src/user_lib.c **** }
+ 412              		.loc 1 174 1 view .LVU103
+ 413 000e 7047     		bx	lr
+ 414              		.cfi_endproc
+ 415              	.LFE143:
+ 417              		.section	.text.loop_float_constrain,"ax",%progbits
+ 418              		.align	1
+ 419              		.global	loop_float_constrain
+ 420              		.syntax unified
+ 421              		.thumb
+ 422              		.thumb_func
+ 424              	loop_float_constrain:
+ 425              	.LVL29:
+ 426              	.LFB144:
+ 175:ACE-ECF/Algorithm/src/user_lib.c **** 
+ 176:ACE-ECF/Algorithm/src/user_lib.c **** //循环限幅函数
+ 177:ACE-ECF/Algorithm/src/user_lib.c **** float loop_float_constrain(float Input, float minValue, float maxValue)
+ 178:ACE-ECF/Algorithm/src/user_lib.c **** {
+ 427              		.loc 1 178 1 is_stmt 1 view -0
+ 428              		.cfi_startproc
+ 429              		@ args = 0, pretend = 0, frame = 0
+ 430              		@ frame_needed = 0, uses_anonymous_args = 0
+ 431              		@ link register save eliminated.
+ 179:ACE-ECF/Algorithm/src/user_lib.c ****     if (maxValue < minValue)
+ 432              		.loc 1 179 5 view .LVU105
+ 433              		.loc 1 179 8 is_stmt 0 view .LVU106
+ 434 0000 B4EEE01A 		vcmpe.f32	s2, s1
+ 435 0004 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 436 0008 1ED4     		bmi	.L47
+ 180:ACE-ECF/Algorithm/src/user_lib.c ****     {
+ 181:ACE-ECF/Algorithm/src/user_lib.c ****         return Input;
+ 182:ACE-ECF/Algorithm/src/user_lib.c ****     }
+ 183:ACE-ECF/Algorithm/src/user_lib.c **** 
+ 184:ACE-ECF/Algorithm/src/user_lib.c ****     if (Input > maxValue)
+ 437              		.loc 1 184 5 is_stmt 1 view .LVU107
+ 438              		.loc 1 184 8 is_stmt 0 view .LVU108
+ 439 000a B4EEC01A 		vcmpe.f32	s2, s0
+ 440 000e F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 441 0012 0AD5     		bpl	.L57
+ 442              	.LBB2:
+ 185:ACE-ECF/Algorithm/src/user_lib.c ****     {
+ 186:ACE-ECF/Algorithm/src/user_lib.c ****         float len = maxValue - minValue;
+ 443              		.loc 1 186 9 is_stmt 1 view .LVU109
+ 444              		.loc 1 186 15 is_stmt 0 view .LVU110
+ 445 0014 71EE600A 		vsub.f32	s1, s2, s1
+ 446              	.LVL30:
+ 187:ACE-ECF/Algorithm/src/user_lib.c ****         while (Input > maxValue)
+ 447              		.loc 1 187 9 is_stmt 1 view .LVU111
+ 448              		.loc 1 187 15 is_stmt 0 view .LVU112
+ 449 0018 01E0     		b	.L50
+ 450              	.L51:
+ 188:ACE-ECF/Algorithm/src/user_lib.c ****         {
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 12
+
+
+ 189:ACE-ECF/Algorithm/src/user_lib.c ****             Input -= len;
+ 451              		.loc 1 189 13 is_stmt 1 view .LVU113
+ 452              		.loc 1 189 19 is_stmt 0 view .LVU114
+ 453 001a 30EE600A 		vsub.f32	s0, s0, s1
+ 454              	.LVL31:
+ 455              	.L50:
+ 187:ACE-ECF/Algorithm/src/user_lib.c ****         while (Input > maxValue)
+ 456              		.loc 1 187 15 is_stmt 1 view .LVU115
+ 457 001e B4EEC10A 		vcmpe.f32	s0, s2
+ 458 0022 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 459 0026 F8DC     		bgt	.L51
+ 187:ACE-ECF/Algorithm/src/user_lib.c ****         while (Input > maxValue)
+ 460              		.loc 1 187 15 is_stmt 0 view .LVU116
+ 461 0028 7047     		bx	lr
+ 462              	.LVL32:
+ 463              	.L57:
+ 187:ACE-ECF/Algorithm/src/user_lib.c ****         while (Input > maxValue)
+ 464              		.loc 1 187 15 view .LVU117
+ 465              	.LBE2:
+ 190:ACE-ECF/Algorithm/src/user_lib.c ****         }
+ 191:ACE-ECF/Algorithm/src/user_lib.c ****     }
+ 192:ACE-ECF/Algorithm/src/user_lib.c ****     else if (Input < minValue)
+ 466              		.loc 1 192 10 is_stmt 1 view .LVU118
+ 467              		.loc 1 192 13 is_stmt 0 view .LVU119
+ 468 002a F4EEC00A 		vcmpe.f32	s1, s0
+ 469 002e F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 470 0032 09DD     		ble	.L47
+ 471              	.LBB3:
+ 193:ACE-ECF/Algorithm/src/user_lib.c ****     {
+ 194:ACE-ECF/Algorithm/src/user_lib.c ****         float len = maxValue - minValue;
+ 472              		.loc 1 194 9 is_stmt 1 view .LVU120
+ 473              		.loc 1 194 15 is_stmt 0 view .LVU121
+ 474 0034 31EE601A 		vsub.f32	s2, s2, s1
+ 475              	.LVL33:
+ 195:ACE-ECF/Algorithm/src/user_lib.c ****         while (Input < minValue)
+ 476              		.loc 1 195 9 is_stmt 1 view .LVU122
+ 477              	.L53:
+ 478              		.loc 1 195 15 view .LVU123
+ 479 0038 B4EEE00A 		vcmpe.f32	s0, s1
+ 480 003c F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 481 0040 02D5     		bpl	.L47
+ 196:ACE-ECF/Algorithm/src/user_lib.c ****         {
+ 197:ACE-ECF/Algorithm/src/user_lib.c ****             Input += len;
+ 482              		.loc 1 197 13 view .LVU124
+ 483              		.loc 1 197 19 is_stmt 0 view .LVU125
+ 484 0042 30EE010A 		vadd.f32	s0, s0, s2
+ 485              	.LVL34:
+ 486              		.loc 1 197 19 view .LVU126
+ 487 0046 F7E7     		b	.L53
+ 488              	.LVL35:
+ 489              	.L47:
+ 490              		.loc 1 197 19 view .LVU127
+ 491              	.LBE3:
+ 198:ACE-ECF/Algorithm/src/user_lib.c ****         }
+ 199:ACE-ECF/Algorithm/src/user_lib.c ****     }
+ 200:ACE-ECF/Algorithm/src/user_lib.c ****     return Input;
+ 201:ACE-ECF/Algorithm/src/user_lib.c **** }
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 13
+
+
+ 492              		.loc 1 201 1 view .LVU128
+ 493 0048 7047     		bx	lr
+ 494              		.cfi_endproc
+ 495              	.LFE144:
+ 497              		.section	.text.theta_format,"ax",%progbits
+ 498              		.align	1
+ 499              		.global	theta_format
+ 500              		.syntax unified
+ 501              		.thumb
+ 502              		.thumb_func
+ 504              	theta_format:
+ 505              	.LVL36:
+ 506              	.LFB145:
+ 202:ACE-ECF/Algorithm/src/user_lib.c **** 
+ 203:ACE-ECF/Algorithm/src/user_lib.c **** //弧度格式化为-PI~PI
+ 204:ACE-ECF/Algorithm/src/user_lib.c **** 
+ 205:ACE-ECF/Algorithm/src/user_lib.c **** //角度格式化为-180~180
+ 206:ACE-ECF/Algorithm/src/user_lib.c **** float theta_format(float Ang)
+ 207:ACE-ECF/Algorithm/src/user_lib.c **** {
+ 507              		.loc 1 207 1 is_stmt 1 view -0
+ 508              		.cfi_startproc
+ 509              		@ args = 0, pretend = 0, frame = 0
+ 510              		@ frame_needed = 0, uses_anonymous_args = 0
+ 511              		.loc 1 207 1 is_stmt 0 view .LVU130
+ 512 0000 08B5     		push	{r3, lr}
+ 513              	.LCFI0:
+ 514              		.cfi_def_cfa_offset 8
+ 515              		.cfi_offset 3, -8
+ 516              		.cfi_offset 14, -4
+ 208:ACE-ECF/Algorithm/src/user_lib.c ****     return loop_float_constrain(Ang, -180.0f, 180.0f);
+ 517              		.loc 1 208 5 is_stmt 1 view .LVU131
+ 518              		.loc 1 208 12 is_stmt 0 view .LVU132
+ 519 0002 9FED031A 		vldr.32	s2, .L60
+ 520 0006 DFED030A 		vldr.32	s1, .L60+4
+ 521 000a FFF7FEFF 		bl	loop_float_constrain
+ 522              	.LVL37:
+ 209:ACE-ECF/Algorithm/src/user_lib.c **** }
+ 523              		.loc 1 209 1 view .LVU133
+ 524 000e 08BD     		pop	{r3, pc}
+ 525              	.L61:
+ 526              		.align	2
+ 527              	.L60:
+ 528 0010 00003443 		.word	1127481344
+ 529 0014 000034C3 		.word	-1020002304
+ 530              		.cfi_endproc
+ 531              	.LFE145:
+ 533              		.section	.text.float_rounding,"ax",%progbits
+ 534              		.align	1
+ 535              		.global	float_rounding
+ 536              		.syntax unified
+ 537              		.thumb
+ 538              		.thumb_func
+ 540              	float_rounding:
+ 541              	.LVL38:
+ 542              	.LFB146:
+ 210:ACE-ECF/Algorithm/src/user_lib.c **** 
+ 211:ACE-ECF/Algorithm/src/user_lib.c **** int float_rounding(float raw)
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 14
+
+
+ 212:ACE-ECF/Algorithm/src/user_lib.c **** {
+ 543              		.loc 1 212 1 is_stmt 1 view -0
+ 544              		.cfi_startproc
+ 545              		@ args = 0, pretend = 0, frame = 0
+ 546              		@ frame_needed = 0, uses_anonymous_args = 0
+ 547              		@ link register save eliminated.
+ 213:ACE-ECF/Algorithm/src/user_lib.c ****     static int integer;
+ 548              		.loc 1 213 5 view .LVU135
+ 214:ACE-ECF/Algorithm/src/user_lib.c ****     static float decimal;
+ 549              		.loc 1 214 5 view .LVU136
+ 215:ACE-ECF/Algorithm/src/user_lib.c ****     integer = (int)raw;
+ 550              		.loc 1 215 5 view .LVU137
+ 551              		.loc 1 215 15 is_stmt 0 view .LVU138
+ 552 0000 FDEEC07A 		vcvt.s32.f32	s15, s0
+ 553              		.loc 1 215 13 view .LVU139
+ 554 0004 0C4B     		ldr	r3, .L66
+ 555 0006 C3ED007A 		vstr.32	s15, [r3]	@ int
+ 216:ACE-ECF/Algorithm/src/user_lib.c ****     decimal = raw - integer;
+ 556              		.loc 1 216 5 is_stmt 1 view .LVU140
+ 557              		.loc 1 216 19 is_stmt 0 view .LVU141
+ 558 000a B8EEE77A 		vcvt.f32.s32	s14, s15
+ 559 000e 30EE470A 		vsub.f32	s0, s0, s14
+ 560              	.LVL39:
+ 561              		.loc 1 216 13 view .LVU142
+ 562 0012 0A4B     		ldr	r3, .L66+4
+ 563 0014 83ED000A 		vstr.32	s0, [r3]
+ 217:ACE-ECF/Algorithm/src/user_lib.c ****     if (decimal > 0.5f)
+ 564              		.loc 1 217 5 is_stmt 1 view .LVU143
+ 565              		.loc 1 217 8 is_stmt 0 view .LVU144
+ 566 0018 B6EE007A 		vmov.f32	s14, #5.0e-1
+ 567 001c B4EEC70A 		vcmpe.f32	s0, s14
+ 568 0020 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 569 0024 04DD     		ble	.L63
+ 218:ACE-ECF/Algorithm/src/user_lib.c ****         integer++;
+ 570              		.loc 1 218 9 is_stmt 1 view .LVU145
+ 571              		.loc 1 218 16 is_stmt 0 view .LVU146
+ 572 0026 17EE903A 		vmov	r3, s15	@ int
+ 573 002a 0133     		adds	r3, r3, #1
+ 574 002c 024A     		ldr	r2, .L66
+ 575 002e 1360     		str	r3, [r2]
+ 576              	.L63:
+ 219:ACE-ECF/Algorithm/src/user_lib.c ****     return integer;
+ 577              		.loc 1 219 5 is_stmt 1 view .LVU147
+ 220:ACE-ECF/Algorithm/src/user_lib.c **** }
+ 578              		.loc 1 220 1 is_stmt 0 view .LVU148
+ 579 0030 014B     		ldr	r3, .L66
+ 580 0032 1868     		ldr	r0, [r3]
+ 581 0034 7047     		bx	lr
+ 582              	.L67:
+ 583 0036 00BF     		.align	2
+ 584              	.L66:
+ 585 0038 00000000 		.word	.LANCHOR0
+ 586 003c 00000000 		.word	.LANCHOR1
+ 587              		.cfi_endproc
+ 588              	.LFE146:
+ 590              		.section	.text.OLS_Init,"ax",%progbits
+ 591              		.align	1
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 15
+
+
+ 592              		.global	OLS_Init
+ 593              		.syntax unified
+ 594              		.thumb
+ 595              		.thumb_func
+ 597              	OLS_Init:
+ 598              	.LVL40:
+ 599              	.LFB147:
+ 221:ACE-ECF/Algorithm/src/user_lib.c **** 
+ 222:ACE-ECF/Algorithm/src/user_lib.c **** //寻找最短距离
+ 223:ACE-ECF/Algorithm/src/user_lib.c **** // float float_min_distance(float target, float actual, float minValue, float maxValue)
+ 224:ACE-ECF/Algorithm/src/user_lib.c **** // {
+ 225:ACE-ECF/Algorithm/src/user_lib.c **** // 	if (maxValue < minValue)
+ 226:ACE-ECF/Algorithm/src/user_lib.c **** //     {
+ 227:ACE-ECF/Algorithm/src/user_lib.c **** //         return 0;
+ 228:ACE-ECF/Algorithm/src/user_lib.c **** //     }
+ 229:ACE-ECF/Algorithm/src/user_lib.c **** 	
+ 230:ACE-ECF/Algorithm/src/user_lib.c **** // 	target = loop_float_constrain(target, minValue,maxValue);
+ 231:ACE-ECF/Algorithm/src/user_lib.c **** 	
+ 232:ACE-ECF/Algorithm/src/user_lib.c **** // 	if (abs(target - actual) > (maxValue - minValue) / 2.0f)
+ 233:ACE-ECF/Algorithm/src/user_lib.c **** // 	{
+ 234:ACE-ECF/Algorithm/src/user_lib.c **** // 		if(maxValue - actual < (maxValue - minValue) / 2.0f)
+ 235:ACE-ECF/Algorithm/src/user_lib.c **** // 		{
+ 236:ACE-ECF/Algorithm/src/user_lib.c **** // 			return maxValue - actual + target - minValue;
+ 237:ACE-ECF/Algorithm/src/user_lib.c **** // 		}
+ 238:ACE-ECF/Algorithm/src/user_lib.c **** // 		else
+ 239:ACE-ECF/Algorithm/src/user_lib.c **** // 		{
+ 240:ACE-ECF/Algorithm/src/user_lib.c **** // 			return minValue - actual + target - maxValue;
+ 241:ACE-ECF/Algorithm/src/user_lib.c **** // 		}
+ 242:ACE-ECF/Algorithm/src/user_lib.c **** // 	}
+ 243:ACE-ECF/Algorithm/src/user_lib.c **** // 	else 
+ 244:ACE-ECF/Algorithm/src/user_lib.c **** // 	{
+ 245:ACE-ECF/Algorithm/src/user_lib.c **** // 		return target - actual;
+ 246:ACE-ECF/Algorithm/src/user_lib.c **** // 	}
+ 247:ACE-ECF/Algorithm/src/user_lib.c **** 	
+ 248:ACE-ECF/Algorithm/src/user_lib.c **** // }
+ 249:ACE-ECF/Algorithm/src/user_lib.c **** 
+ 250:ACE-ECF/Algorithm/src/user_lib.c **** /**
+ 251:ACE-ECF/Algorithm/src/user_lib.c ****   * @brief          最小二乘法初始化
+ 252:ACE-ECF/Algorithm/src/user_lib.c ****   * @param[in]      最小二乘法结构体
+ 253:ACE-ECF/Algorithm/src/user_lib.c ****   * @param[in]      样本数
+ 254:ACE-ECF/Algorithm/src/user_lib.c ****   * @retval         返回空
+ 255:ACE-ECF/Algorithm/src/user_lib.c ****   */
+ 256:ACE-ECF/Algorithm/src/user_lib.c **** void OLS_Init(Ordinary_Least_Squares_t *OLS, uint16_t order)
+ 257:ACE-ECF/Algorithm/src/user_lib.c **** {
+ 600              		.loc 1 257 1 is_stmt 1 view -0
+ 601              		.cfi_startproc
+ 602              		@ args = 0, pretend = 0, frame = 0
+ 603              		@ frame_needed = 0, uses_anonymous_args = 0
+ 604              		.loc 1 257 1 is_stmt 0 view .LVU150
+ 605 0000 70B5     		push	{r4, r5, r6, lr}
+ 606              	.LCFI1:
+ 607              		.cfi_def_cfa_offset 16
+ 608              		.cfi_offset 4, -16
+ 609              		.cfi_offset 5, -12
+ 610              		.cfi_offset 6, -8
+ 611              		.cfi_offset 14, -4
+ 612 0002 0446     		mov	r4, r0
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 16
+
+
+ 258:ACE-ECF/Algorithm/src/user_lib.c ****     OLS->Order = order;
+ 613              		.loc 1 258 5 is_stmt 1 view .LVU151
+ 614              		.loc 1 258 16 is_stmt 0 view .LVU152
+ 615 0004 0180     		strh	r1, [r0]	@ movhi
+ 259:ACE-ECF/Algorithm/src/user_lib.c ****     OLS->Count = 0;
+ 616              		.loc 1 259 5 is_stmt 1 view .LVU153
+ 617              		.loc 1 259 16 is_stmt 0 view .LVU154
+ 618 0006 0026     		movs	r6, #0
+ 619 0008 4660     		str	r6, [r0, #4]
+ 260:ACE-ECF/Algorithm/src/user_lib.c ****     OLS->x = (float *)user_malloc(sizeof(float) * order);
+ 620              		.loc 1 260 5 is_stmt 1 view .LVU155
+ 621              		.loc 1 260 23 is_stmt 0 view .LVU156
+ 622 000a 8D00     		lsls	r5, r1, #2
+ 623 000c 2846     		mov	r0, r5
+ 624              	.LVL41:
+ 625              		.loc 1 260 23 view .LVU157
+ 626 000e FFF7FEFF 		bl	pvPortMalloc
+ 627              	.LVL42:
+ 628              		.loc 1 260 12 view .LVU158
+ 629 0012 A060     		str	r0, [r4, #8]
+ 261:ACE-ECF/Algorithm/src/user_lib.c ****     OLS->y = (float *)user_malloc(sizeof(float) * order);
+ 630              		.loc 1 261 5 is_stmt 1 view .LVU159
+ 631              		.loc 1 261 23 is_stmt 0 view .LVU160
+ 632 0014 2846     		mov	r0, r5
+ 633 0016 FFF7FEFF 		bl	pvPortMalloc
+ 634              	.LVL43:
+ 635              		.loc 1 261 12 view .LVU161
+ 636 001a E060     		str	r0, [r4, #12]
+ 262:ACE-ECF/Algorithm/src/user_lib.c ****     OLS->k = 0;
+ 637              		.loc 1 262 5 is_stmt 1 view .LVU162
+ 638              		.loc 1 262 12 is_stmt 0 view .LVU163
+ 639 001c 0023     		movs	r3, #0
+ 640 001e 2361     		str	r3, [r4, #16]	@ float
+ 263:ACE-ECF/Algorithm/src/user_lib.c ****     OLS->b = 0;
+ 641              		.loc 1 263 5 is_stmt 1 view .LVU164
+ 642              		.loc 1 263 12 is_stmt 0 view .LVU165
+ 643 0020 6361     		str	r3, [r4, #20]	@ float
+ 264:ACE-ECF/Algorithm/src/user_lib.c ****     memset((void *)OLS->x, 0, sizeof(float) * order);
+ 644              		.loc 1 264 5 is_stmt 1 view .LVU166
+ 645 0022 2A46     		mov	r2, r5
+ 646 0024 3146     		mov	r1, r6
+ 647 0026 A068     		ldr	r0, [r4, #8]
+ 648 0028 FFF7FEFF 		bl	memset
+ 649              	.LVL44:
+ 265:ACE-ECF/Algorithm/src/user_lib.c ****     memset((void *)OLS->y, 0, sizeof(float) * order);
+ 650              		.loc 1 265 5 view .LVU167
+ 651 002c 2A46     		mov	r2, r5
+ 652 002e 3146     		mov	r1, r6
+ 653 0030 E068     		ldr	r0, [r4, #12]
+ 654 0032 FFF7FEFF 		bl	memset
+ 655              	.LVL45:
+ 266:ACE-ECF/Algorithm/src/user_lib.c ****     memset((void *)OLS->t, 0, sizeof(float) * 4);
+ 656              		.loc 1 266 5 view .LVU168
+ 657 0036 E661     		str	r6, [r4, #28]	@ unaligned
+ 658 0038 2662     		str	r6, [r4, #32]	@ unaligned
+ 659 003a 6662     		str	r6, [r4, #36]	@ unaligned
+ 660 003c A662     		str	r6, [r4, #40]	@ unaligned
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 17
+
+
+ 267:ACE-ECF/Algorithm/src/user_lib.c **** }
+ 661              		.loc 1 267 1 is_stmt 0 view .LVU169
+ 662 003e 70BD     		pop	{r4, r5, r6, pc}
+ 663              		.loc 1 267 1 view .LVU170
+ 664              		.cfi_endproc
+ 665              	.LFE147:
+ 667              		.section	.text.OLS_Update,"ax",%progbits
+ 668              		.align	1
+ 669              		.global	OLS_Update
+ 670              		.syntax unified
+ 671              		.thumb
+ 672              		.thumb_func
+ 674              	OLS_Update:
+ 675              	.LVL46:
+ 676              	.LFB148:
+ 268:ACE-ECF/Algorithm/src/user_lib.c **** 
+ 269:ACE-ECF/Algorithm/src/user_lib.c **** /**
+ 270:ACE-ECF/Algorithm/src/user_lib.c ****   * @brief          最小二乘法拟合
+ 271:ACE-ECF/Algorithm/src/user_lib.c ****   * @param[in]      最小二乘法结构体
+ 272:ACE-ECF/Algorithm/src/user_lib.c ****   * @param[in]      信号新样本距上一个样本时间间隔
+ 273:ACE-ECF/Algorithm/src/user_lib.c ****   * @param[in]      信号值
+ 274:ACE-ECF/Algorithm/src/user_lib.c ****   */
+ 275:ACE-ECF/Algorithm/src/user_lib.c **** void OLS_Update(Ordinary_Least_Squares_t *OLS, float deltax, float y)
+ 276:ACE-ECF/Algorithm/src/user_lib.c **** {
+ 677              		.loc 1 276 1 is_stmt 1 view -0
+ 678              		.cfi_startproc
+ 679              		@ args = 0, pretend = 0, frame = 0
+ 680              		@ frame_needed = 0, uses_anonymous_args = 0
+ 681              		@ link register save eliminated.
+ 277:ACE-ECF/Algorithm/src/user_lib.c ****     static float temp = 0;
+ 682              		.loc 1 277 5 view .LVU172
+ 278:ACE-ECF/Algorithm/src/user_lib.c ****     temp = OLS->x[1];
+ 683              		.loc 1 278 5 view .LVU173
+ 684              		.loc 1 278 15 is_stmt 0 view .LVU174
+ 685 0000 8368     		ldr	r3, [r0, #8]
+ 686              		.loc 1 278 10 view .LVU175
+ 687 0002 93ED017A 		vldr.32	s14, [r3, #4]
+ 688 0006 614B     		ldr	r3, .L78
+ 689 0008 83ED007A 		vstr.32	s14, [r3]
+ 279:ACE-ECF/Algorithm/src/user_lib.c ****     for (uint16_t i = 0; i < OLS->Order - 1; ++i)
+ 690              		.loc 1 279 5 is_stmt 1 view .LVU176
+ 691              	.LBB4:
+ 692              		.loc 1 279 10 view .LVU177
+ 693              	.LVL47:
+ 694              		.loc 1 279 19 is_stmt 0 view .LVU178
+ 695 000c 0023     		movs	r3, #0
+ 696              		.loc 1 279 5 view .LVU179
+ 697 000e 13E0     		b	.L71
+ 698              	.LVL48:
+ 699              	.L72:
+ 280:ACE-ECF/Algorithm/src/user_lib.c ****     {
+ 281:ACE-ECF/Algorithm/src/user_lib.c ****         OLS->x[i] = OLS->x[i + 1] - temp;
+ 700              		.loc 1 281 9 is_stmt 1 discriminator 3 view .LVU180
+ 701              		.loc 1 281 24 is_stmt 0 discriminator 3 view .LVU181
+ 702 0010 8268     		ldr	r2, [r0, #8]
+ 703              		.loc 1 281 27 discriminator 3 view .LVU182
+ 704 0012 591C     		adds	r1, r3, #1
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 18
+
+
+ 705 0014 02EB810C 		add	ip, r2, r1, lsl #2
+ 706 0018 DCED007A 		vldr.32	s15, [ip]
+ 707              		.loc 1 281 15 discriminator 3 view .LVU183
+ 708 001c 02EB8302 		add	r2, r2, r3, lsl #2
+ 709              		.loc 1 281 35 discriminator 3 view .LVU184
+ 710 0020 77EEC77A 		vsub.f32	s15, s15, s14
+ 711              		.loc 1 281 19 discriminator 3 view .LVU185
+ 712 0024 C2ED007A 		vstr.32	s15, [r2]
+ 282:ACE-ECF/Algorithm/src/user_lib.c ****         OLS->y[i] = OLS->y[i + 1];
+ 713              		.loc 1 282 9 is_stmt 1 discriminator 3 view .LVU186
+ 714              		.loc 1 282 24 is_stmt 0 discriminator 3 view .LVU187
+ 715 0028 C268     		ldr	r2, [r0, #12]
+ 716              		.loc 1 282 15 discriminator 3 view .LVU188
+ 717 002a 02EB8303 		add	r3, r2, r3, lsl #2
+ 718              	.LVL49:
+ 719              		.loc 1 282 27 discriminator 3 view .LVU189
+ 720 002e 02EB8102 		add	r2, r2, r1, lsl #2
+ 721 0032 1268     		ldr	r2, [r2]	@ float
+ 722              		.loc 1 282 19 discriminator 3 view .LVU190
+ 723 0034 1A60     		str	r2, [r3]	@ float
+ 279:ACE-ECF/Algorithm/src/user_lib.c ****     for (uint16_t i = 0; i < OLS->Order - 1; ++i)
+ 724              		.loc 1 279 46 is_stmt 1 discriminator 3 view .LVU191
+ 725 0036 8BB2     		uxth	r3, r1
+ 726              	.LVL50:
+ 727              	.L71:
+ 279:ACE-ECF/Algorithm/src/user_lib.c ****     for (uint16_t i = 0; i < OLS->Order - 1; ++i)
+ 728              		.loc 1 279 26 discriminator 1 view .LVU192
+ 279:ACE-ECF/Algorithm/src/user_lib.c ****     for (uint16_t i = 0; i < OLS->Order - 1; ++i)
+ 729              		.loc 1 279 33 is_stmt 0 discriminator 1 view .LVU193
+ 730 0038 0288     		ldrh	r2, [r0]
+ 279:ACE-ECF/Algorithm/src/user_lib.c ****     for (uint16_t i = 0; i < OLS->Order - 1; ++i)
+ 731              		.loc 1 279 41 discriminator 1 view .LVU194
+ 732 003a 511E     		subs	r1, r2, #1
+ 279:ACE-ECF/Algorithm/src/user_lib.c ****     for (uint16_t i = 0; i < OLS->Order - 1; ++i)
+ 733              		.loc 1 279 5 discriminator 1 view .LVU195
+ 734 003c 8B42     		cmp	r3, r1
+ 735 003e E7DB     		blt	.L72
+ 736              	.LBE4:
+ 283:ACE-ECF/Algorithm/src/user_lib.c ****     }
+ 284:ACE-ECF/Algorithm/src/user_lib.c ****     OLS->x[OLS->Order - 1] = OLS->x[OLS->Order - 2] + deltax;
+ 737              		.loc 1 284 5 is_stmt 1 view .LVU196
+ 738              		.loc 1 284 33 is_stmt 0 view .LVU197
+ 739 0040 8168     		ldr	r1, [r0, #8]
+ 740              		.loc 1 284 36 view .LVU198
+ 741 0042 02F18043 		add	r3, r2, #1073741824
+ 742              	.LVL51:
+ 743              		.loc 1 284 36 view .LVU199
+ 744 0046 023B     		subs	r3, r3, #2
+ 745 0048 01EB8303 		add	r3, r1, r3, lsl #2
+ 746 004c D3ED007A 		vldr.32	s15, [r3]
+ 747              		.loc 1 284 11 view .LVU200
+ 748 0050 6FF0404C 		mvn	ip, #-1073741824
+ 749 0054 6244     		add	r2, r2, ip
+ 750 0056 01EB8202 		add	r2, r1, r2, lsl #2
+ 751              		.loc 1 284 53 view .LVU201
+ 752 005a 37EE800A 		vadd.f32	s0, s15, s0
+ 753              	.LVL52:
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 19
+
+
+ 754              		.loc 1 284 28 view .LVU202
+ 755 005e 82ED000A 		vstr.32	s0, [r2]
+ 285:ACE-ECF/Algorithm/src/user_lib.c ****     OLS->y[OLS->Order - 1] = y;
+ 756              		.loc 1 285 5 is_stmt 1 view .LVU203
+ 757              		.loc 1 285 8 is_stmt 0 view .LVU204
+ 758 0062 C368     		ldr	r3, [r0, #12]
+ 759              		.loc 1 285 15 view .LVU205
+ 760 0064 0288     		ldrh	r2, [r0]
+ 761              		.loc 1 285 11 view .LVU206
+ 762 0066 6244     		add	r2, r2, ip
+ 763 0068 03EB8203 		add	r3, r3, r2, lsl #2
+ 764              		.loc 1 285 28 view .LVU207
+ 765 006c C3ED000A 		vstr.32	s1, [r3]
+ 286:ACE-ECF/Algorithm/src/user_lib.c **** 
+ 287:ACE-ECF/Algorithm/src/user_lib.c ****     if (OLS->Count < OLS->Order)
+ 766              		.loc 1 287 5 is_stmt 1 view .LVU208
+ 767              		.loc 1 287 12 is_stmt 0 view .LVU209
+ 768 0070 4368     		ldr	r3, [r0, #4]
+ 769              		.loc 1 287 25 view .LVU210
+ 770 0072 B0F800C0 		ldrh	ip, [r0]
+ 771              		.loc 1 287 8 view .LVU211
+ 772 0076 6345     		cmp	r3, ip
+ 773 0078 01D2     		bcs	.L73
+ 288:ACE-ECF/Algorithm/src/user_lib.c ****     {
+ 289:ACE-ECF/Algorithm/src/user_lib.c ****         OLS->Count++;
+ 774              		.loc 1 289 9 is_stmt 1 view .LVU212
+ 775              		.loc 1 289 19 is_stmt 0 view .LVU213
+ 776 007a 0133     		adds	r3, r3, #1
+ 777 007c 4360     		str	r3, [r0, #4]
+ 778              	.L73:
+ 290:ACE-ECF/Algorithm/src/user_lib.c ****     }
+ 291:ACE-ECF/Algorithm/src/user_lib.c ****     memset((void *)OLS->t, 0, sizeof(float) * 4);
+ 779              		.loc 1 291 5 is_stmt 1 view .LVU214
+ 780 007e 0023     		movs	r3, #0
+ 781 0080 C361     		str	r3, [r0, #28]	@ unaligned
+ 782 0082 0362     		str	r3, [r0, #32]	@ unaligned
+ 783 0084 4362     		str	r3, [r0, #36]	@ unaligned
+ 784 0086 8362     		str	r3, [r0, #40]	@ unaligned
+ 292:ACE-ECF/Algorithm/src/user_lib.c ****     for (uint16_t i = OLS->Order - OLS->Count; i < OLS->Order; ++i)
+ 785              		.loc 1 292 5 view .LVU215
+ 786              	.LBB5:
+ 787              		.loc 1 292 10 view .LVU216
+ 788              		.loc 1 292 34 is_stmt 0 view .LVU217
+ 789 0088 8388     		ldrh	r3, [r0, #4]
+ 790              		.loc 1 292 19 view .LVU218
+ 791 008a ACEB0303 		sub	r3, ip, r3
+ 792 008e 9BB2     		uxth	r3, r3
+ 793              	.LVL53:
+ 794              		.loc 1 292 19 view .LVU219
+ 795 0090 1A46     		mov	r2, r3
+ 796              		.loc 1 292 5 view .LVU220
+ 797 0092 2DE0     		b	.L74
+ 798              	.LVL54:
+ 799              	.L75:
+ 293:ACE-ECF/Algorithm/src/user_lib.c ****     {
+ 294:ACE-ECF/Algorithm/src/user_lib.c ****         OLS->t[0] += OLS->x[i] * OLS->x[i];
+ 800              		.loc 1 294 9 is_stmt 1 discriminator 3 view .LVU221
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 20
+
+
+ 801              		.loc 1 294 25 is_stmt 0 discriminator 3 view .LVU222
+ 802 0094 8168     		ldr	r1, [r0, #8]
+ 803              		.loc 1 294 28 discriminator 3 view .LVU223
+ 804 0096 01EB8201 		add	r1, r1, r2, lsl #2
+ 805 009a D1ED007A 		vldr.32	s15, [r1]
+ 806              		.loc 1 294 32 discriminator 3 view .LVU224
+ 807 009e 67EEA77A 		vmul.f32	s15, s15, s15
+ 808              		.loc 1 294 19 discriminator 3 view .LVU225
+ 809 00a2 90ED077A 		vldr.32	s14, [r0, #28]
+ 810 00a6 77EE277A 		vadd.f32	s15, s14, s15
+ 811 00aa C0ED077A 		vstr.32	s15, [r0, #28]
+ 295:ACE-ECF/Algorithm/src/user_lib.c ****         OLS->t[1] += OLS->x[i];
+ 812              		.loc 1 295 9 is_stmt 1 discriminator 3 view .LVU226
+ 813              		.loc 1 295 28 is_stmt 0 discriminator 3 view .LVU227
+ 814 00ae 91ED007A 		vldr.32	s14, [r1]
+ 815              		.loc 1 295 19 discriminator 3 view .LVU228
+ 816 00b2 D0ED087A 		vldr.32	s15, [r0, #32]
+ 817 00b6 77EE877A 		vadd.f32	s15, s15, s14
+ 818 00ba C0ED087A 		vstr.32	s15, [r0, #32]
+ 296:ACE-ECF/Algorithm/src/user_lib.c ****         OLS->t[2] += OLS->x[i] * OLS->y[i];
+ 819              		.loc 1 296 9 is_stmt 1 discriminator 3 view .LVU229
+ 820              		.loc 1 296 28 is_stmt 0 discriminator 3 view .LVU230
+ 821 00be D1ED007A 		vldr.32	s15, [r1]
+ 822              		.loc 1 296 37 discriminator 3 view .LVU231
+ 823 00c2 C168     		ldr	r1, [r0, #12]
+ 824              		.loc 1 296 40 discriminator 3 view .LVU232
+ 825 00c4 01EB8201 		add	r1, r1, r2, lsl #2
+ 826 00c8 91ED007A 		vldr.32	s14, [r1]
+ 827              		.loc 1 296 32 discriminator 3 view .LVU233
+ 828 00cc 27EE877A 		vmul.f32	s14, s15, s14
+ 829              		.loc 1 296 19 discriminator 3 view .LVU234
+ 830 00d0 D0ED097A 		vldr.32	s15, [r0, #36]
+ 831 00d4 77EE877A 		vadd.f32	s15, s15, s14
+ 832 00d8 C0ED097A 		vstr.32	s15, [r0, #36]
+ 297:ACE-ECF/Algorithm/src/user_lib.c ****         OLS->t[3] += OLS->y[i];
+ 833              		.loc 1 297 9 is_stmt 1 discriminator 3 view .LVU235
+ 834              		.loc 1 297 28 is_stmt 0 discriminator 3 view .LVU236
+ 835 00dc 91ED007A 		vldr.32	s14, [r1]
+ 836              		.loc 1 297 19 discriminator 3 view .LVU237
+ 837 00e0 D0ED0A7A 		vldr.32	s15, [r0, #40]
+ 838 00e4 77EE877A 		vadd.f32	s15, s15, s14
+ 839 00e8 C0ED0A7A 		vstr.32	s15, [r0, #40]
+ 292:ACE-ECF/Algorithm/src/user_lib.c ****     {
+ 840              		.loc 1 292 64 is_stmt 1 discriminator 3 view .LVU238
+ 841 00ec 0132     		adds	r2, r2, #1
+ 842              	.LVL55:
+ 292:ACE-ECF/Algorithm/src/user_lib.c ****     {
+ 843              		.loc 1 292 64 is_stmt 0 discriminator 3 view .LVU239
+ 844 00ee 92B2     		uxth	r2, r2
+ 845              	.LVL56:
+ 846              	.L74:
+ 292:ACE-ECF/Algorithm/src/user_lib.c ****     {
+ 847              		.loc 1 292 48 is_stmt 1 discriminator 1 view .LVU240
+ 292:ACE-ECF/Algorithm/src/user_lib.c ****     {
+ 848              		.loc 1 292 5 is_stmt 0 discriminator 1 view .LVU241
+ 849 00f0 9445     		cmp	ip, r2
+ 850 00f2 CFD8     		bhi	.L75
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 21
+
+
+ 851              	.LBE5:
+ 298:ACE-ECF/Algorithm/src/user_lib.c ****     }
+ 299:ACE-ECF/Algorithm/src/user_lib.c **** 
+ 300:ACE-ECF/Algorithm/src/user_lib.c ****     OLS->k = (OLS->t[2] * OLS->Order - OLS->t[1] * OLS->t[3]) / (OLS->t[0] * OLS->Order - OLS->t[1]
+ 852              		.loc 1 300 5 is_stmt 1 view .LVU242
+ 853              		.loc 1 300 21 is_stmt 0 view .LVU243
+ 854 00f4 D0ED096A 		vldr.32	s13, [r0, #36]
+ 855              		.loc 1 300 25 view .LVU244
+ 856 00f8 07EE90CA 		vmov	s15, ip	@ int
+ 857 00fc B8EEE75A 		vcvt.f32.s32	s10, s15
+ 858 0100 66EE854A 		vmul.f32	s9, s13, s10
+ 859              		.loc 1 300 46 view .LVU245
+ 860 0104 D0ED085A 		vldr.32	s11, [r0, #32]
+ 861              		.loc 1 300 58 view .LVU246
+ 862 0108 D0ED0A7A 		vldr.32	s15, [r0, #40]
+ 863              		.loc 1 300 50 view .LVU247
+ 864 010c 25EEA77A 		vmul.f32	s14, s11, s15
+ 865              		.loc 1 300 38 view .LVU248
+ 866 0110 74EEC74A 		vsub.f32	s9, s9, s14
+ 867              		.loc 1 300 72 view .LVU249
+ 868 0114 90ED074A 		vldr.32	s8, [r0, #28]
+ 869              		.loc 1 300 76 view .LVU250
+ 870 0118 25EE047A 		vmul.f32	s14, s10, s8
+ 871              		.loc 1 300 101 view .LVU251
+ 872 011c 25EEA56A 		vmul.f32	s12, s11, s11
+ 873              		.loc 1 300 89 view .LVU252
+ 874 0120 37EE467A 		vsub.f32	s14, s14, s12
+ 875              		.loc 1 300 63 view .LVU253
+ 876 0124 84EE876A 		vdiv.f32	s12, s9, s14
+ 877              		.loc 1 300 12 view .LVU254
+ 878 0128 80ED046A 		vstr.32	s12, [r0, #16]
+ 301:ACE-ECF/Algorithm/src/user_lib.c ****     OLS->b = (OLS->t[0] * OLS->t[3] - OLS->t[1] * OLS->t[2]) / (OLS->t[0] * OLS->Order - OLS->t[1] 
+ 879              		.loc 1 301 5 is_stmt 1 view .LVU255
+ 880              		.loc 1 301 25 is_stmt 0 view .LVU256
+ 881 012c 67EE847A 		vmul.f32	s15, s15, s8
+ 882              		.loc 1 301 49 view .LVU257
+ 883 0130 66EEA56A 		vmul.f32	s13, s13, s11
+ 884              		.loc 1 301 37 view .LVU258
+ 885 0134 77EEE67A 		vsub.f32	s15, s15, s13
+ 886              		.loc 1 301 62 view .LVU259
+ 887 0138 C7EE876A 		vdiv.f32	s13, s15, s14
+ 888              		.loc 1 301 12 view .LVU260
+ 889 013c C0ED056A 		vstr.32	s13, [r0, #20]
+ 302:ACE-ECF/Algorithm/src/user_lib.c **** 
+ 303:ACE-ECF/Algorithm/src/user_lib.c ****     OLS->StandardDeviation = 0;
+ 890              		.loc 1 303 5 is_stmt 1 view .LVU261
+ 891              		.loc 1 303 28 is_stmt 0 view .LVU262
+ 892 0140 0022     		movs	r2, #0
+ 893              	.LVL57:
+ 894              		.loc 1 303 28 view .LVU263
+ 895 0142 8261     		str	r2, [r0, #24]	@ float
+ 304:ACE-ECF/Algorithm/src/user_lib.c ****     for (uint16_t i = OLS->Order - OLS->Count; i < OLS->Order; ++i)
+ 896              		.loc 1 304 5 is_stmt 1 view .LVU264
+ 897              	.LBB6:
+ 898              		.loc 1 304 10 view .LVU265
+ 899              	.LVL58:
+ 900              		.loc 1 304 5 is_stmt 0 view .LVU266
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 22
+
+
+ 901 0144 19E0     		b	.L76
+ 902              	.L77:
+ 305:ACE-ECF/Algorithm/src/user_lib.c ****     {
+ 306:ACE-ECF/Algorithm/src/user_lib.c ****         OLS->StandardDeviation += fabsf(OLS->k * OLS->x[i] + OLS->b - OLS->y[i]);
+ 903              		.loc 1 306 9 is_stmt 1 discriminator 3 view .LVU267
+ 904              		.loc 1 306 53 is_stmt 0 discriminator 3 view .LVU268
+ 905 0146 8268     		ldr	r2, [r0, #8]
+ 906              		.loc 1 306 56 discriminator 3 view .LVU269
+ 907 0148 02EB8302 		add	r2, r2, r3, lsl #2
+ 908 014c D2ED007A 		vldr.32	s15, [r2]
+ 909              		.loc 1 306 48 discriminator 3 view .LVU270
+ 910 0150 66EE277A 		vmul.f32	s15, s12, s15
+ 911              		.loc 1 306 60 discriminator 3 view .LVU271
+ 912 0154 76EEA77A 		vadd.f32	s15, s13, s15
+ 913              		.loc 1 306 74 discriminator 3 view .LVU272
+ 914 0158 C268     		ldr	r2, [r0, #12]
+ 915              		.loc 1 306 77 discriminator 3 view .LVU273
+ 916 015a 02EB8302 		add	r2, r2, r3, lsl #2
+ 917 015e 92ED007A 		vldr.32	s14, [r2]
+ 918              		.loc 1 306 69 discriminator 3 view .LVU274
+ 919 0162 77EEC77A 		vsub.f32	s15, s15, s14
+ 920              		.loc 1 306 35 discriminator 3 view .LVU275
+ 921 0166 F0EEE77A 		vabs.f32	s15, s15
+ 922              		.loc 1 306 32 discriminator 3 view .LVU276
+ 923 016a 90ED067A 		vldr.32	s14, [r0, #24]
+ 924 016e 77EE277A 		vadd.f32	s15, s14, s15
+ 925 0172 C0ED067A 		vstr.32	s15, [r0, #24]
+ 304:ACE-ECF/Algorithm/src/user_lib.c ****     for (uint16_t i = OLS->Order - OLS->Count; i < OLS->Order; ++i)
+ 926              		.loc 1 304 64 is_stmt 1 discriminator 3 view .LVU277
+ 927 0176 0133     		adds	r3, r3, #1
+ 928              	.LVL59:
+ 304:ACE-ECF/Algorithm/src/user_lib.c ****     for (uint16_t i = OLS->Order - OLS->Count; i < OLS->Order; ++i)
+ 929              		.loc 1 304 64 is_stmt 0 discriminator 3 view .LVU278
+ 930 0178 9BB2     		uxth	r3, r3
+ 931              	.LVL60:
+ 932              	.L76:
+ 304:ACE-ECF/Algorithm/src/user_lib.c ****     for (uint16_t i = OLS->Order - OLS->Count; i < OLS->Order; ++i)
+ 933              		.loc 1 304 48 is_stmt 1 discriminator 1 view .LVU279
+ 304:ACE-ECF/Algorithm/src/user_lib.c ****     for (uint16_t i = OLS->Order - OLS->Count; i < OLS->Order; ++i)
+ 934              		.loc 1 304 5 is_stmt 0 discriminator 1 view .LVU280
+ 935 017a 9C45     		cmp	ip, r3
+ 936 017c E3D8     		bhi	.L77
+ 304:ACE-ECF/Algorithm/src/user_lib.c ****     for (uint16_t i = OLS->Order - OLS->Count; i < OLS->Order; ++i)
+ 937              		.loc 1 304 5 discriminator 1 view .LVU281
+ 938              	.LBE6:
+ 307:ACE-ECF/Algorithm/src/user_lib.c ****     }
+ 308:ACE-ECF/Algorithm/src/user_lib.c ****     OLS->StandardDeviation /= OLS->Order;
+ 939              		.loc 1 308 5 is_stmt 1 view .LVU282
+ 940              		.loc 1 308 28 is_stmt 0 view .LVU283
+ 941 017e 90ED067A 		vldr.32	s14, [r0, #24]
+ 942 0182 C7EE057A 		vdiv.f32	s15, s14, s10
+ 943 0186 C0ED067A 		vstr.32	s15, [r0, #24]
+ 309:ACE-ECF/Algorithm/src/user_lib.c **** }
+ 944              		.loc 1 309 1 view .LVU284
+ 945 018a 7047     		bx	lr
+ 946              	.L79:
+ 947              		.align	2
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 23
+
+
+ 948              	.L78:
+ 949 018c 00000000 		.word	.LANCHOR2
+ 950              		.cfi_endproc
+ 951              	.LFE148:
+ 953              		.section	.text.OLS_Derivative,"ax",%progbits
+ 954              		.align	1
+ 955              		.global	OLS_Derivative
+ 956              		.syntax unified
+ 957              		.thumb
+ 958              		.thumb_func
+ 960              	OLS_Derivative:
+ 961              	.LVL61:
+ 962              	.LFB149:
+ 310:ACE-ECF/Algorithm/src/user_lib.c **** 
+ 311:ACE-ECF/Algorithm/src/user_lib.c **** /**
+ 312:ACE-ECF/Algorithm/src/user_lib.c ****   * @brief          最小二乘法提取信号微分
+ 313:ACE-ECF/Algorithm/src/user_lib.c ****   * @param[in]      最小二乘法结构体
+ 314:ACE-ECF/Algorithm/src/user_lib.c ****   * @param[in]      信号新样本距上一个样本时间间隔
+ 315:ACE-ECF/Algorithm/src/user_lib.c ****   * @param[in]      信号值
+ 316:ACE-ECF/Algorithm/src/user_lib.c ****   * @retval         返回斜率k
+ 317:ACE-ECF/Algorithm/src/user_lib.c ****   */
+ 318:ACE-ECF/Algorithm/src/user_lib.c **** float OLS_Derivative(Ordinary_Least_Squares_t *OLS, float deltax, float y)
+ 319:ACE-ECF/Algorithm/src/user_lib.c **** {
+ 963              		.loc 1 319 1 is_stmt 1 view -0
+ 964              		.cfi_startproc
+ 965              		@ args = 0, pretend = 0, frame = 0
+ 966              		@ frame_needed = 0, uses_anonymous_args = 0
+ 967              		@ link register save eliminated.
+ 320:ACE-ECF/Algorithm/src/user_lib.c ****     static float temp = 0;
+ 968              		.loc 1 320 5 view .LVU286
+ 321:ACE-ECF/Algorithm/src/user_lib.c ****     temp = OLS->x[1];
+ 969              		.loc 1 321 5 view .LVU287
+ 970              		.loc 1 321 15 is_stmt 0 view .LVU288
+ 971 0000 8368     		ldr	r3, [r0, #8]
+ 972              		.loc 1 321 10 view .LVU289
+ 973 0002 93ED017A 		vldr.32	s14, [r3, #4]
+ 974 0006 5D4B     		ldr	r3, .L88
+ 975 0008 83ED007A 		vstr.32	s14, [r3]
+ 322:ACE-ECF/Algorithm/src/user_lib.c ****     for (uint16_t i = 0; i < OLS->Order - 1; ++i)
+ 976              		.loc 1 322 5 is_stmt 1 view .LVU290
+ 977              	.LBB7:
+ 978              		.loc 1 322 10 view .LVU291
+ 979              	.LVL62:
+ 980              		.loc 1 322 19 is_stmt 0 view .LVU292
+ 981 000c 0023     		movs	r3, #0
+ 982              		.loc 1 322 5 view .LVU293
+ 983 000e 13E0     		b	.L81
+ 984              	.LVL63:
+ 985              	.L82:
+ 323:ACE-ECF/Algorithm/src/user_lib.c ****     {
+ 324:ACE-ECF/Algorithm/src/user_lib.c ****         OLS->x[i] = OLS->x[i + 1] - temp;
+ 986              		.loc 1 324 9 is_stmt 1 discriminator 3 view .LVU294
+ 987              		.loc 1 324 24 is_stmt 0 discriminator 3 view .LVU295
+ 988 0010 8268     		ldr	r2, [r0, #8]
+ 989              		.loc 1 324 27 discriminator 3 view .LVU296
+ 990 0012 591C     		adds	r1, r3, #1
+ 991 0014 02EB810C 		add	ip, r2, r1, lsl #2
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 24
+
+
+ 992 0018 DCED007A 		vldr.32	s15, [ip]
+ 993              		.loc 1 324 15 discriminator 3 view .LVU297
+ 994 001c 02EB8302 		add	r2, r2, r3, lsl #2
+ 995              		.loc 1 324 35 discriminator 3 view .LVU298
+ 996 0020 77EEC77A 		vsub.f32	s15, s15, s14
+ 997              		.loc 1 324 19 discriminator 3 view .LVU299
+ 998 0024 C2ED007A 		vstr.32	s15, [r2]
+ 325:ACE-ECF/Algorithm/src/user_lib.c ****         OLS->y[i] = OLS->y[i + 1];
+ 999              		.loc 1 325 9 is_stmt 1 discriminator 3 view .LVU300
+ 1000              		.loc 1 325 24 is_stmt 0 discriminator 3 view .LVU301
+ 1001 0028 C268     		ldr	r2, [r0, #12]
+ 1002              		.loc 1 325 15 discriminator 3 view .LVU302
+ 1003 002a 02EB8303 		add	r3, r2, r3, lsl #2
+ 1004              	.LVL64:
+ 1005              		.loc 1 325 27 discriminator 3 view .LVU303
+ 1006 002e 02EB8102 		add	r2, r2, r1, lsl #2
+ 1007 0032 1268     		ldr	r2, [r2]	@ float
+ 1008              		.loc 1 325 19 discriminator 3 view .LVU304
+ 1009 0034 1A60     		str	r2, [r3]	@ float
+ 322:ACE-ECF/Algorithm/src/user_lib.c ****     for (uint16_t i = 0; i < OLS->Order - 1; ++i)
+ 1010              		.loc 1 322 46 is_stmt 1 discriminator 3 view .LVU305
+ 1011 0036 8BB2     		uxth	r3, r1
+ 1012              	.LVL65:
+ 1013              	.L81:
+ 322:ACE-ECF/Algorithm/src/user_lib.c ****     for (uint16_t i = 0; i < OLS->Order - 1; ++i)
+ 1014              		.loc 1 322 26 discriminator 1 view .LVU306
+ 322:ACE-ECF/Algorithm/src/user_lib.c ****     for (uint16_t i = 0; i < OLS->Order - 1; ++i)
+ 1015              		.loc 1 322 33 is_stmt 0 discriminator 1 view .LVU307
+ 1016 0038 0288     		ldrh	r2, [r0]
+ 322:ACE-ECF/Algorithm/src/user_lib.c ****     for (uint16_t i = 0; i < OLS->Order - 1; ++i)
+ 1017              		.loc 1 322 41 discriminator 1 view .LVU308
+ 1018 003a 511E     		subs	r1, r2, #1
+ 322:ACE-ECF/Algorithm/src/user_lib.c ****     for (uint16_t i = 0; i < OLS->Order - 1; ++i)
+ 1019              		.loc 1 322 5 discriminator 1 view .LVU309
+ 1020 003c 8B42     		cmp	r3, r1
+ 1021 003e E7DB     		blt	.L82
+ 1022              	.LBE7:
+ 326:ACE-ECF/Algorithm/src/user_lib.c ****     }
+ 327:ACE-ECF/Algorithm/src/user_lib.c ****     OLS->x[OLS->Order - 1] = OLS->x[OLS->Order - 2] + deltax;
+ 1023              		.loc 1 327 5 is_stmt 1 view .LVU310
+ 1024              		.loc 1 327 33 is_stmt 0 view .LVU311
+ 1025 0040 8168     		ldr	r1, [r0, #8]
+ 1026              		.loc 1 327 36 view .LVU312
+ 1027 0042 02F18043 		add	r3, r2, #1073741824
+ 1028              	.LVL66:
+ 1029              		.loc 1 327 36 view .LVU313
+ 1030 0046 023B     		subs	r3, r3, #2
+ 1031 0048 01EB8303 		add	r3, r1, r3, lsl #2
+ 1032 004c D3ED007A 		vldr.32	s15, [r3]
+ 1033              		.loc 1 327 11 view .LVU314
+ 1034 0050 6FF0404C 		mvn	ip, #-1073741824
+ 1035 0054 6244     		add	r2, r2, ip
+ 1036 0056 01EB8202 		add	r2, r1, r2, lsl #2
+ 1037              		.loc 1 327 53 view .LVU315
+ 1038 005a 37EE800A 		vadd.f32	s0, s15, s0
+ 1039              	.LVL67:
+ 1040              		.loc 1 327 28 view .LVU316
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 25
+
+
+ 1041 005e 82ED000A 		vstr.32	s0, [r2]
+ 328:ACE-ECF/Algorithm/src/user_lib.c ****     OLS->y[OLS->Order - 1] = y;
+ 1042              		.loc 1 328 5 is_stmt 1 view .LVU317
+ 1043              		.loc 1 328 8 is_stmt 0 view .LVU318
+ 1044 0062 C368     		ldr	r3, [r0, #12]
+ 1045              		.loc 1 328 15 view .LVU319
+ 1046 0064 0288     		ldrh	r2, [r0]
+ 1047              		.loc 1 328 11 view .LVU320
+ 1048 0066 6244     		add	r2, r2, ip
+ 1049 0068 03EB8203 		add	r3, r3, r2, lsl #2
+ 1050              		.loc 1 328 28 view .LVU321
+ 1051 006c C3ED000A 		vstr.32	s1, [r3]
+ 329:ACE-ECF/Algorithm/src/user_lib.c **** 
+ 330:ACE-ECF/Algorithm/src/user_lib.c ****     if (OLS->Count < OLS->Order)
+ 1052              		.loc 1 330 5 is_stmt 1 view .LVU322
+ 1053              		.loc 1 330 12 is_stmt 0 view .LVU323
+ 1054 0070 4368     		ldr	r3, [r0, #4]
+ 1055              		.loc 1 330 25 view .LVU324
+ 1056 0072 B0F800C0 		ldrh	ip, [r0]
+ 1057              		.loc 1 330 8 view .LVU325
+ 1058 0076 6345     		cmp	r3, ip
+ 1059 0078 01D2     		bcs	.L83
+ 331:ACE-ECF/Algorithm/src/user_lib.c ****     {
+ 332:ACE-ECF/Algorithm/src/user_lib.c ****         OLS->Count++;
+ 1060              		.loc 1 332 9 is_stmt 1 view .LVU326
+ 1061              		.loc 1 332 19 is_stmt 0 view .LVU327
+ 1062 007a 0133     		adds	r3, r3, #1
+ 1063 007c 4360     		str	r3, [r0, #4]
+ 1064              	.L83:
+ 333:ACE-ECF/Algorithm/src/user_lib.c ****     }
+ 334:ACE-ECF/Algorithm/src/user_lib.c **** 
+ 335:ACE-ECF/Algorithm/src/user_lib.c ****     memset((void *)OLS->t, 0, sizeof(float) * 4);
+ 1065              		.loc 1 335 5 is_stmt 1 view .LVU328
+ 1066 007e 0023     		movs	r3, #0
+ 1067 0080 C361     		str	r3, [r0, #28]	@ unaligned
+ 1068 0082 0362     		str	r3, [r0, #32]	@ unaligned
+ 1069 0084 4362     		str	r3, [r0, #36]	@ unaligned
+ 1070 0086 8362     		str	r3, [r0, #40]	@ unaligned
+ 336:ACE-ECF/Algorithm/src/user_lib.c ****     for (uint16_t i = OLS->Order - OLS->Count; i < OLS->Order; ++i)
+ 1071              		.loc 1 336 5 view .LVU329
+ 1072              	.LBB8:
+ 1073              		.loc 1 336 10 view .LVU330
+ 1074              		.loc 1 336 34 is_stmt 0 view .LVU331
+ 1075 0088 8388     		ldrh	r3, [r0, #4]
+ 1076              		.loc 1 336 19 view .LVU332
+ 1077 008a ACEB0303 		sub	r3, ip, r3
+ 1078 008e 9BB2     		uxth	r3, r3
+ 1079              	.LVL68:
+ 1080              		.loc 1 336 19 view .LVU333
+ 1081 0090 1A46     		mov	r2, r3
+ 1082              		.loc 1 336 5 view .LVU334
+ 1083 0092 2DE0     		b	.L84
+ 1084              	.LVL69:
+ 1085              	.L85:
+ 337:ACE-ECF/Algorithm/src/user_lib.c ****     {
+ 338:ACE-ECF/Algorithm/src/user_lib.c ****         OLS->t[0] += OLS->x[i] * OLS->x[i];
+ 1086              		.loc 1 338 9 is_stmt 1 discriminator 3 view .LVU335
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 26
+
+
+ 1087              		.loc 1 338 25 is_stmt 0 discriminator 3 view .LVU336
+ 1088 0094 8168     		ldr	r1, [r0, #8]
+ 1089              		.loc 1 338 28 discriminator 3 view .LVU337
+ 1090 0096 01EB8201 		add	r1, r1, r2, lsl #2
+ 1091 009a D1ED007A 		vldr.32	s15, [r1]
+ 1092              		.loc 1 338 32 discriminator 3 view .LVU338
+ 1093 009e 67EEA77A 		vmul.f32	s15, s15, s15
+ 1094              		.loc 1 338 19 discriminator 3 view .LVU339
+ 1095 00a2 90ED077A 		vldr.32	s14, [r0, #28]
+ 1096 00a6 77EE277A 		vadd.f32	s15, s14, s15
+ 1097 00aa C0ED077A 		vstr.32	s15, [r0, #28]
+ 339:ACE-ECF/Algorithm/src/user_lib.c ****         OLS->t[1] += OLS->x[i];
+ 1098              		.loc 1 339 9 is_stmt 1 discriminator 3 view .LVU340
+ 1099              		.loc 1 339 28 is_stmt 0 discriminator 3 view .LVU341
+ 1100 00ae 91ED007A 		vldr.32	s14, [r1]
+ 1101              		.loc 1 339 19 discriminator 3 view .LVU342
+ 1102 00b2 D0ED087A 		vldr.32	s15, [r0, #32]
+ 1103 00b6 77EE877A 		vadd.f32	s15, s15, s14
+ 1104 00ba C0ED087A 		vstr.32	s15, [r0, #32]
+ 340:ACE-ECF/Algorithm/src/user_lib.c ****         OLS->t[2] += OLS->x[i] * OLS->y[i];
+ 1105              		.loc 1 340 9 is_stmt 1 discriminator 3 view .LVU343
+ 1106              		.loc 1 340 28 is_stmt 0 discriminator 3 view .LVU344
+ 1107 00be D1ED007A 		vldr.32	s15, [r1]
+ 1108              		.loc 1 340 37 discriminator 3 view .LVU345
+ 1109 00c2 C168     		ldr	r1, [r0, #12]
+ 1110              		.loc 1 340 40 discriminator 3 view .LVU346
+ 1111 00c4 01EB8201 		add	r1, r1, r2, lsl #2
+ 1112 00c8 91ED007A 		vldr.32	s14, [r1]
+ 1113              		.loc 1 340 32 discriminator 3 view .LVU347
+ 1114 00cc 27EE877A 		vmul.f32	s14, s15, s14
+ 1115              		.loc 1 340 19 discriminator 3 view .LVU348
+ 1116 00d0 D0ED097A 		vldr.32	s15, [r0, #36]
+ 1117 00d4 77EE877A 		vadd.f32	s15, s15, s14
+ 1118 00d8 C0ED097A 		vstr.32	s15, [r0, #36]
+ 341:ACE-ECF/Algorithm/src/user_lib.c ****         OLS->t[3] += OLS->y[i];
+ 1119              		.loc 1 341 9 is_stmt 1 discriminator 3 view .LVU349
+ 1120              		.loc 1 341 28 is_stmt 0 discriminator 3 view .LVU350
+ 1121 00dc 91ED007A 		vldr.32	s14, [r1]
+ 1122              		.loc 1 341 19 discriminator 3 view .LVU351
+ 1123 00e0 D0ED0A7A 		vldr.32	s15, [r0, #40]
+ 1124 00e4 77EE877A 		vadd.f32	s15, s15, s14
+ 1125 00e8 C0ED0A7A 		vstr.32	s15, [r0, #40]
+ 336:ACE-ECF/Algorithm/src/user_lib.c ****     {
+ 1126              		.loc 1 336 64 is_stmt 1 discriminator 3 view .LVU352
+ 1127 00ec 0132     		adds	r2, r2, #1
+ 1128              	.LVL70:
+ 336:ACE-ECF/Algorithm/src/user_lib.c ****     {
+ 1129              		.loc 1 336 64 is_stmt 0 discriminator 3 view .LVU353
+ 1130 00ee 92B2     		uxth	r2, r2
+ 1131              	.LVL71:
+ 1132              	.L84:
+ 336:ACE-ECF/Algorithm/src/user_lib.c ****     {
+ 1133              		.loc 1 336 48 is_stmt 1 discriminator 1 view .LVU354
+ 336:ACE-ECF/Algorithm/src/user_lib.c ****     {
+ 1134              		.loc 1 336 5 is_stmt 0 discriminator 1 view .LVU355
+ 1135 00f0 9445     		cmp	ip, r2
+ 1136 00f2 CFD8     		bhi	.L85
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 27
+
+
+ 1137              	.LBE8:
+ 342:ACE-ECF/Algorithm/src/user_lib.c ****     }
+ 343:ACE-ECF/Algorithm/src/user_lib.c **** 
+ 344:ACE-ECF/Algorithm/src/user_lib.c ****     OLS->k = (OLS->t[2] * OLS->Order - OLS->t[1] * OLS->t[3]) / (OLS->t[0] * OLS->Order - OLS->t[1]
+ 1138              		.loc 1 344 5 is_stmt 1 view .LVU356
+ 1139              		.loc 1 344 21 is_stmt 0 view .LVU357
+ 1140 00f4 90ED097A 		vldr.32	s14, [r0, #36]
+ 1141              		.loc 1 344 25 view .LVU358
+ 1142 00f8 07EE90CA 		vmov	s15, ip	@ int
+ 1143 00fc B8EEE76A 		vcvt.f32.s32	s12, s15
+ 1144 0100 27EE067A 		vmul.f32	s14, s14, s12
+ 1145              		.loc 1 344 46 view .LVU359
+ 1146 0104 D0ED086A 		vldr.32	s13, [r0, #32]
+ 1147              		.loc 1 344 58 view .LVU360
+ 1148 0108 D0ED0A7A 		vldr.32	s15, [r0, #40]
+ 1149              		.loc 1 344 50 view .LVU361
+ 1150 010c 66EEA77A 		vmul.f32	s15, s13, s15
+ 1151              		.loc 1 344 38 view .LVU362
+ 1152 0110 37EE677A 		vsub.f32	s14, s14, s15
+ 1153              		.loc 1 344 72 view .LVU363
+ 1154 0114 D0ED077A 		vldr.32	s15, [r0, #28]
+ 1155              		.loc 1 344 76 view .LVU364
+ 1156 0118 66EE277A 		vmul.f32	s15, s12, s15
+ 1157              		.loc 1 344 101 view .LVU365
+ 1158 011c 66EEA66A 		vmul.f32	s13, s13, s13
+ 1159              		.loc 1 344 89 view .LVU366
+ 1160 0120 77EEE67A 		vsub.f32	s15, s15, s13
+ 1161              		.loc 1 344 63 view .LVU367
+ 1162 0124 87EE270A 		vdiv.f32	s0, s14, s15
+ 1163              		.loc 1 344 12 view .LVU368
+ 1164 0128 80ED040A 		vstr.32	s0, [r0, #16]
+ 345:ACE-ECF/Algorithm/src/user_lib.c **** 
+ 346:ACE-ECF/Algorithm/src/user_lib.c ****     OLS->StandardDeviation = 0;
+ 1165              		.loc 1 346 5 is_stmt 1 view .LVU369
+ 1166              		.loc 1 346 28 is_stmt 0 view .LVU370
+ 1167 012c 0022     		movs	r2, #0
+ 1168              	.LVL72:
+ 1169              		.loc 1 346 28 view .LVU371
+ 1170 012e 8261     		str	r2, [r0, #24]	@ float
+ 347:ACE-ECF/Algorithm/src/user_lib.c ****     for (uint16_t i = OLS->Order - OLS->Count; i < OLS->Order; ++i)
+ 1171              		.loc 1 347 5 is_stmt 1 view .LVU372
+ 1172              	.LBB9:
+ 1173              		.loc 1 347 10 view .LVU373
+ 1174              	.LVL73:
+ 1175              		.loc 1 347 5 is_stmt 0 view .LVU374
+ 1176 0130 1BE0     		b	.L86
+ 1177              	.L87:
+ 348:ACE-ECF/Algorithm/src/user_lib.c ****     {
+ 349:ACE-ECF/Algorithm/src/user_lib.c ****         OLS->StandardDeviation += fabsf(OLS->k * OLS->x[i] + OLS->b - OLS->y[i]);
+ 1178              		.loc 1 349 9 is_stmt 1 discriminator 3 view .LVU375
+ 1179              		.loc 1 349 53 is_stmt 0 discriminator 3 view .LVU376
+ 1180 0132 8268     		ldr	r2, [r0, #8]
+ 1181              		.loc 1 349 56 discriminator 3 view .LVU377
+ 1182 0134 02EB8302 		add	r2, r2, r3, lsl #2
+ 1183 0138 D2ED007A 		vldr.32	s15, [r2]
+ 1184              		.loc 1 349 48 discriminator 3 view .LVU378
+ 1185 013c 60EE277A 		vmul.f32	s15, s0, s15
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 28
+
+
+ 1186              		.loc 1 349 65 discriminator 3 view .LVU379
+ 1187 0140 90ED057A 		vldr.32	s14, [r0, #20]
+ 1188              		.loc 1 349 60 discriminator 3 view .LVU380
+ 1189 0144 77EE877A 		vadd.f32	s15, s15, s14
+ 1190              		.loc 1 349 74 discriminator 3 view .LVU381
+ 1191 0148 C268     		ldr	r2, [r0, #12]
+ 1192              		.loc 1 349 77 discriminator 3 view .LVU382
+ 1193 014a 02EB8302 		add	r2, r2, r3, lsl #2
+ 1194 014e 92ED007A 		vldr.32	s14, [r2]
+ 1195              		.loc 1 349 69 discriminator 3 view .LVU383
+ 1196 0152 77EEC77A 		vsub.f32	s15, s15, s14
+ 1197              		.loc 1 349 35 discriminator 3 view .LVU384
+ 1198 0156 F0EEE77A 		vabs.f32	s15, s15
+ 1199              		.loc 1 349 32 discriminator 3 view .LVU385
+ 1200 015a 90ED067A 		vldr.32	s14, [r0, #24]
+ 1201 015e 77EE277A 		vadd.f32	s15, s14, s15
+ 1202 0162 C0ED067A 		vstr.32	s15, [r0, #24]
+ 347:ACE-ECF/Algorithm/src/user_lib.c ****     for (uint16_t i = OLS->Order - OLS->Count; i < OLS->Order; ++i)
+ 1203              		.loc 1 347 64 is_stmt 1 discriminator 3 view .LVU386
+ 1204 0166 0133     		adds	r3, r3, #1
+ 1205              	.LVL74:
+ 347:ACE-ECF/Algorithm/src/user_lib.c ****     for (uint16_t i = OLS->Order - OLS->Count; i < OLS->Order; ++i)
+ 1206              		.loc 1 347 64 is_stmt 0 discriminator 3 view .LVU387
+ 1207 0168 9BB2     		uxth	r3, r3
+ 1208              	.LVL75:
+ 1209              	.L86:
+ 347:ACE-ECF/Algorithm/src/user_lib.c ****     for (uint16_t i = OLS->Order - OLS->Count; i < OLS->Order; ++i)
+ 1210              		.loc 1 347 48 is_stmt 1 discriminator 1 view .LVU388
+ 347:ACE-ECF/Algorithm/src/user_lib.c ****     for (uint16_t i = OLS->Order - OLS->Count; i < OLS->Order; ++i)
+ 1211              		.loc 1 347 5 is_stmt 0 discriminator 1 view .LVU389
+ 1212 016a 9C45     		cmp	ip, r3
+ 1213 016c E1D8     		bhi	.L87
+ 347:ACE-ECF/Algorithm/src/user_lib.c ****     for (uint16_t i = OLS->Order - OLS->Count; i < OLS->Order; ++i)
+ 1214              		.loc 1 347 5 discriminator 1 view .LVU390
+ 1215              	.LBE9:
+ 350:ACE-ECF/Algorithm/src/user_lib.c ****     }
+ 351:ACE-ECF/Algorithm/src/user_lib.c ****     OLS->StandardDeviation /= OLS->Order;
+ 1216              		.loc 1 351 5 is_stmt 1 view .LVU391
+ 1217              		.loc 1 351 28 is_stmt 0 view .LVU392
+ 1218 016e 90ED067A 		vldr.32	s14, [r0, #24]
+ 1219 0172 C7EE067A 		vdiv.f32	s15, s14, s12
+ 1220 0176 C0ED067A 		vstr.32	s15, [r0, #24]
+ 352:ACE-ECF/Algorithm/src/user_lib.c **** 
+ 353:ACE-ECF/Algorithm/src/user_lib.c ****     return OLS->k;
+ 1221              		.loc 1 353 5 is_stmt 1 view .LVU393
+ 354:ACE-ECF/Algorithm/src/user_lib.c **** }
+ 1222              		.loc 1 354 1 is_stmt 0 view .LVU394
+ 1223 017a 7047     		bx	lr
+ 1224              	.L89:
+ 1225              		.align	2
+ 1226              	.L88:
+ 1227 017c 00000000 		.word	.LANCHOR3
+ 1228              		.cfi_endproc
+ 1229              	.LFE149:
+ 1231              		.section	.text.Get_OLS_Derivative,"ax",%progbits
+ 1232              		.align	1
+ 1233              		.global	Get_OLS_Derivative
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 29
+
+
+ 1234              		.syntax unified
+ 1235              		.thumb
+ 1236              		.thumb_func
+ 1238              	Get_OLS_Derivative:
+ 1239              	.LVL76:
+ 1240              	.LFB150:
+ 355:ACE-ECF/Algorithm/src/user_lib.c **** 
+ 356:ACE-ECF/Algorithm/src/user_lib.c **** /**
+ 357:ACE-ECF/Algorithm/src/user_lib.c ****   * @brief          获取最小二乘法提取信号微分
+ 358:ACE-ECF/Algorithm/src/user_lib.c ****   * @param[in]      最小二乘法结构体
+ 359:ACE-ECF/Algorithm/src/user_lib.c ****   * @retval         返回斜率k
+ 360:ACE-ECF/Algorithm/src/user_lib.c ****   */
+ 361:ACE-ECF/Algorithm/src/user_lib.c **** float Get_OLS_Derivative(Ordinary_Least_Squares_t *OLS)
+ 362:ACE-ECF/Algorithm/src/user_lib.c **** {
+ 1241              		.loc 1 362 1 is_stmt 1 view -0
+ 1242              		.cfi_startproc
+ 1243              		@ args = 0, pretend = 0, frame = 0
+ 1244              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1245              		@ link register save eliminated.
+ 363:ACE-ECF/Algorithm/src/user_lib.c ****     return OLS->k;
+ 1246              		.loc 1 363 5 view .LVU396
+ 364:ACE-ECF/Algorithm/src/user_lib.c **** }
+ 1247              		.loc 1 364 1 is_stmt 0 view .LVU397
+ 1248 0000 90ED040A 		vldr.32	s0, [r0, #16]
+ 1249 0004 7047     		bx	lr
+ 1250              		.cfi_endproc
+ 1251              	.LFE150:
+ 1253              		.section	.text.OLS_Smooth,"ax",%progbits
+ 1254              		.align	1
+ 1255              		.global	OLS_Smooth
+ 1256              		.syntax unified
+ 1257              		.thumb
+ 1258              		.thumb_func
+ 1260              	OLS_Smooth:
+ 1261              	.LVL77:
+ 1262              	.LFB151:
+ 365:ACE-ECF/Algorithm/src/user_lib.c **** 
+ 366:ACE-ECF/Algorithm/src/user_lib.c **** /**
+ 367:ACE-ECF/Algorithm/src/user_lib.c ****   * @brief          最小二乘法平滑信号
+ 368:ACE-ECF/Algorithm/src/user_lib.c ****   * @param[in]      最小二乘法结构体
+ 369:ACE-ECF/Algorithm/src/user_lib.c ****   * @param[in]      信号新样本距上一个样本时间间隔
+ 370:ACE-ECF/Algorithm/src/user_lib.c ****   * @param[in]      信号值
+ 371:ACE-ECF/Algorithm/src/user_lib.c ****   * @retval         返回平滑输出
+ 372:ACE-ECF/Algorithm/src/user_lib.c ****   */
+ 373:ACE-ECF/Algorithm/src/user_lib.c **** float OLS_Smooth(Ordinary_Least_Squares_t *OLS, float deltax, float y)
+ 374:ACE-ECF/Algorithm/src/user_lib.c **** {
+ 1263              		.loc 1 374 1 is_stmt 1 view -0
+ 1264              		.cfi_startproc
+ 1265              		@ args = 0, pretend = 0, frame = 0
+ 1266              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1267              		@ link register save eliminated.
+ 375:ACE-ECF/Algorithm/src/user_lib.c ****     static float temp = 0;
+ 1268              		.loc 1 375 5 view .LVU399
+ 376:ACE-ECF/Algorithm/src/user_lib.c ****     temp = OLS->x[1];
+ 1269              		.loc 1 376 5 view .LVU400
+ 1270              		.loc 1 376 15 is_stmt 0 view .LVU401
+ 1271 0000 8368     		ldr	r3, [r0, #8]
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 30
+
+
+ 1272              		.loc 1 376 10 view .LVU402
+ 1273 0002 93ED017A 		vldr.32	s14, [r3, #4]
+ 1274 0006 684B     		ldr	r3, .L99
+ 1275 0008 83ED007A 		vstr.32	s14, [r3]
+ 377:ACE-ECF/Algorithm/src/user_lib.c ****     for (uint16_t i = 0; i < OLS->Order - 1; ++i)
+ 1276              		.loc 1 377 5 is_stmt 1 view .LVU403
+ 1277              	.LBB10:
+ 1278              		.loc 1 377 10 view .LVU404
+ 1279              	.LVL78:
+ 1280              		.loc 1 377 19 is_stmt 0 view .LVU405
+ 1281 000c 0023     		movs	r3, #0
+ 1282              		.loc 1 377 5 view .LVU406
+ 1283 000e 13E0     		b	.L92
+ 1284              	.LVL79:
+ 1285              	.L93:
+ 378:ACE-ECF/Algorithm/src/user_lib.c ****     {
+ 379:ACE-ECF/Algorithm/src/user_lib.c ****         OLS->x[i] = OLS->x[i + 1] - temp;
+ 1286              		.loc 1 379 9 is_stmt 1 discriminator 3 view .LVU407
+ 1287              		.loc 1 379 24 is_stmt 0 discriminator 3 view .LVU408
+ 1288 0010 8268     		ldr	r2, [r0, #8]
+ 1289              		.loc 1 379 27 discriminator 3 view .LVU409
+ 1290 0012 591C     		adds	r1, r3, #1
+ 1291 0014 02EB810C 		add	ip, r2, r1, lsl #2
+ 1292 0018 DCED007A 		vldr.32	s15, [ip]
+ 1293              		.loc 1 379 15 discriminator 3 view .LVU410
+ 1294 001c 02EB8302 		add	r2, r2, r3, lsl #2
+ 1295              		.loc 1 379 35 discriminator 3 view .LVU411
+ 1296 0020 77EEC77A 		vsub.f32	s15, s15, s14
+ 1297              		.loc 1 379 19 discriminator 3 view .LVU412
+ 1298 0024 C2ED007A 		vstr.32	s15, [r2]
+ 380:ACE-ECF/Algorithm/src/user_lib.c ****         OLS->y[i] = OLS->y[i + 1];
+ 1299              		.loc 1 380 9 is_stmt 1 discriminator 3 view .LVU413
+ 1300              		.loc 1 380 24 is_stmt 0 discriminator 3 view .LVU414
+ 1301 0028 C268     		ldr	r2, [r0, #12]
+ 1302              		.loc 1 380 15 discriminator 3 view .LVU415
+ 1303 002a 02EB8303 		add	r3, r2, r3, lsl #2
+ 1304              	.LVL80:
+ 1305              		.loc 1 380 27 discriminator 3 view .LVU416
+ 1306 002e 02EB8102 		add	r2, r2, r1, lsl #2
+ 1307 0032 1268     		ldr	r2, [r2]	@ float
+ 1308              		.loc 1 380 19 discriminator 3 view .LVU417
+ 1309 0034 1A60     		str	r2, [r3]	@ float
+ 377:ACE-ECF/Algorithm/src/user_lib.c ****     for (uint16_t i = 0; i < OLS->Order - 1; ++i)
+ 1310              		.loc 1 377 46 is_stmt 1 discriminator 3 view .LVU418
+ 1311 0036 8BB2     		uxth	r3, r1
+ 1312              	.LVL81:
+ 1313              	.L92:
+ 377:ACE-ECF/Algorithm/src/user_lib.c ****     for (uint16_t i = 0; i < OLS->Order - 1; ++i)
+ 1314              		.loc 1 377 26 discriminator 1 view .LVU419
+ 377:ACE-ECF/Algorithm/src/user_lib.c ****     for (uint16_t i = 0; i < OLS->Order - 1; ++i)
+ 1315              		.loc 1 377 33 is_stmt 0 discriminator 1 view .LVU420
+ 1316 0038 0288     		ldrh	r2, [r0]
+ 377:ACE-ECF/Algorithm/src/user_lib.c ****     for (uint16_t i = 0; i < OLS->Order - 1; ++i)
+ 1317              		.loc 1 377 41 discriminator 1 view .LVU421
+ 1318 003a 511E     		subs	r1, r2, #1
+ 377:ACE-ECF/Algorithm/src/user_lib.c ****     for (uint16_t i = 0; i < OLS->Order - 1; ++i)
+ 1319              		.loc 1 377 5 discriminator 1 view .LVU422
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 31
+
+
+ 1320 003c 8B42     		cmp	r3, r1
+ 1321 003e E7DB     		blt	.L93
+ 1322              	.LBE10:
+ 381:ACE-ECF/Algorithm/src/user_lib.c ****     }
+ 382:ACE-ECF/Algorithm/src/user_lib.c ****     OLS->x[OLS->Order - 1] = OLS->x[OLS->Order - 2] + deltax;
+ 1323              		.loc 1 382 5 is_stmt 1 view .LVU423
+ 1324              		.loc 1 382 33 is_stmt 0 view .LVU424
+ 1325 0040 8168     		ldr	r1, [r0, #8]
+ 1326              		.loc 1 382 36 view .LVU425
+ 1327 0042 02F18043 		add	r3, r2, #1073741824
+ 1328              	.LVL82:
+ 1329              		.loc 1 382 36 view .LVU426
+ 1330 0046 023B     		subs	r3, r3, #2
+ 1331 0048 01EB8303 		add	r3, r1, r3, lsl #2
+ 1332 004c D3ED007A 		vldr.32	s15, [r3]
+ 1333              		.loc 1 382 11 view .LVU427
+ 1334 0050 6FF0404C 		mvn	ip, #-1073741824
+ 1335 0054 6244     		add	r2, r2, ip
+ 1336 0056 01EB8202 		add	r2, r1, r2, lsl #2
+ 1337              		.loc 1 382 53 view .LVU428
+ 1338 005a 37EE800A 		vadd.f32	s0, s15, s0
+ 1339              	.LVL83:
+ 1340              		.loc 1 382 28 view .LVU429
+ 1341 005e 82ED000A 		vstr.32	s0, [r2]
+ 383:ACE-ECF/Algorithm/src/user_lib.c ****     OLS->y[OLS->Order - 1] = y;
+ 1342              		.loc 1 383 5 is_stmt 1 view .LVU430
+ 1343              		.loc 1 383 8 is_stmt 0 view .LVU431
+ 1344 0062 C368     		ldr	r3, [r0, #12]
+ 1345              		.loc 1 383 15 view .LVU432
+ 1346 0064 0288     		ldrh	r2, [r0]
+ 1347              		.loc 1 383 11 view .LVU433
+ 1348 0066 6244     		add	r2, r2, ip
+ 1349 0068 03EB8203 		add	r3, r3, r2, lsl #2
+ 1350              		.loc 1 383 28 view .LVU434
+ 1351 006c C3ED000A 		vstr.32	s1, [r3]
+ 384:ACE-ECF/Algorithm/src/user_lib.c **** 
+ 385:ACE-ECF/Algorithm/src/user_lib.c ****     if (OLS->Count < OLS->Order)
+ 1352              		.loc 1 385 5 is_stmt 1 view .LVU435
+ 1353              		.loc 1 385 12 is_stmt 0 view .LVU436
+ 1354 0070 4368     		ldr	r3, [r0, #4]
+ 1355              		.loc 1 385 25 view .LVU437
+ 1356 0072 B0F800C0 		ldrh	ip, [r0]
+ 1357              		.loc 1 385 8 view .LVU438
+ 1358 0076 6345     		cmp	r3, ip
+ 1359 0078 01D2     		bcs	.L94
+ 386:ACE-ECF/Algorithm/src/user_lib.c ****     {
+ 387:ACE-ECF/Algorithm/src/user_lib.c ****         OLS->Count++;
+ 1360              		.loc 1 387 9 is_stmt 1 view .LVU439
+ 1361              		.loc 1 387 19 is_stmt 0 view .LVU440
+ 1362 007a 0133     		adds	r3, r3, #1
+ 1363 007c 4360     		str	r3, [r0, #4]
+ 1364              	.L94:
+ 388:ACE-ECF/Algorithm/src/user_lib.c ****     }
+ 389:ACE-ECF/Algorithm/src/user_lib.c **** 
+ 390:ACE-ECF/Algorithm/src/user_lib.c ****     memset((void *)OLS->t, 0, sizeof(float) * 4);
+ 1365              		.loc 1 390 5 is_stmt 1 view .LVU441
+ 1366 007e 0023     		movs	r3, #0
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 32
+
+
+ 1367 0080 C361     		str	r3, [r0, #28]	@ unaligned
+ 1368 0082 0362     		str	r3, [r0, #32]	@ unaligned
+ 1369 0084 4362     		str	r3, [r0, #36]	@ unaligned
+ 1370 0086 8362     		str	r3, [r0, #40]	@ unaligned
+ 391:ACE-ECF/Algorithm/src/user_lib.c ****     for (uint16_t i = OLS->Order - OLS->Count; i < OLS->Order; ++i)
+ 1371              		.loc 1 391 5 view .LVU442
+ 1372              	.LBB11:
+ 1373              		.loc 1 391 10 view .LVU443
+ 1374              		.loc 1 391 34 is_stmt 0 view .LVU444
+ 1375 0088 8388     		ldrh	r3, [r0, #4]
+ 1376              		.loc 1 391 19 view .LVU445
+ 1377 008a ACEB0303 		sub	r3, ip, r3
+ 1378 008e 9BB2     		uxth	r3, r3
+ 1379              	.LVL84:
+ 1380              		.loc 1 391 19 view .LVU446
+ 1381 0090 1A46     		mov	r2, r3
+ 1382              		.loc 1 391 5 view .LVU447
+ 1383 0092 2DE0     		b	.L95
+ 1384              	.LVL85:
+ 1385              	.L96:
+ 392:ACE-ECF/Algorithm/src/user_lib.c ****     {
+ 393:ACE-ECF/Algorithm/src/user_lib.c ****         OLS->t[0] += OLS->x[i] * OLS->x[i];
+ 1386              		.loc 1 393 9 is_stmt 1 discriminator 3 view .LVU448
+ 1387              		.loc 1 393 25 is_stmt 0 discriminator 3 view .LVU449
+ 1388 0094 8168     		ldr	r1, [r0, #8]
+ 1389              		.loc 1 393 28 discriminator 3 view .LVU450
+ 1390 0096 01EB8201 		add	r1, r1, r2, lsl #2
+ 1391 009a D1ED007A 		vldr.32	s15, [r1]
+ 1392              		.loc 1 393 32 discriminator 3 view .LVU451
+ 1393 009e 67EEA77A 		vmul.f32	s15, s15, s15
+ 1394              		.loc 1 393 19 discriminator 3 view .LVU452
+ 1395 00a2 90ED077A 		vldr.32	s14, [r0, #28]
+ 1396 00a6 77EE277A 		vadd.f32	s15, s14, s15
+ 1397 00aa C0ED077A 		vstr.32	s15, [r0, #28]
+ 394:ACE-ECF/Algorithm/src/user_lib.c ****         OLS->t[1] += OLS->x[i];
+ 1398              		.loc 1 394 9 is_stmt 1 discriminator 3 view .LVU453
+ 1399              		.loc 1 394 28 is_stmt 0 discriminator 3 view .LVU454
+ 1400 00ae 91ED007A 		vldr.32	s14, [r1]
+ 1401              		.loc 1 394 19 discriminator 3 view .LVU455
+ 1402 00b2 D0ED087A 		vldr.32	s15, [r0, #32]
+ 1403 00b6 77EE877A 		vadd.f32	s15, s15, s14
+ 1404 00ba C0ED087A 		vstr.32	s15, [r0, #32]
+ 395:ACE-ECF/Algorithm/src/user_lib.c ****         OLS->t[2] += OLS->x[i] * OLS->y[i];
+ 1405              		.loc 1 395 9 is_stmt 1 discriminator 3 view .LVU456
+ 1406              		.loc 1 395 28 is_stmt 0 discriminator 3 view .LVU457
+ 1407 00be D1ED007A 		vldr.32	s15, [r1]
+ 1408              		.loc 1 395 37 discriminator 3 view .LVU458
+ 1409 00c2 C168     		ldr	r1, [r0, #12]
+ 1410              		.loc 1 395 40 discriminator 3 view .LVU459
+ 1411 00c4 01EB8201 		add	r1, r1, r2, lsl #2
+ 1412 00c8 91ED007A 		vldr.32	s14, [r1]
+ 1413              		.loc 1 395 32 discriminator 3 view .LVU460
+ 1414 00cc 27EE877A 		vmul.f32	s14, s15, s14
+ 1415              		.loc 1 395 19 discriminator 3 view .LVU461
+ 1416 00d0 D0ED097A 		vldr.32	s15, [r0, #36]
+ 1417 00d4 77EE877A 		vadd.f32	s15, s15, s14
+ 1418 00d8 C0ED097A 		vstr.32	s15, [r0, #36]
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 33
+
+
+ 396:ACE-ECF/Algorithm/src/user_lib.c ****         OLS->t[3] += OLS->y[i];
+ 1419              		.loc 1 396 9 is_stmt 1 discriminator 3 view .LVU462
+ 1420              		.loc 1 396 28 is_stmt 0 discriminator 3 view .LVU463
+ 1421 00dc 91ED007A 		vldr.32	s14, [r1]
+ 1422              		.loc 1 396 19 discriminator 3 view .LVU464
+ 1423 00e0 D0ED0A7A 		vldr.32	s15, [r0, #40]
+ 1424 00e4 77EE877A 		vadd.f32	s15, s15, s14
+ 1425 00e8 C0ED0A7A 		vstr.32	s15, [r0, #40]
+ 391:ACE-ECF/Algorithm/src/user_lib.c ****     {
+ 1426              		.loc 1 391 64 is_stmt 1 discriminator 3 view .LVU465
+ 1427 00ec 0132     		adds	r2, r2, #1
+ 1428              	.LVL86:
+ 391:ACE-ECF/Algorithm/src/user_lib.c ****     {
+ 1429              		.loc 1 391 64 is_stmt 0 discriminator 3 view .LVU466
+ 1430 00ee 92B2     		uxth	r2, r2
+ 1431              	.LVL87:
+ 1432              	.L95:
+ 391:ACE-ECF/Algorithm/src/user_lib.c ****     {
+ 1433              		.loc 1 391 48 is_stmt 1 discriminator 1 view .LVU467
+ 391:ACE-ECF/Algorithm/src/user_lib.c ****     {
+ 1434              		.loc 1 391 5 is_stmt 0 discriminator 1 view .LVU468
+ 1435 00f0 9445     		cmp	ip, r2
+ 1436 00f2 CFD8     		bhi	.L96
+ 1437              	.LBE11:
+ 397:ACE-ECF/Algorithm/src/user_lib.c ****     }
+ 398:ACE-ECF/Algorithm/src/user_lib.c **** 
+ 399:ACE-ECF/Algorithm/src/user_lib.c ****     OLS->k = (OLS->t[2] * OLS->Order - OLS->t[1] * OLS->t[3]) / (OLS->t[0] * OLS->Order - OLS->t[1]
+ 1438              		.loc 1 399 5 is_stmt 1 view .LVU469
+ 1439              		.loc 1 399 21 is_stmt 0 view .LVU470
+ 1440 00f4 90ED096A 		vldr.32	s12, [r0, #36]
+ 1441              		.loc 1 399 25 view .LVU471
+ 1442 00f8 07EE90CA 		vmov	s15, ip	@ int
+ 1443 00fc B8EEE75A 		vcvt.f32.s32	s10, s15
+ 1444 0100 66EE054A 		vmul.f32	s9, s12, s10
+ 1445              		.loc 1 399 46 view .LVU472
+ 1446 0104 D0ED085A 		vldr.32	s11, [r0, #32]
+ 1447              		.loc 1 399 58 view .LVU473
+ 1448 0108 D0ED0A7A 		vldr.32	s15, [r0, #40]
+ 1449              		.loc 1 399 50 view .LVU474
+ 1450 010c 25EEA77A 		vmul.f32	s14, s11, s15
+ 1451              		.loc 1 399 38 view .LVU475
+ 1452 0110 74EEC74A 		vsub.f32	s9, s9, s14
+ 1453              		.loc 1 399 72 view .LVU476
+ 1454 0114 90ED074A 		vldr.32	s8, [r0, #28]
+ 1455              		.loc 1 399 76 view .LVU477
+ 1456 0118 25EE047A 		vmul.f32	s14, s10, s8
+ 1457              		.loc 1 399 101 view .LVU478
+ 1458 011c 65EEA56A 		vmul.f32	s13, s11, s11
+ 1459              		.loc 1 399 89 view .LVU479
+ 1460 0120 37EE667A 		vsub.f32	s14, s14, s13
+ 1461              		.loc 1 399 63 view .LVU480
+ 1462 0124 C4EE876A 		vdiv.f32	s13, s9, s14
+ 1463              		.loc 1 399 12 view .LVU481
+ 1464 0128 C0ED046A 		vstr.32	s13, [r0, #16]
+ 400:ACE-ECF/Algorithm/src/user_lib.c ****     OLS->b = (OLS->t[0] * OLS->t[3] - OLS->t[1] * OLS->t[2]) / (OLS->t[0] * OLS->Order - OLS->t[1] 
+ 1465              		.loc 1 400 5 is_stmt 1 view .LVU482
+ 1466              		.loc 1 400 25 is_stmt 0 view .LVU483
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 34
+
+
+ 1467 012c 67EE847A 		vmul.f32	s15, s15, s8
+ 1468              		.loc 1 400 49 view .LVU484
+ 1469 0130 26EE256A 		vmul.f32	s12, s12, s11
+ 1470              		.loc 1 400 37 view .LVU485
+ 1471 0134 77EEC67A 		vsub.f32	s15, s15, s12
+ 1472              		.loc 1 400 62 view .LVU486
+ 1473 0138 87EE870A 		vdiv.f32	s0, s15, s14
+ 1474              		.loc 1 400 12 view .LVU487
+ 1475 013c 80ED050A 		vstr.32	s0, [r0, #20]
+ 401:ACE-ECF/Algorithm/src/user_lib.c **** 
+ 402:ACE-ECF/Algorithm/src/user_lib.c ****     OLS->StandardDeviation = 0;
+ 1476              		.loc 1 402 5 is_stmt 1 view .LVU488
+ 1477              		.loc 1 402 28 is_stmt 0 view .LVU489
+ 1478 0140 0022     		movs	r2, #0
+ 1479              	.LVL88:
+ 1480              		.loc 1 402 28 view .LVU490
+ 1481 0142 8261     		str	r2, [r0, #24]	@ float
+ 403:ACE-ECF/Algorithm/src/user_lib.c ****     for (uint16_t i = OLS->Order - OLS->Count; i < OLS->Order; ++i)
+ 1482              		.loc 1 403 5 is_stmt 1 view .LVU491
+ 1483              	.LBB12:
+ 1484              		.loc 1 403 10 view .LVU492
+ 1485              	.LVL89:
+ 1486              		.loc 1 403 5 is_stmt 0 view .LVU493
+ 1487 0144 19E0     		b	.L97
+ 1488              	.L98:
+ 404:ACE-ECF/Algorithm/src/user_lib.c ****     {
+ 405:ACE-ECF/Algorithm/src/user_lib.c ****         OLS->StandardDeviation += fabsf(OLS->k * OLS->x[i] + OLS->b - OLS->y[i]);
+ 1489              		.loc 1 405 9 is_stmt 1 discriminator 3 view .LVU494
+ 1490              		.loc 1 405 53 is_stmt 0 discriminator 3 view .LVU495
+ 1491 0146 8268     		ldr	r2, [r0, #8]
+ 1492              		.loc 1 405 56 discriminator 3 view .LVU496
+ 1493 0148 02EB8302 		add	r2, r2, r3, lsl #2
+ 1494 014c D2ED007A 		vldr.32	s15, [r2]
+ 1495              		.loc 1 405 48 discriminator 3 view .LVU497
+ 1496 0150 66EEA77A 		vmul.f32	s15, s13, s15
+ 1497              		.loc 1 405 60 discriminator 3 view .LVU498
+ 1498 0154 70EE277A 		vadd.f32	s15, s0, s15
+ 1499              		.loc 1 405 74 discriminator 3 view .LVU499
+ 1500 0158 C268     		ldr	r2, [r0, #12]
+ 1501              		.loc 1 405 77 discriminator 3 view .LVU500
+ 1502 015a 02EB8302 		add	r2, r2, r3, lsl #2
+ 1503 015e 92ED007A 		vldr.32	s14, [r2]
+ 1504              		.loc 1 405 69 discriminator 3 view .LVU501
+ 1505 0162 77EEC77A 		vsub.f32	s15, s15, s14
+ 1506              		.loc 1 405 35 discriminator 3 view .LVU502
+ 1507 0166 F0EEE77A 		vabs.f32	s15, s15
+ 1508              		.loc 1 405 32 discriminator 3 view .LVU503
+ 1509 016a 90ED067A 		vldr.32	s14, [r0, #24]
+ 1510 016e 77EE277A 		vadd.f32	s15, s14, s15
+ 1511 0172 C0ED067A 		vstr.32	s15, [r0, #24]
+ 403:ACE-ECF/Algorithm/src/user_lib.c ****     for (uint16_t i = OLS->Order - OLS->Count; i < OLS->Order; ++i)
+ 1512              		.loc 1 403 64 is_stmt 1 discriminator 3 view .LVU504
+ 1513 0176 0133     		adds	r3, r3, #1
+ 1514              	.LVL90:
+ 403:ACE-ECF/Algorithm/src/user_lib.c ****     for (uint16_t i = OLS->Order - OLS->Count; i < OLS->Order; ++i)
+ 1515              		.loc 1 403 64 is_stmt 0 discriminator 3 view .LVU505
+ 1516 0178 9BB2     		uxth	r3, r3
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 35
+
+
+ 1517              	.LVL91:
+ 1518              	.L97:
+ 403:ACE-ECF/Algorithm/src/user_lib.c ****     for (uint16_t i = OLS->Order - OLS->Count; i < OLS->Order; ++i)
+ 1519              		.loc 1 403 48 is_stmt 1 discriminator 1 view .LVU506
+ 403:ACE-ECF/Algorithm/src/user_lib.c ****     for (uint16_t i = OLS->Order - OLS->Count; i < OLS->Order; ++i)
+ 1520              		.loc 1 403 5 is_stmt 0 discriminator 1 view .LVU507
+ 1521 017a 9C45     		cmp	ip, r3
+ 1522 017c E3D8     		bhi	.L98
+ 403:ACE-ECF/Algorithm/src/user_lib.c ****     for (uint16_t i = OLS->Order - OLS->Count; i < OLS->Order; ++i)
+ 1523              		.loc 1 403 5 discriminator 1 view .LVU508
+ 1524              	.LBE12:
+ 406:ACE-ECF/Algorithm/src/user_lib.c ****     }
+ 407:ACE-ECF/Algorithm/src/user_lib.c ****     OLS->StandardDeviation /= OLS->Order;
+ 1525              		.loc 1 407 5 is_stmt 1 view .LVU509
+ 1526              		.loc 1 407 28 is_stmt 0 view .LVU510
+ 1527 017e 90ED067A 		vldr.32	s14, [r0, #24]
+ 1528 0182 C7EE057A 		vdiv.f32	s15, s14, s10
+ 1529 0186 C0ED067A 		vstr.32	s15, [r0, #24]
+ 408:ACE-ECF/Algorithm/src/user_lib.c **** 
+ 409:ACE-ECF/Algorithm/src/user_lib.c ****     return OLS->k * OLS->x[OLS->Order - 1] + OLS->b;
+ 1530              		.loc 1 409 5 is_stmt 1 view .LVU511
+ 1531              		.loc 1 409 24 is_stmt 0 view .LVU512
+ 1532 018a 8368     		ldr	r3, [r0, #8]
+ 1533              	.LVL92:
+ 1534              		.loc 1 409 27 view .LVU513
+ 1535 018c 0CF1804C 		add	ip, ip, #1073741824
+ 1536 0190 0CF1FF3C 		add	ip, ip, #-1
+ 1537 0194 03EB8C0C 		add	ip, r3, ip, lsl #2
+ 1538 0198 DCED007A 		vldr.32	s15, [ip]
+ 1539              		.loc 1 409 19 view .LVU514
+ 1540 019c 66EEA76A 		vmul.f32	s13, s13, s15
+ 410:ACE-ECF/Algorithm/src/user_lib.c **** }
+ 1541              		.loc 1 410 1 view .LVU515
+ 1542 01a0 30EE260A 		vadd.f32	s0, s0, s13
+ 1543 01a4 7047     		bx	lr
+ 1544              	.L100:
+ 1545 01a6 00BF     		.align	2
+ 1546              	.L99:
+ 1547 01a8 00000000 		.word	.LANCHOR4
+ 1548              		.cfi_endproc
+ 1549              	.LFE151:
+ 1551              		.section	.text.Get_OLS_Smooth,"ax",%progbits
+ 1552              		.align	1
+ 1553              		.global	Get_OLS_Smooth
+ 1554              		.syntax unified
+ 1555              		.thumb
+ 1556              		.thumb_func
+ 1558              	Get_OLS_Smooth:
+ 1559              	.LVL93:
+ 1560              	.LFB152:
+ 411:ACE-ECF/Algorithm/src/user_lib.c **** 
+ 412:ACE-ECF/Algorithm/src/user_lib.c **** /**
+ 413:ACE-ECF/Algorithm/src/user_lib.c ****   * @brief          获取最小二乘法平滑信号
+ 414:ACE-ECF/Algorithm/src/user_lib.c ****   * @param[in]      最小二乘法结构体
+ 415:ACE-ECF/Algorithm/src/user_lib.c ****   * @retval         返回平滑输出
+ 416:ACE-ECF/Algorithm/src/user_lib.c ****   */
+ 417:ACE-ECF/Algorithm/src/user_lib.c **** float Get_OLS_Smooth(Ordinary_Least_Squares_t *OLS)
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 36
+
+
+ 418:ACE-ECF/Algorithm/src/user_lib.c **** {
+ 1561              		.loc 1 418 1 is_stmt 1 view -0
+ 1562              		.cfi_startproc
+ 1563              		@ args = 0, pretend = 0, frame = 0
+ 1564              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1565              		@ link register save eliminated.
+ 419:ACE-ECF/Algorithm/src/user_lib.c ****     return OLS->k * OLS->x[OLS->Order - 1] + OLS->b;
+ 1566              		.loc 1 419 5 view .LVU517
+ 1567              		.loc 1 419 15 is_stmt 0 view .LVU518
+ 1568 0000 D0ED047A 		vldr.32	s15, [r0, #16]
+ 1569              		.loc 1 419 24 view .LVU519
+ 1570 0004 8268     		ldr	r2, [r0, #8]
+ 1571              		.loc 1 419 31 view .LVU520
+ 1572 0006 0388     		ldrh	r3, [r0]
+ 1573              		.loc 1 419 27 view .LVU521
+ 1574 0008 03F18043 		add	r3, r3, #1073741824
+ 1575 000c 013B     		subs	r3, r3, #1
+ 1576 000e 02EB8303 		add	r3, r2, r3, lsl #2
+ 1577 0012 93ED000A 		vldr.32	s0, [r3]
+ 1578              		.loc 1 419 19 view .LVU522
+ 1579 0016 67EE807A 		vmul.f32	s15, s15, s0
+ 1580              		.loc 1 419 49 view .LVU523
+ 1581 001a 90ED050A 		vldr.32	s0, [r0, #20]
+ 420:ACE-ECF/Algorithm/src/user_lib.c **** }
+ 1582              		.loc 1 420 1 view .LVU524
+ 1583 001e 37EE800A 		vadd.f32	s0, s15, s0
+ 1584 0022 7047     		bx	lr
+ 1585              		.cfi_endproc
+ 1586              	.LFE152:
+ 1588              		.global	GlobalDebugMode
+ 1589              		.section	.bss.decimal.3,"aw",%nobits
+ 1590              		.align	2
+ 1591              		.set	.LANCHOR1,. + 0
+ 1594              	decimal.3:
+ 1595 0000 00000000 		.space	4
+ 1596              		.section	.bss.integer.4,"aw",%nobits
+ 1597              		.align	2
+ 1598              		.set	.LANCHOR0,. + 0
+ 1601              	integer.4:
+ 1602 0000 00000000 		.space	4
+ 1603              		.section	.bss.temp.0,"aw",%nobits
+ 1604              		.align	2
+ 1605              		.set	.LANCHOR4,. + 0
+ 1608              	temp.0:
+ 1609 0000 00000000 		.space	4
+ 1610              		.section	.bss.temp.1,"aw",%nobits
+ 1611              		.align	2
+ 1612              		.set	.LANCHOR3,. + 0
+ 1615              	temp.1:
+ 1616 0000 00000000 		.space	4
+ 1617              		.section	.bss.temp.2,"aw",%nobits
+ 1618              		.align	2
+ 1619              		.set	.LANCHOR2,. + 0
+ 1622              	temp.2:
+ 1623 0000 00000000 		.space	4
+ 1624              		.section	.data.GlobalDebugMode,"aw"
+ 1627              	GlobalDebugMode:
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 37
+
+
+ 1628 0000 07       		.byte	7
+ 1629              		.text
+ 1630              	.Letext0:
+ 1631              		.file 2 "d:\\gcc-arm-none-eabi-10.3-2021.10\\arm-none-eabi\\include\\machine\\_default_types.h"
+ 1632              		.file 3 "d:\\gcc-arm-none-eabi-10.3-2021.10\\arm-none-eabi\\include\\sys\\_stdint.h"
+ 1633              		.file 4 "ACE-ECF/Algorithm/inc/user_lib.h"
+ 1634              		.file 5 "Middlewares/Third_Party/FreeRTOS/Source/include/portable.h"
+ 1635              		.file 6 "<built-in>"
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 38
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 user_lib.c
+C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:20     .text.Sqrt:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:26     .text.Sqrt:00000000 Sqrt
+C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:93     .text.Sqrt:00000054 $d
+C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:99     .text.ramp_init:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:105    .text.ramp_init:00000000 ramp_init
+C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:135    .text.ramp_calc:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:141    .text.ramp_calc:00000000 ramp_calc
+C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:193    .text.abs_limit:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:199    .text.abs_limit:00000000 abs_limit
+C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:233    .text.sign:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:239    .text.sign:00000000 sign
+C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:268    .text.float_deadband:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:274    .text.float_deadband:00000000 float_deadband
+C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:301    .text.float_deadband:0000001c $d
+C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:306    .text.int16_deadline:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:312    .text.int16_deadline:00000000 int16_deadline
+C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:338    .text.float_constrain:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:344    .text.float_constrain:00000000 float_constrain
+C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:379    .text.int16_constrain:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:385    .text.int16_constrain:00000000 int16_constrain
+C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:418    .text.loop_float_constrain:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:424    .text.loop_float_constrain:00000000 loop_float_constrain
+C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:498    .text.theta_format:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:504    .text.theta_format:00000000 theta_format
+C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:528    .text.theta_format:00000010 $d
+C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:534    .text.float_rounding:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:540    .text.float_rounding:00000000 float_rounding
+C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:585    .text.float_rounding:00000038 $d
+C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:591    .text.OLS_Init:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:597    .text.OLS_Init:00000000 OLS_Init
+C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:668    .text.OLS_Update:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:674    .text.OLS_Update:00000000 OLS_Update
+C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:949    .text.OLS_Update:0000018c $d
+C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:954    .text.OLS_Derivative:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:960    .text.OLS_Derivative:00000000 OLS_Derivative
+C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:1227   .text.OLS_Derivative:0000017c $d
+C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:1232   .text.Get_OLS_Derivative:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:1238   .text.Get_OLS_Derivative:00000000 Get_OLS_Derivative
+C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:1254   .text.OLS_Smooth:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:1260   .text.OLS_Smooth:00000000 OLS_Smooth
+C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:1547   .text.OLS_Smooth:000001a8 $d
+C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:1552   .text.Get_OLS_Smooth:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:1558   .text.Get_OLS_Smooth:00000000 Get_OLS_Smooth
+C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:1627   .data.GlobalDebugMode:00000000 GlobalDebugMode
+C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:1590   .bss.decimal.3:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:1594   .bss.decimal.3:00000000 decimal.3
+C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:1597   .bss.integer.4:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:1601   .bss.integer.4:00000000 integer.4
+C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:1604   .bss.temp.0:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:1608   .bss.temp.0:00000000 temp.0
+C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:1611   .bss.temp.1:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:1615   .bss.temp.1:00000000 temp.1
+C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:1618   .bss.temp.2:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:1622   .bss.temp.2:00000000 temp.2
+
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 39
+
+
+UNDEFINED SYMBOLS
+pvPortMalloc
+memset

@@ -1,0 +1,594 @@
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccdYbCic.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.arch armv7e-m
+   3              		.fpu fpv4-sp-d16
+   4              		.eabi_attribute 27, 1
+   5              		.eabi_attribute 28, 1
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.file	"freertos.c"
+  16              		.section	.rodata.str1.4,"aMS",%progbits,1
+  17              		.align	2
+  18              	.LC0:
+  19 0000 64656661 		.ascii	"defaultTask\000"
+  19      756C7454 
+  19      61736B00 
+  20              		.align	2
+  21              	.LC2:
+  22 000c 67696D62 		.ascii	"gimbal_task\000"
+  22      616C5F74 
+  22      61736B00 
+  23              		.align	2
+  24              	.LC4:
+  25 0018 696D755F 		.ascii	"imu_task\000"
+  25      7461736B 
+  25      00
+  26 0021 000000   		.align	2
+  27              	.LC6:
+  28 0024 66697265 		.ascii	"fire_task\000"
+  28      5F746173 
+  28      6B00
+  29 002e 0000     		.align	2
+  30              	.LC8:
+  31 0030 73616665 		.ascii	"safe_task\000"
+  31      5F746173 
+  31      6B00
+  32              		.text
+  33              	.Ltext0:
+  34              		.cfi_sections	.debug_frame
+  35              		.section	.text.StartDefaultTask,"ax",%progbits
+  36              		.align	1
+  37              		.global	StartDefaultTask
+  38              		.syntax unified
+  39              		.thumb
+  40              		.thumb_func
+  42              	StartDefaultTask:
+  43              	.LVL0:
+  44              	.LFB137:
+  45              		.file 1 "Core/Src/freertos.c"
+   1:Core/Src/freertos.c **** /* USER CODE BEGIN Header */
+   2:Core/Src/freertos.c **** /**
+   3:Core/Src/freertos.c ****   ******************************************************************************
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccdYbCic.s 			page 2
+
+
+   4:Core/Src/freertos.c ****   * File Name          : freertos.c
+   5:Core/Src/freertos.c ****   * Description        : Code for freertos applications
+   6:Core/Src/freertos.c ****   ******************************************************************************
+   7:Core/Src/freertos.c ****   * @attention
+   8:Core/Src/freertos.c ****   *
+   9:Core/Src/freertos.c ****   * Copyright (c) 2024 STMicroelectronics.
+  10:Core/Src/freertos.c ****   * All rights reserved.
+  11:Core/Src/freertos.c ****   *
+  12:Core/Src/freertos.c ****   * This software is licensed under terms that can be found in the LICENSE file
+  13:Core/Src/freertos.c ****   * in the root directory of this software component.
+  14:Core/Src/freertos.c ****   * If no LICENSE file comes with this software, it is provided AS-IS.
+  15:Core/Src/freertos.c ****   *
+  16:Core/Src/freertos.c ****   ******************************************************************************
+  17:Core/Src/freertos.c ****   */
+  18:Core/Src/freertos.c **** /* USER CODE END Header */
+  19:Core/Src/freertos.c **** 
+  20:Core/Src/freertos.c **** /* Includes ------------------------------------------------------------------*/
+  21:Core/Src/freertos.c **** #include "FreeRTOS.h"
+  22:Core/Src/freertos.c **** #include "task.h"
+  23:Core/Src/freertos.c **** #include "main.h"
+  24:Core/Src/freertos.c **** #include "cmsis_os.h"
+  25:Core/Src/freertos.c **** 
+  26:Core/Src/freertos.c **** /* Private includes ----------------------------------------------------------*/
+  27:Core/Src/freertos.c **** /* USER CODE BEGIN Includes */
+  28:Core/Src/freertos.c **** 
+  29:Core/Src/freertos.c **** /* USER CODE END Includes */
+  30:Core/Src/freertos.c **** 
+  31:Core/Src/freertos.c **** /* Private typedef -----------------------------------------------------------*/
+  32:Core/Src/freertos.c **** /* USER CODE BEGIN PTD */
+  33:Core/Src/freertos.c **** 
+  34:Core/Src/freertos.c **** /* USER CODE END PTD */
+  35:Core/Src/freertos.c **** 
+  36:Core/Src/freertos.c **** /* Private define ------------------------------------------------------------*/
+  37:Core/Src/freertos.c **** /* USER CODE BEGIN PD */
+  38:Core/Src/freertos.c **** 
+  39:Core/Src/freertos.c **** /* USER CODE END PD */
+  40:Core/Src/freertos.c **** 
+  41:Core/Src/freertos.c **** /* Private macro -------------------------------------------------------------*/
+  42:Core/Src/freertos.c **** /* USER CODE BEGIN PM */
+  43:Core/Src/freertos.c **** 
+  44:Core/Src/freertos.c **** /* USER CODE END PM */
+  45:Core/Src/freertos.c **** 
+  46:Core/Src/freertos.c **** /* Private variables ---------------------------------------------------------*/
+  47:Core/Src/freertos.c **** /* USER CODE BEGIN Variables */
+  48:Core/Src/freertos.c **** 
+  49:Core/Src/freertos.c **** /* USER CODE END Variables */
+  50:Core/Src/freertos.c **** osThreadId defaultTaskHandle;
+  51:Core/Src/freertos.c **** osThreadId gimbal_taskHandle;
+  52:Core/Src/freertos.c **** osThreadId imu_taskHandle;
+  53:Core/Src/freertos.c **** osThreadId fire_taskHandle;
+  54:Core/Src/freertos.c **** //osThreadId virtual_taskHandle;
+  55:Core/Src/freertos.c **** osThreadId safe_taskHandle;
+  56:Core/Src/freertos.c **** 
+  57:Core/Src/freertos.c **** /* Private function prototypes -----------------------------------------------*/
+  58:Core/Src/freertos.c **** /* USER CODE BEGIN FunctionPrototypes */
+  59:Core/Src/freertos.c **** 
+  60:Core/Src/freertos.c **** /* USER CODE END FunctionPrototypes */
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccdYbCic.s 			page 3
+
+
+  61:Core/Src/freertos.c **** 
+  62:Core/Src/freertos.c **** void StartDefaultTask(void const * argument);
+  63:Core/Src/freertos.c **** extern void GIMBAL_TASK(void const * argument);
+  64:Core/Src/freertos.c **** extern void ECF_IMU_Task(void const * argument);
+  65:Core/Src/freertos.c **** extern void FIRE_TASK(void const * argument);
+  66:Core/Src/freertos.c **** //extern void VIRTUAL_TASK(void const * argument);
+  67:Core/Src/freertos.c **** extern void SAFE_TASK(void const * argument);
+  68:Core/Src/freertos.c **** 
+  69:Core/Src/freertos.c **** extern void MX_USB_DEVICE_Init(void);
+  70:Core/Src/freertos.c **** void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
+  71:Core/Src/freertos.c **** 
+  72:Core/Src/freertos.c **** /* GetIdleTaskMemory prototype (linked to static allocation support) */
+  73:Core/Src/freertos.c **** void vApplicationGetIdleTaskMemory( StaticTask_t **ppxIdleTaskTCBBuffer, StackType_t **ppxIdleTaskS
+  74:Core/Src/freertos.c **** 
+  75:Core/Src/freertos.c **** /* USER CODE BEGIN GET_IDLE_TASK_MEMORY */
+  76:Core/Src/freertos.c **** static StaticTask_t xIdleTaskTCBBuffer;
+  77:Core/Src/freertos.c **** static StackType_t xIdleStack[configMINIMAL_STACK_SIZE];
+  78:Core/Src/freertos.c **** 
+  79:Core/Src/freertos.c **** void vApplicationGetIdleTaskMemory( StaticTask_t **ppxIdleTaskTCBBuffer, StackType_t **ppxIdleTaskS
+  80:Core/Src/freertos.c **** {
+  81:Core/Src/freertos.c ****   *ppxIdleTaskTCBBuffer = &xIdleTaskTCBBuffer;
+  82:Core/Src/freertos.c ****   *ppxIdleTaskStackBuffer = &xIdleStack[0];
+  83:Core/Src/freertos.c ****   *pulIdleTaskStackSize = configMINIMAL_STACK_SIZE;
+  84:Core/Src/freertos.c ****   /* place for user code */
+  85:Core/Src/freertos.c **** }
+  86:Core/Src/freertos.c **** /* USER CODE END GET_IDLE_TASK_MEMORY */
+  87:Core/Src/freertos.c **** 
+  88:Core/Src/freertos.c **** /**
+  89:Core/Src/freertos.c ****   * @brief  FreeRTOS initialization
+  90:Core/Src/freertos.c ****   * @param  None
+  91:Core/Src/freertos.c ****   * @retval None
+  92:Core/Src/freertos.c ****   */
+  93:Core/Src/freertos.c **** void MX_FREERTOS_Init(void) {
+  94:Core/Src/freertos.c ****   /* USER CODE BEGIN Init */
+  95:Core/Src/freertos.c **** 
+  96:Core/Src/freertos.c ****   /* USER CODE END Init */
+  97:Core/Src/freertos.c **** 
+  98:Core/Src/freertos.c ****   /* USER CODE BEGIN RTOS_MUTEX */
+  99:Core/Src/freertos.c ****   /* add mutexes, ... */
+ 100:Core/Src/freertos.c ****   /* USER CODE END RTOS_MUTEX */
+ 101:Core/Src/freertos.c **** 
+ 102:Core/Src/freertos.c ****   /* USER CODE BEGIN RTOS_SEMAPHORES */
+ 103:Core/Src/freertos.c ****   /* add semaphores, ... */
+ 104:Core/Src/freertos.c ****   /* USER CODE END RTOS_SEMAPHORES */
+ 105:Core/Src/freertos.c **** 
+ 106:Core/Src/freertos.c ****   /* USER CODE BEGIN RTOS_TIMERS */
+ 107:Core/Src/freertos.c ****   /* start timers, add new ones, ... */
+ 108:Core/Src/freertos.c ****   /* USER CODE END RTOS_TIMERS */
+ 109:Core/Src/freertos.c **** 
+ 110:Core/Src/freertos.c ****   /* USER CODE BEGIN RTOS_QUEUES */
+ 111:Core/Src/freertos.c ****   /* add queues, ... */
+ 112:Core/Src/freertos.c ****   /* USER CODE END RTOS_QUEUES */
+ 113:Core/Src/freertos.c **** 
+ 114:Core/Src/freertos.c ****   /* Create the thread(s) */
+ 115:Core/Src/freertos.c ****   /* definition and creation of defaultTask */
+ 116:Core/Src/freertos.c ****   osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 128);
+ 117:Core/Src/freertos.c ****   defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccdYbCic.s 			page 4
+
+
+ 118:Core/Src/freertos.c **** 
+ 119:Core/Src/freertos.c ****   /* definition and creation of gimbal_task */
+ 120:Core/Src/freertos.c ****   osThreadDef(gimbal_task, GIMBAL_TASK, osPriorityHigh, 0, 1024);
+ 121:Core/Src/freertos.c ****   gimbal_taskHandle = osThreadCreate(osThread(gimbal_task), NULL);
+ 122:Core/Src/freertos.c **** 
+ 123:Core/Src/freertos.c ****   /* definition and creation of imu_task */
+ 124:Core/Src/freertos.c ****   osThreadDef(imu_task, ECF_IMU_Task, osPriorityNormal, 0, 512);
+ 125:Core/Src/freertos.c ****   imu_taskHandle = osThreadCreate(osThread(imu_task), NULL);
+ 126:Core/Src/freertos.c **** 
+ 127:Core/Src/freertos.c ****   /* definition and creation of fire_task */
+ 128:Core/Src/freertos.c ****   osThreadDef(fire_task, FIRE_TASK, osPriorityNormal, 0, 512);
+ 129:Core/Src/freertos.c ****   fire_taskHandle = osThreadCreate(osThread(fire_task), NULL);
+ 130:Core/Src/freertos.c **** 
+ 131:Core/Src/freertos.c ****   /* definition and creation of virtual_task */
+ 132:Core/Src/freertos.c ****   // osThreadDef(virtual_task, VIRTUAL_TASK, osPriorityNormal, 0, 512);
+ 133:Core/Src/freertos.c ****   // virtual_taskHandle = osThreadCreate(osThread(virtual_task), NULL);
+ 134:Core/Src/freertos.c **** 
+ 135:Core/Src/freertos.c ****   /* definition and creation of safe_task */
+ 136:Core/Src/freertos.c ****   osThreadDef(safe_task, SAFE_TASK, osPriorityNormal, 0, 512);
+ 137:Core/Src/freertos.c ****   safe_taskHandle = osThreadCreate(osThread(safe_task), NULL);
+ 138:Core/Src/freertos.c **** 
+ 139:Core/Src/freertos.c ****   /* USER CODE BEGIN RTOS_THREADS */
+ 140:Core/Src/freertos.c ****   /* add threads, ... */
+ 141:Core/Src/freertos.c ****   /* USER CODE END RTOS_THREADS */
+ 142:Core/Src/freertos.c **** 
+ 143:Core/Src/freertos.c **** }
+ 144:Core/Src/freertos.c **** 
+ 145:Core/Src/freertos.c **** /* USER CODE BEGIN Header_StartDefaultTask */
+ 146:Core/Src/freertos.c **** /**
+ 147:Core/Src/freertos.c ****   * @brief  Function implementing the defaultTask thread.
+ 148:Core/Src/freertos.c ****   * @param  argument: Not used
+ 149:Core/Src/freertos.c ****   * @retval None
+ 150:Core/Src/freertos.c ****   */
+ 151:Core/Src/freertos.c **** /* USER CODE END Header_StartDefaultTask */
+ 152:Core/Src/freertos.c **** void StartDefaultTask(void const * argument)
+ 153:Core/Src/freertos.c **** {
+  46              		.loc 1 153 1 view -0
+  47              		.cfi_startproc
+  48              		@ Volatile: function does not return.
+  49              		@ args = 0, pretend = 0, frame = 0
+  50              		@ frame_needed = 0, uses_anonymous_args = 0
+  51              		.loc 1 153 1 is_stmt 0 view .LVU1
+  52 0000 08B5     		push	{r3, lr}
+  53              	.LCFI0:
+  54              		.cfi_def_cfa_offset 8
+  55              		.cfi_offset 3, -8
+  56              		.cfi_offset 14, -4
+ 154:Core/Src/freertos.c ****   /* init code for USB_DEVICE */
+ 155:Core/Src/freertos.c ****   MX_USB_DEVICE_Init();
+  57              		.loc 1 155 3 is_stmt 1 view .LVU2
+  58 0002 FFF7FEFF 		bl	MX_USB_DEVICE_Init
+  59              	.LVL1:
+  60              	.L2:
+ 156:Core/Src/freertos.c ****   /* USER CODE BEGIN StartDefaultTask */
+ 157:Core/Src/freertos.c ****   /* Infinite loop */
+ 158:Core/Src/freertos.c ****   for(;;)
+  61              		.loc 1 158 3 discriminator 1 view .LVU3
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccdYbCic.s 			page 5
+
+
+ 159:Core/Src/freertos.c ****   {
+ 160:Core/Src/freertos.c ****     osDelay(1);
+  62              		.loc 1 160 5 discriminator 1 view .LVU4
+  63 0006 0120     		movs	r0, #1
+  64 0008 FFF7FEFF 		bl	osDelay
+  65              	.LVL2:
+ 158:Core/Src/freertos.c ****   {
+  66              		.loc 1 158 8 discriminator 1 view .LVU5
+  67 000c FBE7     		b	.L2
+  68              		.cfi_endproc
+  69              	.LFE137:
+  71              		.section	.text.vApplicationGetIdleTaskMemory,"ax",%progbits
+  72              		.align	1
+  73              		.global	vApplicationGetIdleTaskMemory
+  74              		.syntax unified
+  75              		.thumb
+  76              		.thumb_func
+  78              	vApplicationGetIdleTaskMemory:
+  79              	.LVL3:
+  80              	.LFB135:
+  80:Core/Src/freertos.c ****   *ppxIdleTaskTCBBuffer = &xIdleTaskTCBBuffer;
+  81              		.loc 1 80 1 view -0
+  82              		.cfi_startproc
+  83              		@ args = 0, pretend = 0, frame = 0
+  84              		@ frame_needed = 0, uses_anonymous_args = 0
+  85              		@ link register save eliminated.
+  81:Core/Src/freertos.c ****   *ppxIdleTaskStackBuffer = &xIdleStack[0];
+  86              		.loc 1 81 3 view .LVU7
+  81:Core/Src/freertos.c ****   *ppxIdleTaskStackBuffer = &xIdleStack[0];
+  87              		.loc 1 81 25 is_stmt 0 view .LVU8
+  88 0000 034B     		ldr	r3, .L5
+  89 0002 0360     		str	r3, [r0]
+  82:Core/Src/freertos.c ****   *pulIdleTaskStackSize = configMINIMAL_STACK_SIZE;
+  90              		.loc 1 82 3 is_stmt 1 view .LVU9
+  82:Core/Src/freertos.c ****   *pulIdleTaskStackSize = configMINIMAL_STACK_SIZE;
+  91              		.loc 1 82 27 is_stmt 0 view .LVU10
+  92 0004 034B     		ldr	r3, .L5+4
+  93 0006 0B60     		str	r3, [r1]
+  83:Core/Src/freertos.c ****   /* place for user code */
+  94              		.loc 1 83 3 is_stmt 1 view .LVU11
+  83:Core/Src/freertos.c ****   /* place for user code */
+  95              		.loc 1 83 25 is_stmt 0 view .LVU12
+  96 0008 8023     		movs	r3, #128
+  97 000a 1360     		str	r3, [r2]
+  85:Core/Src/freertos.c **** /* USER CODE END GET_IDLE_TASK_MEMORY */
+  98              		.loc 1 85 1 view .LVU13
+  99 000c 7047     		bx	lr
+ 100              	.L6:
+ 101 000e 00BF     		.align	2
+ 102              	.L5:
+ 103 0010 00000000 		.word	.LANCHOR0
+ 104 0014 00000000 		.word	.LANCHOR1
+ 105              		.cfi_endproc
+ 106              	.LFE135:
+ 108              		.section	.text.MX_FREERTOS_Init,"ax",%progbits
+ 109              		.align	1
+ 110              		.global	MX_FREERTOS_Init
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccdYbCic.s 			page 6
+
+
+ 111              		.syntax unified
+ 112              		.thumb
+ 113              		.thumb_func
+ 115              	MX_FREERTOS_Init:
+ 116              	.LFB136:
+  93:Core/Src/freertos.c ****   /* USER CODE BEGIN Init */
+ 117              		.loc 1 93 29 is_stmt 1 view -0
+ 118              		.cfi_startproc
+ 119              		@ args = 0, pretend = 0, frame = 144
+ 120              		@ frame_needed = 0, uses_anonymous_args = 0
+ 121 0000 10B5     		push	{r4, lr}
+ 122              	.LCFI1:
+ 123              		.cfi_def_cfa_offset 8
+ 124              		.cfi_offset 4, -8
+ 125              		.cfi_offset 14, -4
+ 126 0002 A4B0     		sub	sp, sp, #144
+ 127              	.LCFI2:
+ 128              		.cfi_def_cfa_offset 152
+ 116:Core/Src/freertos.c ****   defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
+ 129              		.loc 1 116 3 view .LVU15
+ 130 0004 2D4C     		ldr	r4, .L9
+ 131 0006 0DF1740C 		add	ip, sp, #116
+ 132 000a A646     		mov	lr, r4
+ 133 000c BEE80F00 		ldmia	lr!, {r0, r1, r2, r3}
+ 134 0010 ACE80F00 		stmia	ip!, {r0, r1, r2, r3}
+ 135 0014 9EE80700 		ldm	lr, {r0, r1, r2}
+ 136 0018 8CE80700 		stm	ip, {r0, r1, r2}
+ 117:Core/Src/freertos.c **** 
+ 137              		.loc 1 117 3 view .LVU16
+ 117:Core/Src/freertos.c **** 
+ 138              		.loc 1 117 23 is_stmt 0 view .LVU17
+ 139 001c 0021     		movs	r1, #0
+ 140 001e 1DA8     		add	r0, sp, #116
+ 141 0020 FFF7FEFF 		bl	osThreadCreate
+ 142              	.LVL4:
+ 117:Core/Src/freertos.c **** 
+ 143              		.loc 1 117 21 view .LVU18
+ 144 0024 264B     		ldr	r3, .L9+4
+ 145 0026 1860     		str	r0, [r3]
+ 120:Core/Src/freertos.c ****   gimbal_taskHandle = osThreadCreate(osThread(gimbal_task), NULL);
+ 146              		.loc 1 120 3 is_stmt 1 view .LVU19
+ 147 0028 0DF1580C 		add	ip, sp, #88
+ 148 002c 04F11C0E 		add	lr, r4, #28
+ 149 0030 BEE80F00 		ldmia	lr!, {r0, r1, r2, r3}
+ 150 0034 ACE80F00 		stmia	ip!, {r0, r1, r2, r3}
+ 151 0038 9EE80700 		ldm	lr, {r0, r1, r2}
+ 152 003c 8CE80700 		stm	ip, {r0, r1, r2}
+ 121:Core/Src/freertos.c **** 
+ 153              		.loc 1 121 3 view .LVU20
+ 121:Core/Src/freertos.c **** 
+ 154              		.loc 1 121 23 is_stmt 0 view .LVU21
+ 155 0040 0021     		movs	r1, #0
+ 156 0042 16A8     		add	r0, sp, #88
+ 157 0044 FFF7FEFF 		bl	osThreadCreate
+ 158              	.LVL5:
+ 121:Core/Src/freertos.c **** 
+ 159              		.loc 1 121 21 view .LVU22
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccdYbCic.s 			page 7
+
+
+ 160 0048 1E4B     		ldr	r3, .L9+8
+ 161 004a 1860     		str	r0, [r3]
+ 124:Core/Src/freertos.c ****   imu_taskHandle = osThreadCreate(osThread(imu_task), NULL);
+ 162              		.loc 1 124 3 is_stmt 1 view .LVU23
+ 163 004c 0DF13C0C 		add	ip, sp, #60
+ 164 0050 04F1380E 		add	lr, r4, #56
+ 165 0054 BEE80F00 		ldmia	lr!, {r0, r1, r2, r3}
+ 166 0058 ACE80F00 		stmia	ip!, {r0, r1, r2, r3}
+ 167 005c 9EE80700 		ldm	lr, {r0, r1, r2}
+ 168 0060 8CE80700 		stm	ip, {r0, r1, r2}
+ 125:Core/Src/freertos.c **** 
+ 169              		.loc 1 125 3 view .LVU24
+ 125:Core/Src/freertos.c **** 
+ 170              		.loc 1 125 20 is_stmt 0 view .LVU25
+ 171 0064 0021     		movs	r1, #0
+ 172 0066 0FA8     		add	r0, sp, #60
+ 173 0068 FFF7FEFF 		bl	osThreadCreate
+ 174              	.LVL6:
+ 125:Core/Src/freertos.c **** 
+ 175              		.loc 1 125 18 view .LVU26
+ 176 006c 164B     		ldr	r3, .L9+12
+ 177 006e 1860     		str	r0, [r3]
+ 128:Core/Src/freertos.c ****   fire_taskHandle = osThreadCreate(osThread(fire_task), NULL);
+ 178              		.loc 1 128 3 is_stmt 1 view .LVU27
+ 179 0070 0DF1200C 		add	ip, sp, #32
+ 180 0074 04F1540E 		add	lr, r4, #84
+ 181 0078 BEE80F00 		ldmia	lr!, {r0, r1, r2, r3}
+ 182 007c ACE80F00 		stmia	ip!, {r0, r1, r2, r3}
+ 183 0080 9EE80700 		ldm	lr, {r0, r1, r2}
+ 184 0084 8CE80700 		stm	ip, {r0, r1, r2}
+ 129:Core/Src/freertos.c **** 
+ 185              		.loc 1 129 3 view .LVU28
+ 129:Core/Src/freertos.c **** 
+ 186              		.loc 1 129 21 is_stmt 0 view .LVU29
+ 187 0088 0021     		movs	r1, #0
+ 188 008a 08A8     		add	r0, sp, #32
+ 189 008c FFF7FEFF 		bl	osThreadCreate
+ 190              	.LVL7:
+ 129:Core/Src/freertos.c **** 
+ 191              		.loc 1 129 19 view .LVU30
+ 192 0090 0E4B     		ldr	r3, .L9+16
+ 193 0092 1860     		str	r0, [r3]
+ 136:Core/Src/freertos.c ****   safe_taskHandle = osThreadCreate(osThread(safe_task), NULL);
+ 194              		.loc 1 136 3 is_stmt 1 view .LVU31
+ 195 0094 0DF1040E 		add	lr, sp, #4
+ 196 0098 04F1700C 		add	ip, r4, #112
+ 197 009c BCE80F00 		ldmia	ip!, {r0, r1, r2, r3}
+ 198 00a0 AEE80F00 		stmia	lr!, {r0, r1, r2, r3}
+ 199 00a4 9CE80700 		ldm	ip, {r0, r1, r2}
+ 200 00a8 8EE80700 		stm	lr, {r0, r1, r2}
+ 137:Core/Src/freertos.c **** 
+ 201              		.loc 1 137 3 view .LVU32
+ 137:Core/Src/freertos.c **** 
+ 202              		.loc 1 137 21 is_stmt 0 view .LVU33
+ 203 00ac 0021     		movs	r1, #0
+ 204 00ae 01A8     		add	r0, sp, #4
+ 205 00b0 FFF7FEFF 		bl	osThreadCreate
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccdYbCic.s 			page 8
+
+
+ 206              	.LVL8:
+ 137:Core/Src/freertos.c **** 
+ 207              		.loc 1 137 19 view .LVU34
+ 208 00b4 064B     		ldr	r3, .L9+20
+ 209 00b6 1860     		str	r0, [r3]
+ 143:Core/Src/freertos.c **** 
+ 210              		.loc 1 143 1 view .LVU35
+ 211 00b8 24B0     		add	sp, sp, #144
+ 212              	.LCFI3:
+ 213              		.cfi_def_cfa_offset 8
+ 214              		@ sp needed
+ 215 00ba 10BD     		pop	{r4, pc}
+ 216              	.L10:
+ 217              		.align	2
+ 218              	.L9:
+ 219 00bc 00000000 		.word	.LANCHOR2
+ 220 00c0 00000000 		.word	.LANCHOR3
+ 221 00c4 00000000 		.word	.LANCHOR4
+ 222 00c8 00000000 		.word	.LANCHOR5
+ 223 00cc 00000000 		.word	.LANCHOR6
+ 224 00d0 00000000 		.word	.LANCHOR7
+ 225              		.cfi_endproc
+ 226              	.LFE136:
+ 228              		.global	safe_taskHandle
+ 229              		.global	fire_taskHandle
+ 230              		.global	imu_taskHandle
+ 231              		.global	gimbal_taskHandle
+ 232              		.global	defaultTaskHandle
+ 233              		.section	.rodata
+ 234              		.align	2
+ 235              		.set	.LANCHOR2,. + 0
+ 236              	.LC10:
+ 237 0000 00000000 		.word	.LC0
+ 238 0004 00000000 		.word	StartDefaultTask
+ 239 0008 0000     		.short	0
+ 240 000a 0000     		.space	2
+ 241 000c 00000000 		.word	0
+ 242 0010 80000000 		.word	128
+ 243 0014 00000000 		.word	0
+ 244 0018 00000000 		.word	0
+ 245              	.LC11:
+ 246 001c 0C000000 		.word	.LC2
+ 247 0020 00000000 		.word	GIMBAL_TASK
+ 248 0024 0200     		.short	2
+ 249 0026 0000     		.space	2
+ 250 0028 00000000 		.word	0
+ 251 002c 00040000 		.word	1024
+ 252 0030 00000000 		.word	0
+ 253 0034 00000000 		.word	0
+ 254              	.LC12:
+ 255 0038 18000000 		.word	.LC4
+ 256 003c 00000000 		.word	ECF_IMU_Task
+ 257 0040 0000     		.short	0
+ 258 0042 0000     		.space	2
+ 259 0044 00000000 		.word	0
+ 260 0048 00020000 		.word	512
+ 261 004c 00000000 		.word	0
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccdYbCic.s 			page 9
+
+
+ 262 0050 00000000 		.word	0
+ 263              	.LC13:
+ 264 0054 24000000 		.word	.LC6
+ 265 0058 00000000 		.word	FIRE_TASK
+ 266 005c 0000     		.short	0
+ 267 005e 0000     		.space	2
+ 268 0060 00000000 		.word	0
+ 269 0064 00020000 		.word	512
+ 270 0068 00000000 		.word	0
+ 271 006c 00000000 		.word	0
+ 272              	.LC14:
+ 273 0070 30000000 		.word	.LC8
+ 274 0074 00000000 		.word	SAFE_TASK
+ 275 0078 0000     		.short	0
+ 276 007a 0000     		.space	2
+ 277 007c 00000000 		.word	0
+ 278 0080 00020000 		.word	512
+ 279 0084 00000000 		.word	0
+ 280 0088 00000000 		.word	0
+ 281              		.section	.bss.defaultTaskHandle,"aw",%nobits
+ 282              		.align	2
+ 283              		.set	.LANCHOR3,. + 0
+ 286              	defaultTaskHandle:
+ 287 0000 00000000 		.space	4
+ 288              		.section	.bss.fire_taskHandle,"aw",%nobits
+ 289              		.align	2
+ 290              		.set	.LANCHOR6,. + 0
+ 293              	fire_taskHandle:
+ 294 0000 00000000 		.space	4
+ 295              		.section	.bss.gimbal_taskHandle,"aw",%nobits
+ 296              		.align	2
+ 297              		.set	.LANCHOR4,. + 0
+ 300              	gimbal_taskHandle:
+ 301 0000 00000000 		.space	4
+ 302              		.section	.bss.imu_taskHandle,"aw",%nobits
+ 303              		.align	2
+ 304              		.set	.LANCHOR5,. + 0
+ 307              	imu_taskHandle:
+ 308 0000 00000000 		.space	4
+ 309              		.section	.bss.safe_taskHandle,"aw",%nobits
+ 310              		.align	2
+ 311              		.set	.LANCHOR7,. + 0
+ 314              	safe_taskHandle:
+ 315 0000 00000000 		.space	4
+ 316              		.section	.bss.xIdleStack,"aw",%nobits
+ 317              		.align	2
+ 318              		.set	.LANCHOR1,. + 0
+ 321              	xIdleStack:
+ 322 0000 00000000 		.space	512
+ 322      00000000 
+ 322      00000000 
+ 322      00000000 
+ 322      00000000 
+ 323              		.section	.bss.xIdleTaskTCBBuffer,"aw",%nobits
+ 324              		.align	2
+ 325              		.set	.LANCHOR0,. + 0
+ 328              	xIdleTaskTCBBuffer:
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccdYbCic.s 			page 10
+
+
+ 329 0000 00000000 		.space	84
+ 329      00000000 
+ 329      00000000 
+ 329      00000000 
+ 329      00000000 
+ 330              		.text
+ 331              	.Letext0:
+ 332              		.file 2 "d:\\gcc-arm-none-eabi-10.3-2021.10\\arm-none-eabi\\include\\machine\\_default_types.h"
+ 333              		.file 3 "d:\\gcc-arm-none-eabi-10.3-2021.10\\arm-none-eabi\\include\\sys\\_stdint.h"
+ 334              		.file 4 "Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/portmacro.h"
+ 335              		.file 5 "Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h"
+ 336              		.file 6 "Middlewares/Third_Party/FreeRTOS/Source/include/task.h"
+ 337              		.file 7 "Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.h"
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccdYbCic.s 			page 11
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 freertos.c
+C:\Users\28212\AppData\Local\Temp\ccdYbCic.s:17     .rodata.str1.4:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccdYbCic.s:36     .text.StartDefaultTask:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccdYbCic.s:42     .text.StartDefaultTask:00000000 StartDefaultTask
+C:\Users\28212\AppData\Local\Temp\ccdYbCic.s:72     .text.vApplicationGetIdleTaskMemory:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccdYbCic.s:78     .text.vApplicationGetIdleTaskMemory:00000000 vApplicationGetIdleTaskMemory
+C:\Users\28212\AppData\Local\Temp\ccdYbCic.s:103    .text.vApplicationGetIdleTaskMemory:00000010 $d
+C:\Users\28212\AppData\Local\Temp\ccdYbCic.s:109    .text.MX_FREERTOS_Init:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccdYbCic.s:115    .text.MX_FREERTOS_Init:00000000 MX_FREERTOS_Init
+C:\Users\28212\AppData\Local\Temp\ccdYbCic.s:219    .text.MX_FREERTOS_Init:000000bc $d
+C:\Users\28212\AppData\Local\Temp\ccdYbCic.s:314    .bss.safe_taskHandle:00000000 safe_taskHandle
+C:\Users\28212\AppData\Local\Temp\ccdYbCic.s:293    .bss.fire_taskHandle:00000000 fire_taskHandle
+C:\Users\28212\AppData\Local\Temp\ccdYbCic.s:307    .bss.imu_taskHandle:00000000 imu_taskHandle
+C:\Users\28212\AppData\Local\Temp\ccdYbCic.s:300    .bss.gimbal_taskHandle:00000000 gimbal_taskHandle
+C:\Users\28212\AppData\Local\Temp\ccdYbCic.s:286    .bss.defaultTaskHandle:00000000 defaultTaskHandle
+C:\Users\28212\AppData\Local\Temp\ccdYbCic.s:234    .rodata:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccdYbCic.s:282    .bss.defaultTaskHandle:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccdYbCic.s:289    .bss.fire_taskHandle:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccdYbCic.s:296    .bss.gimbal_taskHandle:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccdYbCic.s:303    .bss.imu_taskHandle:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccdYbCic.s:310    .bss.safe_taskHandle:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccdYbCic.s:317    .bss.xIdleStack:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccdYbCic.s:321    .bss.xIdleStack:00000000 xIdleStack
+C:\Users\28212\AppData\Local\Temp\ccdYbCic.s:324    .bss.xIdleTaskTCBBuffer:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccdYbCic.s:328    .bss.xIdleTaskTCBBuffer:00000000 xIdleTaskTCBBuffer
+
+UNDEFINED SYMBOLS
+MX_USB_DEVICE_Init
+osDelay
+osThreadCreate
+GIMBAL_TASK
+ECF_IMU_Task
+FIRE_TASK
+SAFE_TASK

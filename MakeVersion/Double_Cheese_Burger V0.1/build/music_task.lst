@@ -1,0 +1,592 @@
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccVDvwId.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.arch armv7e-m
+   3              		.fpu fpv4-sp-d16
+   4              		.eabi_attribute 27, 1
+   5              		.eabi_attribute 28, 1
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.file	"music_task.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.music,"ax",%progbits
+  20              		.align	1
+  21              		.global	music
+  22              		.syntax unified
+  23              		.thumb
+  24              		.thumb_func
+  26              	music:
+  27              	.LFB135:
+  28              		.file 1 "TASK/src/music_task.c"
+   1:TASK/src/music_task.c **** #include "FreeRTOS.h"
+   2:TASK/src/music_task.c **** #include "freertos.h"
+   3:TASK/src/music_task.c **** #include "queue.h"
+   4:TASK/src/music_task.c **** #include "semphr.h"
+   5:TASK/src/music_task.c **** 
+   6:TASK/src/music_task.c **** #include "bsp_buzzer.h"
+   7:TASK/src/music_task.c **** #include "music_task.h"
+   8:TASK/src/music_task.c **** #include "stm32f4xx_hal.h"
+   9:TASK/src/music_task.c **** 
+  10:TASK/src/music_task.c **** extern TIM_HandleTypeDef htim4;
+  11:TASK/src/music_task.c ****     unsigned int Moon[]={
+  12:TASK/src/music_task.c **** //SuperMario
+  13:TASK/src/music_task.c **** //17,2,17,4,17,2,0,2,13,2,17,4,20,4,0,4,8,4,0,4,13,4,0,2,8,2,0,4,5,4,0,2,10,4,12,2,0,2,12,2,10,4,8,
+  14:TASK/src/music_task.c **** //一路靠北
+  15:TASK/src/music_task.c **** //13,4,13,4,17,4,24,4,24,4,25,8,25,4,25,4,27,4,25,4,24,4,24,4,25,8,25,4,25,4,27,4,25,4,27,4,29,4,27
+  16:TASK/src/music_task.c ****  //晴天//怪怪的
+  17:TASK/src/music_task.c **** 0,8,0,8,13,4,15,4,17,8,0,4,20,4,17,8,15,20,13,8,10,20,8,8,13,20,13,4,15,4,17,8,0,4,20,4,17,8,25,20,
+  18:TASK/src/music_task.c ****         0xFF
+  19:TASK/src/music_task.c **** };
+  20:TASK/src/music_task.c **** 
+  21:TASK/src/music_task.c **** float note_list[] =
+  22:TASK/src/music_task.c ****     {
+  23:TASK/src/music_task.c ****         1000000,
+  24:TASK/src/music_task.c ****         NOTE_C4,
+  25:TASK/src/music_task.c ****         NOTE_CS4,
+  26:TASK/src/music_task.c ****         NOTE_D4,
+  27:TASK/src/music_task.c ****         NOTE_DS4,
+  28:TASK/src/music_task.c ****         NOTE_E4,
+  29:TASK/src/music_task.c ****         NOTE_F4,
+  30:TASK/src/music_task.c ****         NOTE_FS4,
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccVDvwId.s 			page 2
+
+
+  31:TASK/src/music_task.c ****         NOTE_G4,
+  32:TASK/src/music_task.c ****         NOTE_GS4,
+  33:TASK/src/music_task.c ****         NOTE_A4,
+  34:TASK/src/music_task.c ****         NOTE_AS4,
+  35:TASK/src/music_task.c ****         NOTE_B4,
+  36:TASK/src/music_task.c ****         NOTE_C5,
+  37:TASK/src/music_task.c ****         NOTE_CS5,
+  38:TASK/src/music_task.c ****         NOTE_D5,
+  39:TASK/src/music_task.c ****         NOTE_DS5,
+  40:TASK/src/music_task.c ****         NOTE_E5,
+  41:TASK/src/music_task.c ****         NOTE_F5,
+  42:TASK/src/music_task.c ****         NOTE_FS5,
+  43:TASK/src/music_task.c ****         NOTE_G5,
+  44:TASK/src/music_task.c ****         NOTE_GS5,
+  45:TASK/src/music_task.c ****         NOTE_A5,
+  46:TASK/src/music_task.c ****         NOTE_AS5,
+  47:TASK/src/music_task.c ****         NOTE_B5,
+  48:TASK/src/music_task.c ****         NOTE_C6,
+  49:TASK/src/music_task.c ****         NOTE_CS6,
+  50:TASK/src/music_task.c ****         NOTE_D6,
+  51:TASK/src/music_task.c ****         NOTE_DS6,
+  52:TASK/src/music_task.c ****         NOTE_E6,
+  53:TASK/src/music_task.c ****         NOTE_F6,
+  54:TASK/src/music_task.c ****         NOTE_FS6,
+  55:TASK/src/music_task.c ****         NOTE_G6,
+  56:TASK/src/music_task.c ****         NOTE_GS6,
+  57:TASK/src/music_task.c ****         NOTE_A6,
+  58:TASK/src/music_task.c ****         NOTE_AS6,
+  59:TASK/src/music_task.c ****         -1.0f,
+  60:TASK/src/music_task.c **** };
+  61:TASK/src/music_task.c ****     
+  62:TASK/src/music_task.c **** void music()
+  63:TASK/src/music_task.c **** {
+  29              		.loc 1 63 1 view -0
+  30              		.cfi_startproc
+  31              		@ args = 0, pretend = 0, frame = 0
+  32              		@ frame_needed = 0, uses_anonymous_args = 0
+  33              		@ link register save eliminated.
+  64:TASK/src/music_task.c **** //    static TickType_t last_note_systick = 0;
+  65:TASK/src/music_task.c **** //    static uint64_t music_num = 0;
+  66:TASK/src/music_task.c **** //    if (xTaskGetTickCount() - last_note_systick > Music[music_num + 1] * 73)
+  67:TASK/src/music_task.c **** //        buzzer_off();
+  68:TASK/src/music_task.c **** //    if (xTaskGetTickCount() - last_note_systick > Music[music_num + 1] * 80)
+  69:TASK/src/music_task.c **** //    {
+  70:TASK/src/music_task.c **** //        last_note_systick = xTaskGetTickCount();
+  71:TASK/src/music_task.c **** //        music_num += 2;
+  72:TASK/src/music_task.c **** //        if (Music[music_num] == 0xff)
+  73:TASK/src/music_task.c **** //        {
+  74:TASK/src/music_task.c **** //            music_num = 0;
+  75:TASK/src/music_task.c **** ////            vTaskSuspend(NULL);
+  76:TASK/src/music_task.c **** //        }
+  77:TASK/src/music_task.c **** //        buzzer_test(83, 1000000 / note_list[Music[music_num]]);
+  78:TASK/src/music_task.c **** //    }
+  79:TASK/src/music_task.c **** }
+  34              		.loc 1 79 1 view .LVU1
+  35 0000 7047     		bx	lr
+  36              		.cfi_endproc
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccVDvwId.s 			page 3
+
+
+  37              	.LFE135:
+  39              		.section	.text.Music_choice,"ax",%progbits
+  40              		.align	1
+  41              		.global	Music_choice
+  42              		.syntax unified
+  43              		.thumb
+  44              		.thumb_func
+  46              	Music_choice:
+  47              	.LVL0:
+  48              	.LFB136:
+  80:TASK/src/music_task.c **** 
+  81:TASK/src/music_task.c **** typedef enum
+  82:TASK/src/music_task.c **** {
+  83:TASK/src/music_task.c ****     Init_Music,
+  84:TASK/src/music_task.c ****     Can_dis_Music
+  85:TASK/src/music_task.c **** }Music_e;
+  86:TASK/src/music_task.c **** 
+  87:TASK/src/music_task.c **** Music_e Music;
+  88:TASK/src/music_task.c **** uint64_t music_time = 0;
+  89:TASK/src/music_task.c **** unsigned int *music_list_point;
+  90:TASK/src/music_task.c **** 
+  91:TASK/src/music_task.c **** void Music_choice(Music_e Music)
+  92:TASK/src/music_task.c **** {
+  49              		.loc 1 92 1 view -0
+  50              		.cfi_startproc
+  51              		@ args = 0, pretend = 0, frame = 0
+  52              		@ frame_needed = 0, uses_anonymous_args = 0
+  53              		@ link register save eliminated.
+  93:TASK/src/music_task.c ****     switch (Music)
+  54              		.loc 1 93 5 view .LVU3
+  55 0000 10B9     		cbnz	r0, .L3
+  94:TASK/src/music_task.c ****     {
+  95:TASK/src/music_task.c ****         case Init_Music:
+  96:TASK/src/music_task.c ****         {
+  97:TASK/src/music_task.c ****             music_list_point = Moon;
+  56              		.loc 1 97 13 view .LVU4
+  57              		.loc 1 97 30 is_stmt 0 view .LVU5
+  58 0002 044B     		ldr	r3, .L4
+  59 0004 044A     		ldr	r2, .L4+4
+  60 0006 1A60     		str	r2, [r3]
+  98:TASK/src/music_task.c ****         }break;
+  61              		.loc 1 98 10 is_stmt 1 view .LVU6
+  62              	.L3:
+  99:TASK/src/music_task.c ****     }
+ 100:TASK/src/music_task.c ****     music_time = 0;
+  63              		.loc 1 100 5 view .LVU7
+  64              		.loc 1 100 16 is_stmt 0 view .LVU8
+  65 0008 044B     		ldr	r3, .L4+8
+  66 000a 0020     		movs	r0, #0
+  67              	.LVL1:
+  68              		.loc 1 100 16 view .LVU9
+  69 000c 0021     		movs	r1, #0
+  70 000e C3E90001 		strd	r0, [r3]
+ 101:TASK/src/music_task.c **** }
+  71              		.loc 1 101 1 view .LVU10
+  72 0012 7047     		bx	lr
+  73              	.L5:
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccVDvwId.s 			page 4
+
+
+  74              		.align	2
+  75              	.L4:
+  76 0014 00000000 		.word	.LANCHOR0
+  77 0018 00000000 		.word	.LANCHOR1
+  78 001c 00000000 		.word	.LANCHOR2
+  79              		.cfi_endproc
+  80              	.LFE136:
+  82              		.section	.text.MUSIC_TASK,"ax",%progbits
+  83              		.align	1
+  84              		.global	MUSIC_TASK
+  85              		.syntax unified
+  86              		.thumb
+  87              		.thumb_func
+  89              	MUSIC_TASK:
+  90              	.LVL2:
+  91              	.LFB137:
+ 102:TASK/src/music_task.c **** 
+ 103:TASK/src/music_task.c **** void MUSIC_TASK(void const * argument)
+ 104:TASK/src/music_task.c **** {  
+  92              		.loc 1 104 1 is_stmt 1 view -0
+  93              		.cfi_startproc
+  94              		@ Volatile: function does not return.
+  95              		@ args = 0, pretend = 0, frame = 0
+  96              		@ frame_needed = 0, uses_anonymous_args = 0
+  97              		.loc 1 104 1 is_stmt 0 view .LVU12
+  98 0000 08B5     		push	{r3, lr}
+  99              	.LCFI0:
+ 100              		.cfi_def_cfa_offset 8
+ 101              		.cfi_offset 3, -8
+ 102              		.cfi_offset 14, -4
+ 105:TASK/src/music_task.c ****     //HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_3);
+ 106:TASK/src/music_task.c ****     Music_choice(Init_Music);
+ 103              		.loc 1 106 5 is_stmt 1 view .LVU13
+ 104 0002 0020     		movs	r0, #0
+ 105              	.LVL3:
+ 106              		.loc 1 106 5 is_stmt 0 view .LVU14
+ 107 0004 FFF7FEFF 		bl	Music_choice
+ 108              	.LVL4:
+ 109 0008 1CE0     		b	.L10
+ 110              	.L12:
+ 111              	.LBB2:
+ 107:TASK/src/music_task.c ****     while (1)
+ 108:TASK/src/music_task.c ****     {
+ 109:TASK/src/music_task.c ****         static TickType_t last_note_systick = 0;
+ 110:TASK/src/music_task.c ****         if (xTaskGetTickCount() - last_note_systick > music_list_point[music_time + 1] * 73)
+ 111:TASK/src/music_task.c ****             buzzer_off();
+ 112              		.loc 1 111 13 is_stmt 1 view .LVU15
+ 113 000a FFF7FEFF 		bl	buzzer_off
+ 114              	.LVL5:
+ 115 000e 2BE0     		b	.L7
+ 116              	.L9:
+ 112:TASK/src/music_task.c ****         if (xTaskGetTickCount() - last_note_systick > music_list_point[music_time + 1] * 80)
+ 113:TASK/src/music_task.c ****         {
+ 114:TASK/src/music_task.c ****             last_note_systick = xTaskGetTickCount();
+ 115:TASK/src/music_task.c ****             music_time += 2;
+ 116:TASK/src/music_task.c ****             if (music_list_point[music_time] == 0xff)
+ 117:TASK/src/music_task.c ****             {
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccVDvwId.s 			page 5
+
+
+ 118:TASK/src/music_task.c ****                 music_time = 0;
+ 119:TASK/src/music_task.c ****                 buzzer_off();
+ 120:TASK/src/music_task.c ****                 vTaskSuspend(NULL);
+ 121:TASK/src/music_task.c ****             }
+ 122:TASK/src/music_task.c ****             buzzer_test(83, 1000000 / note_list[music_list_point[music_time]]);
+ 117              		.loc 1 122 13 view .LVU16
+ 118              		.loc 1 122 65 is_stmt 0 view .LVU17
+ 119 0010 2C4B     		ldr	r3, .L13
+ 120 0012 1A68     		ldr	r2, [r3]
+ 121 0014 2C4B     		ldr	r3, .L13+4
+ 122 0016 1B68     		ldr	r3, [r3]
+ 123 0018 53F82220 		ldr	r2, [r3, r2, lsl #2]
+ 124              		.loc 1 122 48 view .LVU18
+ 125 001c 2B4B     		ldr	r3, .L13+8
+ 126 001e 03EB8203 		add	r3, r3, r2, lsl #2
+ 127 0022 93ED007A 		vldr.32	s14, [r3]
+ 128              		.loc 1 122 37 view .LVU19
+ 129 0026 DFED2A6A 		vldr.32	s13, .L13+12
+ 130 002a C6EE877A 		vdiv.f32	s15, s13, s14
+ 131              		.loc 1 122 13 view .LVU20
+ 132 002e FCEEE77A 		vcvt.u32.f32	s15, s15
+ 133 0032 17EE903A 		vmov	r3, s15	@ int
+ 134 0036 99B2     		uxth	r1, r3
+ 135 0038 5320     		movs	r0, #83
+ 136 003a FFF7FEFF 		bl	buzzer_test
+ 137              	.LVL6:
+ 138              	.L8:
+ 123:TASK/src/music_task.c ****         }
+ 124:TASK/src/music_task.c ****         vTaskDelay(1); // 绝对延时//vTaskDelay(2);
+ 139              		.loc 1 124 9 is_stmt 1 view .LVU21
+ 140 003e 0120     		movs	r0, #1
+ 141 0040 FFF7FEFF 		bl	vTaskDelay
+ 142              	.LVL7:
+ 143              	.LBE2:
+ 107:TASK/src/music_task.c ****     {
+ 144              		.loc 1 107 11 view .LVU22
+ 145              	.L10:
+ 107:TASK/src/music_task.c ****     {
+ 146              		.loc 1 107 5 view .LVU23
+ 147              	.LBB3:
+ 109:TASK/src/music_task.c ****         if (xTaskGetTickCount() - last_note_systick > music_list_point[music_time + 1] * 73)
+ 148              		.loc 1 109 9 view .LVU24
+ 110:TASK/src/music_task.c ****             buzzer_off();
+ 149              		.loc 1 110 9 view .LVU25
+ 110:TASK/src/music_task.c ****             buzzer_off();
+ 150              		.loc 1 110 13 is_stmt 0 view .LVU26
+ 151 0044 FFF7FEFF 		bl	xTaskGetTickCount
+ 152              	.LVL8:
+ 110:TASK/src/music_task.c ****             buzzer_off();
+ 153              		.loc 1 110 33 view .LVU27
+ 154 0048 224B     		ldr	r3, .L13+16
+ 155 004a 1B68     		ldr	r3, [r3]
+ 156 004c C01A     		subs	r0, r0, r3
+ 110:TASK/src/music_task.c ****             buzzer_off();
+ 157              		.loc 1 110 83 view .LVU28
+ 158 004e 1D4B     		ldr	r3, .L13
+ 159 0050 1B68     		ldr	r3, [r3]
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccVDvwId.s 			page 6
+
+
+ 160 0052 0133     		adds	r3, r3, #1
+ 110:TASK/src/music_task.c ****             buzzer_off();
+ 161              		.loc 1 110 71 view .LVU29
+ 162 0054 1C4A     		ldr	r2, .L13+4
+ 163 0056 1268     		ldr	r2, [r2]
+ 164 0058 52F82330 		ldr	r3, [r2, r3, lsl #2]
+ 110:TASK/src/music_task.c ****             buzzer_off();
+ 165              		.loc 1 110 88 view .LVU30
+ 166 005c 03EBC302 		add	r2, r3, r3, lsl #3
+ 167 0060 03EBC203 		add	r3, r3, r2, lsl #3
+ 110:TASK/src/music_task.c ****             buzzer_off();
+ 168              		.loc 1 110 12 view .LVU31
+ 169 0064 9842     		cmp	r0, r3
+ 170 0066 D0D8     		bhi	.L12
+ 171              	.L7:
+ 112:TASK/src/music_task.c ****         {
+ 172              		.loc 1 112 9 is_stmt 1 view .LVU32
+ 112:TASK/src/music_task.c ****         {
+ 173              		.loc 1 112 13 is_stmt 0 view .LVU33
+ 174 0068 FFF7FEFF 		bl	xTaskGetTickCount
+ 175              	.LVL9:
+ 112:TASK/src/music_task.c ****         {
+ 176              		.loc 1 112 33 view .LVU34
+ 177 006c 194B     		ldr	r3, .L13+16
+ 178 006e 1B68     		ldr	r3, [r3]
+ 179 0070 C01A     		subs	r0, r0, r3
+ 112:TASK/src/music_task.c ****         {
+ 180              		.loc 1 112 83 view .LVU35
+ 181 0072 144B     		ldr	r3, .L13
+ 182 0074 1B68     		ldr	r3, [r3]
+ 183 0076 0133     		adds	r3, r3, #1
+ 112:TASK/src/music_task.c ****         {
+ 184              		.loc 1 112 71 view .LVU36
+ 185 0078 134A     		ldr	r2, .L13+4
+ 186 007a 1268     		ldr	r2, [r2]
+ 187 007c 52F82330 		ldr	r3, [r2, r3, lsl #2]
+ 112:TASK/src/music_task.c ****         {
+ 188              		.loc 1 112 88 view .LVU37
+ 189 0080 03EB8303 		add	r3, r3, r3, lsl #2
+ 112:TASK/src/music_task.c ****         {
+ 190              		.loc 1 112 12 view .LVU38
+ 191 0084 B0EB031F 		cmp	r0, r3, lsl #4
+ 192 0088 D9D9     		bls	.L8
+ 114:TASK/src/music_task.c ****             music_time += 2;
+ 193              		.loc 1 114 13 is_stmt 1 view .LVU39
+ 114:TASK/src/music_task.c ****             music_time += 2;
+ 194              		.loc 1 114 33 is_stmt 0 view .LVU40
+ 195 008a FFF7FEFF 		bl	xTaskGetTickCount
+ 196              	.LVL10:
+ 114:TASK/src/music_task.c ****             music_time += 2;
+ 197              		.loc 1 114 31 view .LVU41
+ 198 008e 114B     		ldr	r3, .L13+16
+ 199 0090 1860     		str	r0, [r3]
+ 115:TASK/src/music_task.c ****             if (music_list_point[music_time] == 0xff)
+ 200              		.loc 1 115 13 is_stmt 1 view .LVU42
+ 115:TASK/src/music_task.c ****             if (music_list_point[music_time] == 0xff)
+ 201              		.loc 1 115 24 is_stmt 0 view .LVU43
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccVDvwId.s 			page 7
+
+
+ 202 0092 0C4A     		ldr	r2, .L13
+ 203 0094 1368     		ldr	r3, [r2]
+ 204 0096 5168     		ldr	r1, [r2, #4]
+ 205 0098 0233     		adds	r3, r3, #2
+ 206 009a 41F10001 		adc	r1, r1, #0
+ 207 009e 1360     		str	r3, [r2]
+ 208 00a0 5160     		str	r1, [r2, #4]
+ 116:TASK/src/music_task.c ****             {
+ 209              		.loc 1 116 13 is_stmt 1 view .LVU44
+ 116:TASK/src/music_task.c ****             {
+ 210              		.loc 1 116 33 is_stmt 0 view .LVU45
+ 211 00a2 094A     		ldr	r2, .L13+4
+ 212 00a4 1268     		ldr	r2, [r2]
+ 213 00a6 52F82330 		ldr	r3, [r2, r3, lsl #2]
+ 116:TASK/src/music_task.c ****             {
+ 214              		.loc 1 116 16 view .LVU46
+ 215 00aa FF2B     		cmp	r3, #255
+ 216 00ac B0D1     		bne	.L9
+ 118:TASK/src/music_task.c ****                 buzzer_off();
+ 217              		.loc 1 118 17 is_stmt 1 view .LVU47
+ 118:TASK/src/music_task.c ****                 buzzer_off();
+ 218              		.loc 1 118 28 is_stmt 0 view .LVU48
+ 219 00ae 054B     		ldr	r3, .L13
+ 220 00b0 0020     		movs	r0, #0
+ 221 00b2 0021     		movs	r1, #0
+ 222 00b4 C3E90001 		strd	r0, [r3]
+ 119:TASK/src/music_task.c ****                 vTaskSuspend(NULL);
+ 223              		.loc 1 119 17 is_stmt 1 view .LVU49
+ 224 00b8 FFF7FEFF 		bl	buzzer_off
+ 225              	.LVL11:
+ 120:TASK/src/music_task.c ****             }
+ 226              		.loc 1 120 17 view .LVU50
+ 227 00bc 0020     		movs	r0, #0
+ 228 00be FFF7FEFF 		bl	vTaskSuspend
+ 229              	.LVL12:
+ 230 00c2 A5E7     		b	.L9
+ 231              	.L14:
+ 232              		.align	2
+ 233              	.L13:
+ 234 00c4 00000000 		.word	.LANCHOR2
+ 235 00c8 00000000 		.word	.LANCHOR0
+ 236 00cc 00000000 		.word	.LANCHOR4
+ 237 00d0 00247449 		.word	1232348160
+ 238 00d4 00000000 		.word	.LANCHOR3
+ 239              	.LBE3:
+ 240              		.cfi_endproc
+ 241              	.LFE137:
+ 243              		.global	music_list_point
+ 244              		.global	music_time
+ 245              		.global	Music
+ 246              		.global	note_list
+ 247              		.global	Moon
+ 248              		.section	.bss.Music,"aw",%nobits
+ 251              	Music:
+ 252 0000 00       		.space	1
+ 253              		.section	.bss.last_note_systick.0,"aw",%nobits
+ 254              		.align	2
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccVDvwId.s 			page 8
+
+
+ 255              		.set	.LANCHOR3,. + 0
+ 258              	last_note_systick.0:
+ 259 0000 00000000 		.space	4
+ 260              		.section	.bss.music_list_point,"aw",%nobits
+ 261              		.align	2
+ 262              		.set	.LANCHOR0,. + 0
+ 265              	music_list_point:
+ 266 0000 00000000 		.space	4
+ 267              		.section	.bss.music_time,"aw",%nobits
+ 268              		.align	3
+ 269              		.set	.LANCHOR2,. + 0
+ 272              	music_time:
+ 273 0000 00000000 		.space	8
+ 273      00000000 
+ 274              		.section	.data.Moon,"aw"
+ 275              		.align	2
+ 276              		.set	.LANCHOR1,. + 0
+ 279              	Moon:
+ 280 0000 00000000 		.word	0
+ 281 0004 08000000 		.word	8
+ 282 0008 00000000 		.word	0
+ 283 000c 08000000 		.word	8
+ 284 0010 0D000000 		.word	13
+ 285 0014 04000000 		.word	4
+ 286 0018 0F000000 		.word	15
+ 287 001c 04000000 		.word	4
+ 288 0020 11000000 		.word	17
+ 289 0024 08000000 		.word	8
+ 290 0028 00000000 		.word	0
+ 291 002c 04000000 		.word	4
+ 292 0030 14000000 		.word	20
+ 293 0034 04000000 		.word	4
+ 294 0038 11000000 		.word	17
+ 295 003c 08000000 		.word	8
+ 296 0040 0F000000 		.word	15
+ 297 0044 14000000 		.word	20
+ 298 0048 0D000000 		.word	13
+ 299 004c 08000000 		.word	8
+ 300 0050 0A000000 		.word	10
+ 301 0054 14000000 		.word	20
+ 302 0058 08000000 		.word	8
+ 303 005c 08000000 		.word	8
+ 304 0060 0D000000 		.word	13
+ 305 0064 14000000 		.word	20
+ 306 0068 0D000000 		.word	13
+ 307 006c 04000000 		.word	4
+ 308 0070 0F000000 		.word	15
+ 309 0074 04000000 		.word	4
+ 310 0078 11000000 		.word	17
+ 311 007c 08000000 		.word	8
+ 312 0080 00000000 		.word	0
+ 313 0084 04000000 		.word	4
+ 314 0088 14000000 		.word	20
+ 315 008c 04000000 		.word	4
+ 316 0090 11000000 		.word	17
+ 317 0094 08000000 		.word	8
+ 318 0098 19000000 		.word	25
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccVDvwId.s 			page 9
+
+
+ 319 009c 14000000 		.word	20
+ 320 00a0 16000000 		.word	22
+ 321 00a4 08000000 		.word	8
+ 322 00a8 14000000 		.word	20
+ 323 00ac 08000000 		.word	8
+ 324 00b0 00000000 		.word	0
+ 325 00b4 04000000 		.word	4
+ 326 00b8 0F000000 		.word	15
+ 327 00bc 04000000 		.word	4
+ 328 00c0 11000000 		.word	17
+ 329 00c4 04000000 		.word	4
+ 330 00c8 12000000 		.word	18
+ 331 00cc 04000000 		.word	4
+ 332 00d0 11000000 		.word	17
+ 333 00d4 14000000 		.word	20
+ 334 00d8 0D000000 		.word	13
+ 335 00dc 04000000 		.word	4
+ 336 00e0 0F000000 		.word	15
+ 337 00e4 04000000 		.word	4
+ 338 00e8 11000000 		.word	17
+ 339 00ec 08000000 		.word	8
+ 340 00f0 11000000 		.word	17
+ 341 00f4 08000000 		.word	8
+ 342 00f8 11000000 		.word	17
+ 343 00fc 08000000 		.word	8
+ 344 0100 FF000000 		.word	255
+ 345              		.section	.data.note_list,"aw"
+ 346              		.align	2
+ 347              		.set	.LANCHOR4,. + 0
+ 350              	note_list:
+ 351 0000 00247449 		.word	1232348160
+ 352 0004 A4D08243 		.word	1132646564
+ 353 0008 0A978A43 		.word	1133156106
+ 354 000c 7BD49243 		.word	1133696123
+ 355 0010 A4909B43 		.word	1134268580
+ 356 0014 A4D0A443 		.word	1134874788
+ 357 0018 719DAE43 		.word	1135517041
+ 358 001c B8FEB843 		.word	1136197304
+ 359 0020 0000C443 		.word	1136918528
+ 360 0024 66A6CF43 		.word	1137682022
+ 361 0028 0000DC43 		.word	1138491392
+ 362 002c 7B14E943 		.word	1139348603
+ 363 0030 A4F0F643 		.word	1140256932
+ 364 0034 00D00244 		.word	1141035008
+ 365 0038 AE970A44 		.word	1141544878
+ 366 003c 1FD51244 		.word	1142084895
+ 367 0040 00901B44 		.word	1142657024
+ 368 0044 A4D02444 		.word	1143263396
+ 369 0048 719D2E44 		.word	1143905649
+ 370 004c 5CFF3844 		.word	1144586076
+ 371 0050 5CFF4344 		.word	1145306972
+ 372 0054 0AA74F44 		.word	1146070794
+ 373 0058 00005C44 		.word	1146880000
+ 374 005c 1F156944 		.word	1147737375
+ 375 0060 48F17644 		.word	1148645704
+ 376 0064 00D08244 		.word	1149423616
+ 377 0068 5C978A44 		.word	1149933404
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccVDvwId.s 			page 10
+
+
+ 378 006c 1FD59244 		.word	1150473503
+ 379 0070 52909B44 		.word	1151045714
+ 380 0074 52D0A444 		.word	1151651922
+ 381 0078 1F9DAE44 		.word	1152294175
+ 382 007c 5CFFB844 		.word	1152974684
+ 383 0080 5CFFC344 		.word	1153695580
+ 384 0084 0AA7CF44 		.word	1154459402
+ 385 0088 0000DC44 		.word	1155268608
+ 386 008c 1F15E944 		.word	1156125983
+ 387 0090 000080BF 		.word	-1082130432
+ 388              		.text
+ 389              	.Letext0:
+ 390              		.file 2 "d:\\gcc-arm-none-eabi-10.3-2021.10\\arm-none-eabi\\include\\machine\\_default_types.h"
+ 391              		.file 3 "d:\\gcc-arm-none-eabi-10.3-2021.10\\arm-none-eabi\\include\\sys\\_stdint.h"
+ 392              		.file 4 "Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/portmacro.h"
+ 393              		.file 5 "ACE-ECF/Bsp/Inc/bsp_buzzer.h"
+ 394              		.file 6 "Middlewares/Third_Party/FreeRTOS/Source/include/task.h"
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccVDvwId.s 			page 11
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 music_task.c
+C:\Users\28212\AppData\Local\Temp\ccVDvwId.s:20     .text.music:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccVDvwId.s:26     .text.music:00000000 music
+C:\Users\28212\AppData\Local\Temp\ccVDvwId.s:40     .text.Music_choice:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccVDvwId.s:46     .text.Music_choice:00000000 Music_choice
+C:\Users\28212\AppData\Local\Temp\ccVDvwId.s:76     .text.Music_choice:00000014 $d
+C:\Users\28212\AppData\Local\Temp\ccVDvwId.s:83     .text.MUSIC_TASK:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccVDvwId.s:89     .text.MUSIC_TASK:00000000 MUSIC_TASK
+C:\Users\28212\AppData\Local\Temp\ccVDvwId.s:234    .text.MUSIC_TASK:000000c4 $d
+C:\Users\28212\AppData\Local\Temp\ccVDvwId.s:265    .bss.music_list_point:00000000 music_list_point
+C:\Users\28212\AppData\Local\Temp\ccVDvwId.s:272    .bss.music_time:00000000 music_time
+C:\Users\28212\AppData\Local\Temp\ccVDvwId.s:251    .bss.Music:00000000 Music
+C:\Users\28212\AppData\Local\Temp\ccVDvwId.s:350    .data.note_list:00000000 note_list
+C:\Users\28212\AppData\Local\Temp\ccVDvwId.s:279    .data.Moon:00000000 Moon
+C:\Users\28212\AppData\Local\Temp\ccVDvwId.s:252    .bss.Music:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccVDvwId.s:254    .bss.last_note_systick.0:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccVDvwId.s:258    .bss.last_note_systick.0:00000000 last_note_systick.0
+C:\Users\28212\AppData\Local\Temp\ccVDvwId.s:261    .bss.music_list_point:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccVDvwId.s:268    .bss.music_time:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccVDvwId.s:275    .data.Moon:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccVDvwId.s:346    .data.note_list:00000000 $d
+
+UNDEFINED SYMBOLS
+buzzer_off
+buzzer_test
+vTaskDelay
+xTaskGetTickCount
+vTaskSuspend

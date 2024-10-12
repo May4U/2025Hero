@@ -1,0 +1,1031 @@
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccd8Rryy.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.arch armv7e-m
+   3              		.fpu fpv4-sp-d16
+   4              		.eabi_attribute 27, 1
+   5              		.eabi_attribute 28, 1
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.file	"filter.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.KalmanCreate,"ax",%progbits
+  20              		.align	1
+  21              		.global	KalmanCreate
+  22              		.syntax unified
+  23              		.thumb
+  24              		.thumb_func
+  26              	KalmanCreate:
+  27              	.LVL0:
+  28              	.LFB163:
+  29              		.file 1 "ACE-ECF/Algorithm/src/filter.c"
+   1:ACE-ECF/Algorithm/src/filter.c **** #include "filter.h"
+   2:ACE-ECF/Algorithm/src/filter.c **** #include "maths.h"
+   3:ACE-ECF/Algorithm/src/filter.c **** /*********************************************************************一阶卡尔曼**************
+   4:ACE-ECF/Algorithm/src/filter.c **** /**
+   5:ACE-ECF/Algorithm/src/filter.c ****  * @author  Liu heng
+   6:ACE-ECF/Algorithm/src/filter.c ****  * 一阶卡尔曼滤波器来自RoboMaster论坛
+   7:ACE-ECF/Algorithm/src/filter.c ****  *   一维卡尔曼滤波器
+   8:ACE-ECF/Algorithm/src/filter.c ****  *   使用时先定义一个kalman指针，然后调用kalmanCreate()创建一个滤波器
+   9:ACE-ECF/Algorithm/src/filter.c ****  *   每次读取到传感器数据后即可调用KalmanFilter()来对数据进行滤波
+  10:ACE-ECF/Algorithm/src/filter.c ****  *          使用示例
+  11:ACE-ECF/Algorithm/src/filter.c ****  *          extKalman_t p;                  //定义一个卡尔曼滤波器结构体
+  12:ACE-ECF/Algorithm/src/filter.c ****  *          float SersorData;             //需要进行滤波的数据
+  13:ACE-ECF/Algorithm/src/filter.c ****  *          KalmanCreate(&p,20,200);      //初始化该滤波器的Q=20 R=200参数
+  14:ACE-ECF/Algorithm/src/filter.c ****  *          while(1)
+  15:ACE-ECF/Algorithm/src/filter.c ****  *          {
+  16:ACE-ECF/Algorithm/src/filter.c ****  *             SersorData = sersor();                     //获取数据
+  17:ACE-ECF/Algorithm/src/filter.c ****  *             SersorData = KalmanFilter(&p,SersorData);  //对数据进行滤波
+  18:ACE-ECF/Algorithm/src/filter.c ****  *          }
+  19:ACE-ECF/Algorithm/src/filter.c ****  */
+  20:ACE-ECF/Algorithm/src/filter.c **** 
+  21:ACE-ECF/Algorithm/src/filter.c **** /**
+  22:ACE-ECF/Algorithm/src/filter.c ****  * @name   kalmanCreate
+  23:ACE-ECF/Algorithm/src/filter.c ****  * @brief  创建一个卡尔曼滤波器
+  24:ACE-ECF/Algorithm/src/filter.c ****  * @param  p:  滤波器
+  25:ACE-ECF/Algorithm/src/filter.c ****  *         T_Q:系统噪声协方差
+  26:ACE-ECF/Algorithm/src/filter.c ****  *         T_R:测量噪声协方差
+  27:ACE-ECF/Algorithm/src/filter.c ****  *
+  28:ACE-ECF/Algorithm/src/filter.c ****  * @retval none
+  29:ACE-ECF/Algorithm/src/filter.c ****  * @attention R固定，Q越大，代表越信任侧量值，Q无穷代表只用测量值
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccd8Rryy.s 			page 2
+
+
+  30:ACE-ECF/Algorithm/src/filter.c ****  *		       	反之，Q越小代表越信任模型预测值，Q为零则是只用模型预测
+  31:ACE-ECF/Algorithm/src/filter.c ****  */
+  32:ACE-ECF/Algorithm/src/filter.c **** void KalmanCreate(extKalman_t *p, float T_Q, float T_R)
+  33:ACE-ECF/Algorithm/src/filter.c **** {
+  30              		.loc 1 33 1 view -0
+  31              		.cfi_startproc
+  32              		@ args = 0, pretend = 0, frame = 0
+  33              		@ frame_needed = 0, uses_anonymous_args = 0
+  34              		@ link register save eliminated.
+  34:ACE-ECF/Algorithm/src/filter.c ****   p->X_last = (float)0;
+  35              		.loc 1 34 3 view .LVU1
+  36              		.loc 1 34 13 is_stmt 0 view .LVU2
+  37 0000 0023     		movs	r3, #0
+  38 0002 0360     		str	r3, [r0]	@ float
+  35:ACE-ECF/Algorithm/src/filter.c ****   p->P_last = 0;
+  39              		.loc 1 35 3 is_stmt 1 view .LVU3
+  40              		.loc 1 35 13 is_stmt 0 view .LVU4
+  41 0004 4361     		str	r3, [r0, #20]	@ float
+  36:ACE-ECF/Algorithm/src/filter.c ****   p->Q = T_Q;
+  42              		.loc 1 36 3 is_stmt 1 view .LVU5
+  43              		.loc 1 36 8 is_stmt 0 view .LVU6
+  44 0006 80ED090A 		vstr.32	s0, [r0, #36]
+  37:ACE-ECF/Algorithm/src/filter.c ****   p->R = T_R;
+  45              		.loc 1 37 3 is_stmt 1 view .LVU7
+  46              		.loc 1 37 8 is_stmt 0 view .LVU8
+  47 000a C0ED0A0A 		vstr.32	s1, [r0, #40]
+  38:ACE-ECF/Algorithm/src/filter.c ****   p->A = 1;
+  48              		.loc 1 38 3 is_stmt 1 view .LVU9
+  49              		.loc 1 38 8 is_stmt 0 view .LVU10
+  50 000e 4FF07E52 		mov	r2, #1065353216
+  51 0012 C261     		str	r2, [r0, #28]	@ float
+  39:ACE-ECF/Algorithm/src/filter.c ****   p->B = 0;
+  52              		.loc 1 39 3 is_stmt 1 view .LVU11
+  53              		.loc 1 39 8 is_stmt 0 view .LVU12
+  54 0014 0362     		str	r3, [r0, #32]	@ float
+  40:ACE-ECF/Algorithm/src/filter.c ****   p->H = 1;
+  55              		.loc 1 40 3 is_stmt 1 view .LVU13
+  56              		.loc 1 40 8 is_stmt 0 view .LVU14
+  57 0016 C262     		str	r2, [r0, #44]	@ float
+  41:ACE-ECF/Algorithm/src/filter.c ****   p->X_mid = p->X_last;
+  58              		.loc 1 41 3 is_stmt 1 view .LVU15
+  59              		.loc 1 41 12 is_stmt 0 view .LVU16
+  60 0018 4360     		str	r3, [r0, #4]	@ float
+  42:ACE-ECF/Algorithm/src/filter.c **** }
+  61              		.loc 1 42 1 view .LVU17
+  62 001a 7047     		bx	lr
+  63              		.cfi_endproc
+  64              	.LFE163:
+  66              		.section	.text.KalmanFilter,"ax",%progbits
+  67              		.align	1
+  68              		.global	KalmanFilter
+  69              		.syntax unified
+  70              		.thumb
+  71              		.thumb_func
+  73              	KalmanFilter:
+  74              	.LVL1:
+  75              	.LFB164:
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccd8Rryy.s 			page 3
+
+
+  43:ACE-ECF/Algorithm/src/filter.c **** 
+  44:ACE-ECF/Algorithm/src/filter.c **** /**
+  45:ACE-ECF/Algorithm/src/filter.c ****  * @name   KalmanFilter
+  46:ACE-ECF/Algorithm/src/filter.c ****  * @brief  卡尔曼滤波器
+  47:ACE-ECF/Algorithm/src/filter.c ****  * @param  p:  滤波器
+  48:ACE-ECF/Algorithm/src/filter.c ****  *         dat:待滤波数据
+  49:ACE-ECF/Algorithm/src/filter.c ****  * @retval 滤波后的数据
+  50:ACE-ECF/Algorithm/src/filter.c ****  * @attention Z(k)是系统输入,即测量值   X(k|k)是卡尔曼滤波后的值,即最终输出
+  51:ACE-ECF/Algorithm/src/filter.c ****  *            A=1 B=0 H=1 I=1  W(K)  V(k)是高斯白噪声,叠加在测量值上了,可以不用�
+  52:ACE-ECF/Algorithm/src/filter.c ****  *            以下是卡尔曼的5个核心公式
+  53:ACE-ECF/Algorithm/src/filter.c ****  *            一阶H'即为它本身,否则为转置矩阵
+  54:ACE-ECF/Algorithm/src/filter.c ****  */
+  55:ACE-ECF/Algorithm/src/filter.c **** 
+  56:ACE-ECF/Algorithm/src/filter.c **** float KalmanFilter(extKalman_t *p, float dat)
+  57:ACE-ECF/Algorithm/src/filter.c **** {
+  76              		.loc 1 57 1 is_stmt 1 view -0
+  77              		.cfi_startproc
+  78              		@ args = 0, pretend = 0, frame = 0
+  79              		@ frame_needed = 0, uses_anonymous_args = 0
+  80              		@ link register save eliminated.
+  58:ACE-ECF/Algorithm/src/filter.c ****   p->X_mid = p->A * p->X_last;                    // 计算当前时刻的预测结果(1)         x
+  81              		.loc 1 58 3 view .LVU19
+  82              		.loc 1 58 15 is_stmt 0 view .LVU20
+  83 0000 D0ED077A 		vldr.32	s15, [r0, #28]
+  84              		.loc 1 58 22 view .LVU21
+  85 0004 90ED007A 		vldr.32	s14, [r0]
+  86              		.loc 1 58 19 view .LVU22
+  87 0008 27EE877A 		vmul.f32	s14, s15, s14
+  88              		.loc 1 58 12 view .LVU23
+  89 000c 80ED017A 		vstr.32	s14, [r0, #4]
+  59:ACE-ECF/Algorithm/src/filter.c ****   p->P_mid = p->A * p->P_last + p->Q;             // 计算当前时刻预测结果的协方差(2) 
+  90              		.loc 1 59 3 is_stmt 1 view .LVU24
+  91              		.loc 1 59 22 is_stmt 0 view .LVU25
+  92 0010 D0ED056A 		vldr.32	s13, [r0, #20]
+  93              		.loc 1 59 19 view .LVU26
+  94 0014 67EEA67A 		vmul.f32	s15, s15, s13
+  95              		.loc 1 59 34 view .LVU27
+  96 0018 D0ED096A 		vldr.32	s13, [r0, #36]
+  97              		.loc 1 59 31 view .LVU28
+  98 001c 77EEA67A 		vadd.f32	s15, s15, s13
+  99              		.loc 1 59 12 view .LVU29
+ 100 0020 C0ED037A 		vstr.32	s15, [r0, #12]
+  60:ACE-ECF/Algorithm/src/filter.c ****   p->kg = p->P_mid / (p->P_mid + p->R);           // 计算klaman增益(4)               kg(k) = p(
+ 101              		.loc 1 60 3 is_stmt 1 view .LVU30
+ 102              		.loc 1 60 35 is_stmt 0 view .LVU31
+ 103 0024 90ED0A6A 		vldr.32	s12, [r0, #40]
+ 104              		.loc 1 60 32 view .LVU32
+ 105 0028 37EE866A 		vadd.f32	s12, s15, s12
+ 106              		.loc 1 60 20 view .LVU33
+ 107 002c C7EE866A 		vdiv.f32	s13, s15, s12
+ 108              		.loc 1 60 9 view .LVU34
+ 109 0030 C0ED066A 		vstr.32	s13, [r0, #24]
+  61:ACE-ECF/Algorithm/src/filter.c ****   p->X_now = p->X_mid + p->kg * (dat - p->X_mid); // 计算当前时刻的最优结果(3)         x
+ 110              		.loc 1 61 3 is_stmt 1 view .LVU35
+ 111              		.loc 1 61 38 is_stmt 0 view .LVU36
+ 112 0034 30EE470A 		vsub.f32	s0, s0, s14
+ 113              	.LVL2:
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccd8Rryy.s 			page 4
+
+
+ 114              		.loc 1 61 31 view .LVU37
+ 115 0038 26EE800A 		vmul.f32	s0, s13, s0
+ 116              		.loc 1 61 23 view .LVU38
+ 117 003c 37EE000A 		vadd.f32	s0, s14, s0
+ 118              		.loc 1 61 12 view .LVU39
+ 119 0040 80ED020A 		vstr.32	s0, [r0, #8]
+  62:ACE-ECF/Algorithm/src/filter.c ****   p->P_now = (1 - p->kg) * p->P_mid;              // 计算当前时刻最优结果的协方差(5) 
+ 120              		.loc 1 62 3 is_stmt 1 view .LVU40
+ 121              		.loc 1 62 17 is_stmt 0 view .LVU41
+ 122 0044 B7EE007A 		vmov.f32	s14, #1.0e+0
+ 123 0048 37EE667A 		vsub.f32	s14, s14, s13
+ 124              		.loc 1 62 26 view .LVU42
+ 125 004c 67EE877A 		vmul.f32	s15, s15, s14
+ 126              		.loc 1 62 12 view .LVU43
+ 127 0050 C0ED047A 		vstr.32	s15, [r0, #16]
+  63:ACE-ECF/Algorithm/src/filter.c **** 
+  64:ACE-ECF/Algorithm/src/filter.c ****   p->P_last = p->P_now; // 状态更新
+ 128              		.loc 1 64 3 is_stmt 1 view .LVU44
+ 129              		.loc 1 64 13 is_stmt 0 view .LVU45
+ 130 0054 C0ED057A 		vstr.32	s15, [r0, #20]
+  65:ACE-ECF/Algorithm/src/filter.c ****   p->X_last = p->X_now;
+ 131              		.loc 1 65 3 is_stmt 1 view .LVU46
+ 132              		.loc 1 65 13 is_stmt 0 view .LVU47
+ 133 0058 80ED000A 		vstr.32	s0, [r0]
+  66:ACE-ECF/Algorithm/src/filter.c **** 
+  67:ACE-ECF/Algorithm/src/filter.c ****   return p->X_now; // 输出预测结果x(k|k)
+ 134              		.loc 1 67 3 is_stmt 1 view .LVU48
+  68:ACE-ECF/Algorithm/src/filter.c **** }
+ 135              		.loc 1 68 1 is_stmt 0 view .LVU49
+ 136 005c 7047     		bx	lr
+ 137              		.cfi_endproc
+ 138              	.LFE164:
+ 140              		.section	.text.kalman_filter_init,"ax",%progbits
+ 141              		.align	1
+ 142              		.global	kalman_filter_init
+ 143              		.syntax unified
+ 144              		.thumb
+ 145              		.thumb_func
+ 147              	kalman_filter_init:
+ 148              	.LVL3:
+ 149              	.LFB165:
+  69:ACE-ECF/Algorithm/src/filter.c **** 
+  70:ACE-ECF/Algorithm/src/filter.c **** /*******************************************************************二阶卡尔曼****************
+  71:ACE-ECF/Algorithm/src/filter.c **** 
+  72:ACE-ECF/Algorithm/src/filter.c **** /**
+  73:ACE-ECF/Algorithm/src/filter.c ****  * @brief      视觉数据卡尔曼初始化
+  74:ACE-ECF/Algorithm/src/filter.c ****  * @param[in]
+  75:ACE-ECF/Algorithm/src/filter.c ****  * @retval
+  76:ACE-ECF/Algorithm/src/filter.c ****  * @attention
+  77:ACE-ECF/Algorithm/src/filter.c ****  */
+  78:ACE-ECF/Algorithm/src/filter.c **** kalman_filter_init_t visual_kalman_filter_init = {0};
+  79:ACE-ECF/Algorithm/src/filter.c **** kalman_filter_t visual_kalman_filter = {0};
+  80:ACE-ECF/Algorithm/src/filter.c **** void kalman_filter_init(kalman_filter_t *F, kalman_filter_init_t *I)
+  81:ACE-ECF/Algorithm/src/filter.c **** {
+ 150              		.loc 1 81 1 is_stmt 1 view -0
+ 151              		.cfi_startproc
+ 152              		@ args = 0, pretend = 0, frame = 0
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccd8Rryy.s 			page 5
+
+
+ 153              		@ frame_needed = 0, uses_anonymous_args = 0
+ 154              		.loc 1 81 1 is_stmt 0 view .LVU51
+ 155 0000 2DE9F843 		push	{r3, r4, r5, r6, r7, r8, r9, lr}
+ 156              	.LCFI0:
+ 157              		.cfi_def_cfa_offset 32
+ 158              		.cfi_offset 3, -32
+ 159              		.cfi_offset 4, -28
+ 160              		.cfi_offset 5, -24
+ 161              		.cfi_offset 6, -20
+ 162              		.cfi_offset 7, -16
+ 163              		.cfi_offset 8, -12
+ 164              		.cfi_offset 9, -8
+ 165              		.cfi_offset 14, -4
+ 166 0004 0446     		mov	r4, r0
+ 167 0006 0D46     		mov	r5, r1
+  82:ACE-ECF/Algorithm/src/filter.c ****   mat_init(&F->xhat, 4, 1, (float *)I->xhat_data);           // 4*1 特征值(k-1)
+ 168              		.loc 1 82 3 is_stmt 1 view .LVU52
+ 169 0008 01F11403 		add	r3, r1, #20
+ 170 000c 0122     		movs	r2, #1
+ 171 000e 0421     		movs	r1, #4
+ 172              	.LVL4:
+ 173              		.loc 1 82 3 is_stmt 0 view .LVU53
+ 174 0010 1430     		adds	r0, r0, #20
+ 175              	.LVL5:
+ 176              		.loc 1 82 3 view .LVU54
+ 177 0012 FFF7FEFF 		bl	arm_mat_init_f32
+ 178              	.LVL6:
+  83:ACE-ECF/Algorithm/src/filter.c ****   mat_init(&F->xhatminus, 4, 1, (float *)I->xhatminus_data); // 4*1 特征值(k)
+ 179              		.loc 1 83 3 is_stmt 1 view .LVU55
+ 180 0016 05F12403 		add	r3, r5, #36
+ 181 001a 0122     		movs	r2, #1
+ 182 001c 0421     		movs	r1, #4
+ 183 001e 04F11C00 		add	r0, r4, #28
+ 184 0022 FFF7FEFF 		bl	arm_mat_init_f32
+ 185              	.LVL7:
+  84:ACE-ECF/Algorithm/src/filter.c ****   mat_init(&F->z, 2, 1, (float *)I->z_data);                 // 2*1 测量值
+ 186              		.loc 1 84 3 view .LVU56
+ 187 0026 05F13403 		add	r3, r5, #52
+ 188 002a 0122     		movs	r2, #1
+ 189 002c 0221     		movs	r1, #2
+ 190 002e 04F12400 		add	r0, r4, #36
+ 191 0032 FFF7FEFF 		bl	arm_mat_init_f32
+ 192              	.LVL8:
+  85:ACE-ECF/Algorithm/src/filter.c ****   mat_init(&F->Pminus, 4, 4, (float *)I->Pminus_data);       // 4*4 新的协方差矩阵
+ 193              		.loc 1 85 3 view .LVU57
+ 194 0036 05F13C03 		add	r3, r5, #60
+ 195 003a 0422     		movs	r2, #4
+ 196 003c 1146     		mov	r1, r2
+ 197 003e 04F16400 		add	r0, r4, #100
+ 198 0042 FFF7FEFF 		bl	arm_mat_init_f32
+ 199              	.LVL9:
+  86:ACE-ECF/Algorithm/src/filter.c ****   mat_init(&F->k, 4, 2, (float *)I->K_data);                 // 4*2 kalman增益
+ 200              		.loc 1 86 3 view .LVU58
+ 201 0046 05F17C03 		add	r3, r5, #124
+ 202 004a 0222     		movs	r2, #2
+ 203 004c 0421     		movs	r1, #4
+ 204 004e 04F16C00 		add	r0, r4, #108
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccd8Rryy.s 			page 6
+
+
+ 205 0052 FFF7FEFF 		bl	arm_mat_init_f32
+ 206              	.LVL10:
+  87:ACE-ECF/Algorithm/src/filter.c ****   mat_init(&F->p, 4, 4, (float *)I->P_data);                 // 4*4 协方差矩阵
+ 207              		.loc 1 87 3 view .LVU59
+ 208 0056 05F19C03 		add	r3, r5, #156
+ 209 005a 0422     		movs	r2, #4
+ 210 005c 1146     		mov	r1, r2
+ 211 005e 04F15C00 		add	r0, r4, #92
+ 212 0062 FFF7FEFF 		bl	arm_mat_init_f32
+ 213              	.LVL11:
+  88:ACE-ECF/Algorithm/src/filter.c ****   mat_init(&F->AT, 4, 4, (float *)I->AT_data);               // 4*4 状态方程
+ 214              		.loc 1 88 3 view .LVU60
+ 215 0066 04F13C09 		add	r9, r4, #60
+ 216 006a 05F1DC03 		add	r3, r5, #220
+ 217 006e 0422     		movs	r2, #4
+ 218 0070 1146     		mov	r1, r2
+ 219 0072 4846     		mov	r0, r9
+ 220 0074 FFF7FEFF 		bl	arm_mat_init_f32
+ 221              	.LVL12:
+  89:ACE-ECF/Algorithm/src/filter.c ****   mat_init(&F->HT, 4, 2, (float *)I->HT_data);               // 4*2
+ 222              		.loc 1 89 3 view .LVU61
+ 223 0078 04F14407 		add	r7, r4, #68
+ 224 007c 05F58E73 		add	r3, r5, #284
+ 225 0080 0222     		movs	r2, #2
+ 226 0082 0421     		movs	r1, #4
+ 227 0084 3846     		mov	r0, r7
+ 228 0086 FFF7FEFF 		bl	arm_mat_init_f32
+ 229              	.LVL13:
+  90:ACE-ECF/Algorithm/src/filter.c ****   mat_init(&F->A, 4, 4, (float *)I->A_data);                 // 4*4
+ 230              		.loc 1 90 3 view .LVU62
+ 231 008a 04F12C08 		add	r8, r4, #44
+ 232 008e 05F59E73 		add	r3, r5, #316
+ 233 0092 0422     		movs	r2, #4
+ 234 0094 1146     		mov	r1, r2
+ 235 0096 4046     		mov	r0, r8
+ 236 0098 FFF7FEFF 		bl	arm_mat_init_f32
+ 237              	.LVL14:
+  91:ACE-ECF/Algorithm/src/filter.c ****   mat_init(&F->H, 2, 4, (float *)I->H_data);                 // 2*4
+ 238              		.loc 1 91 3 view .LVU63
+ 239 009c 04F13406 		add	r6, r4, #52
+ 240 00a0 05F5BE73 		add	r3, r5, #380
+ 241 00a4 0422     		movs	r2, #4
+ 242 00a6 0221     		movs	r1, #2
+ 243 00a8 3046     		mov	r0, r6
+ 244 00aa FFF7FEFF 		bl	arm_mat_init_f32
+ 245              	.LVL15:
+  92:ACE-ECF/Algorithm/src/filter.c ****   mat_init(&F->Q, 4, 4, (float *)I->Q_data);                 // 4*4
+ 246              		.loc 1 92 3 view .LVU64
+ 247 00ae 05F5CE73 		add	r3, r5, #412
+ 248 00b2 0422     		movs	r2, #4
+ 249 00b4 1146     		mov	r1, r2
+ 250 00b6 04F14C00 		add	r0, r4, #76
+ 251 00ba FFF7FEFF 		bl	arm_mat_init_f32
+ 252              	.LVL16:
+  93:ACE-ECF/Algorithm/src/filter.c ****   mat_init(&F->R, 2, 2, (float *)I->R_data);                 // 4*4
+ 253              		.loc 1 93 3 view .LVU65
+ 254 00be 05F5EE73 		add	r3, r5, #476
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccd8Rryy.s 			page 7
+
+
+ 255 00c2 0222     		movs	r2, #2
+ 256 00c4 1146     		mov	r1, r2
+ 257 00c6 04F15400 		add	r0, r4, #84
+ 258 00ca FFF7FEFF 		bl	arm_mat_init_f32
+ 259              	.LVL17:
+  94:ACE-ECF/Algorithm/src/filter.c ****   mat_trans(&F->A, &F->AT);
+ 260              		.loc 1 94 3 view .LVU66
+ 261 00ce 4946     		mov	r1, r9
+ 262 00d0 4046     		mov	r0, r8
+ 263 00d2 FFF7FEFF 		bl	arm_mat_trans_f32
+ 264              	.LVL18:
+  95:ACE-ECF/Algorithm/src/filter.c ****   mat_trans(&F->H, &F->HT);
+ 265              		.loc 1 95 3 view .LVU67
+ 266 00d6 3946     		mov	r1, r7
+ 267 00d8 3046     		mov	r0, r6
+ 268 00da FFF7FEFF 		bl	arm_mat_trans_f32
+ 269              	.LVL19:
+  96:ACE-ECF/Algorithm/src/filter.c **** }
+ 270              		.loc 1 96 1 is_stmt 0 view .LVU68
+ 271 00de BDE8F883 		pop	{r3, r4, r5, r6, r7, r8, r9, pc}
+ 272              		.loc 1 96 1 view .LVU69
+ 273              		.cfi_endproc
+ 274              	.LFE165:
+ 276              		.section	.text.first_order_filter,"ax",%progbits
+ 277              		.align	1
+ 278              		.global	first_order_filter
+ 279              		.syntax unified
+ 280              		.thumb
+ 281              		.thumb_func
+ 283              	first_order_filter:
+ 284              	.LVL20:
+ 285              	.LFB166:
+  97:ACE-ECF/Algorithm/src/filter.c **** 
+  98:ACE-ECF/Algorithm/src/filter.c **** // 一阶低通滤波计算
+  99:ACE-ECF/Algorithm/src/filter.c **** float first_order_filter(first_order_filter_type_t *first_order_filter_type, fp32 input)
+ 100:ACE-ECF/Algorithm/src/filter.c **** {
+ 286              		.loc 1 100 1 is_stmt 1 view -0
+ 287              		.cfi_startproc
+ 288              		@ args = 0, pretend = 0, frame = 0
+ 289              		@ frame_needed = 0, uses_anonymous_args = 0
+ 290              		@ link register save eliminated.
+ 101:ACE-ECF/Algorithm/src/filter.c ****   first_order_filter_type->input = input;
+ 291              		.loc 1 101 3 view .LVU71
+ 292              		.loc 1 101 34 is_stmt 0 view .LVU72
+ 293 0000 80ED000A 		vstr.32	s0, [r0]
+ 102:ACE-ECF/Algorithm/src/filter.c ****   first_order_filter_type->out = first_order_filter_type->input * first_order_filter_type->num + (1
+ 294              		.loc 1 102 3 is_stmt 1 view .LVU73
+ 295              		.loc 1 102 90 is_stmt 0 view .LVU74
+ 296 0004 90ED037A 		vldr.32	s14, [r0, #12]
+ 297              		.loc 1 102 65 view .LVU75
+ 298 0008 27EE000A 		vmul.f32	s0, s14, s0
+ 299              	.LVL21:
+ 300              		.loc 1 102 101 view .LVU76
+ 301 000c F7EE007A 		vmov.f32	s15, #1.0e+0
+ 302 0010 77EEC77A 		vsub.f32	s15, s15, s14
+ 303              		.loc 1 102 158 view .LVU77
+ 304 0014 90ED017A 		vldr.32	s14, [r0, #4]
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccd8Rryy.s 			page 8
+
+
+ 305              		.loc 1 102 133 view .LVU78
+ 306 0018 67EE877A 		vmul.f32	s15, s15, s14
+ 307              		.loc 1 102 96 view .LVU79
+ 308 001c 30EE270A 		vadd.f32	s0, s0, s15
+ 309              		.loc 1 102 32 view .LVU80
+ 310 0020 80ED020A 		vstr.32	s0, [r0, #8]
+ 103:ACE-ECF/Algorithm/src/filter.c ****   first_order_filter_type->last_input = first_order_filter_type->out;
+ 311              		.loc 1 103 3 is_stmt 1 view .LVU81
+ 312              		.loc 1 103 39 is_stmt 0 view .LVU82
+ 313 0024 80ED010A 		vstr.32	s0, [r0, #4]
+ 104:ACE-ECF/Algorithm/src/filter.c **** 
+ 105:ACE-ECF/Algorithm/src/filter.c ****   return first_order_filter_type->out;
+ 314              		.loc 1 105 3 is_stmt 1 view .LVU83
+ 106:ACE-ECF/Algorithm/src/filter.c **** }
+ 315              		.loc 1 106 1 is_stmt 0 view .LVU84
+ 316 0028 7047     		bx	lr
+ 317              		.cfi_endproc
+ 318              	.LFE166:
+ 320              		.section	.text.first_order_filter_init,"ax",%progbits
+ 321              		.align	1
+ 322              		.global	first_order_filter_init
+ 323              		.syntax unified
+ 324              		.thumb
+ 325              		.thumb_func
+ 327              	first_order_filter_init:
+ 328              	.LVL22:
+ 329              	.LFB167:
+ 107:ACE-ECF/Algorithm/src/filter.c **** 
+ 108:ACE-ECF/Algorithm/src/filter.c **** // 一阶低通滤波初始化
+ 109:ACE-ECF/Algorithm/src/filter.c **** void first_order_filter_init(first_order_filter_type_t *first_order_filter_type, fp32 num)
+ 110:ACE-ECF/Algorithm/src/filter.c **** {
+ 330              		.loc 1 110 1 is_stmt 1 view -0
+ 331              		.cfi_startproc
+ 332              		@ args = 0, pretend = 0, frame = 0
+ 333              		@ frame_needed = 0, uses_anonymous_args = 0
+ 334              		@ link register save eliminated.
+ 111:ACE-ECF/Algorithm/src/filter.c ****   if (first_order_filter_type == NULL)
+ 335              		.loc 1 111 3 view .LVU86
+ 336              		.loc 1 111 6 is_stmt 0 view .LVU87
+ 337 0000 28B1     		cbz	r0, .L6
+ 112:ACE-ECF/Algorithm/src/filter.c ****   {
+ 113:ACE-ECF/Algorithm/src/filter.c ****     return;
+ 114:ACE-ECF/Algorithm/src/filter.c ****   }
+ 115:ACE-ECF/Algorithm/src/filter.c **** 
+ 116:ACE-ECF/Algorithm/src/filter.c ****   first_order_filter_type->input = 0;
+ 338              		.loc 1 116 3 is_stmt 1 view .LVU88
+ 339              		.loc 1 116 34 is_stmt 0 view .LVU89
+ 340 0002 0022     		movs	r2, #0
+ 341 0004 0260     		str	r2, [r0]	@ float
+ 117:ACE-ECF/Algorithm/src/filter.c ****   first_order_filter_type->last_input = 0;
+ 342              		.loc 1 117 3 is_stmt 1 view .LVU90
+ 343              		.loc 1 117 39 is_stmt 0 view .LVU91
+ 344 0006 4260     		str	r2, [r0, #4]	@ float
+ 118:ACE-ECF/Algorithm/src/filter.c ****   first_order_filter_type->num = num;
+ 345              		.loc 1 118 3 is_stmt 1 view .LVU92
+ 346              		.loc 1 118 32 is_stmt 0 view .LVU93
+ 347 0008 80ED030A 		vstr.32	s0, [r0, #12]
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccd8Rryy.s 			page 9
+
+
+ 119:ACE-ECF/Algorithm/src/filter.c ****   first_order_filter_type->out = 0;
+ 348              		.loc 1 119 3 is_stmt 1 view .LVU94
+ 349              		.loc 1 119 32 is_stmt 0 view .LVU95
+ 350 000c 8260     		str	r2, [r0, #8]	@ float
+ 351              	.L6:
+ 120:ACE-ECF/Algorithm/src/filter.c **** }
+ 352              		.loc 1 120 1 view .LVU96
+ 353 000e 7047     		bx	lr
+ 354              		.cfi_endproc
+ 355              	.LFE167:
+ 357              		.section	.text.sliding_mean_filter_init,"ax",%progbits
+ 358              		.align	1
+ 359              		.global	sliding_mean_filter_init
+ 360              		.syntax unified
+ 361              		.thumb
+ 362              		.thumb_func
+ 364              	sliding_mean_filter_init:
+ 365              	.LVL23:
+ 366              	.LFB168:
+ 121:ACE-ECF/Algorithm/src/filter.c **** 
+ 122:ACE-ECF/Algorithm/src/filter.c **** /*
+ 123:ACE-ECF/Algorithm/src/filter.c ****  *功能：滑动均值滤波参数初始化(浮点型)
+ 124:ACE-ECF/Algorithm/src/filter.c ****  *输入：滤波对象结构体
+ 125:ACE-ECF/Algorithm/src/filter.c ****  */
+ 126:ACE-ECF/Algorithm/src/filter.c **** void sliding_mean_filter_init(sliding_mean_filter_type_t *mean_filter)
+ 127:ACE-ECF/Algorithm/src/filter.c **** {
+ 367              		.loc 1 127 1 is_stmt 1 view -0
+ 368              		.cfi_startproc
+ 369              		@ args = 0, pretend = 0, frame = 0
+ 370              		@ frame_needed = 0, uses_anonymous_args = 0
+ 371              		@ link register save eliminated.
+ 128:ACE-ECF/Algorithm/src/filter.c ****   mean_filter->count_num = 0;
+ 372              		.loc 1 128 3 view .LVU98
+ 373              		.loc 1 128 26 is_stmt 0 view .LVU99
+ 374 0000 0023     		movs	r3, #0
+ 375 0002 4360     		str	r3, [r0, #4]
+ 129:ACE-ECF/Algorithm/src/filter.c ****   for (int i = 0; i < 20; i++)
+ 376              		.loc 1 129 3 is_stmt 1 view .LVU100
+ 377              	.LBB2:
+ 378              		.loc 1 129 8 view .LVU101
+ 379              	.LVL24:
+ 380              		.loc 1 129 3 is_stmt 0 view .LVU102
+ 381 0004 05E0     		b	.L9
+ 382              	.LVL25:
+ 383              	.L10:
+ 130:ACE-ECF/Algorithm/src/filter.c ****     mean_filter->FIFO[i] = 0.0f;
+ 384              		.loc 1 130 5 is_stmt 1 discriminator 3 view .LVU103
+ 385              		.loc 1 130 26 is_stmt 0 discriminator 3 view .LVU104
+ 386 0006 1A1D     		adds	r2, r3, #4
+ 387 0008 00EB8202 		add	r2, r0, r2, lsl #2
+ 388 000c 0021     		movs	r1, #0
+ 389 000e 1160     		str	r1, [r2]	@ float
+ 129:ACE-ECF/Algorithm/src/filter.c ****   for (int i = 0; i < 20; i++)
+ 390              		.loc 1 129 27 is_stmt 1 discriminator 3 view .LVU105
+ 129:ACE-ECF/Algorithm/src/filter.c ****   for (int i = 0; i < 20; i++)
+ 391              		.loc 1 129 28 is_stmt 0 discriminator 3 view .LVU106
+ 392 0010 0133     		adds	r3, r3, #1
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccd8Rryy.s 			page 10
+
+
+ 393              	.LVL26:
+ 394              	.L9:
+ 129:ACE-ECF/Algorithm/src/filter.c ****   for (int i = 0; i < 20; i++)
+ 395              		.loc 1 129 19 is_stmt 1 discriminator 1 view .LVU107
+ 129:ACE-ECF/Algorithm/src/filter.c ****   for (int i = 0; i < 20; i++)
+ 396              		.loc 1 129 3 is_stmt 0 discriminator 1 view .LVU108
+ 397 0012 132B     		cmp	r3, #19
+ 398 0014 F7DD     		ble	.L10
+ 399              	.LBE2:
+ 131:ACE-ECF/Algorithm/src/filter.c ****   mean_filter->Input = 0.0f;
+ 400              		.loc 1 131 3 is_stmt 1 view .LVU109
+ 401              		.loc 1 131 22 is_stmt 0 view .LVU110
+ 402 0016 0023     		movs	r3, #0
+ 403              	.LVL27:
+ 404              		.loc 1 131 22 view .LVU111
+ 405 0018 0360     		str	r3, [r0]	@ float
+ 132:ACE-ECF/Algorithm/src/filter.c ****   mean_filter->Output = 0.0f;
+ 406              		.loc 1 132 3 is_stmt 1 view .LVU112
+ 407              		.loc 1 132 23 is_stmt 0 view .LVU113
+ 408 001a 8360     		str	r3, [r0, #8]	@ float
+ 133:ACE-ECF/Algorithm/src/filter.c ****   mean_filter->Sum = 0.0f;
+ 409              		.loc 1 133 3 is_stmt 1 view .LVU114
+ 410              		.loc 1 133 20 is_stmt 0 view .LVU115
+ 411 001c C360     		str	r3, [r0, #12]	@ float
+ 134:ACE-ECF/Algorithm/src/filter.c ****   mean_filter->sum_flag = 0;
+ 412              		.loc 1 134 3 is_stmt 1 view .LVU116
+ 413              		.loc 1 134 25 is_stmt 0 view .LVU117
+ 414 001e 0023     		movs	r3, #0
+ 415 0020 C0F8F833 		str	r3, [r0, #1016]
+ 135:ACE-ECF/Algorithm/src/filter.c **** }
+ 416              		.loc 1 135 1 view .LVU118
+ 417 0024 7047     		bx	lr
+ 418              		.cfi_endproc
+ 419              	.LFE168:
+ 421              		.section	.text.sliding_mean_filter,"ax",%progbits
+ 422              		.align	1
+ 423              		.global	sliding_mean_filter
+ 424              		.syntax unified
+ 425              		.thumb
+ 426              		.thumb_func
+ 428              	sliding_mean_filter:
+ 429              	.LVL28:
+ 430              	.LFB169:
+ 136:ACE-ECF/Algorithm/src/filter.c **** 
+ 137:ACE-ECF/Algorithm/src/filter.c **** /*
+ 138:ACE-ECF/Algorithm/src/filter.c ****  *功能：滑动均值滤波（浮点型）------抑制小幅度高频噪声
+ 139:ACE-ECF/Algorithm/src/filter.c ****  *传入：1.滤波对象结构体  2.更新值 3.均值数量
+ 140:ACE-ECF/Algorithm/src/filter.c ****  *传出：滑动滤波输出值（250次）
+ 141:ACE-ECF/Algorithm/src/filter.c ****  */
+ 142:ACE-ECF/Algorithm/src/filter.c **** float sliding_mean_filter(sliding_mean_filter_type_t *mean_filter, float Input, int num)
+ 143:ACE-ECF/Algorithm/src/filter.c **** {
+ 431              		.loc 1 143 1 is_stmt 1 view -0
+ 432              		.cfi_startproc
+ 433              		@ args = 0, pretend = 0, frame = 0
+ 434              		@ frame_needed = 0, uses_anonymous_args = 0
+ 435              		@ link register save eliminated.
+ 144:ACE-ECF/Algorithm/src/filter.c ****   // 更新
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccd8Rryy.s 			page 11
+
+
+ 145:ACE-ECF/Algorithm/src/filter.c ****   mean_filter->Input = Input;
+ 436              		.loc 1 145 3 view .LVU120
+ 437              		.loc 1 145 22 is_stmt 0 view .LVU121
+ 438 0000 80ED000A 		vstr.32	s0, [r0]
+ 146:ACE-ECF/Algorithm/src/filter.c ****   mean_filter->FIFO[mean_filter->count_num] = mean_filter->Input;
+ 439              		.loc 1 146 3 is_stmt 1 view .LVU122
+ 440              		.loc 1 146 32 is_stmt 0 view .LVU123
+ 441 0004 4368     		ldr	r3, [r0, #4]
+ 442              		.loc 1 146 45 view .LVU124
+ 443 0006 1A1D     		adds	r2, r3, #4
+ 444 0008 00EB8202 		add	r2, r0, r2, lsl #2
+ 445 000c 82ED000A 		vstr.32	s0, [r2]
+ 147:ACE-ECF/Algorithm/src/filter.c ****   mean_filter->count_num++;
+ 446              		.loc 1 147 3 is_stmt 1 view .LVU125
+ 447              		.loc 1 147 25 is_stmt 0 view .LVU126
+ 448 0010 0133     		adds	r3, r3, #1
+ 449 0012 4360     		str	r3, [r0, #4]
+ 148:ACE-ECF/Algorithm/src/filter.c **** 
+ 149:ACE-ECF/Algorithm/src/filter.c ****   if (mean_filter->count_num == num)
+ 450              		.loc 1 149 3 is_stmt 1 view .LVU127
+ 451              		.loc 1 149 6 is_stmt 0 view .LVU128
+ 452 0014 8B42     		cmp	r3, r1
+ 453 0016 10D0     		beq	.L17
+ 454              	.L12:
+ 150:ACE-ECF/Algorithm/src/filter.c ****   {
+ 151:ACE-ECF/Algorithm/src/filter.c ****     mean_filter->count_num = 0;
+ 152:ACE-ECF/Algorithm/src/filter.c ****     mean_filter->sum_flag = 1;
+ 153:ACE-ECF/Algorithm/src/filter.c ****   }
+ 154:ACE-ECF/Algorithm/src/filter.c ****   // 求和
+ 155:ACE-ECF/Algorithm/src/filter.c ****   if (mean_filter->sum_flag == 1)
+ 455              		.loc 1 155 3 is_stmt 1 view .LVU129
+ 456              		.loc 1 155 18 is_stmt 0 view .LVU130
+ 457 0018 D0F8F833 		ldr	r3, [r0, #1016]
+ 458              		.loc 1 155 6 view .LVU131
+ 459 001c 012B     		cmp	r3, #1
+ 460 001e 21D0     		beq	.L18
+ 461              	.L14:
+ 156:ACE-ECF/Algorithm/src/filter.c ****   {
+ 157:ACE-ECF/Algorithm/src/filter.c ****     for (int count = 0; count < num; count++)
+ 158:ACE-ECF/Algorithm/src/filter.c ****     {
+ 159:ACE-ECF/Algorithm/src/filter.c ****       mean_filter->Sum += mean_filter->FIFO[count];
+ 160:ACE-ECF/Algorithm/src/filter.c ****     }
+ 161:ACE-ECF/Algorithm/src/filter.c ****   }
+ 162:ACE-ECF/Algorithm/src/filter.c ****   // 均值
+ 163:ACE-ECF/Algorithm/src/filter.c ****   mean_filter->Output = mean_filter->Sum / num;
+ 462              		.loc 1 163 3 is_stmt 1 view .LVU132
+ 463              		.loc 1 163 36 is_stmt 0 view .LVU133
+ 464 0020 90ED037A 		vldr.32	s14, [r0, #12]
+ 465              		.loc 1 163 42 view .LVU134
+ 466 0024 07EE901A 		vmov	s15, r1	@ int
+ 467 0028 F8EEE77A 		vcvt.f32.s32	s15, s15
+ 468 002c 87EE270A 		vdiv.f32	s0, s14, s15
+ 469              	.LVL29:
+ 470              		.loc 1 163 23 view .LVU135
+ 471 0030 80ED020A 		vstr.32	s0, [r0, #8]
+ 164:ACE-ECF/Algorithm/src/filter.c ****   mean_filter->Sum = 0;
+ 472              		.loc 1 164 3 is_stmt 1 view .LVU136
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccd8Rryy.s 			page 12
+
+
+ 473              		.loc 1 164 20 is_stmt 0 view .LVU137
+ 474 0034 0023     		movs	r3, #0
+ 475 0036 C360     		str	r3, [r0, #12]	@ float
+ 165:ACE-ECF/Algorithm/src/filter.c **** 
+ 166:ACE-ECF/Algorithm/src/filter.c ****   return mean_filter->Output;
+ 476              		.loc 1 166 3 is_stmt 1 view .LVU138
+ 167:ACE-ECF/Algorithm/src/filter.c **** }
+ 477              		.loc 1 167 1 is_stmt 0 view .LVU139
+ 478 0038 7047     		bx	lr
+ 479              	.LVL30:
+ 480              	.L17:
+ 151:ACE-ECF/Algorithm/src/filter.c ****     mean_filter->sum_flag = 1;
+ 481              		.loc 1 151 5 is_stmt 1 view .LVU140
+ 151:ACE-ECF/Algorithm/src/filter.c ****     mean_filter->sum_flag = 1;
+ 482              		.loc 1 151 28 is_stmt 0 view .LVU141
+ 483 003a 0023     		movs	r3, #0
+ 484 003c 4360     		str	r3, [r0, #4]
+ 152:ACE-ECF/Algorithm/src/filter.c ****   }
+ 485              		.loc 1 152 5 is_stmt 1 view .LVU142
+ 152:ACE-ECF/Algorithm/src/filter.c ****   }
+ 486              		.loc 1 152 27 is_stmt 0 view .LVU143
+ 487 003e 0123     		movs	r3, #1
+ 488 0040 C0F8F833 		str	r3, [r0, #1016]
+ 489 0044 E8E7     		b	.L12
+ 490              	.LVL31:
+ 491              	.L15:
+ 492              	.LBB3:
+ 159:ACE-ECF/Algorithm/src/filter.c ****     }
+ 493              		.loc 1 159 7 is_stmt 1 discriminator 3 view .LVU144
+ 159:ACE-ECF/Algorithm/src/filter.c ****     }
+ 494              		.loc 1 159 44 is_stmt 0 discriminator 3 view .LVU145
+ 495 0046 1A1D     		adds	r2, r3, #4
+ 496 0048 00EB8202 		add	r2, r0, r2, lsl #2
+ 497 004c 92ED007A 		vldr.32	s14, [r2]
+ 159:ACE-ECF/Algorithm/src/filter.c ****     }
+ 498              		.loc 1 159 24 discriminator 3 view .LVU146
+ 499 0050 D0ED037A 		vldr.32	s15, [r0, #12]
+ 500 0054 77EE877A 		vadd.f32	s15, s15, s14
+ 501 0058 C0ED037A 		vstr.32	s15, [r0, #12]
+ 157:ACE-ECF/Algorithm/src/filter.c ****     {
+ 502              		.loc 1 157 38 is_stmt 1 discriminator 3 view .LVU147
+ 157:ACE-ECF/Algorithm/src/filter.c ****     {
+ 503              		.loc 1 157 43 is_stmt 0 discriminator 3 view .LVU148
+ 504 005c 0133     		adds	r3, r3, #1
+ 505              	.LVL32:
+ 506              	.L13:
+ 157:ACE-ECF/Algorithm/src/filter.c ****     {
+ 507              		.loc 1 157 25 is_stmt 1 discriminator 1 view .LVU149
+ 157:ACE-ECF/Algorithm/src/filter.c ****     {
+ 508              		.loc 1 157 5 is_stmt 0 discriminator 1 view .LVU150
+ 509 005e 8B42     		cmp	r3, r1
+ 510 0060 F1DB     		blt	.L15
+ 511 0062 DDE7     		b	.L14
+ 512              	.LVL33:
+ 513              	.L18:
+ 157:ACE-ECF/Algorithm/src/filter.c ****     {
+ 514              		.loc 1 157 14 view .LVU151
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccd8Rryy.s 			page 13
+
+
+ 515 0064 0023     		movs	r3, #0
+ 516 0066 FAE7     		b	.L13
+ 517              	.LBE3:
+ 518              		.cfi_endproc
+ 519              	.LFE169:
+ 521              		.section	.text.Recursive_ave_filter_init,"ax",%progbits
+ 522              		.align	1
+ 523              		.global	Recursive_ave_filter_init
+ 524              		.syntax unified
+ 525              		.thumb
+ 526              		.thumb_func
+ 528              	Recursive_ave_filter_init:
+ 529              	.LVL34:
+ 530              	.LFB170:
+ 168:ACE-ECF/Algorithm/src/filter.c **** 
+ 169:ACE-ECF/Algorithm/src/filter.c **** // 递推平均滤波初始化
+ 170:ACE-ECF/Algorithm/src/filter.c **** float Recursive_ave_filter_init(Recursive_ave_filter_type_t * filter)
+ 171:ACE-ECF/Algorithm/src/filter.c **** {
+ 531              		.loc 1 171 1 is_stmt 1 view -0
+ 532              		.cfi_startproc
+ 533              		@ args = 0, pretend = 0, frame = 0
+ 534              		@ frame_needed = 0, uses_anonymous_args = 0
+ 535              		@ link register save eliminated.
+ 172:ACE-ECF/Algorithm/src/filter.c ****     for (int i = 0; i < 300; i++)   filter->fifo[i] = 0;
+ 536              		.loc 1 172 5 view .LVU153
+ 537              	.LBB4:
+ 538              		.loc 1 172 10 view .LVU154
+ 539              		.loc 1 172 14 is_stmt 0 view .LVU155
+ 540 0000 0023     		movs	r3, #0
+ 541              		.loc 1 172 5 view .LVU156
+ 542 0002 04E0     		b	.L20
+ 543              	.LVL35:
+ 544              	.L21:
+ 545              		.loc 1 172 37 is_stmt 1 discriminator 3 view .LVU157
+ 546              		.loc 1 172 53 is_stmt 0 discriminator 3 view .LVU158
+ 547 0004 00EB8302 		add	r2, r0, r3, lsl #2
+ 548 0008 0021     		movs	r1, #0
+ 549 000a 5160     		str	r1, [r2, #4]	@ float
+ 550              		.loc 1 172 30 is_stmt 1 discriminator 3 view .LVU159
+ 551              		.loc 1 172 31 is_stmt 0 discriminator 3 view .LVU160
+ 552 000c 0133     		adds	r3, r3, #1
+ 553              	.LVL36:
+ 554              	.L20:
+ 555              		.loc 1 172 21 is_stmt 1 discriminator 1 view .LVU161
+ 556              		.loc 1 172 5 is_stmt 0 discriminator 1 view .LVU162
+ 557 000e B3F5967F 		cmp	r3, #300
+ 558 0012 F7DB     		blt	.L21
+ 559              	.LBE4:
+ 173:ACE-ECF/Algorithm/src/filter.c **** 	filter->count_num = 0;
+ 560              		.loc 1 173 2 is_stmt 1 view .LVU163
+ 561              		.loc 1 173 20 is_stmt 0 view .LVU164
+ 562 0014 0023     		movs	r3, #0
+ 563              	.LVL37:
+ 564              		.loc 1 173 20 view .LVU165
+ 565 0016 0360     		str	r3, [r0]
+ 174:ACE-ECF/Algorithm/src/filter.c **** 	filter->sum = 0;
+ 566              		.loc 1 174 2 is_stmt 1 view .LVU166
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccd8Rryy.s 			page 14
+
+
+ 567              		.loc 1 174 14 is_stmt 0 view .LVU167
+ 568 0018 00F2B443 		addw	r3, r0, #1204
+ 569 001c 9FED040A 		vldr.32	s0, .L22
+ 570 0020 83ED000A 		vstr.32	s0, [r3]
+ 175:ACE-ECF/Algorithm/src/filter.c ****     filter->filter_out = 0;
+ 571              		.loc 1 175 5 is_stmt 1 view .LVU168
+ 572              		.loc 1 175 24 is_stmt 0 view .LVU169
+ 573 0024 00F59760 		add	r0, r0, #1208
+ 574              	.LVL38:
+ 575              		.loc 1 175 24 view .LVU170
+ 576 0028 80ED000A 		vstr.32	s0, [r0]
+ 176:ACE-ECF/Algorithm/src/filter.c **** 	return 0;
+ 577              		.loc 1 176 2 is_stmt 1 view .LVU171
+ 177:ACE-ECF/Algorithm/src/filter.c **** }
+ 578              		.loc 1 177 1 is_stmt 0 view .LVU172
+ 579 002c 7047     		bx	lr
+ 580              	.L23:
+ 581 002e 00BF     		.align	2
+ 582              	.L22:
+ 583 0030 00000000 		.word	0
+ 584              		.cfi_endproc
+ 585              	.LFE170:
+ 587              		.section	.text.Recursive_ave_filter,"ax",%progbits
+ 588              		.align	1
+ 589              		.global	Recursive_ave_filter
+ 590              		.syntax unified
+ 591              		.thumb
+ 592              		.thumb_func
+ 594              	Recursive_ave_filter:
+ 595              	.LVL39:
+ 596              	.LFB171:
+ 178:ACE-ECF/Algorithm/src/filter.c **** 
+ 179:ACE-ECF/Algorithm/src/filter.c **** /*
+ 180:ACE-ECF/Algorithm/src/filter.c ****  *功能：递推平均滤波（浮点型）------抑制大幅度高频噪声
+ 181:ACE-ECF/Algorithm/src/filter.c ****  *传入：1.滤波对象结构体  2.更新值 3.均值数量
+ 182:ACE-ECF/Algorithm/src/filter.c ****  *传出：滑动滤波输出值（max = 100次）
+ 183:ACE-ECF/Algorithm/src/filter.c ****  */
+ 184:ACE-ECF/Algorithm/src/filter.c **** float Recursive_ave_filter(Recursive_ave_filter_type_t *filter,float input,int num)
+ 185:ACE-ECF/Algorithm/src/filter.c **** {
+ 597              		.loc 1 185 1 is_stmt 1 view -0
+ 598              		.cfi_startproc
+ 599              		@ args = 0, pretend = 0, frame = 0
+ 600              		@ frame_needed = 0, uses_anonymous_args = 0
+ 601              		@ link register save eliminated.
+ 186:ACE-ECF/Algorithm/src/filter.c **** 	int i;
+ 602              		.loc 1 186 2 view .LVU174
+ 187:ACE-ECF/Algorithm/src/filter.c **** 	for(i = num-1; i > 0;i--)//搬运
+ 603              		.loc 1 187 2 view .LVU175
+ 604              		.loc 1 187 8 is_stmt 0 view .LVU176
+ 605 0000 4B1E     		subs	r3, r1, #1
+ 606              	.LVL40:
+ 607              		.loc 1 187 2 view .LVU177
+ 608 0002 09E0     		b	.L25
+ 609              	.L26:
+ 188:ACE-ECF/Algorithm/src/filter.c **** 	{
+ 189:ACE-ECF/Algorithm/src/filter.c **** 		filter->fifo[i] = filter->fifo[i-1];
+ 610              		.loc 1 189 3 is_stmt 1 discriminator 3 view .LVU178
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccd8Rryy.s 			page 15
+
+
+ 611              		.loc 1 189 35 is_stmt 0 discriminator 3 view .LVU179
+ 612 0004 5A1E     		subs	r2, r3, #1
+ 613              		.loc 1 189 33 discriminator 3 view .LVU180
+ 614 0006 00EB820C 		add	ip, r0, r2, lsl #2
+ 615 000a DCF804C0 		ldr	ip, [ip, #4]	@ float
+ 616              		.loc 1 189 19 discriminator 3 view .LVU181
+ 617 000e 00EB8303 		add	r3, r0, r3, lsl #2
+ 618              	.LVL41:
+ 619              		.loc 1 189 19 discriminator 3 view .LVU182
+ 620 0012 C3F804C0 		str	ip, [r3, #4]	@ float
+ 187:ACE-ECF/Algorithm/src/filter.c **** 	for(i = num-1; i > 0;i--)//搬运
+ 621              		.loc 1 187 23 is_stmt 1 discriminator 3 view .LVU183
+ 622              	.LVL42:
+ 187:ACE-ECF/Algorithm/src/filter.c **** 	for(i = num-1; i > 0;i--)//搬运
+ 623              		.loc 1 187 24 is_stmt 0 discriminator 3 view .LVU184
+ 624 0016 1346     		mov	r3, r2
+ 625              	.LVL43:
+ 626              	.L25:
+ 187:ACE-ECF/Algorithm/src/filter.c **** 	for(i = num-1; i > 0;i--)//搬运
+ 627              		.loc 1 187 17 is_stmt 1 discriminator 1 view .LVU185
+ 187:ACE-ECF/Algorithm/src/filter.c **** 	for(i = num-1; i > 0;i--)//搬运
+ 628              		.loc 1 187 2 is_stmt 0 discriminator 1 view .LVU186
+ 629 0018 002B     		cmp	r3, #0
+ 630 001a F3DC     		bgt	.L26
+ 190:ACE-ECF/Algorithm/src/filter.c **** 	}
+ 191:ACE-ECF/Algorithm/src/filter.c **** 	filter->fifo[0] = input;
+ 631              		.loc 1 191 2 is_stmt 1 view .LVU187
+ 632              		.loc 1 191 18 is_stmt 0 view .LVU188
+ 633 001c 80ED010A 		vstr.32	s0, [r0, #4]
+ 192:ACE-ECF/Algorithm/src/filter.c **** 	
+ 193:ACE-ECF/Algorithm/src/filter.c **** 	if(filter->count_num < num)//终止条件为count_num = num;
+ 634              		.loc 1 193 2 is_stmt 1 view .LVU189
+ 635              		.loc 1 193 11 is_stmt 0 view .LVU190
+ 636 0020 0368     		ldr	r3, [r0]
+ 637              	.LVL44:
+ 638              		.loc 1 193 4 view .LVU191
+ 639 0022 8B42     		cmp	r3, r1
+ 640 0024 07DA     		bge	.L27
+ 194:ACE-ECF/Algorithm/src/filter.c **** 	{
+ 195:ACE-ECF/Algorithm/src/filter.c **** 		filter->count_num ++;
+ 641              		.loc 1 195 3 is_stmt 1 view .LVU192
+ 642              		.loc 1 195 21 is_stmt 0 view .LVU193
+ 643 0026 0133     		adds	r3, r3, #1
+ 644 0028 0360     		str	r3, [r0]
+ 645              	.L28:
+ 196:ACE-ECF/Algorithm/src/filter.c **** 	}else
+ 197:ACE-ECF/Algorithm/src/filter.c ****     {
+ 198:ACE-ECF/Algorithm/src/filter.c ****         filter->count_num = num;
+ 199:ACE-ECF/Algorithm/src/filter.c ****     }
+ 200:ACE-ECF/Algorithm/src/filter.c **** 	
+ 201:ACE-ECF/Algorithm/src/filter.c **** 	filter->sum = 0;
+ 646              		.loc 1 201 2 is_stmt 1 view .LVU194
+ 647              		.loc 1 201 14 is_stmt 0 view .LVU195
+ 648 002a 00F2B443 		addw	r3, r0, #1204
+ 649 002e 0022     		movs	r2, #0
+ 650 0030 1A60     		str	r2, [r3]	@ float
+ 202:ACE-ECF/Algorithm/src/filter.c **** 	for(i = 0; i < filter->count_num; i++)//防止取样数量 < max时 滤波错误
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccd8Rryy.s 			page 16
+
+
+ 651              		.loc 1 202 2 is_stmt 1 view .LVU196
+ 652              	.LVL45:
+ 653              		.loc 1 202 8 is_stmt 0 view .LVU197
+ 654 0032 0023     		movs	r3, #0
+ 655              		.loc 1 202 2 view .LVU198
+ 656 0034 0EE0     		b	.L29
+ 657              	.LVL46:
+ 658              	.L27:
+ 198:ACE-ECF/Algorithm/src/filter.c ****     }
+ 659              		.loc 1 198 9 is_stmt 1 view .LVU199
+ 198:ACE-ECF/Algorithm/src/filter.c ****     }
+ 660              		.loc 1 198 27 is_stmt 0 view .LVU200
+ 661 0036 0160     		str	r1, [r0]
+ 662 0038 F7E7     		b	.L28
+ 663              	.LVL47:
+ 664              	.L30:
+ 203:ACE-ECF/Algorithm/src/filter.c **** 	{
+ 204:ACE-ECF/Algorithm/src/filter.c **** 		filter->sum += filter->fifo[i]; 
+ 665              		.loc 1 204 3 is_stmt 1 discriminator 3 view .LVU201
+ 666              		.loc 1 204 30 is_stmt 0 discriminator 3 view .LVU202
+ 667 003a 00EB8302 		add	r2, r0, r3, lsl #2
+ 668 003e 92ED017A 		vldr.32	s14, [r2, #4]
+ 669              		.loc 1 204 15 discriminator 3 view .LVU203
+ 670 0042 00F2B442 		addw	r2, r0, #1204
+ 671 0046 D2ED007A 		vldr.32	s15, [r2]
+ 672 004a 77EE877A 		vadd.f32	s15, s15, s14
+ 673 004e C2ED007A 		vstr.32	s15, [r2]
+ 202:ACE-ECF/Algorithm/src/filter.c **** 	{
+ 674              		.loc 1 202 36 is_stmt 1 discriminator 3 view .LVU204
+ 202:ACE-ECF/Algorithm/src/filter.c **** 	{
+ 675              		.loc 1 202 37 is_stmt 0 discriminator 3 view .LVU205
+ 676 0052 0133     		adds	r3, r3, #1
+ 677              	.LVL48:
+ 678              	.L29:
+ 202:ACE-ECF/Algorithm/src/filter.c **** 	{
+ 679              		.loc 1 202 13 is_stmt 1 discriminator 1 view .LVU206
+ 202:ACE-ECF/Algorithm/src/filter.c **** 	{
+ 680              		.loc 1 202 23 is_stmt 0 discriminator 1 view .LVU207
+ 681 0054 0268     		ldr	r2, [r0]
+ 202:ACE-ECF/Algorithm/src/filter.c **** 	{
+ 682              		.loc 1 202 2 discriminator 1 view .LVU208
+ 683 0056 9A42     		cmp	r2, r3
+ 684 0058 EFDC     		bgt	.L30
+ 205:ACE-ECF/Algorithm/src/filter.c **** 	}
+ 206:ACE-ECF/Algorithm/src/filter.c **** 	filter->filter_out = filter->sum/filter->count_num;
+ 685              		.loc 1 206 2 is_stmt 1 view .LVU209
+ 686              		.loc 1 206 29 is_stmt 0 view .LVU210
+ 687 005a 00F2B443 		addw	r3, r0, #1204
+ 688              	.LVL49:
+ 689              		.loc 1 206 29 view .LVU211
+ 690 005e 93ED007A 		vldr.32	s14, [r3]
+ 691              		.loc 1 206 34 view .LVU212
+ 692 0062 07EE902A 		vmov	s15, r2	@ int
+ 693 0066 F8EEE77A 		vcvt.f32.s32	s15, s15
+ 694 006a 87EE270A 		vdiv.f32	s0, s14, s15
+ 695              	.LVL50:
+ 696              		.loc 1 206 21 view .LVU213
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccd8Rryy.s 			page 17
+
+
+ 697 006e 00F59760 		add	r0, r0, #1208
+ 698              	.LVL51:
+ 699              		.loc 1 206 21 view .LVU214
+ 700 0072 80ED000A 		vstr.32	s0, [r0]
+ 207:ACE-ECF/Algorithm/src/filter.c **** 	return filter->filter_out;
+ 701              		.loc 1 207 2 is_stmt 1 view .LVU215
+ 208:ACE-ECF/Algorithm/src/filter.c **** }
+ 702              		.loc 1 208 1 is_stmt 0 view .LVU216
+ 703 0076 7047     		bx	lr
+ 704              		.cfi_endproc
+ 705              	.LFE171:
+ 707              		.global	visual_kalman_filter
+ 708              		.global	visual_kalman_filter_init
+ 709              		.section	.bss.visual_kalman_filter,"aw",%nobits
+ 710              		.align	2
+ 713              	visual_kalman_filter:
+ 714 0000 00000000 		.space	116
+ 714      00000000 
+ 714      00000000 
+ 714      00000000 
+ 714      00000000 
+ 715              		.section	.bss.visual_kalman_filter_init,"aw",%nobits
+ 716              		.align	2
+ 719              	visual_kalman_filter_init:
+ 720 0000 00000000 		.space	492
+ 720      00000000 
+ 720      00000000 
+ 720      00000000 
+ 720      00000000 
+ 721              		.text
+ 722              	.Letext0:
+ 723              		.file 2 "ACE-ECF/Algorithm/inc/struct_typedef.h"
+ 724              		.file 3 "d:\\gcc-arm-none-eabi-10.3-2021.10\\arm-none-eabi\\include\\machine\\_default_types.h"
+ 725              		.file 4 "d:\\gcc-arm-none-eabi-10.3-2021.10\\arm-none-eabi\\include\\sys\\_stdint.h"
+ 726              		.file 5 "Middlewares/ST/ARM/DSP/Inc/arm_math.h"
+ 727              		.file 6 "ACE-ECF/Algorithm/inc/filter.h"
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccd8Rryy.s 			page 18
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 filter.c
+C:\Users\28212\AppData\Local\Temp\ccd8Rryy.s:20     .text.KalmanCreate:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccd8Rryy.s:26     .text.KalmanCreate:00000000 KalmanCreate
+C:\Users\28212\AppData\Local\Temp\ccd8Rryy.s:67     .text.KalmanFilter:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccd8Rryy.s:73     .text.KalmanFilter:00000000 KalmanFilter
+C:\Users\28212\AppData\Local\Temp\ccd8Rryy.s:141    .text.kalman_filter_init:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccd8Rryy.s:147    .text.kalman_filter_init:00000000 kalman_filter_init
+C:\Users\28212\AppData\Local\Temp\ccd8Rryy.s:277    .text.first_order_filter:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccd8Rryy.s:283    .text.first_order_filter:00000000 first_order_filter
+C:\Users\28212\AppData\Local\Temp\ccd8Rryy.s:321    .text.first_order_filter_init:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccd8Rryy.s:327    .text.first_order_filter_init:00000000 first_order_filter_init
+C:\Users\28212\AppData\Local\Temp\ccd8Rryy.s:358    .text.sliding_mean_filter_init:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccd8Rryy.s:364    .text.sliding_mean_filter_init:00000000 sliding_mean_filter_init
+C:\Users\28212\AppData\Local\Temp\ccd8Rryy.s:422    .text.sliding_mean_filter:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccd8Rryy.s:428    .text.sliding_mean_filter:00000000 sliding_mean_filter
+C:\Users\28212\AppData\Local\Temp\ccd8Rryy.s:522    .text.Recursive_ave_filter_init:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccd8Rryy.s:528    .text.Recursive_ave_filter_init:00000000 Recursive_ave_filter_init
+C:\Users\28212\AppData\Local\Temp\ccd8Rryy.s:583    .text.Recursive_ave_filter_init:00000030 $d
+C:\Users\28212\AppData\Local\Temp\ccd8Rryy.s:588    .text.Recursive_ave_filter:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccd8Rryy.s:594    .text.Recursive_ave_filter:00000000 Recursive_ave_filter
+C:\Users\28212\AppData\Local\Temp\ccd8Rryy.s:713    .bss.visual_kalman_filter:00000000 visual_kalman_filter
+C:\Users\28212\AppData\Local\Temp\ccd8Rryy.s:719    .bss.visual_kalman_filter_init:00000000 visual_kalman_filter_init
+C:\Users\28212\AppData\Local\Temp\ccd8Rryy.s:710    .bss.visual_kalman_filter:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccd8Rryy.s:716    .bss.visual_kalman_filter_init:00000000 $d
+
+UNDEFINED SYMBOLS
+arm_mat_init_f32
+arm_mat_trans_f32

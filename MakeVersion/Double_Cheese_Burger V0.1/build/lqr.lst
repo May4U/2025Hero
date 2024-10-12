@@ -1,0 +1,864 @@
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cclEY8YN.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.arch armv7e-m
+   3              		.fpu fpv4-sp-d16
+   4              		.eabi_attribute 27, 1
+   5              		.eabi_attribute 28, 1
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.file	"lqr.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.LQR_Calculate,"ax",%progbits
+  20              		.align	1
+  21              		.global	LQR_Calculate
+  22              		.syntax unified
+  23              		.thumb
+  24              		.thumb_func
+  26              	LQR_Calculate:
+  27              	.LVL0:
+  28              	.LFB135:
+  29              		.file 1 "ACE-ECF/Algorithm/src/lqr.c"
+   1:ACE-ECF/Algorithm/src/lqr.c **** /**
+   2:ACE-ECF/Algorithm/src/lqr.c ****  * ************************* Dongguan-University of Technology -ACE**************************
+   3:ACE-ECF/Algorithm/src/lqr.c ****  * @file lqr.c
+   4:ACE-ECF/Algorithm/src/lqr.c ****  * @brief 
+   5:ACE-ECF/Algorithm/src/lqr.c ****  * @author 洪张茹
+   6:ACE-ECF/Algorithm/src/lqr.c ****  * @version 1.0
+   7:ACE-ECF/Algorithm/src/lqr.c ****  * @date 2022-12-05
+   8:ACE-ECF/Algorithm/src/lqr.c ****  * 
+   9:ACE-ECF/Algorithm/src/lqr.c ****  * ************************* Dongguan-University of Technology -ACE**************************
+  10:ACE-ECF/Algorithm/src/lqr.c ****  */
+  11:ACE-ECF/Algorithm/src/lqr.c **** 
+  12:ACE-ECF/Algorithm/src/lqr.c **** 
+  13:ACE-ECF/Algorithm/src/lqr.c **** #include "lqr.h"
+  14:ACE-ECF/Algorithm/src/lqr.c **** 
+  15:ACE-ECF/Algorithm/src/lqr.c **** /* Funtion */
+  16:ACE-ECF/Algorithm/src/lqr.c **** void LQR_Data_Clear(LQR_t *lqr);
+  17:ACE-ECF/Algorithm/src/lqr.c **** 
+  18:ACE-ECF/Algorithm/src/lqr.c **** 
+  19:ACE-ECF/Algorithm/src/lqr.c **** /**
+  20:ACE-ECF/Algorithm/src/lqr.c ****  * ************************* Dongguan-University of Technology -ACE**************************
+  21:ACE-ECF/Algorithm/src/lqr.c ****  * @brief LQR计算
+  22:ACE-ECF/Algorithm/src/lqr.c ****  * @param  lqr              
+  23:ACE-ECF/Algorithm/src/lqr.c ****  * ************************* Dongguan-University of Technology -ACE**************************
+  24:ACE-ECF/Algorithm/src/lqr.c ****  */
+  25:ACE-ECF/Algorithm/src/lqr.c **** void LQR_Calculate(LQR_t *lqr)
+  26:ACE-ECF/Algorithm/src/lqr.c **** {
+  30              		.loc 1 26 1 view -0
+  31              		.cfi_startproc
+  32              		@ args = 0, pretend = 0, frame = 0
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cclEY8YN.s 			page 2
+
+
+  33              		@ frame_needed = 0, uses_anonymous_args = 0
+  34              		.loc 1 26 1 is_stmt 0 view .LVU1
+  35 0000 30B5     		push	{r4, r5, lr}
+  36              	.LCFI0:
+  37              		.cfi_def_cfa_offset 12
+  38              		.cfi_offset 4, -12
+  39              		.cfi_offset 5, -8
+  40              		.cfi_offset 14, -4
+  27:ACE-ECF/Algorithm/src/lqr.c **** 	int i,j;
+  41              		.loc 1 27 2 is_stmt 1 view .LVU2
+  28:ACE-ECF/Algorithm/src/lqr.c **** 	for(i = 0; i < lqr->Control_Size; i++)
+  42              		.loc 1 28 2 view .LVU3
+  43              	.LVL1:
+  44              		.loc 1 28 8 is_stmt 0 view .LVU4
+  45 0002 4FF0000E 		mov	lr, #0
+  46              		.loc 1 28 2 view .LVU5
+  47 0006 1BE0     		b	.L2
+  48              	.LVL2:
+  49              	.L4:
+  29:ACE-ECF/Algorithm/src/lqr.c **** 	{
+  30:ACE-ECF/Algorithm/src/lqr.c **** 		lqr->Output[i] = 0;
+  31:ACE-ECF/Algorithm/src/lqr.c **** 		for(j = 0; j < lqr->System_State_Size; j++)
+  32:ACE-ECF/Algorithm/src/lqr.c **** 		{
+  33:ACE-ECF/Algorithm/src/lqr.c **** 			lqr->Output[i] += lqr->Input[j] * lqr->k[i * lqr->System_State_Size + j];
+  50              		.loc 1 33 4 is_stmt 1 discriminator 3 view .LVU6
+  51              		.loc 1 33 7 is_stmt 0 discriminator 3 view .LVU7
+  52 0008 0169     		ldr	r1, [r0, #16]
+  53              		.loc 1 33 19 discriminator 3 view .LVU8
+  54 000a 2144     		add	r1, r1, r4
+  55              		.loc 1 33 32 discriminator 3 view .LVU9
+  56 000c C568     		ldr	r5, [r0, #12]
+  57 000e 05EB830C 		add	ip, r5, r3, lsl #2
+  58 0012 DCED007A 		vldr.32	s15, [ip]
+  59              		.loc 1 33 72 discriminator 3 view .LVU10
+  60 0016 0EFB0232 		mla	r2, lr, r2, r3
+  61              		.loc 1 33 44 discriminator 3 view .LVU11
+  62 001a 4569     		ldr	r5, [r0, #20]
+  63 001c 05EB8202 		add	r2, r5, r2, lsl #2
+  64 0020 92ED007A 		vldr.32	s14, [r2]
+  65              		.loc 1 33 36 discriminator 3 view .LVU12
+  66 0024 27EE877A 		vmul.f32	s14, s15, s14
+  67              		.loc 1 33 19 discriminator 3 view .LVU13
+  68 0028 D1ED007A 		vldr.32	s15, [r1]
+  69 002c 77EE877A 		vadd.f32	s15, s15, s14
+  70 0030 C1ED007A 		vstr.32	s15, [r1]
+  31:ACE-ECF/Algorithm/src/lqr.c **** 		{
+  71              		.loc 1 31 42 is_stmt 1 discriminator 3 view .LVU14
+  31:ACE-ECF/Algorithm/src/lqr.c **** 		{
+  72              		.loc 1 31 43 is_stmt 0 discriminator 3 view .LVU15
+  73 0034 0133     		adds	r3, r3, #1
+  74              	.LVL3:
+  75              	.L3:
+  31:ACE-ECF/Algorithm/src/lqr.c **** 		{
+  76              		.loc 1 31 14 is_stmt 1 discriminator 1 view .LVU16
+  31:ACE-ECF/Algorithm/src/lqr.c **** 		{
+  77              		.loc 1 31 21 is_stmt 0 discriminator 1 view .LVU17
+  78 0036 0278     		ldrb	r2, [r0]	@ zero_extendqisi2
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cclEY8YN.s 			page 3
+
+
+  31:ACE-ECF/Algorithm/src/lqr.c **** 		{
+  79              		.loc 1 31 3 discriminator 1 view .LVU18
+  80 0038 9A42     		cmp	r2, r3
+  81 003a E5DC     		bgt	.L4
+  28:ACE-ECF/Algorithm/src/lqr.c **** 	for(i = 0; i < lqr->Control_Size; i++)
+  82              		.loc 1 28 36 is_stmt 1 discriminator 2 view .LVU19
+  28:ACE-ECF/Algorithm/src/lqr.c **** 	for(i = 0; i < lqr->Control_Size; i++)
+  83              		.loc 1 28 37 is_stmt 0 discriminator 2 view .LVU20
+  84 003c 0EF1010E 		add	lr, lr, #1
+  85              	.LVL4:
+  86              	.L2:
+  28:ACE-ECF/Algorithm/src/lqr.c **** 	for(i = 0; i < lqr->Control_Size; i++)
+  87              		.loc 1 28 13 is_stmt 1 discriminator 1 view .LVU21
+  28:ACE-ECF/Algorithm/src/lqr.c **** 	for(i = 0; i < lqr->Control_Size; i++)
+  88              		.loc 1 28 20 is_stmt 0 discriminator 1 view .LVU22
+  89 0040 4378     		ldrb	r3, [r0, #1]	@ zero_extendqisi2
+  28:ACE-ECF/Algorithm/src/lqr.c **** 	for(i = 0; i < lqr->Control_Size; i++)
+  90              		.loc 1 28 2 discriminator 1 view .LVU23
+  91 0042 7345     		cmp	r3, lr
+  92 0044 08DD     		ble	.L7
+  30:ACE-ECF/Algorithm/src/lqr.c **** 		for(j = 0; j < lqr->System_State_Size; j++)
+  93              		.loc 1 30 3 is_stmt 1 view .LVU24
+  30:ACE-ECF/Algorithm/src/lqr.c **** 		for(j = 0; j < lqr->System_State_Size; j++)
+  94              		.loc 1 30 6 is_stmt 0 view .LVU25
+  95 0046 0369     		ldr	r3, [r0, #16]
+  30:ACE-ECF/Algorithm/src/lqr.c **** 		for(j = 0; j < lqr->System_State_Size; j++)
+  96              		.loc 1 30 14 view .LVU26
+  97 0048 4FEA8E04 		lsl	r4, lr, #2
+  98 004c 03EB8E03 		add	r3, r3, lr, lsl #2
+  30:ACE-ECF/Algorithm/src/lqr.c **** 		for(j = 0; j < lqr->System_State_Size; j++)
+  99              		.loc 1 30 18 view .LVU27
+ 100 0050 0022     		movs	r2, #0
+ 101 0052 1A60     		str	r2, [r3]	@ float
+  31:ACE-ECF/Algorithm/src/lqr.c **** 		{
+ 102              		.loc 1 31 3 is_stmt 1 view .LVU28
+ 103              	.LVL5:
+  31:ACE-ECF/Algorithm/src/lqr.c **** 		{
+ 104              		.loc 1 31 9 is_stmt 0 view .LVU29
+ 105 0054 0023     		movs	r3, #0
+  31:ACE-ECF/Algorithm/src/lqr.c **** 		{
+ 106              		.loc 1 31 3 view .LVU30
+ 107 0056 EEE7     		b	.L3
+ 108              	.LVL6:
+ 109              	.L7:
+  34:ACE-ECF/Algorithm/src/lqr.c **** 		}
+  35:ACE-ECF/Algorithm/src/lqr.c **** 	}
+  36:ACE-ECF/Algorithm/src/lqr.c **** 	
+  37:ACE-ECF/Algorithm/src/lqr.c **** }
+ 110              		.loc 1 37 1 view .LVU31
+ 111 0058 30BD     		pop	{r4, r5, pc}
+ 112              		.cfi_endproc
+ 113              	.LFE135:
+ 115              		.global	__aeabi_l2f
+ 116              		.global	__aeabi_f2lz
+ 117              		.section	.text.LQR_Int_Calculate,"ax",%progbits
+ 118              		.align	1
+ 119              		.global	LQR_Int_Calculate
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cclEY8YN.s 			page 4
+
+
+ 120              		.syntax unified
+ 121              		.thumb
+ 122              		.thumb_func
+ 124              	LQR_Int_Calculate:
+ 125              	.LVL7:
+ 126              	.LFB136:
+  38:ACE-ECF/Algorithm/src/lqr.c **** 
+  39:ACE-ECF/Algorithm/src/lqr.c **** void LQR_Int_Calculate(LQR_int_t *lqr)
+  40:ACE-ECF/Algorithm/src/lqr.c **** {
+ 127              		.loc 1 40 1 is_stmt 1 view -0
+ 128              		.cfi_startproc
+ 129              		@ args = 0, pretend = 0, frame = 0
+ 130              		@ frame_needed = 0, uses_anonymous_args = 0
+ 131              		.loc 1 40 1 is_stmt 0 view .LVU33
+ 132 0000 2DE9F041 		push	{r4, r5, r6, r7, r8, lr}
+ 133              	.LCFI1:
+ 134              		.cfi_def_cfa_offset 24
+ 135              		.cfi_offset 4, -24
+ 136              		.cfi_offset 5, -20
+ 137              		.cfi_offset 6, -16
+ 138              		.cfi_offset 7, -12
+ 139              		.cfi_offset 8, -8
+ 140              		.cfi_offset 14, -4
+ 141 0004 2DED028B 		vpush.64	{d8}
+ 142              	.LCFI2:
+ 143              		.cfi_def_cfa_offset 32
+ 144              		.cfi_offset 80, -32
+ 145              		.cfi_offset 81, -28
+ 146 0008 0646     		mov	r6, r0
+  41:ACE-ECF/Algorithm/src/lqr.c **** 	int i,j;
+ 147              		.loc 1 41 2 is_stmt 1 view .LVU34
+  42:ACE-ECF/Algorithm/src/lqr.c **** 	for(i = 0; i < lqr->Control_Size; i++)
+ 148              		.loc 1 42 2 view .LVU35
+ 149              	.LVL8:
+ 150              		.loc 1 42 8 is_stmt 0 view .LVU36
+ 151 000a 0027     		movs	r7, #0
+ 152              		.loc 1 42 2 view .LVU37
+ 153 000c 26E0     		b	.L9
+ 154              	.LVL9:
+ 155              	.L11:
+  43:ACE-ECF/Algorithm/src/lqr.c **** 	{
+  44:ACE-ECF/Algorithm/src/lqr.c **** 		lqr->Output[i] = 0;
+  45:ACE-ECF/Algorithm/src/lqr.c **** 		for(j = 0; j < lqr->System_State_Size; j++)
+  46:ACE-ECF/Algorithm/src/lqr.c **** 		{
+  47:ACE-ECF/Algorithm/src/lqr.c **** 			lqr->Output[i] += lqr->Input[j] * lqr->k[i * lqr->System_State_Size + j];
+ 156              		.loc 1 47 4 is_stmt 1 discriminator 3 view .LVU38
+ 157              		.loc 1 47 7 is_stmt 0 discriminator 3 view .LVU39
+ 158 000e F569     		ldr	r5, [r6, #28]
+ 159              		.loc 1 47 19 discriminator 3 view .LVU40
+ 160 0010 4544     		add	r5, r5, r8
+ 161              		.loc 1 47 25 discriminator 3 view .LVU41
+ 162 0012 B269     		ldr	r2, [r6, #24]
+ 163              		.loc 1 47 32 discriminator 3 view .LVU42
+ 164 0014 02EBC402 		add	r2, r2, r4, lsl #3
+ 165              		.loc 1 47 41 discriminator 3 view .LVU43
+ 166 0018 316A     		ldr	r1, [r6, #32]
+ 167              		.loc 1 47 72 discriminator 3 view .LVU44
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cclEY8YN.s 			page 5
+
+
+ 168 001a 07FB0343 		mla	r3, r7, r3, r4
+ 169              		.loc 1 47 44 discriminator 3 view .LVU45
+ 170 001e 01EB8303 		add	r3, r1, r3, lsl #2
+ 171 0022 D3ED008A 		vldr.32	s17, [r3]
+ 172              		.loc 1 47 36 discriminator 3 view .LVU46
+ 173 0026 D2E90001 		ldrd	r0, [r2]
+ 174 002a FFF7FEFF 		bl	__aeabi_l2f
+ 175              	.LVL10:
+ 176 002e 08EE100A 		vmov	s16, r0
+ 177 0032 28EE288A 		vmul.f32	s16, s16, s17
+ 178              		.loc 1 47 19 discriminator 3 view .LVU47
+ 179 0036 D5E90001 		ldrd	r0, [r5]
+ 180 003a FFF7FEFF 		bl	__aeabi_l2f
+ 181              	.LVL11:
+ 182 003e 07EE900A 		vmov	s15, r0
+ 183 0042 77EE887A 		vadd.f32	s15, s15, s16
+ 184 0046 17EE900A 		vmov	r0, s15
+ 185 004a FFF7FEFF 		bl	__aeabi_f2lz
+ 186              	.LVL12:
+ 187 004e C5E90001 		strd	r0, [r5]
+  45:ACE-ECF/Algorithm/src/lqr.c **** 		{
+ 188              		.loc 1 45 42 is_stmt 1 discriminator 3 view .LVU48
+  45:ACE-ECF/Algorithm/src/lqr.c **** 		{
+ 189              		.loc 1 45 43 is_stmt 0 discriminator 3 view .LVU49
+ 190 0052 0134     		adds	r4, r4, #1
+ 191              	.LVL13:
+ 192              	.L10:
+  45:ACE-ECF/Algorithm/src/lqr.c **** 		{
+ 193              		.loc 1 45 14 is_stmt 1 discriminator 1 view .LVU50
+  45:ACE-ECF/Algorithm/src/lqr.c **** 		{
+ 194              		.loc 1 45 21 is_stmt 0 discriminator 1 view .LVU51
+ 195 0054 3378     		ldrb	r3, [r6]	@ zero_extendqisi2
+  45:ACE-ECF/Algorithm/src/lqr.c **** 		{
+ 196              		.loc 1 45 3 discriminator 1 view .LVU52
+ 197 0056 A342     		cmp	r3, r4
+ 198 0058 D9DC     		bgt	.L11
+  42:ACE-ECF/Algorithm/src/lqr.c **** 	for(i = 0; i < lqr->Control_Size; i++)
+ 199              		.loc 1 42 36 is_stmt 1 discriminator 2 view .LVU53
+  42:ACE-ECF/Algorithm/src/lqr.c **** 	for(i = 0; i < lqr->Control_Size; i++)
+ 200              		.loc 1 42 37 is_stmt 0 discriminator 2 view .LVU54
+ 201 005a 0137     		adds	r7, r7, #1
+ 202              	.LVL14:
+ 203              	.L9:
+  42:ACE-ECF/Algorithm/src/lqr.c **** 	for(i = 0; i < lqr->Control_Size; i++)
+ 204              		.loc 1 42 13 is_stmt 1 discriminator 1 view .LVU55
+  42:ACE-ECF/Algorithm/src/lqr.c **** 	for(i = 0; i < lqr->Control_Size; i++)
+ 205              		.loc 1 42 20 is_stmt 0 discriminator 1 view .LVU56
+ 206 005c 7378     		ldrb	r3, [r6, #1]	@ zero_extendqisi2
+  42:ACE-ECF/Algorithm/src/lqr.c **** 	for(i = 0; i < lqr->Control_Size; i++)
+ 207              		.loc 1 42 2 discriminator 1 view .LVU57
+ 208 005e BB42     		cmp	r3, r7
+ 209 0060 0ADD     		ble	.L14
+  44:ACE-ECF/Algorithm/src/lqr.c **** 		for(j = 0; j < lqr->System_State_Size; j++)
+ 210              		.loc 1 44 3 is_stmt 1 view .LVU58
+  44:ACE-ECF/Algorithm/src/lqr.c **** 		for(j = 0; j < lqr->System_State_Size; j++)
+ 211              		.loc 1 44 6 is_stmt 0 view .LVU59
+ 212 0062 F369     		ldr	r3, [r6, #28]
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cclEY8YN.s 			page 6
+
+
+  44:ACE-ECF/Algorithm/src/lqr.c **** 		for(j = 0; j < lqr->System_State_Size; j++)
+ 213              		.loc 1 44 14 view .LVU60
+ 214 0064 4FEAC708 		lsl	r8, r7, #3
+ 215 0068 03EBC703 		add	r3, r3, r7, lsl #3
+  44:ACE-ECF/Algorithm/src/lqr.c **** 		for(j = 0; j < lqr->System_State_Size; j++)
+ 216              		.loc 1 44 18 view .LVU61
+ 217 006c 0020     		movs	r0, #0
+ 218 006e 0021     		movs	r1, #0
+ 219 0070 C3E90001 		strd	r0, [r3]
+  45:ACE-ECF/Algorithm/src/lqr.c **** 		{
+ 220              		.loc 1 45 3 is_stmt 1 view .LVU62
+ 221              	.LVL15:
+  45:ACE-ECF/Algorithm/src/lqr.c **** 		{
+ 222              		.loc 1 45 9 is_stmt 0 view .LVU63
+ 223 0074 0024     		movs	r4, #0
+  45:ACE-ECF/Algorithm/src/lqr.c **** 		{
+ 224              		.loc 1 45 3 view .LVU64
+ 225 0076 EDE7     		b	.L10
+ 226              	.LVL16:
+ 227              	.L14:
+  48:ACE-ECF/Algorithm/src/lqr.c **** 		}
+  49:ACE-ECF/Algorithm/src/lqr.c **** 	}
+  50:ACE-ECF/Algorithm/src/lqr.c **** 	
+  51:ACE-ECF/Algorithm/src/lqr.c **** }
+ 228              		.loc 1 51 1 view .LVU65
+ 229 0078 BDEC028B 		vldm	sp!, {d8}
+ 230              	.LCFI3:
+ 231              		.cfi_restore 80
+ 232              		.cfi_restore 81
+ 233              		.cfi_def_cfa_offset 24
+ 234 007c BDE8F081 		pop	{r4, r5, r6, r7, r8, pc}
+ 235              		.loc 1 51 1 view .LVU66
+ 236              		.cfi_endproc
+ 237              	.LFE136:
+ 239              		.section	.text.LQR_Init,"ax",%progbits
+ 240              		.align	1
+ 241              		.global	LQR_Init
+ 242              		.syntax unified
+ 243              		.thumb
+ 244              		.thumb_func
+ 246              	LQR_Init:
+ 247              	.LVL17:
+ 248              	.LFB137:
+  52:ACE-ECF/Algorithm/src/lqr.c **** /**
+  53:ACE-ECF/Algorithm/src/lqr.c ****  * ************************* Dongguan-University of Technology -ACE**************************
+  54:ACE-ECF/Algorithm/src/lqr.c ****  * @brief  LQR初始化
+  55:ACE-ECF/Algorithm/src/lqr.c ****  * @param  lqr              
+  56:ACE-ECF/Algorithm/src/lqr.c ****  * @param  system_state_size
+  57:ACE-ECF/Algorithm/src/lqr.c ****  * @param  control_size     
+  58:ACE-ECF/Algorithm/src/lqr.c ****  * @param  control_area     
+  59:ACE-ECF/Algorithm/src/lqr.c ****  * ************************* Dongguan-University of Technology -ACE**************************
+  60:ACE-ECF/Algorithm/src/lqr.c ****  */
+  61:ACE-ECF/Algorithm/src/lqr.c **** void LQR_Init(LQR_t *lqr, uint8_t system_state_size, uint8_t control_size, float *k)
+  62:ACE-ECF/Algorithm/src/lqr.c **** {
+ 249              		.loc 1 62 1 is_stmt 1 view -0
+ 250              		.cfi_startproc
+ 251              		@ args = 0, pretend = 0, frame = 0
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cclEY8YN.s 			page 7
+
+
+ 252              		@ frame_needed = 0, uses_anonymous_args = 0
+ 253              		.loc 1 62 1 is_stmt 0 view .LVU68
+ 254 0000 F8B5     		push	{r3, r4, r5, r6, r7, lr}
+ 255              	.LCFI4:
+ 256              		.cfi_def_cfa_offset 24
+ 257              		.cfi_offset 3, -24
+ 258              		.cfi_offset 4, -20
+ 259              		.cfi_offset 5, -16
+ 260              		.cfi_offset 6, -12
+ 261              		.cfi_offset 7, -8
+ 262              		.cfi_offset 14, -4
+ 263 0002 0546     		mov	r5, r0
+ 264 0004 1646     		mov	r6, r2
+ 265 0006 1F46     		mov	r7, r3
+  63:ACE-ECF/Algorithm/src/lqr.c ****   lqr->System_State_Size = system_state_size;
+ 266              		.loc 1 63 3 is_stmt 1 view .LVU69
+ 267              		.loc 1 63 26 is_stmt 0 view .LVU70
+ 268 0008 0170     		strb	r1, [r0]
+  64:ACE-ECF/Algorithm/src/lqr.c ****   lqr->Control_Size = control_size;
+ 269              		.loc 1 64 3 is_stmt 1 view .LVU71
+ 270              		.loc 1 64 21 is_stmt 0 view .LVU72
+ 271 000a 4270     		strb	r2, [r0, #1]
+  65:ACE-ECF/Algorithm/src/lqr.c **** 	
+  66:ACE-ECF/Algorithm/src/lqr.c ****   //lqr->Control_Area = control_area;
+  67:ACE-ECF/Algorithm/src/lqr.c ****   if(system_state_size != 0)
+ 272              		.loc 1 67 3 is_stmt 1 view .LVU73
+ 273              		.loc 1 67 5 is_stmt 0 view .LVU74
+ 274 000c 11B9     		cbnz	r1, .L19
+ 275              	.LVL18:
+ 276              	.L16:
+  68:ACE-ECF/Algorithm/src/lqr.c ****   {
+  69:ACE-ECF/Algorithm/src/lqr.c ****     lqr->Input = (float *)user_malloc(sizeof(float) * system_state_size * control_size);
+  70:ACE-ECF/Algorithm/src/lqr.c **** 	memset(lqr->Input, 0, sizeof(float) * system_state_size * control_size);
+  71:ACE-ECF/Algorithm/src/lqr.c **** 	lqr->k = (float *)user_malloc(sizeof(float) * system_state_size * control_size);
+  72:ACE-ECF/Algorithm/src/lqr.c **** 	memset(lqr->k, 0, sizeof(float) * system_state_size * control_size);
+  73:ACE-ECF/Algorithm/src/lqr.c **** 
+  74:ACE-ECF/Algorithm/src/lqr.c ****   }
+  75:ACE-ECF/Algorithm/src/lqr.c ****   if(control_size != 0)
+ 277              		.loc 1 75 3 is_stmt 1 view .LVU75
+ 278              		.loc 1 75 5 is_stmt 0 view .LVU76
+ 279 000e AEB9     		cbnz	r6, .L20
+ 280              	.L17:
+  76:ACE-ECF/Algorithm/src/lqr.c ****   {
+  77:ACE-ECF/Algorithm/src/lqr.c ****     lqr->Output = (float *)user_malloc(sizeof(float) * control_size);
+  78:ACE-ECF/Algorithm/src/lqr.c **** 	memset(lqr->Output, 0, sizeof(float) * control_size);
+  79:ACE-ECF/Algorithm/src/lqr.c **** 
+  80:ACE-ECF/Algorithm/src/lqr.c ****   }
+  81:ACE-ECF/Algorithm/src/lqr.c ****   
+  82:ACE-ECF/Algorithm/src/lqr.c **** 	  lqr->k = k;
+ 281              		.loc 1 82 4 is_stmt 1 view .LVU77
+ 282              		.loc 1 82 11 is_stmt 0 view .LVU78
+ 283 0010 6F61     		str	r7, [r5, #20]
+  83:ACE-ECF/Algorithm/src/lqr.c ****   
+  84:ACE-ECF/Algorithm/src/lqr.c **** }
+ 284              		.loc 1 84 1 view .LVU79
+ 285 0012 F8BD     		pop	{r3, r4, r5, r6, r7, pc}
+ 286              	.LVL19:
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cclEY8YN.s 			page 8
+
+
+ 287              	.L19:
+  69:ACE-ECF/Algorithm/src/lqr.c **** 	memset(lqr->Input, 0, sizeof(float) * system_state_size * control_size);
+ 288              		.loc 1 69 5 is_stmt 1 view .LVU80
+  69:ACE-ECF/Algorithm/src/lqr.c **** 	memset(lqr->Input, 0, sizeof(float) * system_state_size * control_size);
+ 289              		.loc 1 69 73 is_stmt 0 view .LVU81
+ 290 0014 02FB01F1 		mul	r1, r2, r1
+ 291              	.LVL20:
+  69:ACE-ECF/Algorithm/src/lqr.c **** 	memset(lqr->Input, 0, sizeof(float) * system_state_size * control_size);
+ 292              		.loc 1 69 27 view .LVU82
+ 293 0018 8C00     		lsls	r4, r1, #2
+ 294 001a 2046     		mov	r0, r4
+ 295              	.LVL21:
+  69:ACE-ECF/Algorithm/src/lqr.c **** 	memset(lqr->Input, 0, sizeof(float) * system_state_size * control_size);
+ 296              		.loc 1 69 27 view .LVU83
+ 297 001c FFF7FEFF 		bl	pvPortMalloc
+ 298              	.LVL22:
+  69:ACE-ECF/Algorithm/src/lqr.c **** 	memset(lqr->Input, 0, sizeof(float) * system_state_size * control_size);
+ 299              		.loc 1 69 16 view .LVU84
+ 300 0020 E860     		str	r0, [r5, #12]
+  70:ACE-ECF/Algorithm/src/lqr.c **** 	lqr->k = (float *)user_malloc(sizeof(float) * system_state_size * control_size);
+ 301              		.loc 1 70 2 is_stmt 1 view .LVU85
+ 302 0022 2246     		mov	r2, r4
+ 303 0024 0021     		movs	r1, #0
+ 304 0026 FFF7FEFF 		bl	memset
+ 305              	.LVL23:
+  71:ACE-ECF/Algorithm/src/lqr.c **** 	memset(lqr->k, 0, sizeof(float) * system_state_size * control_size);
+ 306              		.loc 1 71 2 view .LVU86
+  71:ACE-ECF/Algorithm/src/lqr.c **** 	memset(lqr->k, 0, sizeof(float) * system_state_size * control_size);
+ 307              		.loc 1 71 20 is_stmt 0 view .LVU87
+ 308 002a 2046     		mov	r0, r4
+ 309 002c FFF7FEFF 		bl	pvPortMalloc
+ 310              	.LVL24:
+  71:ACE-ECF/Algorithm/src/lqr.c **** 	memset(lqr->k, 0, sizeof(float) * system_state_size * control_size);
+ 311              		.loc 1 71 9 view .LVU88
+ 312 0030 6861     		str	r0, [r5, #20]
+  72:ACE-ECF/Algorithm/src/lqr.c **** 
+ 313              		.loc 1 72 2 is_stmt 1 view .LVU89
+ 314 0032 2246     		mov	r2, r4
+ 315 0034 0021     		movs	r1, #0
+ 316 0036 FFF7FEFF 		bl	memset
+ 317              	.LVL25:
+ 318 003a E8E7     		b	.L16
+ 319              	.L20:
+  77:ACE-ECF/Algorithm/src/lqr.c **** 	memset(lqr->Output, 0, sizeof(float) * control_size);
+ 320              		.loc 1 77 5 view .LVU90
+  77:ACE-ECF/Algorithm/src/lqr.c **** 	memset(lqr->Output, 0, sizeof(float) * control_size);
+ 321              		.loc 1 77 28 is_stmt 0 view .LVU91
+ 322 003c B600     		lsls	r6, r6, #2
+ 323 003e 3046     		mov	r0, r6
+ 324 0040 FFF7FEFF 		bl	pvPortMalloc
+ 325              	.LVL26:
+  77:ACE-ECF/Algorithm/src/lqr.c **** 	memset(lqr->Output, 0, sizeof(float) * control_size);
+ 326              		.loc 1 77 17 view .LVU92
+ 327 0044 2861     		str	r0, [r5, #16]
+  78:ACE-ECF/Algorithm/src/lqr.c **** 
+ 328              		.loc 1 78 2 is_stmt 1 view .LVU93
+ 329 0046 3246     		mov	r2, r6
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cclEY8YN.s 			page 9
+
+
+ 330 0048 0021     		movs	r1, #0
+ 331 004a FFF7FEFF 		bl	memset
+ 332              	.LVL27:
+ 333 004e DFE7     		b	.L17
+ 334              		.cfi_endproc
+ 335              	.LFE137:
+ 337              		.section	.text.LQR_Int_Init,"ax",%progbits
+ 338              		.align	1
+ 339              		.global	LQR_Int_Init
+ 340              		.syntax unified
+ 341              		.thumb
+ 342              		.thumb_func
+ 344              	LQR_Int_Init:
+ 345              	.LVL28:
+ 346              	.LFB138:
+  85:ACE-ECF/Algorithm/src/lqr.c **** 
+  86:ACE-ECF/Algorithm/src/lqr.c **** void LQR_Int_Init(LQR_int_t *lqr, uint8_t system_state_size, uint8_t control_size, float *k)
+  87:ACE-ECF/Algorithm/src/lqr.c **** {
+ 347              		.loc 1 87 1 view -0
+ 348              		.cfi_startproc
+ 349              		@ args = 0, pretend = 0, frame = 0
+ 350              		@ frame_needed = 0, uses_anonymous_args = 0
+ 351              		.loc 1 87 1 is_stmt 0 view .LVU95
+ 352 0000 2DE9F041 		push	{r4, r5, r6, r7, r8, lr}
+ 353              	.LCFI5:
+ 354              		.cfi_def_cfa_offset 24
+ 355              		.cfi_offset 4, -24
+ 356              		.cfi_offset 5, -20
+ 357              		.cfi_offset 6, -16
+ 358              		.cfi_offset 7, -12
+ 359              		.cfi_offset 8, -8
+ 360              		.cfi_offset 14, -4
+ 361 0004 0546     		mov	r5, r0
+ 362 0006 1646     		mov	r6, r2
+ 363 0008 1F46     		mov	r7, r3
+  88:ACE-ECF/Algorithm/src/lqr.c ****   lqr->System_State_Size = system_state_size;
+ 364              		.loc 1 88 3 is_stmt 1 view .LVU96
+ 365              		.loc 1 88 26 is_stmt 0 view .LVU97
+ 366 000a 0170     		strb	r1, [r0]
+  89:ACE-ECF/Algorithm/src/lqr.c ****   lqr->Control_Size = control_size;
+ 367              		.loc 1 89 3 is_stmt 1 view .LVU98
+ 368              		.loc 1 89 21 is_stmt 0 view .LVU99
+ 369 000c 4270     		strb	r2, [r0, #1]
+  90:ACE-ECF/Algorithm/src/lqr.c **** 	
+  91:ACE-ECF/Algorithm/src/lqr.c ****   //lqr->Control_Area = control_area;
+  92:ACE-ECF/Algorithm/src/lqr.c ****   if(system_state_size != 0)
+ 370              		.loc 1 92 3 is_stmt 1 view .LVU100
+ 371              		.loc 1 92 5 is_stmt 0 view .LVU101
+ 372 000e 19B9     		cbnz	r1, .L25
+ 373              	.LVL29:
+ 374              	.L22:
+  93:ACE-ECF/Algorithm/src/lqr.c ****   {
+  94:ACE-ECF/Algorithm/src/lqr.c ****     lqr->Input = (int64_t *)user_malloc(sizeof(int64_t) * system_state_size * control_size);
+  95:ACE-ECF/Algorithm/src/lqr.c **** 	memset(lqr->Input, 0, sizeof(int64_t) * system_state_size * control_size);
+  96:ACE-ECF/Algorithm/src/lqr.c **** 	lqr->k = (float *)user_malloc(sizeof(float) * system_state_size * control_size);
+  97:ACE-ECF/Algorithm/src/lqr.c **** 	memset(lqr->k, 0, sizeof(float) * system_state_size * control_size);
+  98:ACE-ECF/Algorithm/src/lqr.c **** 
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cclEY8YN.s 			page 10
+
+
+  99:ACE-ECF/Algorithm/src/lqr.c ****   }
+ 100:ACE-ECF/Algorithm/src/lqr.c ****   if(control_size != 0)
+ 375              		.loc 1 100 3 is_stmt 1 view .LVU102
+ 376              		.loc 1 100 5 is_stmt 0 view .LVU103
+ 377 0010 C6B9     		cbnz	r6, .L26
+ 378              	.L23:
+ 101:ACE-ECF/Algorithm/src/lqr.c ****   {
+ 102:ACE-ECF/Algorithm/src/lqr.c ****     lqr->Output = (int64_t *)user_malloc(sizeof(int64_t) * control_size);
+ 103:ACE-ECF/Algorithm/src/lqr.c **** 	memset(lqr->Output, 0, sizeof(int64_t) * control_size);
+ 104:ACE-ECF/Algorithm/src/lqr.c **** 
+ 105:ACE-ECF/Algorithm/src/lqr.c ****   }
+ 106:ACE-ECF/Algorithm/src/lqr.c ****   
+ 107:ACE-ECF/Algorithm/src/lqr.c **** 	  lqr->k = k;
+ 379              		.loc 1 107 4 is_stmt 1 view .LVU104
+ 380              		.loc 1 107 11 is_stmt 0 view .LVU105
+ 381 0012 2F62     		str	r7, [r5, #32]
+ 108:ACE-ECF/Algorithm/src/lqr.c ****   
+ 109:ACE-ECF/Algorithm/src/lqr.c **** }
+ 382              		.loc 1 109 1 view .LVU106
+ 383 0014 BDE8F081 		pop	{r4, r5, r6, r7, r8, pc}
+ 384              	.LVL30:
+ 385              	.L25:
+  94:ACE-ECF/Algorithm/src/lqr.c **** 	memset(lqr->Input, 0, sizeof(int64_t) * system_state_size * control_size);
+ 386              		.loc 1 94 5 is_stmt 1 view .LVU107
+  94:ACE-ECF/Algorithm/src/lqr.c **** 	memset(lqr->Input, 0, sizeof(int64_t) * system_state_size * control_size);
+ 387              		.loc 1 94 77 is_stmt 0 view .LVU108
+ 388 0018 02FB01F4 		mul	r4, r2, r1
+  94:ACE-ECF/Algorithm/src/lqr.c **** 	memset(lqr->Input, 0, sizeof(int64_t) * system_state_size * control_size);
+ 389              		.loc 1 94 29 view .LVU109
+ 390 001c 4FEAC408 		lsl	r8, r4, #3
+ 391 0020 4046     		mov	r0, r8
+ 392              	.LVL31:
+  94:ACE-ECF/Algorithm/src/lqr.c **** 	memset(lqr->Input, 0, sizeof(int64_t) * system_state_size * control_size);
+ 393              		.loc 1 94 29 view .LVU110
+ 394 0022 FFF7FEFF 		bl	pvPortMalloc
+ 395              	.LVL32:
+  94:ACE-ECF/Algorithm/src/lqr.c **** 	memset(lqr->Input, 0, sizeof(int64_t) * system_state_size * control_size);
+ 396              		.loc 1 94 16 view .LVU111
+ 397 0026 A861     		str	r0, [r5, #24]
+  95:ACE-ECF/Algorithm/src/lqr.c **** 	lqr->k = (float *)user_malloc(sizeof(float) * system_state_size * control_size);
+ 398              		.loc 1 95 2 is_stmt 1 view .LVU112
+ 399 0028 4246     		mov	r2, r8
+ 400 002a 0021     		movs	r1, #0
+ 401 002c FFF7FEFF 		bl	memset
+ 402              	.LVL33:
+  96:ACE-ECF/Algorithm/src/lqr.c **** 	memset(lqr->k, 0, sizeof(float) * system_state_size * control_size);
+ 403              		.loc 1 96 2 view .LVU113
+  96:ACE-ECF/Algorithm/src/lqr.c **** 	memset(lqr->k, 0, sizeof(float) * system_state_size * control_size);
+ 404              		.loc 1 96 20 is_stmt 0 view .LVU114
+ 405 0030 A400     		lsls	r4, r4, #2
+ 406 0032 2046     		mov	r0, r4
+ 407 0034 FFF7FEFF 		bl	pvPortMalloc
+ 408              	.LVL34:
+  96:ACE-ECF/Algorithm/src/lqr.c **** 	memset(lqr->k, 0, sizeof(float) * system_state_size * control_size);
+ 409              		.loc 1 96 9 view .LVU115
+ 410 0038 2862     		str	r0, [r5, #32]
+  97:ACE-ECF/Algorithm/src/lqr.c **** 
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cclEY8YN.s 			page 11
+
+
+ 411              		.loc 1 97 2 is_stmt 1 view .LVU116
+ 412 003a 2246     		mov	r2, r4
+ 413 003c 0021     		movs	r1, #0
+ 414 003e FFF7FEFF 		bl	memset
+ 415              	.LVL35:
+ 416 0042 E5E7     		b	.L22
+ 417              	.L26:
+ 102:ACE-ECF/Algorithm/src/lqr.c **** 	memset(lqr->Output, 0, sizeof(int64_t) * control_size);
+ 418              		.loc 1 102 5 view .LVU117
+ 102:ACE-ECF/Algorithm/src/lqr.c **** 	memset(lqr->Output, 0, sizeof(int64_t) * control_size);
+ 419              		.loc 1 102 30 is_stmt 0 view .LVU118
+ 420 0044 F600     		lsls	r6, r6, #3
+ 421 0046 3046     		mov	r0, r6
+ 422 0048 FFF7FEFF 		bl	pvPortMalloc
+ 423              	.LVL36:
+ 102:ACE-ECF/Algorithm/src/lqr.c **** 	memset(lqr->Output, 0, sizeof(int64_t) * control_size);
+ 424              		.loc 1 102 17 view .LVU119
+ 425 004c E861     		str	r0, [r5, #28]
+ 103:ACE-ECF/Algorithm/src/lqr.c **** 
+ 426              		.loc 1 103 2 is_stmt 1 view .LVU120
+ 427 004e 3246     		mov	r2, r6
+ 428 0050 0021     		movs	r1, #0
+ 429 0052 FFF7FEFF 		bl	memset
+ 430              	.LVL37:
+ 431 0056 DCE7     		b	.L23
+ 432              		.cfi_endproc
+ 433              	.LFE138:
+ 435              		.section	.text.LQR_Data_Clear,"ax",%progbits
+ 436              		.align	1
+ 437              		.global	LQR_Data_Clear
+ 438              		.syntax unified
+ 439              		.thumb
+ 440              		.thumb_func
+ 442              	LQR_Data_Clear:
+ 443              	.LVL38:
+ 444              	.LFB139:
+ 110:ACE-ECF/Algorithm/src/lqr.c **** 
+ 111:ACE-ECF/Algorithm/src/lqr.c **** /**
+ 112:ACE-ECF/Algorithm/src/lqr.c ****  * ************************* Dongguan-University of Technology -ACE**************************
+ 113:ACE-ECF/Algorithm/src/lqr.c ****  * @brief  LQR数据清除
+ 114:ACE-ECF/Algorithm/src/lqr.c ****  * @param  lqr              
+ 115:ACE-ECF/Algorithm/src/lqr.c ****  * ************************* Dongguan-University of Technology -ACE**************************
+ 116:ACE-ECF/Algorithm/src/lqr.c ****  */
+ 117:ACE-ECF/Algorithm/src/lqr.c **** void LQR_Data_Clear(LQR_t *lqr)
+ 118:ACE-ECF/Algorithm/src/lqr.c **** {
+ 445              		.loc 1 118 1 view -0
+ 446              		.cfi_startproc
+ 447              		@ args = 0, pretend = 0, frame = 0
+ 448              		@ frame_needed = 0, uses_anonymous_args = 0
+ 449              		.loc 1 118 1 is_stmt 0 view .LVU122
+ 450 0000 10B5     		push	{r4, lr}
+ 451              	.LCFI6:
+ 452              		.cfi_def_cfa_offset 8
+ 453              		.cfi_offset 4, -8
+ 454              		.cfi_offset 14, -4
+ 455 0002 0446     		mov	r4, r0
+ 119:ACE-ECF/Algorithm/src/lqr.c ****   memset(lqr->Input, 0, sizeof(float) * lqr->System_State_Size * lqr->Control_Size);
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cclEY8YN.s 			page 12
+
+
+ 456              		.loc 1 119 3 is_stmt 1 view .LVU123
+ 457              		.loc 1 119 44 is_stmt 0 view .LVU124
+ 458 0004 0278     		ldrb	r2, [r0]	@ zero_extendqisi2
+ 459              		.loc 1 119 69 view .LVU125
+ 460 0006 4378     		ldrb	r3, [r0, #1]	@ zero_extendqisi2
+ 461              		.loc 1 119 64 view .LVU126
+ 462 0008 03FB02F2 		mul	r2, r3, r2
+ 463              		.loc 1 119 3 view .LVU127
+ 464 000c 9200     		lsls	r2, r2, #2
+ 465 000e 0021     		movs	r1, #0
+ 466 0010 C068     		ldr	r0, [r0, #12]
+ 467              	.LVL39:
+ 468              		.loc 1 119 3 view .LVU128
+ 469 0012 FFF7FEFF 		bl	memset
+ 470              	.LVL40:
+ 120:ACE-ECF/Algorithm/src/lqr.c ****   
+ 121:ACE-ECF/Algorithm/src/lqr.c ****   memset(lqr->Output, 0, sizeof(float) * lqr->Control_Size);
+ 471              		.loc 1 121 3 is_stmt 1 view .LVU129
+ 472              		.loc 1 121 45 is_stmt 0 view .LVU130
+ 473 0016 6278     		ldrb	r2, [r4, #1]	@ zero_extendqisi2
+ 474              		.loc 1 121 3 view .LVU131
+ 475 0018 9200     		lsls	r2, r2, #2
+ 476 001a 0021     		movs	r1, #0
+ 477 001c 2069     		ldr	r0, [r4, #16]
+ 478 001e FFF7FEFF 		bl	memset
+ 479              	.LVL41:
+ 122:ACE-ECF/Algorithm/src/lqr.c **** }
+ 480              		.loc 1 122 1 view .LVU132
+ 481 0022 10BD     		pop	{r4, pc}
+ 482              		.loc 1 122 1 view .LVU133
+ 483              		.cfi_endproc
+ 484              	.LFE139:
+ 486              		.section	.text.LQR_Data_Update,"ax",%progbits
+ 487              		.align	1
+ 488              		.global	LQR_Data_Update
+ 489              		.syntax unified
+ 490              		.thumb
+ 491              		.thumb_func
+ 493              	LQR_Data_Update:
+ 494              	.LVL42:
+ 495              	.LFB140:
+ 123:ACE-ECF/Algorithm/src/lqr.c **** 
+ 124:ACE-ECF/Algorithm/src/lqr.c **** 
+ 125:ACE-ECF/Algorithm/src/lqr.c **** /**
+ 126:ACE-ECF/Algorithm/src/lqr.c ****  * ************************* Dongguan-University of Technology -ACE**************************
+ 127:ACE-ECF/Algorithm/src/lqr.c ****  * @brief  LQR数据更新
+ 128:ACE-ECF/Algorithm/src/lqr.c ****  * @param  lqr              
+ 129:ACE-ECF/Algorithm/src/lqr.c ****  * ************************* Dongguan-University of Technology -ACE**************************
+ 130:ACE-ECF/Algorithm/src/lqr.c ****  */
+ 131:ACE-ECF/Algorithm/src/lqr.c **** void LQR_Data_Update(LQR_t *lqr, float* system_state)
+ 132:ACE-ECF/Algorithm/src/lqr.c **** {
+ 496              		.loc 1 132 1 is_stmt 1 view -0
+ 497              		.cfi_startproc
+ 498              		@ args = 0, pretend = 0, frame = 0
+ 499              		@ frame_needed = 0, uses_anonymous_args = 0
+ 500              		@ link register save eliminated.
+ 133:ACE-ECF/Algorithm/src/lqr.c **** 	int i = 0;
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cclEY8YN.s 			page 13
+
+
+ 501              		.loc 1 133 2 view .LVU135
+ 134:ACE-ECF/Algorithm/src/lqr.c **** 	for(; i < lqr->System_State_Size; i++)
+ 502              		.loc 1 134 2 view .LVU136
+ 133:ACE-ECF/Algorithm/src/lqr.c **** 	int i = 0;
+ 503              		.loc 1 133 6 is_stmt 0 view .LVU137
+ 504 0000 0023     		movs	r3, #0
+ 505              		.loc 1 134 2 view .LVU138
+ 506 0002 09E0     		b	.L30
+ 507              	.LVL43:
+ 508              	.L31:
+ 135:ACE-ECF/Algorithm/src/lqr.c **** 	{
+ 136:ACE-ECF/Algorithm/src/lqr.c **** 		lqr->Input[i] = system_state[i];
+ 509              		.loc 1 136 3 is_stmt 1 discriminator 2 view .LVU139
+ 510              		.loc 1 136 6 is_stmt 0 discriminator 2 view .LVU140
+ 511 0004 C268     		ldr	r2, [r0, #12]
+ 512              		.loc 1 136 13 discriminator 2 view .LVU141
+ 513 0006 02EB8302 		add	r2, r2, r3, lsl #2
+ 514              		.loc 1 136 31 discriminator 2 view .LVU142
+ 515 000a 01EB830C 		add	ip, r1, r3, lsl #2
+ 516 000e DCF800C0 		ldr	ip, [ip]	@ float
+ 517              		.loc 1 136 17 discriminator 2 view .LVU143
+ 518 0012 C2F800C0 		str	ip, [r2]	@ float
+ 134:ACE-ECF/Algorithm/src/lqr.c **** 	for(; i < lqr->System_State_Size; i++)
+ 519              		.loc 1 134 36 is_stmt 1 discriminator 2 view .LVU144
+ 134:ACE-ECF/Algorithm/src/lqr.c **** 	for(; i < lqr->System_State_Size; i++)
+ 520              		.loc 1 134 37 is_stmt 0 discriminator 2 view .LVU145
+ 521 0016 0133     		adds	r3, r3, #1
+ 522              	.LVL44:
+ 523              	.L30:
+ 134:ACE-ECF/Algorithm/src/lqr.c **** 	for(; i < lqr->System_State_Size; i++)
+ 524              		.loc 1 134 8 is_stmt 1 discriminator 1 view .LVU146
+ 134:ACE-ECF/Algorithm/src/lqr.c **** 	for(; i < lqr->System_State_Size; i++)
+ 525              		.loc 1 134 15 is_stmt 0 discriminator 1 view .LVU147
+ 526 0018 0278     		ldrb	r2, [r0]	@ zero_extendqisi2
+ 134:ACE-ECF/Algorithm/src/lqr.c **** 	for(; i < lqr->System_State_Size; i++)
+ 527              		.loc 1 134 2 discriminator 1 view .LVU148
+ 528 001a 9A42     		cmp	r2, r3
+ 529 001c F2DC     		bgt	.L31
+ 137:ACE-ECF/Algorithm/src/lqr.c **** 	}
+ 138:ACE-ECF/Algorithm/src/lqr.c **** }
+ 530              		.loc 1 138 1 view .LVU149
+ 531 001e 7047     		bx	lr
+ 532              		.cfi_endproc
+ 533              	.LFE140:
+ 535              		.section	.text.LQR_Int_Data_Update,"ax",%progbits
+ 536              		.align	1
+ 537              		.global	LQR_Int_Data_Update
+ 538              		.syntax unified
+ 539              		.thumb
+ 540              		.thumb_func
+ 542              	LQR_Int_Data_Update:
+ 543              	.LVL45:
+ 544              	.LFB141:
+ 139:ACE-ECF/Algorithm/src/lqr.c **** 
+ 140:ACE-ECF/Algorithm/src/lqr.c **** void LQR_Int_Data_Update(LQR_int_t *lqr, int64_t* system_state)
+ 141:ACE-ECF/Algorithm/src/lqr.c **** {
+ 545              		.loc 1 141 1 is_stmt 1 view -0
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cclEY8YN.s 			page 14
+
+
+ 546              		.cfi_startproc
+ 547              		@ args = 0, pretend = 0, frame = 0
+ 548              		@ frame_needed = 0, uses_anonymous_args = 0
+ 549              		@ link register save eliminated.
+ 142:ACE-ECF/Algorithm/src/lqr.c **** 	int i = 0;
+ 550              		.loc 1 142 2 view .LVU151
+ 143:ACE-ECF/Algorithm/src/lqr.c **** 	for(; i < lqr->System_State_Size; i++)
+ 551              		.loc 1 143 2 view .LVU152
+ 142:ACE-ECF/Algorithm/src/lqr.c **** 	int i = 0;
+ 552              		.loc 1 142 6 is_stmt 0 view .LVU153
+ 553 0000 0023     		movs	r3, #0
+ 554              		.loc 1 143 2 view .LVU154
+ 555 0002 09E0     		b	.L33
+ 556              	.LVL46:
+ 557              	.L34:
+ 144:ACE-ECF/Algorithm/src/lqr.c **** 	{
+ 145:ACE-ECF/Algorithm/src/lqr.c **** 		lqr->Input[i] = system_state[i];
+ 558              		.loc 1 145 3 is_stmt 1 discriminator 2 view .LVU155
+ 559              		.loc 1 145 6 is_stmt 0 discriminator 2 view .LVU156
+ 560 0004 8269     		ldr	r2, [r0, #24]
+ 561              		.loc 1 145 13 discriminator 2 view .LVU157
+ 562 0006 02EBC302 		add	r2, r2, r3, lsl #3
+ 563              		.loc 1 145 31 discriminator 2 view .LVU158
+ 564 000a 01EBC30C 		add	ip, r1, r3, lsl #3
+ 565 000e 9CED007B 		vldr.64	d7, [ip]	@ int
+ 566              		.loc 1 145 17 discriminator 2 view .LVU159
+ 567 0012 82ED007B 		vstr.64	d7, [r2]	@ int
+ 143:ACE-ECF/Algorithm/src/lqr.c **** 	for(; i < lqr->System_State_Size; i++)
+ 568              		.loc 1 143 36 is_stmt 1 discriminator 2 view .LVU160
+ 143:ACE-ECF/Algorithm/src/lqr.c **** 	for(; i < lqr->System_State_Size; i++)
+ 569              		.loc 1 143 37 is_stmt 0 discriminator 2 view .LVU161
+ 570 0016 0133     		adds	r3, r3, #1
+ 571              	.LVL47:
+ 572              	.L33:
+ 143:ACE-ECF/Algorithm/src/lqr.c **** 	for(; i < lqr->System_State_Size; i++)
+ 573              		.loc 1 143 8 is_stmt 1 discriminator 1 view .LVU162
+ 143:ACE-ECF/Algorithm/src/lqr.c **** 	for(; i < lqr->System_State_Size; i++)
+ 574              		.loc 1 143 15 is_stmt 0 discriminator 1 view .LVU163
+ 575 0018 0278     		ldrb	r2, [r0]	@ zero_extendqisi2
+ 143:ACE-ECF/Algorithm/src/lqr.c **** 	for(; i < lqr->System_State_Size; i++)
+ 576              		.loc 1 143 2 discriminator 1 view .LVU164
+ 577 001a 9A42     		cmp	r2, r3
+ 578 001c F2DC     		bgt	.L34
+ 146:ACE-ECF/Algorithm/src/lqr.c **** 	}
+ 147:ACE-ECF/Algorithm/src/lqr.c **** }
+ 579              		.loc 1 147 1 view .LVU165
+ 580 001e 7047     		bx	lr
+ 581              		.cfi_endproc
+ 582              	.LFE141:
+ 584              		.text
+ 585              	.Letext0:
+ 586              		.file 2 "d:\\gcc-arm-none-eabi-10.3-2021.10\\arm-none-eabi\\include\\machine\\_default_types.h"
+ 587              		.file 3 "d:\\gcc-arm-none-eabi-10.3-2021.10\\arm-none-eabi\\include\\sys\\_stdint.h"
+ 588              		.file 4 "ACE-ECF/Algorithm/inc/lqr.h"
+ 589              		.file 5 "<built-in>"
+ 590              		.file 6 "Middlewares/Third_Party/FreeRTOS/Source/include/portable.h"
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cclEY8YN.s 			page 15
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 lqr.c
+C:\Users\28212\AppData\Local\Temp\cclEY8YN.s:20     .text.LQR_Calculate:00000000 $t
+C:\Users\28212\AppData\Local\Temp\cclEY8YN.s:26     .text.LQR_Calculate:00000000 LQR_Calculate
+C:\Users\28212\AppData\Local\Temp\cclEY8YN.s:118    .text.LQR_Int_Calculate:00000000 $t
+C:\Users\28212\AppData\Local\Temp\cclEY8YN.s:124    .text.LQR_Int_Calculate:00000000 LQR_Int_Calculate
+C:\Users\28212\AppData\Local\Temp\cclEY8YN.s:240    .text.LQR_Init:00000000 $t
+C:\Users\28212\AppData\Local\Temp\cclEY8YN.s:246    .text.LQR_Init:00000000 LQR_Init
+C:\Users\28212\AppData\Local\Temp\cclEY8YN.s:338    .text.LQR_Int_Init:00000000 $t
+C:\Users\28212\AppData\Local\Temp\cclEY8YN.s:344    .text.LQR_Int_Init:00000000 LQR_Int_Init
+C:\Users\28212\AppData\Local\Temp\cclEY8YN.s:436    .text.LQR_Data_Clear:00000000 $t
+C:\Users\28212\AppData\Local\Temp\cclEY8YN.s:442    .text.LQR_Data_Clear:00000000 LQR_Data_Clear
+C:\Users\28212\AppData\Local\Temp\cclEY8YN.s:487    .text.LQR_Data_Update:00000000 $t
+C:\Users\28212\AppData\Local\Temp\cclEY8YN.s:493    .text.LQR_Data_Update:00000000 LQR_Data_Update
+C:\Users\28212\AppData\Local\Temp\cclEY8YN.s:536    .text.LQR_Int_Data_Update:00000000 $t
+C:\Users\28212\AppData\Local\Temp\cclEY8YN.s:542    .text.LQR_Int_Data_Update:00000000 LQR_Int_Data_Update
+
+UNDEFINED SYMBOLS
+__aeabi_l2f
+__aeabi_f2lz
+pvPortMalloc
+memset

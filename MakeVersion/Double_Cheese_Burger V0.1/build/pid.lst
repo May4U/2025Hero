@@ -1,0 +1,1746 @@
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccbfa9Ec.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.arch armv7e-m
+   3              		.fpu fpv4-sp-d16
+   4              		.eabi_attribute 27, 1
+   5              		.eabi_attribute 28, 1
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.file	"pid.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.first_order_filter,"ax",%progbits
+  20              		.align	1
+  21              		.syntax unified
+  22              		.thumb
+  23              		.thumb_func
+  25              	first_order_filter:
+  26              	.LVL0:
+  27              	.LFB137:
+  28              		.file 1 "ACE-ECF/Algorithm/src/pid.c"
+   1:ACE-ECF/Algorithm/src/pid.c **** 
+   2:ACE-ECF/Algorithm/src/pid.c **** /*************************** Dongguan-University of Technology -ACE**************************
+   3:ACE-ECF/Algorithm/src/pid.c ****  * @file    pid.c
+   4:ACE-ECF/Algorithm/src/pid.c ****  * @author  郑杰瀚
+   5:ACE-ECF/Algorithm/src/pid.c ****  * @version V1.0.3
+   6:ACE-ECF/Algorithm/src/pid.c ****  * @date    2022/11/19
+   7:ACE-ECF/Algorithm/src/pid.c ****  * @brief
+   8:ACE-ECF/Algorithm/src/pid.c ****  ******************************************************************************
+   9:ACE-ECF/Algorithm/src/pid.c ****  * @verbatim
+  10:ACE-ECF/Algorithm/src/pid.c ****  *  已经把常用的pid模式都加进去了，还有滤波器一些没有实现
+  11:ACE-ECF/Algorithm/src/pid.c ****  *  使用方法：
+  12:ACE-ECF/Algorithm/src/pid.c ****  *      先创建一个pid结构体。
+  13:ACE-ECF/Algorithm/src/pid.c ****  *      初始化：
+  14:ACE-ECF/Algorithm/src/pid.c ****  *            先使用PidInit，注意模式是在这里设置，用 | 链接
+  15:ACE-ECF/Algorithm/src/pid.c ****  *            然后使用PidInitMode将每个模式逐个赋值
+  16:ACE-ECF/Algorithm/src/pid.c ****  *      使用：PidCalculate
+  17:ACE-ECF/Algorithm/src/pid.c ****  *            pid_clear
+  18:ACE-ECF/Algorithm/src/pid.c ****  *            User_Fun_Callback_Register
+  19:ACE-ECF/Algorithm/src/pid.c ****  *  demo：
+  20:ACE-ECF/Algorithm/src/pid.c ****  *       pid_parameter_t motor6020pid_s;//定义一个pid结构体
+  21:ACE-ECF/Algorithm/src/pid.c ****  *       PidInit(&motor6020pid_s,20,0,0,Output_Limit | Integral_Limit);//使用输出限幅和积�
+  22:ACE-ECF/Algorithm/src/pid.c ****  *       PidInitMode(&motor6020pid_s,Integral_Limit,1000,0);//积分限幅模式设置
+  23:ACE-ECF/Algorithm/src/pid.c ****  *       PidInitMode(&motor6020pid_s,Output_Limit,30000,0);//输出限幅模式设置
+  24:ACE-ECF/Algorithm/src/pid.c ****  *          while(1)
+  25:ACE-ECF/Algorithm/src/pid.c ****  *          {
+  26:ACE-ECF/Algorithm/src/pid.c ****  *             ActualValue = sersor();                     //获取数据
+  27:ACE-ECF/Algorithm/src/pid.c ****  *             setvalue  = setclaculate();                 //获取数据
+  28:ACE-ECF/Algorithm/src/pid.c ****  *             PidCalculate(&motor6020pid_s,setvalue,ActualValue);   //计算
+  29:ACE-ECF/Algorithm/src/pid.c ****  *          }
+  30:ACE-ECF/Algorithm/src/pid.c ****  *
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccbfa9Ec.s 			page 2
+
+
+  31:ACE-ECF/Algorithm/src/pid.c ****  * @attention
+  32:ACE-ECF/Algorithm/src/pid.c ****  *      请确保User_Fun_Callback_Register注册了函数再使用结构体中的自定义函数
+  33:ACE-ECF/Algorithm/src/pid.c ****  *      死区默认是使用的，如果不使用，不用理会就行，使用了会在死区内�
+  34:ACE-ECF/Algorithm/src/pid.c ****  * @version
+  35:ACE-ECF/Algorithm/src/pid.c ****  * v1.0.1 添加了步进式PID，所有功能待验证
+  36:ACE-ECF/Algorithm/src/pid.c ****  * V1.0.2 添加了很多注释，Integral_Limit ，Output_Limit ，StepIn模式已验证，Derivat
+  37:ACE-ECF/Algorithm/src/pid.c ****  * V1.0.3 添加了积分和输出滤波，待验证
+  38:ACE-ECF/Algorithm/src/pid.c ****  ************************** Dongguan-University of Technology -ACE***************************/
+  39:ACE-ECF/Algorithm/src/pid.c **** #include "pid.h"
+  40:ACE-ECF/Algorithm/src/pid.c **** #include <string.h>
+  41:ACE-ECF/Algorithm/src/pid.c **** 
+  42:ACE-ECF/Algorithm/src/pid.c **** /*--------------------函数声明-----------------------*/
+  43:ACE-ECF/Algorithm/src/pid.c **** static fp32 first_order_filter(first_order_filter_t *first_order_filter_type, fp32 input);
+  44:ACE-ECF/Algorithm/src/pid.c **** static void f_Separated_Integral(pid_parameter_t *pid);
+  45:ACE-ECF/Algorithm/src/pid.c **** static void f_Integral_Limit(pid_parameter_t *pid);
+  46:ACE-ECF/Algorithm/src/pid.c **** static void f_Derivative_On_Measurement(pid_parameter_t *pid);
+  47:ACE-ECF/Algorithm/src/pid.c **** static void Changing_Integration_Rate(pid_parameter_t *pid);
+  48:ACE-ECF/Algorithm/src/pid.c **** static void f_Output_Limit(pid_parameter_t *pid);
+  49:ACE-ECF/Algorithm/src/pid.c **** static void f_StepIn(pid_parameter_t *pid);
+  50:ACE-ECF/Algorithm/src/pid.c **** /*---------------------------------------------------------*/
+  51:ACE-ECF/Algorithm/src/pid.c **** /**
+  52:ACE-ECF/Algorithm/src/pid.c ****  * @brief          PID初始化
+  53:ACE-ECF/Algorithm/src/pid.c ****  * @param[in]      初始化的pid结构体
+  54:ACE-ECF/Algorithm/src/pid.c ****  * @param[in]      pid的p
+  55:ACE-ECF/Algorithm/src/pid.c ****  * @param[in]      pid的i
+  56:ACE-ECF/Algorithm/src/pid.c ****  * @param[in]      pid的d
+  57:ACE-ECF/Algorithm/src/pid.c ****  * @param[in]      pid模式 详见pid_mode_e枚举
+  58:ACE-ECF/Algorithm/src/pid.c ****  * @retval         none
+  59:ACE-ECF/Algorithm/src/pid.c ****  */
+  60:ACE-ECF/Algorithm/src/pid.c **** void PidInit(pid_parameter_t *pid, fp32 kp, fp32 ki, fp32 kd, uint32_t mode)
+  61:ACE-ECF/Algorithm/src/pid.c **** {
+  62:ACE-ECF/Algorithm/src/pid.c ****     memset(pid, 0, sizeof(pid_parameter_t));
+  63:ACE-ECF/Algorithm/src/pid.c ****     pid->User_Fun = NULL;
+  64:ACE-ECF/Algorithm/src/pid.c ****     pid->Kp = kp;
+  65:ACE-ECF/Algorithm/src/pid.c ****     pid->Ki = ki;
+  66:ACE-ECF/Algorithm/src/pid.c ****     pid->Kd = kd;
+  67:ACE-ECF/Algorithm/src/pid.c ****     pid->mode = mode;
+  68:ACE-ECF/Algorithm/src/pid.c **** }
+  69:ACE-ECF/Algorithm/src/pid.c **** /**
+  70:ACE-ECF/Algorithm/src/pid.c ****  * @brief          PID模式初始化
+  71:ACE-ECF/Algorithm/src/pid.c ****  * @param[in]      初始化的pid结构体
+  72:ACE-ECF/Algorithm/src/pid.c ****  * @param[in]      要初始化的mode值 详见pid_mode_e枚举
+  73:ACE-ECF/Algorithm/src/pid.c ****  *                 以下为不同的mode需要填入的值
+  74:ACE-ECF/Algorithm/src/pid.c ****  *                 NONE                         num1、num2都不填
+  75:ACE-ECF/Algorithm/src/pid.c ****  *                 Deadzone                     num1 死区范围
+  76:ACE-ECF/Algorithm/src/pid.c ****  *                 Integral_Limit               num1 积分限幅最大值
+  77:ACE-ECF/Algorithm/src/pid.c ****  *                 Output_Limit                 num1 输出限幅值 这个是绝对值
+  78:ACE-ECF/Algorithm/src/pid.c ****  *                 Derivative_On_Measurement    num1 惯性系数
+  79:ACE-ECF/Algorithm/src/pid.c ****  *                 Separated_Integral           num1 积分分离上限 num2积分分离下限
+  80:ACE-ECF/Algorithm/src/pid.c ****  *                 ChangingIntegrationRate      num1 为变积分上限 num2为变积分下限
+  81:ACE-ECF/Algorithm/src/pid.c ****  *                 OutputFilter                 num1 为滤波系数
+  82:ACE-ECF/Algorithm/src/pid.c ****  *                 DerivativeFilter             num1 为滤波系数
+  83:ACE-ECF/Algorithm/src/pid.c ****  *                 StepIN                       num1 步进数
+  84:ACE-ECF/Algorithm/src/pid.c ****  * @retval         none
+  85:ACE-ECF/Algorithm/src/pid.c ****  */
+  86:ACE-ECF/Algorithm/src/pid.c **** void PidInitMode(pid_parameter_t *pid, uint32_t mode, fp32 num1, fp32 num2)
+  87:ACE-ECF/Algorithm/src/pid.c **** {
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccbfa9Ec.s 			page 3
+
+
+  88:ACE-ECF/Algorithm/src/pid.c ****     switch (mode)
+  89:ACE-ECF/Algorithm/src/pid.c ****     {
+  90:ACE-ECF/Algorithm/src/pid.c ****     case NONE:
+  91:ACE-ECF/Algorithm/src/pid.c ****         return;
+  92:ACE-ECF/Algorithm/src/pid.c ****     case Integral_Limit:
+  93:ACE-ECF/Algorithm/src/pid.c ****         pid->max_Ierror = num1;
+  94:ACE-ECF/Algorithm/src/pid.c ****         return;
+  95:ACE-ECF/Algorithm/src/pid.c ****     case Derivative_On_Measurement:
+  96:ACE-ECF/Algorithm/src/pid.c ****         pid->gama = num1;
+  97:ACE-ECF/Algorithm/src/pid.c ****         return;
+  98:ACE-ECF/Algorithm/src/pid.c ****     case Separated_Integral:
+  99:ACE-ECF/Algorithm/src/pid.c ****         pid->threshold_max = num1;
+ 100:ACE-ECF/Algorithm/src/pid.c ****         pid->threshold_min = num2;
+ 101:ACE-ECF/Algorithm/src/pid.c ****         return;
+ 102:ACE-ECF/Algorithm/src/pid.c ****     case Output_Limit:
+ 103:ACE-ECF/Algorithm/src/pid.c ****         pid->max_out = num1;
+ 104:ACE-ECF/Algorithm/src/pid.c ****         return;
+ 105:ACE-ECF/Algorithm/src/pid.c ****     case OutputFilter:
+ 106:ACE-ECF/Algorithm/src/pid.c ****         pid->out_filter.num = num1;
+ 107:ACE-ECF/Algorithm/src/pid.c ****         return;
+ 108:ACE-ECF/Algorithm/src/pid.c ****     case ChangingIntegrationRate:
+ 109:ACE-ECF/Algorithm/src/pid.c ****         pid->errorabsmax = num1;
+ 110:ACE-ECF/Algorithm/src/pid.c ****         pid->errorabsmin = num2;
+ 111:ACE-ECF/Algorithm/src/pid.c ****         return;
+ 112:ACE-ECF/Algorithm/src/pid.c ****     case DerivativeFilter:
+ 113:ACE-ECF/Algorithm/src/pid.c ****         pid->d_filter.num = num1;
+ 114:ACE-ECF/Algorithm/src/pid.c ****         return;
+ 115:ACE-ECF/Algorithm/src/pid.c ****     case Deadzone:
+ 116:ACE-ECF/Algorithm/src/pid.c ****         pid->deadband = num1;
+ 117:ACE-ECF/Algorithm/src/pid.c ****         return;
+ 118:ACE-ECF/Algorithm/src/pid.c ****     case StepIn:
+ 119:ACE-ECF/Algorithm/src/pid.c ****         pid->stepIn = num1;
+ 120:ACE-ECF/Algorithm/src/pid.c ****         return;
+ 121:ACE-ECF/Algorithm/src/pid.c ****     case FeedFront:
+ 122:ACE-ECF/Algorithm/src/pid.c ****         pid->Kf = num1;
+ 123:ACE-ECF/Algorithm/src/pid.c ****         return;
+ 124:ACE-ECF/Algorithm/src/pid.c ****     }
+ 125:ACE-ECF/Algorithm/src/pid.c ****     return;
+ 126:ACE-ECF/Algorithm/src/pid.c **** }
+ 127:ACE-ECF/Algorithm/src/pid.c **** /**
+ 128:ACE-ECF/Algorithm/src/pid.c ****  * @brief          PID通用计算
+ 129:ACE-ECF/Algorithm/src/pid.c ****  * @param[in]      待计算的pid结构体
+ 130:ACE-ECF/Algorithm/src/pid.c ****  * @param[in]      设定值
+ 131:ACE-ECF/Algorithm/src/pid.c ****  * @param[in]      实际值
+ 132:ACE-ECF/Algorithm/src/pid.c ****  * @retval         none
+ 133:ACE-ECF/Algorithm/src/pid.c ****  */
+ 134:ACE-ECF/Algorithm/src/pid.c **** fp32 PidCalculate(pid_parameter_t *pid, fp32 SetValue, fp32 ActualValue)
+ 135:ACE-ECF/Algorithm/src/pid.c **** {
+ 136:ACE-ECF/Algorithm/src/pid.c ****     pid->SetValue = SetValue;
+ 137:ACE-ECF/Algorithm/src/pid.c ****     // 步进式pid
+ 138:ACE-ECF/Algorithm/src/pid.c ****     if (pid->mode & StepIn)
+ 139:ACE-ECF/Algorithm/src/pid.c ****         f_StepIn(pid);
+ 140:ACE-ECF/Algorithm/src/pid.c ****     pid->ActualValue = ActualValue;
+ 141:ACE-ECF/Algorithm/src/pid.c ****     pid->error = pid->SetValue - pid->ActualValue;
+ 142:ACE-ECF/Algorithm/src/pid.c ****     pid->Derror = pid->error - pid->LastError;
+ 143:ACE-ECF/Algorithm/src/pid.c ****     if (abs(pid->error) > pid->deadband) // 死区
+ 144:ACE-ECF/Algorithm/src/pid.c ****     {
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccbfa9Ec.s 			page 4
+
+
+ 145:ACE-ECF/Algorithm/src/pid.c ****         pid->Pout = pid->error * pid->Kp;
+ 146:ACE-ECF/Algorithm/src/pid.c ****         pid->Ierror += pid->error;
+ 147:ACE-ECF/Algorithm/src/pid.c **** 
+ 148:ACE-ECF/Algorithm/src/pid.c ****         // 微分先行
+ 149:ACE-ECF/Algorithm/src/pid.c ****         if (pid->mode & Derivative_On_Measurement)
+ 150:ACE-ECF/Algorithm/src/pid.c ****             f_Derivative_On_Measurement(pid);
+ 151:ACE-ECF/Algorithm/src/pid.c ****         else
+ 152:ACE-ECF/Algorithm/src/pid.c ****             pid->Dout = pid->Kd * pid->Derror;
+ 153:ACE-ECF/Algorithm/src/pid.c **** 
+ 154:ACE-ECF/Algorithm/src/pid.c ****         // 变积分
+ 155:ACE-ECF/Algorithm/src/pid.c ****         if (pid->mode & ChangingIntegrationRate)
+ 156:ACE-ECF/Algorithm/src/pid.c ****             Changing_Integration_Rate(pid);
+ 157:ACE-ECF/Algorithm/src/pid.c **** 
+ 158:ACE-ECF/Algorithm/src/pid.c ****         // 积分限幅
+ 159:ACE-ECF/Algorithm/src/pid.c ****         if (pid->mode & Integral_Limit)
+ 160:ACE-ECF/Algorithm/src/pid.c ****             f_Integral_Limit(pid);
+ 161:ACE-ECF/Algorithm/src/pid.c ****         pid->Iout = pid->Ki * pid->Ierror;
+ 162:ACE-ECF/Algorithm/src/pid.c **** 
+ 163:ACE-ECF/Algorithm/src/pid.c ****         // 积分分离 注意需要放在iout计算后
+ 164:ACE-ECF/Algorithm/src/pid.c ****         if (pid->mode & Separated_Integral)
+ 165:ACE-ECF/Algorithm/src/pid.c ****             f_Separated_Integral(pid);
+ 166:ACE-ECF/Algorithm/src/pid.c **** 
+ 167:ACE-ECF/Algorithm/src/pid.c ****         // 微分滤波
+ 168:ACE-ECF/Algorithm/src/pid.c ****         if (pid->mode & DerivativeFilter)
+ 169:ACE-ECF/Algorithm/src/pid.c ****             pid->Dout = first_order_filter(&pid->d_filter, pid->Dout);
+ 170:ACE-ECF/Algorithm/src/pid.c **** 
+ 171:ACE-ECF/Algorithm/src/pid.c ****         pid->Fout = (pid->Kf*(pid->SetValue-pid->LastSetValue));
+ 172:ACE-ECF/Algorithm/src/pid.c ****         pid->out = pid->Pout + pid->Iout + pid->Dout + pid->Fout;
+ 173:ACE-ECF/Algorithm/src/pid.c **** 
+ 174:ACE-ECF/Algorithm/src/pid.c ****         // 输出滤波
+ 175:ACE-ECF/Algorithm/src/pid.c ****         if (pid->mode & OutputFilter)
+ 176:ACE-ECF/Algorithm/src/pid.c ****             pid->out = first_order_filter(&pid->out_filter, pid->out);
+ 177:ACE-ECF/Algorithm/src/pid.c **** 
+ 178:ACE-ECF/Algorithm/src/pid.c ****         // 输出限幅
+ 179:ACE-ECF/Algorithm/src/pid.c ****         if (pid->mode & Output_Limit)
+ 180:ACE-ECF/Algorithm/src/pid.c ****             f_Output_Limit(pid);
+ 181:ACE-ECF/Algorithm/src/pid.c ****     }
+ 182:ACE-ECF/Algorithm/src/pid.c ****     else
+ 183:ACE-ECF/Algorithm/src/pid.c ****     {
+ 184:ACE-ECF/Algorithm/src/pid.c ****         pid_clear(pid);
+ 185:ACE-ECF/Algorithm/src/pid.c ****     }
+ 186:ACE-ECF/Algorithm/src/pid.c **** 
+ 187:ACE-ECF/Algorithm/src/pid.c ****     pid->LastActualValue = pid->ActualValue;
+ 188:ACE-ECF/Algorithm/src/pid.c ****     pid->LastSetValue = pid->SetValue;
+ 189:ACE-ECF/Algorithm/src/pid.c ****     pid->LastDerror = pid->Derror;
+ 190:ACE-ECF/Algorithm/src/pid.c ****     pid->LastError = pid->error;
+ 191:ACE-ECF/Algorithm/src/pid.c **** 
+ 192:ACE-ECF/Algorithm/src/pid.c ****     return pid->out;
+ 193:ACE-ECF/Algorithm/src/pid.c **** }
+ 194:ACE-ECF/Algorithm/src/pid.c **** /**
+ 195:ACE-ECF/Algorithm/src/pid.c ****  * @brief          PID清除
+ 196:ACE-ECF/Algorithm/src/pid.c ****  * @param[in]      待清除的pid结构体
+ 197:ACE-ECF/Algorithm/src/pid.c ****  * @retval         none
+ 198:ACE-ECF/Algorithm/src/pid.c ****  * @attention      只是清除所有计算的数据，不会清除pid或者模式的数据
+ 199:ACE-ECF/Algorithm/src/pid.c ****  */
+ 200:ACE-ECF/Algorithm/src/pid.c **** void pid_clear(pid_parameter_t *pid)
+ 201:ACE-ECF/Algorithm/src/pid.c **** {
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccbfa9Ec.s 			page 5
+
+
+ 202:ACE-ECF/Algorithm/src/pid.c ****     pid->error = pid->LastError = 0.0f;
+ 203:ACE-ECF/Algorithm/src/pid.c ****     pid->Derror = pid->LastDerror = pid->LastLastDerror = 0.0f;
+ 204:ACE-ECF/Algorithm/src/pid.c ****     pid->out = pid->Pout = pid->Iout = pid->Dout = pid->Ierror = 0.0f;
+ 205:ACE-ECF/Algorithm/src/pid.c ****     pid->ActualValue = pid->SetValue = pid->LastActualValue = pid->LastSetValue = 0.0f;
+ 206:ACE-ECF/Algorithm/src/pid.c ****     pid->d_filter.last_input = pid->out_filter.last_input = 0;
+ 207:ACE-ECF/Algorithm/src/pid.c **** }
+ 208:ACE-ECF/Algorithm/src/pid.c **** /**
+ 209:ACE-ECF/Algorithm/src/pid.c ****  * @brief          PID回调函数注册
+ 210:ACE-ECF/Algorithm/src/pid.c ****  * @param[in]      待注册的pid结构体
+ 211:ACE-ECF/Algorithm/src/pid.c ****  * @param[in]      将要注册的函数
+ 212:ACE-ECF/Algorithm/src/pid.c ****  * @retval         none
+ 213:ACE-ECF/Algorithm/src/pid.c ****  * @attention      none
+ 214:ACE-ECF/Algorithm/src/pid.c ****  */
+ 215:ACE-ECF/Algorithm/src/pid.c **** void User_Fun_Callback_Register(pid_parameter_t *pid, void (*User_Fun)(struct Pid_parameter_t *))
+ 216:ACE-ECF/Algorithm/src/pid.c **** {
+ 217:ACE-ECF/Algorithm/src/pid.c ****     pid->User_Fun = User_Fun;
+ 218:ACE-ECF/Algorithm/src/pid.c **** }
+ 219:ACE-ECF/Algorithm/src/pid.c **** 
+ 220:ACE-ECF/Algorithm/src/pid.c **** /*------------------------------应用---------------------------------*/
+ 221:ACE-ECF/Algorithm/src/pid.c **** /**
+ 222:ACE-ECF/Algorithm/src/pid.c ****  * @brief          电机速度环控制算法
+ 223:ACE-ECF/Algorithm/src/pid.c ****  * @param[in]      速度环pid结构体
+ 224:ACE-ECF/Algorithm/src/pid.c ****  * @param[in]      设定速度值
+ 225:ACE-ECF/Algorithm/src/pid.c ****  * @param[in]      实际值
+ 226:ACE-ECF/Algorithm/src/pid.c ****  * @retval         计算值
+ 227:ACE-ECF/Algorithm/src/pid.c ****  */
+ 228:ACE-ECF/Algorithm/src/pid.c **** int16_t motor_speed_control(pid_parameter_t *spid, fp32 setSpeed, fp32 actualSpeed)
+ 229:ACE-ECF/Algorithm/src/pid.c **** {
+ 230:ACE-ECF/Algorithm/src/pid.c ****     return PidCalculate(spid, setSpeed, actualSpeed);
+ 231:ACE-ECF/Algorithm/src/pid.c **** }
+ 232:ACE-ECF/Algorithm/src/pid.c **** 
+ 233:ACE-ECF/Algorithm/src/pid.c **** /**
+ 234:ACE-ECF/Algorithm/src/pid.c ****  * @brief          电机速度位置环串级控制算法
+ 235:ACE-ECF/Algorithm/src/pid.c ****  * @param[in]      速度环pid结构体
+ 236:ACE-ECF/Algorithm/src/pid.c ****  * @param[in]      位置环pid结构体
+ 237:ACE-ECF/Algorithm/src/pid.c ****  * @param[in]      设定位置值
+ 238:ACE-ECF/Algorithm/src/pid.c ****  * @param[in]      实际位置值
+ 239:ACE-ECF/Algorithm/src/pid.c ****  * @param[in]      实际速度值
+ 240:ACE-ECF/Algorithm/src/pid.c ****  * @retval         计算值
+ 241:ACE-ECF/Algorithm/src/pid.c ****  */
+ 242:ACE-ECF/Algorithm/src/pid.c **** int16_t motor_position_speed_control(pid_parameter_t *speed_pid, pid_parameter_t *position_pid, fp3
+ 243:ACE-ECF/Algorithm/src/pid.c **** {
+ 244:ACE-ECF/Algorithm/src/pid.c ****     speed_pid->SetValue = PidCalculate(position_pid, setPosition, actual_position); // 速度环设
+ 245:ACE-ECF/Algorithm/src/pid.c ****     return PidCalculate(speed_pid, speed_pid->SetValue, actual_speed);              // 电机输出
+ 246:ACE-ECF/Algorithm/src/pid.c **** }
+ 247:ACE-ECF/Algorithm/src/pid.c **** 
+ 248:ACE-ECF/Algorithm/src/pid.c **** /*------------------------------以下为内部函数---------------------------------*/
+ 249:ACE-ECF/Algorithm/src/pid.c **** /**
+ 250:ACE-ECF/Algorithm/src/pid.c ****  * @brief          一阶低通滤波计算
+ 251:ACE-ECF/Algorithm/src/pid.c ****  * @param[in]      低通滤波结构体
+ 252:ACE-ECF/Algorithm/src/pid.c ****  * @param[in]      输入值
+ 253:ACE-ECF/Algorithm/src/pid.c ****  * @retval         输出值
+ 254:ACE-ECF/Algorithm/src/pid.c ****  * @attention      none
+ 255:ACE-ECF/Algorithm/src/pid.c ****  */
+ 256:ACE-ECF/Algorithm/src/pid.c **** fp32 first_order_filter(first_order_filter_t *first_order_filter_type, fp32 input)
+ 257:ACE-ECF/Algorithm/src/pid.c **** {
+  29              		.loc 1 257 1 view -0
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccbfa9Ec.s 			page 6
+
+
+  30              		.cfi_startproc
+  31              		@ args = 0, pretend = 0, frame = 0
+  32              		@ frame_needed = 0, uses_anonymous_args = 0
+  33              		@ link register save eliminated.
+ 258:ACE-ECF/Algorithm/src/pid.c ****     first_order_filter_type->input = input;
+  34              		.loc 1 258 5 view .LVU1
+  35              		.loc 1 258 36 is_stmt 0 view .LVU2
+  36 0000 80ED000A 		vstr.32	s0, [r0]
+ 259:ACE-ECF/Algorithm/src/pid.c ****     first_order_filter_type->out = first_order_filter_type->input * first_order_filter_type->num + 
+  37              		.loc 1 259 5 is_stmt 1 view .LVU3
+  38              		.loc 1 259 92 is_stmt 0 view .LVU4
+  39 0004 90ED037A 		vldr.32	s14, [r0, #12]
+  40              		.loc 1 259 67 view .LVU5
+  41 0008 27EE000A 		vmul.f32	s0, s14, s0
+  42              	.LVL1:
+  43              		.loc 1 259 103 view .LVU6
+  44 000c F7EE007A 		vmov.f32	s15, #1.0e+0
+  45 0010 77EEC77A 		vsub.f32	s15, s15, s14
+  46              		.loc 1 259 160 view .LVU7
+  47 0014 90ED017A 		vldr.32	s14, [r0, #4]
+  48              		.loc 1 259 135 view .LVU8
+  49 0018 67EE877A 		vmul.f32	s15, s15, s14
+  50              		.loc 1 259 98 view .LVU9
+  51 001c 30EE270A 		vadd.f32	s0, s0, s15
+  52              		.loc 1 259 34 view .LVU10
+  53 0020 80ED020A 		vstr.32	s0, [r0, #8]
+ 260:ACE-ECF/Algorithm/src/pid.c ****     first_order_filter_type->last_input = first_order_filter_type->out;
+  54              		.loc 1 260 5 is_stmt 1 view .LVU11
+  55              		.loc 1 260 41 is_stmt 0 view .LVU12
+  56 0024 80ED010A 		vstr.32	s0, [r0, #4]
+ 261:ACE-ECF/Algorithm/src/pid.c **** 
+ 262:ACE-ECF/Algorithm/src/pid.c ****     return first_order_filter_type->out;
+  57              		.loc 1 262 5 is_stmt 1 view .LVU13
+ 263:ACE-ECF/Algorithm/src/pid.c **** }
+  58              		.loc 1 263 1 is_stmt 0 view .LVU14
+  59 0028 7047     		bx	lr
+  60              		.cfi_endproc
+  61              	.LFE137:
+  63              		.section	.text.f_Derivative_On_Measurement,"ax",%progbits
+  64              		.align	1
+  65              		.syntax unified
+  66              		.thumb
+  67              		.thumb_func
+  69              	f_Derivative_On_Measurement:
+  70              	.LVL2:
+  71              	.LFB138:
+ 264:ACE-ECF/Algorithm/src/pid.c **** /**
+ 265:ACE-ECF/Algorithm/src/pid.c ****  * @brief          微分先行pid
+ 266:ACE-ECF/Algorithm/src/pid.c ****  * @param[in]      pid结构体
+ 267:ACE-ECF/Algorithm/src/pid.c ****  * @retval         none
+ 268:ACE-ECF/Algorithm/src/pid.c ****  * @attention      似乎存在问题 详见 https://blog.csdn.net/foxclever/article/details/806332
+ 269:ACE-ECF/Algorithm/src/pid.c ****  */
+ 270:ACE-ECF/Algorithm/src/pid.c **** void f_Derivative_On_Measurement(pid_parameter_t *PID)
+ 271:ACE-ECF/Algorithm/src/pid.c **** {
+  72              		.loc 1 271 1 is_stmt 1 view -0
+  73              		.cfi_startproc
+  74              		@ args = 0, pretend = 0, frame = 0
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccbfa9Ec.s 			page 7
+
+
+  75              		@ frame_needed = 0, uses_anonymous_args = 0
+  76              		@ link register save eliminated.
+ 272:ACE-ECF/Algorithm/src/pid.c ****     fp32 c1, c2, c3, temp;
+  77              		.loc 1 272 5 view .LVU16
+ 273:ACE-ECF/Algorithm/src/pid.c **** 
+ 274:ACE-ECF/Algorithm/src/pid.c ****     temp = PID->gama * PID->Kd + PID->Kp;
+  78              		.loc 1 274 5 view .LVU17
+  79              		.loc 1 274 15 is_stmt 0 view .LVU18
+  80 0000 D0ED1B7A 		vldr.32	s15, [r0, #108]
+  81              		.loc 1 274 27 view .LVU19
+  82 0004 90ED027A 		vldr.32	s14, [r0, #8]
+  83              		.loc 1 274 22 view .LVU20
+  84 0008 67EE876A 		vmul.f32	s13, s15, s14
+  85              		.loc 1 274 37 view .LVU21
+  86 000c D0ED005A 		vldr.32	s11, [r0]
+  87              		.loc 1 274 10 view .LVU22
+  88 0010 76EEA56A 		vadd.f32	s13, s13, s11
+  89              	.LVL3:
+ 275:ACE-ECF/Algorithm/src/pid.c ****     c3 = PID->Kd / temp;
+  90              		.loc 1 275 5 is_stmt 1 view .LVU23
+  91              		.loc 1 275 8 is_stmt 0 view .LVU24
+  92 0014 87EE266A 		vdiv.f32	s12, s14, s13
+  93              	.LVL4:
+ 276:ACE-ECF/Algorithm/src/pid.c ****     c2 = (PID->Kd + PID->Kp) / temp;
+  94              		.loc 1 276 5 is_stmt 1 view .LVU25
+  95              		.loc 1 276 19 is_stmt 0 view .LVU26
+  96 0018 37EE257A 		vadd.f32	s14, s14, s11
+  97              		.loc 1 276 8 view .LVU27
+  98 001c C7EE265A 		vdiv.f32	s11, s14, s13
+  99              	.LVL5:
+ 277:ACE-ECF/Algorithm/src/pid.c ****     c1 = PID->gama * c3;
+ 100              		.loc 1 277 5 is_stmt 1 view .LVU28
+ 101              		.loc 1 277 8 is_stmt 0 view .LVU29
+ 102 0020 27EE867A 		vmul.f32	s14, s15, s12
+ 103              	.LVL6:
+ 278:ACE-ECF/Algorithm/src/pid.c ****     PID->Dout = c1 * PID->Dout + c2 * PID->ActualValue + c3 * PID->LastActualValue;
+ 104              		.loc 1 278 5 is_stmt 1 view .LVU30
+ 105              		.loc 1 278 25 is_stmt 0 view .LVU31
+ 106 0024 D0ED0B7A 		vldr.32	s15, [r0, #44]
+ 107              		.loc 1 278 20 view .LVU32
+ 108 0028 67EE877A 		vmul.f32	s15, s15, s14
+ 109              		.loc 1 278 42 view .LVU33
+ 110 002c D0ED076A 		vldr.32	s13, [r0, #28]
+ 111              	.LVL7:
+ 112              		.loc 1 278 37 view .LVU34
+ 113 0030 66EEA56A 		vmul.f32	s13, s13, s11
+ 114              		.loc 1 278 32 view .LVU35
+ 115 0034 77EEA67A 		vadd.f32	s15, s15, s13
+ 116              		.loc 1 278 66 view .LVU36
+ 117 0038 90ED067A 		vldr.32	s14, [r0, #24]
+ 118              	.LVL8:
+ 119              		.loc 1 278 61 view .LVU37
+ 120 003c 27EE067A 		vmul.f32	s14, s14, s12
+ 121              		.loc 1 278 56 view .LVU38
+ 122 0040 77EE877A 		vadd.f32	s15, s15, s14
+ 123              		.loc 1 278 15 view .LVU39
+ 124 0044 C0ED0B7A 		vstr.32	s15, [r0, #44]
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccbfa9Ec.s 			page 8
+
+
+ 279:ACE-ECF/Algorithm/src/pid.c **** }
+ 125              		.loc 1 279 1 view .LVU40
+ 126 0048 7047     		bx	lr
+ 127              		.cfi_endproc
+ 128              	.LFE138:
+ 130              		.section	.text.f_StepIn,"ax",%progbits
+ 131              		.align	1
+ 132              		.syntax unified
+ 133              		.thumb
+ 134              		.thumb_func
+ 136              	f_StepIn:
+ 137              	.LVL9:
+ 138              	.LFB139:
+ 280:ACE-ECF/Algorithm/src/pid.c **** /**
+ 281:ACE-ECF/Algorithm/src/pid.c ****  * @brief          步进式pid
+ 282:ACE-ECF/Algorithm/src/pid.c ****  * @param[in]      pid结构体
+ 283:ACE-ECF/Algorithm/src/pid.c ****  * @retval         none
+ 284:ACE-ECF/Algorithm/src/pid.c ****  * @attention      详见 https://blog.csdn.net/foxclever/article/details/81151898
+ 285:ACE-ECF/Algorithm/src/pid.c ****  */
+ 286:ACE-ECF/Algorithm/src/pid.c **** void f_StepIn(pid_parameter_t *pid)
+ 287:ACE-ECF/Algorithm/src/pid.c **** {
+ 139              		.loc 1 287 1 is_stmt 1 view -0
+ 140              		.cfi_startproc
+ 141              		@ args = 0, pretend = 0, frame = 0
+ 142              		@ frame_needed = 0, uses_anonymous_args = 0
+ 143              		@ link register save eliminated.
+ 288:ACE-ECF/Algorithm/src/pid.c ****     fp32 kFactor = 0.0f;
+ 144              		.loc 1 288 5 view .LVU42
+ 289:ACE-ECF/Algorithm/src/pid.c ****     //    if ((pid->LastSetValue - pid->SetValue <= pid->stepIn) && (pid->LastSetValue - pid->SetVa
+ 290:ACE-ECF/Algorithm/src/pid.c ****     //    {
+ 291:ACE-ECF/Algorithm/src/pid.c ****     //        return;
+ 292:ACE-ECF/Algorithm/src/pid.c ****     //    }
+ 293:ACE-ECF/Algorithm/src/pid.c ****     if (abs(pid->LastSetValue - pid->SetValue) <= pid->stepIn)
+ 145              		.loc 1 293 5 view .LVU43
+ 146              		.loc 1 293 9 is_stmt 0 view .LVU44
+ 147 0000 90ED057A 		vldr.32	s14, [r0, #20]
+ 148 0004 D0ED047A 		vldr.32	s15, [r0, #16]
+ 149 0008 77EE677A 		vsub.f32	s15, s14, s15
+ 150 000c F5EEC07A 		vcmpe.f32	s15, #0
+ 151 0010 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 152 0014 16DD     		ble	.L13
+ 153 0016 B0EE676A 		vmov.f32	s12, s15
+ 154              	.L4:
+ 155              		.loc 1 293 54 discriminator 4 view .LVU45
+ 156 001a D0ED246A 		vldr.32	s13, [r0, #144]
+ 157              		.loc 1 293 8 discriminator 4 view .LVU46
+ 158 001e F4EEC66A 		vcmpe.f32	s13, s12
+ 159 0022 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 160 0026 0CDA     		bge	.L3
+ 294:ACE-ECF/Algorithm/src/pid.c ****     {
+ 295:ACE-ECF/Algorithm/src/pid.c ****         return;
+ 296:ACE-ECF/Algorithm/src/pid.c ****     }
+ 297:ACE-ECF/Algorithm/src/pid.c ****     else
+ 298:ACE-ECF/Algorithm/src/pid.c ****     {
+ 299:ACE-ECF/Algorithm/src/pid.c ****         if ((pid->LastSetValue - pid->SetValue) > 0.0f)
+ 161              		.loc 1 299 9 is_stmt 1 view .LVU47
+ 162              		.loc 1 299 12 is_stmt 0 view .LVU48
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccbfa9Ec.s 			page 9
+
+
+ 163 0028 F5EEC07A 		vcmpe.f32	s15, #0
+ 164 002c F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 165 0030 0BDD     		ble	.L14
+ 300:ACE-ECF/Algorithm/src/pid.c ****         {
+ 301:ACE-ECF/Algorithm/src/pid.c ****             kFactor = -1.0f;
+ 166              		.loc 1 301 21 view .LVU49
+ 167 0032 FFEE007A 		vmov.f32	s15, #-1.0e+0
+ 168              	.L6:
+ 169              	.LVL10:
+ 302:ACE-ECF/Algorithm/src/pid.c ****         }
+ 303:ACE-ECF/Algorithm/src/pid.c ****         else if ((pid->LastSetValue - pid->SetValue) < 0.0f)
+ 304:ACE-ECF/Algorithm/src/pid.c ****         {
+ 305:ACE-ECF/Algorithm/src/pid.c ****             kFactor = 1.0f;
+ 306:ACE-ECF/Algorithm/src/pid.c ****         }
+ 307:ACE-ECF/Algorithm/src/pid.c ****         else
+ 308:ACE-ECF/Algorithm/src/pid.c ****         {
+ 309:ACE-ECF/Algorithm/src/pid.c ****             kFactor = 0.0f;
+ 310:ACE-ECF/Algorithm/src/pid.c ****         }
+ 311:ACE-ECF/Algorithm/src/pid.c ****         pid->SetValue = pid->LastSetValue + kFactor * pid->stepIn;
+ 170              		.loc 1 311 9 is_stmt 1 view .LVU50
+ 171              		.loc 1 311 53 is_stmt 0 view .LVU51
+ 172 0036 66EEA76A 		vmul.f32	s13, s13, s15
+ 173              		.loc 1 311 43 view .LVU52
+ 174 003a 37EE267A 		vadd.f32	s14, s14, s13
+ 175              		.loc 1 311 23 view .LVU53
+ 176 003e 80ED047A 		vstr.32	s14, [r0, #16]
+ 177              	.LVL11:
+ 178              	.L3:
+ 312:ACE-ECF/Algorithm/src/pid.c ****     }
+ 313:ACE-ECF/Algorithm/src/pid.c **** }
+ 179              		.loc 1 313 1 view .LVU54
+ 180 0042 7047     		bx	lr
+ 181              	.LVL12:
+ 182              	.L13:
+ 293:ACE-ECF/Algorithm/src/pid.c ****     {
+ 183              		.loc 1 293 9 discriminator 2 view .LVU55
+ 184 0044 B1EE676A 		vneg.f32	s12, s15
+ 185 0048 E7E7     		b	.L4
+ 186              	.L14:
+ 303:ACE-ECF/Algorithm/src/pid.c ****         {
+ 187              		.loc 1 303 14 is_stmt 1 view .LVU56
+ 303:ACE-ECF/Algorithm/src/pid.c ****         {
+ 188              		.loc 1 303 17 is_stmt 0 view .LVU57
+ 189 004a 02D4     		bmi	.L15
+ 309:ACE-ECF/Algorithm/src/pid.c ****         }
+ 190              		.loc 1 309 21 view .LVU58
+ 191 004c DFED027A 		vldr.32	s15, .L16
+ 192 0050 F1E7     		b	.L6
+ 193              	.L15:
+ 305:ACE-ECF/Algorithm/src/pid.c ****         }
+ 194              		.loc 1 305 21 view .LVU59
+ 195 0052 F7EE007A 		vmov.f32	s15, #1.0e+0
+ 196 0056 EEE7     		b	.L6
+ 197              	.L17:
+ 198              		.align	2
+ 199              	.L16:
+ 200 0058 00000000 		.word	0
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccbfa9Ec.s 			page 10
+
+
+ 201              		.cfi_endproc
+ 202              	.LFE139:
+ 204              		.section	.text.f_Separated_Integral,"ax",%progbits
+ 205              		.align	1
+ 206              		.syntax unified
+ 207              		.thumb
+ 208              		.thumb_func
+ 210              	f_Separated_Integral:
+ 211              	.LVL13:
+ 212              	.LFB140:
+ 314:ACE-ECF/Algorithm/src/pid.c **** /**
+ 315:ACE-ECF/Algorithm/src/pid.c ****  * @brief          积分分离
+ 316:ACE-ECF/Algorithm/src/pid.c ****  * @param[in]      pid结构体
+ 317:ACE-ECF/Algorithm/src/pid.c ****  * @retval         none
+ 318:ACE-ECF/Algorithm/src/pid.c ****  * @attention      当超过阈值的时候吧iout清零就行
+ 319:ACE-ECF/Algorithm/src/pid.c ****  */
+ 320:ACE-ECF/Algorithm/src/pid.c **** void f_Separated_Integral(pid_parameter_t *pid)
+ 321:ACE-ECF/Algorithm/src/pid.c **** {
+ 213              		.loc 1 321 1 is_stmt 1 view -0
+ 214              		.cfi_startproc
+ 215              		@ args = 0, pretend = 0, frame = 0
+ 216              		@ frame_needed = 0, uses_anonymous_args = 0
+ 217              		@ link register save eliminated.
+ 322:ACE-ECF/Algorithm/src/pid.c ****     if (pid->threshold_min > pid->error && pid->error < pid->threshold_max)
+ 218              		.loc 1 322 5 view .LVU61
+ 219              		.loc 1 322 12 is_stmt 0 view .LVU62
+ 220 0000 90ED187A 		vldr.32	s14, [r0, #96]
+ 221              		.loc 1 322 33 view .LVU63
+ 222 0004 D0ED117A 		vldr.32	s15, [r0, #68]
+ 223              		.loc 1 322 8 view .LVU64
+ 224 0008 B4EEE77A 		vcmpe.f32	s14, s15
+ 225 000c F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 226 0010 08DD     		ble	.L18
+ 227              		.loc 1 322 60 discriminator 1 view .LVU65
+ 228 0012 90ED177A 		vldr.32	s14, [r0, #92]
+ 229              		.loc 1 322 41 discriminator 1 view .LVU66
+ 230 0016 F4EEC77A 		vcmpe.f32	s15, s14
+ 231 001a F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 232 001e 01D5     		bpl	.L18
+ 323:ACE-ECF/Algorithm/src/pid.c ****         pid->Iout = 0;
+ 233              		.loc 1 323 9 is_stmt 1 view .LVU67
+ 234              		.loc 1 323 19 is_stmt 0 view .LVU68
+ 235 0020 0023     		movs	r3, #0
+ 236 0022 8362     		str	r3, [r0, #40]	@ float
+ 237              	.L18:
+ 324:ACE-ECF/Algorithm/src/pid.c **** }
+ 238              		.loc 1 324 1 view .LVU69
+ 239 0024 7047     		bx	lr
+ 240              		.cfi_endproc
+ 241              	.LFE140:
+ 243              		.section	.text.f_Integral_Limit,"ax",%progbits
+ 244              		.align	1
+ 245              		.syntax unified
+ 246              		.thumb
+ 247              		.thumb_func
+ 249              	f_Integral_Limit:
+ 250              	.LVL14:
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccbfa9Ec.s 			page 11
+
+
+ 251              	.LFB141:
+ 325:ACE-ECF/Algorithm/src/pid.c **** /**
+ 326:ACE-ECF/Algorithm/src/pid.c ****  * @brief          积分限幅
+ 327:ACE-ECF/Algorithm/src/pid.c ****  * @param[in]      pid结构体
+ 328:ACE-ECF/Algorithm/src/pid.c ****  * @retval         none
+ 329:ACE-ECF/Algorithm/src/pid.c ****  * @attention      当超过阈值的时候吧iout清零就行
+ 330:ACE-ECF/Algorithm/src/pid.c ****  */
+ 331:ACE-ECF/Algorithm/src/pid.c **** void f_Integral_Limit(pid_parameter_t *pid)
+ 332:ACE-ECF/Algorithm/src/pid.c **** {
+ 252              		.loc 1 332 1 is_stmt 1 view -0
+ 253              		.cfi_startproc
+ 254              		@ args = 0, pretend = 0, frame = 0
+ 255              		@ frame_needed = 0, uses_anonymous_args = 0
+ 256              		@ link register save eliminated.
+ 333:ACE-ECF/Algorithm/src/pid.c ****     if (pid->Ierror > pid->max_Ierror)
+ 257              		.loc 1 333 5 view .LVU71
+ 258              		.loc 1 333 12 is_stmt 0 view .LVU72
+ 259 0000 90ED087A 		vldr.32	s14, [r0, #32]
+ 260              		.loc 1 333 26 view .LVU73
+ 261 0004 D0ED157A 		vldr.32	s15, [r0, #84]
+ 262              		.loc 1 333 8 view .LVU74
+ 263 0008 B4EEE77A 		vcmpe.f32	s14, s15
+ 264 000c F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 265 0010 01DD     		ble	.L25
+ 334:ACE-ECF/Algorithm/src/pid.c ****     {
+ 335:ACE-ECF/Algorithm/src/pid.c ****         pid->Ierror = pid->max_Ierror;
+ 266              		.loc 1 335 9 is_stmt 1 view .LVU75
+ 267              		.loc 1 335 21 is_stmt 0 view .LVU76
+ 268 0012 C0ED087A 		vstr.32	s15, [r0, #32]
+ 269              	.L25:
+ 336:ACE-ECF/Algorithm/src/pid.c ****     }
+ 337:ACE-ECF/Algorithm/src/pid.c ****     if (pid->Ierror < -(pid->max_Ierror))
+ 270              		.loc 1 337 5 is_stmt 1 view .LVU77
+ 271              		.loc 1 337 12 is_stmt 0 view .LVU78
+ 272 0016 90ED087A 		vldr.32	s14, [r0, #32]
+ 273              		.loc 1 337 23 view .LVU79
+ 274 001a F1EE677A 		vneg.f32	s15, s15
+ 275              		.loc 1 337 8 view .LVU80
+ 276 001e B4EEE77A 		vcmpe.f32	s14, s15
+ 277 0022 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 278 0026 01D5     		bpl	.L24
+ 338:ACE-ECF/Algorithm/src/pid.c ****     {
+ 339:ACE-ECF/Algorithm/src/pid.c ****         pid->Ierror = -(pid->max_Ierror);
+ 279              		.loc 1 339 9 is_stmt 1 view .LVU81
+ 280              		.loc 1 339 21 is_stmt 0 view .LVU82
+ 281 0028 C0ED087A 		vstr.32	s15, [r0, #32]
+ 282              	.L24:
+ 340:ACE-ECF/Algorithm/src/pid.c ****     }
+ 341:ACE-ECF/Algorithm/src/pid.c **** }
+ 283              		.loc 1 341 1 view .LVU83
+ 284 002c 7047     		bx	lr
+ 285              		.cfi_endproc
+ 286              	.LFE141:
+ 288              		.section	.text.Changing_Integration_Rate,"ax",%progbits
+ 289              		.align	1
+ 290              		.syntax unified
+ 291              		.thumb
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccbfa9Ec.s 			page 12
+
+
+ 292              		.thumb_func
+ 294              	Changing_Integration_Rate:
+ 295              	.LVL15:
+ 296              	.LFB142:
+ 342:ACE-ECF/Algorithm/src/pid.c **** /**
+ 343:ACE-ECF/Algorithm/src/pid.c ****  * @brief          变积分系数处理函数，实现一个输出0和1之间的分段线性函数
+ 344:ACE-ECF/Algorithm/src/pid.c ****  * @param[in]      pid结构体
+ 345:ACE-ECF/Algorithm/src/pid.c ****  * @retval         none
+ 346:ACE-ECF/Algorithm/src/pid.c ****  * @attention      当偏差的绝对值小于最小值时，输出为1；当偏差的绝对值大�
+ 347:ACE-ECF/Algorithm/src/pid.c ****  *                 当偏差的绝对值介于最大值和最小值之间时，输出在0和1之间
+ 348:ACE-ECF/Algorithm/src/pid.c ****  */
+ 349:ACE-ECF/Algorithm/src/pid.c **** void Changing_Integration_Rate(pid_parameter_t *pid)
+ 350:ACE-ECF/Algorithm/src/pid.c **** {
+ 297              		.loc 1 350 1 is_stmt 1 view -0
+ 298              		.cfi_startproc
+ 299              		@ args = 0, pretend = 0, frame = 0
+ 300              		@ frame_needed = 0, uses_anonymous_args = 0
+ 301              		@ link register save eliminated.
+ 351:ACE-ECF/Algorithm/src/pid.c ****     if (abs(pid->error) <= pid->errorabsmin) // 最小值
+ 302              		.loc 1 351 5 view .LVU85
+ 303              		.loc 1 351 9 is_stmt 0 view .LVU86
+ 304 0000 D0ED117A 		vldr.32	s15, [r0, #68]
+ 305 0004 F5EEC07A 		vcmpe.f32	s15, #0
+ 306 0008 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 307 000c 10DD     		ble	.L38
+ 308              	.L32:
+ 309              		.loc 1 351 31 discriminator 4 view .LVU87
+ 310 000e D0ED1A6A 		vldr.32	s13, [r0, #104]
+ 311              		.loc 1 351 8 discriminator 4 view .LVU88
+ 312 0012 F4EEE76A 		vcmpe.f32	s13, s15
+ 313 0016 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 314 001a 18DA     		bge	.L31
+ 352:ACE-ECF/Algorithm/src/pid.c ****     {
+ 353:ACE-ECF/Algorithm/src/pid.c ****         return;
+ 354:ACE-ECF/Algorithm/src/pid.c ****     }
+ 355:ACE-ECF/Algorithm/src/pid.c ****     else if (abs(pid->error) > pid->errorabsmax) // 最大值
+ 315              		.loc 1 355 10 is_stmt 1 discriminator 4 view .LVU89
+ 316              		.loc 1 355 35 is_stmt 0 discriminator 4 view .LVU90
+ 317 001c 90ED197A 		vldr.32	s14, [r0, #100]
+ 318              		.loc 1 355 13 discriminator 4 view .LVU91
+ 319 0020 B4EEE77A 		vcmpe.f32	s14, s15
+ 320 0024 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 321 0028 05D5     		bpl	.L37
+ 356:ACE-ECF/Algorithm/src/pid.c ****     {
+ 357:ACE-ECF/Algorithm/src/pid.c ****         pid->Ierror = 0.0f;
+ 322              		.loc 1 357 9 is_stmt 1 view .LVU92
+ 323              		.loc 1 357 21 is_stmt 0 view .LVU93
+ 324 002a 0023     		movs	r3, #0
+ 325 002c 0362     		str	r3, [r0, #32]	@ float
+ 326 002e 7047     		bx	lr
+ 327              	.L38:
+ 351:ACE-ECF/Algorithm/src/pid.c ****     {
+ 328              		.loc 1 351 9 discriminator 2 view .LVU94
+ 329 0030 F1EE677A 		vneg.f32	s15, s15
+ 330 0034 EBE7     		b	.L32
+ 331              	.L37:
+ 358:ACE-ECF/Algorithm/src/pid.c ****     }
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccbfa9Ec.s 			page 13
+
+
+ 359:ACE-ECF/Algorithm/src/pid.c ****     else
+ 360:ACE-ECF/Algorithm/src/pid.c ****     {
+ 361:ACE-ECF/Algorithm/src/pid.c ****         pid->Ierror *= ((pid->errorabsmax - abs(pid->error)) / (pid->errorabsmax - pid->errorabsmin
+ 332              		.loc 1 361 9 is_stmt 1 view .LVU95
+ 333              		.loc 1 361 43 is_stmt 0 view .LVU96
+ 334 0036 77EE677A 		vsub.f32	s15, s14, s15
+ 335              		.loc 1 361 82 view .LVU97
+ 336 003a 37EE667A 		vsub.f32	s14, s14, s13
+ 337              		.loc 1 361 62 view .LVU98
+ 338 003e C7EE876A 		vdiv.f32	s13, s15, s14
+ 339              		.loc 1 361 21 view .LVU99
+ 340 0042 D0ED087A 		vldr.32	s15, [r0, #32]
+ 341 0046 67EEA67A 		vmul.f32	s15, s15, s13
+ 342 004a C0ED087A 		vstr.32	s15, [r0, #32]
+ 343              	.L31:
+ 362:ACE-ECF/Algorithm/src/pid.c ****     }
+ 363:ACE-ECF/Algorithm/src/pid.c **** }
+ 344              		.loc 1 363 1 view .LVU100
+ 345 004e 7047     		bx	lr
+ 346              		.cfi_endproc
+ 347              	.LFE142:
+ 349              		.section	.text.f_Output_Limit,"ax",%progbits
+ 350              		.align	1
+ 351              		.syntax unified
+ 352              		.thumb
+ 353              		.thumb_func
+ 355              	f_Output_Limit:
+ 356              	.LVL16:
+ 357              	.LFB143:
+ 364:ACE-ECF/Algorithm/src/pid.c **** /**
+ 365:ACE-ECF/Algorithm/src/pid.c ****  * @brief          输出限幅
+ 366:ACE-ECF/Algorithm/src/pid.c ****  * @param[in]      pid结构体
+ 367:ACE-ECF/Algorithm/src/pid.c ****  * @retval         none
+ 368:ACE-ECF/Algorithm/src/pid.c ****  * @attention      none
+ 369:ACE-ECF/Algorithm/src/pid.c ****  */
+ 370:ACE-ECF/Algorithm/src/pid.c **** void f_Output_Limit(pid_parameter_t *pid)
+ 371:ACE-ECF/Algorithm/src/pid.c **** {
+ 358              		.loc 1 371 1 is_stmt 1 view -0
+ 359              		.cfi_startproc
+ 360              		@ args = 0, pretend = 0, frame = 0
+ 361              		@ frame_needed = 0, uses_anonymous_args = 0
+ 362              		@ link register save eliminated.
+ 372:ACE-ECF/Algorithm/src/pid.c ****     if (pid->out > pid->max_out)
+ 363              		.loc 1 372 5 view .LVU102
+ 364              		.loc 1 372 12 is_stmt 0 view .LVU103
+ 365 0000 90ED0D7A 		vldr.32	s14, [r0, #52]
+ 366              		.loc 1 372 23 view .LVU104
+ 367 0004 D0ED137A 		vldr.32	s15, [r0, #76]
+ 368              		.loc 1 372 8 view .LVU105
+ 369 0008 B4EEE77A 		vcmpe.f32	s14, s15
+ 370 000c F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 371 0010 01DD     		ble	.L40
+ 373:ACE-ECF/Algorithm/src/pid.c ****     {
+ 374:ACE-ECF/Algorithm/src/pid.c ****         pid->out = pid->max_out;
+ 372              		.loc 1 374 9 is_stmt 1 view .LVU106
+ 373              		.loc 1 374 18 is_stmt 0 view .LVU107
+ 374 0012 C0ED0D7A 		vstr.32	s15, [r0, #52]
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccbfa9Ec.s 			page 14
+
+
+ 375              	.L40:
+ 375:ACE-ECF/Algorithm/src/pid.c ****     }
+ 376:ACE-ECF/Algorithm/src/pid.c ****     if (pid->out < -(pid->max_out))
+ 376              		.loc 1 376 5 is_stmt 1 view .LVU108
+ 377              		.loc 1 376 12 is_stmt 0 view .LVU109
+ 378 0016 90ED0D7A 		vldr.32	s14, [r0, #52]
+ 379              		.loc 1 376 20 view .LVU110
+ 380 001a F1EE677A 		vneg.f32	s15, s15
+ 381              		.loc 1 376 8 view .LVU111
+ 382 001e B4EEE77A 		vcmpe.f32	s14, s15
+ 383 0022 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 384 0026 01D5     		bpl	.L39
+ 377:ACE-ECF/Algorithm/src/pid.c ****     {
+ 378:ACE-ECF/Algorithm/src/pid.c ****         pid->out = -(pid->max_out);
+ 385              		.loc 1 378 9 is_stmt 1 view .LVU112
+ 386              		.loc 1 378 18 is_stmt 0 view .LVU113
+ 387 0028 C0ED0D7A 		vstr.32	s15, [r0, #52]
+ 388              	.L39:
+ 379:ACE-ECF/Algorithm/src/pid.c ****     }
+ 380:ACE-ECF/Algorithm/src/pid.c **** }
+ 389              		.loc 1 380 1 view .LVU114
+ 390 002c 7047     		bx	lr
+ 391              		.cfi_endproc
+ 392              	.LFE143:
+ 394              		.section	.text.PidInit,"ax",%progbits
+ 395              		.align	1
+ 396              		.global	PidInit
+ 397              		.syntax unified
+ 398              		.thumb
+ 399              		.thumb_func
+ 401              	PidInit:
+ 402              	.LVL17:
+ 403              	.LFB130:
+  61:ACE-ECF/Algorithm/src/pid.c ****     memset(pid, 0, sizeof(pid_parameter_t));
+ 404              		.loc 1 61 1 is_stmt 1 view -0
+ 405              		.cfi_startproc
+ 406              		@ args = 0, pretend = 0, frame = 0
+ 407              		@ frame_needed = 0, uses_anonymous_args = 0
+  61:ACE-ECF/Algorithm/src/pid.c ****     memset(pid, 0, sizeof(pid_parameter_t));
+ 408              		.loc 1 61 1 is_stmt 0 view .LVU116
+ 409 0000 2DE9F041 		push	{r4, r5, r6, r7, r8, lr}
+ 410              	.LCFI0:
+ 411              		.cfi_def_cfa_offset 24
+ 412              		.cfi_offset 4, -24
+ 413              		.cfi_offset 5, -20
+ 414              		.cfi_offset 6, -16
+ 415              		.cfi_offset 7, -12
+ 416              		.cfi_offset 8, -8
+ 417              		.cfi_offset 14, -4
+ 418 0004 0446     		mov	r4, r0
+ 419 0006 10EE108A 		vmov	r8, s0
+ 420 000a 10EE907A 		vmov	r7, s1
+ 421 000e 11EE106A 		vmov	r6, s2
+ 422 0012 0D46     		mov	r5, r1
+  62:ACE-ECF/Algorithm/src/pid.c ****     pid->User_Fun = NULL;
+ 423              		.loc 1 62 5 is_stmt 1 view .LVU117
+ 424 0014 9822     		movs	r2, #152
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccbfa9Ec.s 			page 15
+
+
+ 425 0016 0021     		movs	r1, #0
+ 426              	.LVL18:
+  62:ACE-ECF/Algorithm/src/pid.c ****     pid->User_Fun = NULL;
+ 427              		.loc 1 62 5 is_stmt 0 view .LVU118
+ 428 0018 FFF7FEFF 		bl	memset
+ 429              	.LVL19:
+  63:ACE-ECF/Algorithm/src/pid.c ****     pid->Kp = kp;
+ 430              		.loc 1 63 5 is_stmt 1 view .LVU119
+  64:ACE-ECF/Algorithm/src/pid.c ****     pid->Ki = ki;
+ 431              		.loc 1 64 5 view .LVU120
+  64:ACE-ECF/Algorithm/src/pid.c ****     pid->Ki = ki;
+ 432              		.loc 1 64 13 is_stmt 0 view .LVU121
+ 433 001c C4F80080 		str	r8, [r4]	@ float
+  65:ACE-ECF/Algorithm/src/pid.c ****     pid->Kd = kd;
+ 434              		.loc 1 65 5 is_stmt 1 view .LVU122
+  65:ACE-ECF/Algorithm/src/pid.c ****     pid->Kd = kd;
+ 435              		.loc 1 65 13 is_stmt 0 view .LVU123
+ 436 0020 6760     		str	r7, [r4, #4]	@ float
+  66:ACE-ECF/Algorithm/src/pid.c ****     pid->mode = mode;
+ 437              		.loc 1 66 5 is_stmt 1 view .LVU124
+  66:ACE-ECF/Algorithm/src/pid.c ****     pid->mode = mode;
+ 438              		.loc 1 66 13 is_stmt 0 view .LVU125
+ 439 0022 A660     		str	r6, [r4, #8]	@ float
+  67:ACE-ECF/Algorithm/src/pid.c **** }
+ 440              		.loc 1 67 5 is_stmt 1 view .LVU126
+  67:ACE-ECF/Algorithm/src/pid.c **** }
+ 441              		.loc 1 67 15 is_stmt 0 view .LVU127
+ 442 0024 2565     		str	r5, [r4, #80]
+  68:ACE-ECF/Algorithm/src/pid.c **** /**
+ 443              		.loc 1 68 1 view .LVU128
+ 444 0026 BDE8F081 		pop	{r4, r5, r6, r7, r8, pc}
+  68:ACE-ECF/Algorithm/src/pid.c **** /**
+ 445              		.loc 1 68 1 view .LVU129
+ 446              		.cfi_endproc
+ 447              	.LFE130:
+ 449              		.section	.text.PidInitMode,"ax",%progbits
+ 450              		.align	1
+ 451              		.global	PidInitMode
+ 452              		.syntax unified
+ 453              		.thumb
+ 454              		.thumb_func
+ 456              	PidInitMode:
+ 457              	.LVL20:
+ 458              	.LFB131:
+  87:ACE-ECF/Algorithm/src/pid.c ****     switch (mode)
+ 459              		.loc 1 87 1 is_stmt 1 view -0
+ 460              		.cfi_startproc
+ 461              		@ args = 0, pretend = 0, frame = 0
+ 462              		@ frame_needed = 0, uses_anonymous_args = 0
+ 463              		@ link register save eliminated.
+  88:ACE-ECF/Algorithm/src/pid.c ****     {
+ 464              		.loc 1 88 5 view .LVU131
+ 465 0000 2029     		cmp	r1, #32
+ 466 0002 15D8     		bhi	.L49
+ 467 0004 E9B1     		cbz	r1, .L48
+ 468 0006 0139     		subs	r1, r1, #1
+ 469              	.LVL21:
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccbfa9Ec.s 			page 16
+
+
+  88:ACE-ECF/Algorithm/src/pid.c ****     {
+ 470              		.loc 1 88 5 is_stmt 0 view .LVU132
+ 471 0008 1F29     		cmp	r1, #31
+ 472 000a 1AD8     		bhi	.L48
+ 473 000c DFE801F0 		tbb	[pc, r1]
+ 474              	.L52:
+ 475 0010 39       		.byte	(.L57-.L52)/2
+ 476 0011 23       		.byte	(.L56-.L52)/2
+ 477 0012 19       		.byte	(.L48-.L52)/2
+ 478 0013 2E       		.byte	(.L55-.L52)/2
+ 479 0014 19       		.byte	(.L48-.L52)/2
+ 480 0015 19       		.byte	(.L48-.L52)/2
+ 481 0016 19       		.byte	(.L48-.L52)/2
+ 482 0017 26       		.byte	(.L54-.L52)/2
+ 483 0018 19       		.byte	(.L48-.L52)/2
+ 484 0019 19       		.byte	(.L48-.L52)/2
+ 485 001a 19       		.byte	(.L48-.L52)/2
+ 486 001b 19       		.byte	(.L48-.L52)/2
+ 487 001c 19       		.byte	(.L48-.L52)/2
+ 488 001d 19       		.byte	(.L48-.L52)/2
+ 489 001e 19       		.byte	(.L48-.L52)/2
+ 490 001f 29       		.byte	(.L53-.L52)/2
+ 491 0020 19       		.byte	(.L48-.L52)/2
+ 492 0021 19       		.byte	(.L48-.L52)/2
+ 493 0022 19       		.byte	(.L48-.L52)/2
+ 494 0023 19       		.byte	(.L48-.L52)/2
+ 495 0024 19       		.byte	(.L48-.L52)/2
+ 496 0025 19       		.byte	(.L48-.L52)/2
+ 497 0026 19       		.byte	(.L48-.L52)/2
+ 498 0027 19       		.byte	(.L48-.L52)/2
+ 499 0028 19       		.byte	(.L48-.L52)/2
+ 500 0029 19       		.byte	(.L48-.L52)/2
+ 501 002a 19       		.byte	(.L48-.L52)/2
+ 502 002b 19       		.byte	(.L48-.L52)/2
+ 503 002c 19       		.byte	(.L48-.L52)/2
+ 504 002d 19       		.byte	(.L48-.L52)/2
+ 505 002e 19       		.byte	(.L48-.L52)/2
+ 506 002f 34       		.byte	(.L51-.L52)/2
+ 507              	.LVL22:
+ 508              		.p2align 1
+ 509              	.L49:
+  88:ACE-ECF/Algorithm/src/pid.c ****     {
+ 510              		.loc 1 88 5 view .LVU133
+ 511 0030 B1F5807F 		cmp	r1, #256
+ 512 0034 28D0     		beq	.L58
+ 513 0036 05D9     		bls	.L63
+ 514 0038 B1F5007F 		cmp	r1, #512
+ 515 003c 0AD1     		bne	.L64
+ 122:ACE-ECF/Algorithm/src/pid.c ****         return;
+ 516              		.loc 1 122 9 is_stmt 1 view .LVU134
+ 122:ACE-ECF/Algorithm/src/pid.c ****         return;
+ 517              		.loc 1 122 17 is_stmt 0 view .LVU135
+ 518 003e 80ED030A 		vstr.32	s0, [r0, #12]
+ 123:ACE-ECF/Algorithm/src/pid.c ****     }
+ 519              		.loc 1 123 9 is_stmt 1 view .LVU136
+ 520              	.LVL23:
+ 521              	.L48:
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccbfa9Ec.s 			page 17
+
+
+ 126:ACE-ECF/Algorithm/src/pid.c **** /**
+ 522              		.loc 1 126 1 is_stmt 0 view .LVU137
+ 523 0042 7047     		bx	lr
+ 524              	.LVL24:
+ 525              	.L63:
+  88:ACE-ECF/Algorithm/src/pid.c ****     {
+ 526              		.loc 1 88 5 view .LVU138
+ 527 0044 4029     		cmp	r1, #64
+ 528 0046 14D0     		beq	.L60
+ 529 0048 8029     		cmp	r1, #128
+ 530 004a 02D1     		bne	.L65
+ 113:ACE-ECF/Algorithm/src/pid.c ****         return;
+ 531              		.loc 1 113 9 is_stmt 1 view .LVU139
+ 113:ACE-ECF/Algorithm/src/pid.c ****         return;
+ 532              		.loc 1 113 27 is_stmt 0 view .LVU140
+ 533 004c 80ED1F0A 		vstr.32	s0, [r0, #124]
+ 114:ACE-ECF/Algorithm/src/pid.c ****     case Deadzone:
+ 534              		.loc 1 114 9 is_stmt 1 view .LVU141
+ 535 0050 7047     		bx	lr
+ 536              	.L65:
+ 114:ACE-ECF/Algorithm/src/pid.c ****     case Deadzone:
+ 537              		.loc 1 114 9 is_stmt 0 view .LVU142
+ 538 0052 7047     		bx	lr
+ 539              	.L64:
+ 114:ACE-ECF/Algorithm/src/pid.c ****     case Deadzone:
+ 540              		.loc 1 114 9 view .LVU143
+ 541 0054 7047     		bx	lr
+ 542              	.LVL25:
+ 543              	.L56:
+  93:ACE-ECF/Algorithm/src/pid.c ****         return;
+ 544              		.loc 1 93 9 is_stmt 1 view .LVU144
+  93:ACE-ECF/Algorithm/src/pid.c ****         return;
+ 545              		.loc 1 93 25 is_stmt 0 view .LVU145
+ 546 0056 80ED150A 		vstr.32	s0, [r0, #84]
+  94:ACE-ECF/Algorithm/src/pid.c ****     case Derivative_On_Measurement:
+ 547              		.loc 1 94 9 is_stmt 1 view .LVU146
+ 548 005a 7047     		bx	lr
+ 549              	.L54:
+  96:ACE-ECF/Algorithm/src/pid.c ****         return;
+ 550              		.loc 1 96 9 view .LVU147
+  96:ACE-ECF/Algorithm/src/pid.c ****         return;
+ 551              		.loc 1 96 19 is_stmt 0 view .LVU148
+ 552 005c 80ED1B0A 		vstr.32	s0, [r0, #108]
+  97:ACE-ECF/Algorithm/src/pid.c ****     case Separated_Integral:
+ 553              		.loc 1 97 9 is_stmt 1 view .LVU149
+ 554 0060 7047     		bx	lr
+ 555              	.L53:
+  99:ACE-ECF/Algorithm/src/pid.c ****         pid->threshold_min = num2;
+ 556              		.loc 1 99 9 view .LVU150
+  99:ACE-ECF/Algorithm/src/pid.c ****         pid->threshold_min = num2;
+ 557              		.loc 1 99 28 is_stmt 0 view .LVU151
+ 558 0062 80ED170A 		vstr.32	s0, [r0, #92]
+ 100:ACE-ECF/Algorithm/src/pid.c ****         return;
+ 559              		.loc 1 100 9 is_stmt 1 view .LVU152
+ 100:ACE-ECF/Algorithm/src/pid.c ****         return;
+ 560              		.loc 1 100 28 is_stmt 0 view .LVU153
+ 561 0066 C0ED180A 		vstr.32	s1, [r0, #96]
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccbfa9Ec.s 			page 18
+
+
+ 101:ACE-ECF/Algorithm/src/pid.c ****     case Output_Limit:
+ 562              		.loc 1 101 9 is_stmt 1 view .LVU154
+ 563 006a 7047     		bx	lr
+ 564              	.L55:
+ 103:ACE-ECF/Algorithm/src/pid.c ****         return;
+ 565              		.loc 1 103 9 view .LVU155
+ 103:ACE-ECF/Algorithm/src/pid.c ****         return;
+ 566              		.loc 1 103 22 is_stmt 0 view .LVU156
+ 567 006c 80ED130A 		vstr.32	s0, [r0, #76]
+ 104:ACE-ECF/Algorithm/src/pid.c ****     case OutputFilter:
+ 568              		.loc 1 104 9 is_stmt 1 view .LVU157
+ 569 0070 7047     		bx	lr
+ 570              	.LVL26:
+ 571              	.L60:
+ 106:ACE-ECF/Algorithm/src/pid.c ****         return;
+ 572              		.loc 1 106 9 view .LVU158
+ 106:ACE-ECF/Algorithm/src/pid.c ****         return;
+ 573              		.loc 1 106 29 is_stmt 0 view .LVU159
+ 574 0072 80ED230A 		vstr.32	s0, [r0, #140]
+ 107:ACE-ECF/Algorithm/src/pid.c ****     case ChangingIntegrationRate:
+ 575              		.loc 1 107 9 is_stmt 1 view .LVU160
+ 576 0076 7047     		bx	lr
+ 577              	.LVL27:
+ 578              	.L51:
+ 109:ACE-ECF/Algorithm/src/pid.c ****         pid->errorabsmin = num2;
+ 579              		.loc 1 109 9 view .LVU161
+ 109:ACE-ECF/Algorithm/src/pid.c ****         pid->errorabsmin = num2;
+ 580              		.loc 1 109 26 is_stmt 0 view .LVU162
+ 581 0078 80ED190A 		vstr.32	s0, [r0, #100]
+ 110:ACE-ECF/Algorithm/src/pid.c ****         return;
+ 582              		.loc 1 110 9 is_stmt 1 view .LVU163
+ 110:ACE-ECF/Algorithm/src/pid.c ****         return;
+ 583              		.loc 1 110 26 is_stmt 0 view .LVU164
+ 584 007c C0ED1A0A 		vstr.32	s1, [r0, #104]
+ 111:ACE-ECF/Algorithm/src/pid.c ****     case DerivativeFilter:
+ 585              		.loc 1 111 9 is_stmt 1 view .LVU165
+ 586 0080 7047     		bx	lr
+ 587              	.L57:
+ 116:ACE-ECF/Algorithm/src/pid.c ****         return;
+ 588              		.loc 1 116 9 view .LVU166
+ 116:ACE-ECF/Algorithm/src/pid.c ****         return;
+ 589              		.loc 1 116 23 is_stmt 0 view .LVU167
+ 590 0082 80ED160A 		vstr.32	s0, [r0, #88]
+ 117:ACE-ECF/Algorithm/src/pid.c ****     case StepIn:
+ 591              		.loc 1 117 9 is_stmt 1 view .LVU168
+ 592 0086 7047     		bx	lr
+ 593              	.LVL28:
+ 594              	.L58:
+ 119:ACE-ECF/Algorithm/src/pid.c ****         return;
+ 595              		.loc 1 119 9 view .LVU169
+ 119:ACE-ECF/Algorithm/src/pid.c ****         return;
+ 596              		.loc 1 119 21 is_stmt 0 view .LVU170
+ 597 0088 80ED240A 		vstr.32	s0, [r0, #144]
+ 120:ACE-ECF/Algorithm/src/pid.c ****     case FeedFront:
+ 598              		.loc 1 120 9 is_stmt 1 view .LVU171
+ 599 008c 7047     		bx	lr
+ 600              		.cfi_endproc
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccbfa9Ec.s 			page 19
+
+
+ 601              	.LFE131:
+ 603              		.section	.text.pid_clear,"ax",%progbits
+ 604              		.align	1
+ 605              		.global	pid_clear
+ 606              		.syntax unified
+ 607              		.thumb
+ 608              		.thumb_func
+ 610              	pid_clear:
+ 611              	.LVL29:
+ 612              	.LFB133:
+ 201:ACE-ECF/Algorithm/src/pid.c ****     pid->error = pid->LastError = 0.0f;
+ 613              		.loc 1 201 1 view -0
+ 614              		.cfi_startproc
+ 615              		@ args = 0, pretend = 0, frame = 0
+ 616              		@ frame_needed = 0, uses_anonymous_args = 0
+ 617              		@ link register save eliminated.
+ 202:ACE-ECF/Algorithm/src/pid.c ****     pid->Derror = pid->LastDerror = pid->LastLastDerror = 0.0f;
+ 618              		.loc 1 202 5 view .LVU173
+ 202:ACE-ECF/Algorithm/src/pid.c ****     pid->Derror = pid->LastDerror = pid->LastLastDerror = 0.0f;
+ 619              		.loc 1 202 33 is_stmt 0 view .LVU174
+ 620 0000 0023     		movs	r3, #0
+ 621 0002 8364     		str	r3, [r0, #72]	@ float
+ 202:ACE-ECF/Algorithm/src/pid.c ****     pid->Derror = pid->LastDerror = pid->LastLastDerror = 0.0f;
+ 622              		.loc 1 202 16 view .LVU175
+ 623 0004 4364     		str	r3, [r0, #68]	@ float
+ 203:ACE-ECF/Algorithm/src/pid.c ****     pid->out = pid->Pout = pid->Iout = pid->Dout = pid->Ierror = 0.0f;
+ 624              		.loc 1 203 5 is_stmt 1 view .LVU176
+ 203:ACE-ECF/Algorithm/src/pid.c ****     pid->out = pid->Pout = pid->Iout = pid->Dout = pid->Ierror = 0.0f;
+ 625              		.loc 1 203 57 is_stmt 0 view .LVU177
+ 626 0006 0364     		str	r3, [r0, #64]	@ float
+ 203:ACE-ECF/Algorithm/src/pid.c ****     pid->out = pid->Pout = pid->Iout = pid->Dout = pid->Ierror = 0.0f;
+ 627              		.loc 1 203 35 view .LVU178
+ 628 0008 C363     		str	r3, [r0, #60]	@ float
+ 203:ACE-ECF/Algorithm/src/pid.c ****     pid->out = pid->Pout = pid->Iout = pid->Dout = pid->Ierror = 0.0f;
+ 629              		.loc 1 203 17 view .LVU179
+ 630 000a 8363     		str	r3, [r0, #56]	@ float
+ 204:ACE-ECF/Algorithm/src/pid.c ****     pid->ActualValue = pid->SetValue = pid->LastActualValue = pid->LastSetValue = 0.0f;
+ 631              		.loc 1 204 5 is_stmt 1 view .LVU180
+ 204:ACE-ECF/Algorithm/src/pid.c ****     pid->ActualValue = pid->SetValue = pid->LastActualValue = pid->LastSetValue = 0.0f;
+ 632              		.loc 1 204 64 is_stmt 0 view .LVU181
+ 633 000c 0362     		str	r3, [r0, #32]	@ float
+ 204:ACE-ECF/Algorithm/src/pid.c ****     pid->ActualValue = pid->SetValue = pid->LastActualValue = pid->LastSetValue = 0.0f;
+ 634              		.loc 1 204 50 view .LVU182
+ 635 000e C362     		str	r3, [r0, #44]	@ float
+ 204:ACE-ECF/Algorithm/src/pid.c ****     pid->ActualValue = pid->SetValue = pid->LastActualValue = pid->LastSetValue = 0.0f;
+ 636              		.loc 1 204 38 view .LVU183
+ 637 0010 8362     		str	r3, [r0, #40]	@ float
+ 204:ACE-ECF/Algorithm/src/pid.c ****     pid->ActualValue = pid->SetValue = pid->LastActualValue = pid->LastSetValue = 0.0f;
+ 638              		.loc 1 204 26 view .LVU184
+ 639 0012 4362     		str	r3, [r0, #36]	@ float
+ 204:ACE-ECF/Algorithm/src/pid.c ****     pid->ActualValue = pid->SetValue = pid->LastActualValue = pid->LastSetValue = 0.0f;
+ 640              		.loc 1 204 14 view .LVU185
+ 641 0014 4363     		str	r3, [r0, #52]	@ float
+ 205:ACE-ECF/Algorithm/src/pid.c ****     pid->d_filter.last_input = pid->out_filter.last_input = 0;
+ 642              		.loc 1 205 5 is_stmt 1 view .LVU186
+ 205:ACE-ECF/Algorithm/src/pid.c ****     pid->d_filter.last_input = pid->out_filter.last_input = 0;
+ 643              		.loc 1 205 81 is_stmt 0 view .LVU187
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccbfa9Ec.s 			page 20
+
+
+ 644 0016 4361     		str	r3, [r0, #20]	@ float
+ 205:ACE-ECF/Algorithm/src/pid.c ****     pid->d_filter.last_input = pid->out_filter.last_input = 0;
+ 645              		.loc 1 205 61 view .LVU188
+ 646 0018 8361     		str	r3, [r0, #24]	@ float
+ 205:ACE-ECF/Algorithm/src/pid.c ****     pid->d_filter.last_input = pid->out_filter.last_input = 0;
+ 647              		.loc 1 205 38 view .LVU189
+ 648 001a 0361     		str	r3, [r0, #16]	@ float
+ 205:ACE-ECF/Algorithm/src/pid.c ****     pid->d_filter.last_input = pid->out_filter.last_input = 0;
+ 649              		.loc 1 205 22 view .LVU190
+ 650 001c C361     		str	r3, [r0, #28]	@ float
+ 206:ACE-ECF/Algorithm/src/pid.c **** }
+ 651              		.loc 1 206 5 is_stmt 1 view .LVU191
+ 206:ACE-ECF/Algorithm/src/pid.c **** }
+ 652              		.loc 1 206 59 is_stmt 0 view .LVU192
+ 653 001e C0F88430 		str	r3, [r0, #132]	@ float
+ 206:ACE-ECF/Algorithm/src/pid.c **** }
+ 654              		.loc 1 206 30 view .LVU193
+ 655 0022 4367     		str	r3, [r0, #116]	@ float
+ 207:ACE-ECF/Algorithm/src/pid.c **** /**
+ 656              		.loc 1 207 1 view .LVU194
+ 657 0024 7047     		bx	lr
+ 658              		.cfi_endproc
+ 659              	.LFE133:
+ 661              		.section	.text.PidCalculate,"ax",%progbits
+ 662              		.align	1
+ 663              		.global	PidCalculate
+ 664              		.syntax unified
+ 665              		.thumb
+ 666              		.thumb_func
+ 668              	PidCalculate:
+ 669              	.LVL30:
+ 670              	.LFB132:
+ 135:ACE-ECF/Algorithm/src/pid.c ****     pid->SetValue = SetValue;
+ 671              		.loc 1 135 1 is_stmt 1 view -0
+ 672              		.cfi_startproc
+ 673              		@ args = 0, pretend = 0, frame = 0
+ 674              		@ frame_needed = 0, uses_anonymous_args = 0
+ 135:ACE-ECF/Algorithm/src/pid.c ****     pid->SetValue = SetValue;
+ 675              		.loc 1 135 1 is_stmt 0 view .LVU196
+ 676 0000 10B5     		push	{r4, lr}
+ 677              	.LCFI1:
+ 678              		.cfi_def_cfa_offset 8
+ 679              		.cfi_offset 4, -8
+ 680              		.cfi_offset 14, -4
+ 681 0002 2DED028B 		vpush.64	{d8}
+ 682              	.LCFI2:
+ 683              		.cfi_def_cfa_offset 16
+ 684              		.cfi_offset 80, -16
+ 685              		.cfi_offset 81, -12
+ 686 0006 0446     		mov	r4, r0
+ 687 0008 B0EE608A 		vmov.f32	s16, s1
+ 136:ACE-ECF/Algorithm/src/pid.c ****     // 步进式pid
+ 688              		.loc 1 136 5 is_stmt 1 view .LVU197
+ 136:ACE-ECF/Algorithm/src/pid.c ****     // 步进式pid
+ 689              		.loc 1 136 19 is_stmt 0 view .LVU198
+ 690 000c 80ED040A 		vstr.32	s0, [r0, #16]
+ 138:ACE-ECF/Algorithm/src/pid.c ****         f_StepIn(pid);
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccbfa9Ec.s 			page 21
+
+
+ 691              		.loc 1 138 5 is_stmt 1 view .LVU199
+ 138:ACE-ECF/Algorithm/src/pid.c ****         f_StepIn(pid);
+ 692              		.loc 1 138 12 is_stmt 0 view .LVU200
+ 693 0010 036D     		ldr	r3, [r0, #80]
+ 138:ACE-ECF/Algorithm/src/pid.c ****         f_StepIn(pid);
+ 694              		.loc 1 138 8 view .LVU201
+ 695 0012 13F4807F 		tst	r3, #256
+ 696 0016 79D1     		bne	.L84
+ 697              	.LVL31:
+ 698              	.L68:
+ 140:ACE-ECF/Algorithm/src/pid.c ****     pid->error = pid->SetValue - pid->ActualValue;
+ 699              		.loc 1 140 5 is_stmt 1 view .LVU202
+ 140:ACE-ECF/Algorithm/src/pid.c ****     pid->error = pid->SetValue - pid->ActualValue;
+ 700              		.loc 1 140 22 is_stmt 0 view .LVU203
+ 701 0018 84ED078A 		vstr.32	s16, [r4, #28]
+ 141:ACE-ECF/Algorithm/src/pid.c ****     pid->Derror = pid->error - pid->LastError;
+ 702              		.loc 1 141 5 is_stmt 1 view .LVU204
+ 141:ACE-ECF/Algorithm/src/pid.c ****     pid->Derror = pid->error - pid->LastError;
+ 703              		.loc 1 141 21 is_stmt 0 view .LVU205
+ 704 001c D4ED047A 		vldr.32	s15, [r4, #16]
+ 141:ACE-ECF/Algorithm/src/pid.c ****     pid->Derror = pid->error - pid->LastError;
+ 705              		.loc 1 141 32 view .LVU206
+ 706 0020 77EEC80A 		vsub.f32	s1, s15, s16
+ 141:ACE-ECF/Algorithm/src/pid.c ****     pid->Derror = pid->error - pid->LastError;
+ 707              		.loc 1 141 16 view .LVU207
+ 708 0024 C4ED110A 		vstr.32	s1, [r4, #68]
+ 142:ACE-ECF/Algorithm/src/pid.c ****     if (abs(pid->error) > pid->deadband) // 死区
+ 709              		.loc 1 142 5 is_stmt 1 view .LVU208
+ 142:ACE-ECF/Algorithm/src/pid.c ****     if (abs(pid->error) > pid->deadband) // 死区
+ 710              		.loc 1 142 35 is_stmt 0 view .LVU209
+ 711 0028 D4ED127A 		vldr.32	s15, [r4, #72]
+ 142:ACE-ECF/Algorithm/src/pid.c ****     if (abs(pid->error) > pid->deadband) // 死区
+ 712              		.loc 1 142 30 view .LVU210
+ 713 002c 70EEE77A 		vsub.f32	s15, s1, s15
+ 142:ACE-ECF/Algorithm/src/pid.c ****     if (abs(pid->error) > pid->deadband) // 死区
+ 714              		.loc 1 142 17 view .LVU211
+ 715 0030 C4ED0E7A 		vstr.32	s15, [r4, #56]
+ 143:ACE-ECF/Algorithm/src/pid.c ****     {
+ 716              		.loc 1 143 5 is_stmt 1 view .LVU212
+ 143:ACE-ECF/Algorithm/src/pid.c ****     {
+ 717              		.loc 1 143 9 is_stmt 0 view .LVU213
+ 718 0034 F5EEC00A 		vcmpe.f32	s1, #0
+ 719 0038 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 720 003c 69DD     		ble	.L85
+ 143:ACE-ECF/Algorithm/src/pid.c ****     {
+ 721              		.loc 1 143 9 view .LVU214
+ 722 003e B0EE607A 		vmov.f32	s14, s1
+ 723              	.L69:
+ 143:ACE-ECF/Algorithm/src/pid.c ****     {
+ 724              		.loc 1 143 30 discriminator 4 view .LVU215
+ 725 0042 D4ED166A 		vldr.32	s13, [r4, #88]
+ 143:ACE-ECF/Algorithm/src/pid.c ****     {
+ 726              		.loc 1 143 8 discriminator 4 view .LVU216
+ 727 0046 F4EEC76A 		vcmpe.f32	s13, s14
+ 728 004a F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 729 004e 40F18780 		bpl	.L82
+ 145:ACE-ECF/Algorithm/src/pid.c ****         pid->Ierror += pid->error;
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccbfa9Ec.s 			page 22
+
+
+ 730              		.loc 1 145 9 is_stmt 1 view .LVU217
+ 145:ACE-ECF/Algorithm/src/pid.c ****         pid->Ierror += pid->error;
+ 731              		.loc 1 145 37 is_stmt 0 view .LVU218
+ 732 0052 94ED007A 		vldr.32	s14, [r4]
+ 145:ACE-ECF/Algorithm/src/pid.c ****         pid->Ierror += pid->error;
+ 733              		.loc 1 145 32 view .LVU219
+ 734 0056 20EE877A 		vmul.f32	s14, s1, s14
+ 145:ACE-ECF/Algorithm/src/pid.c ****         pid->Ierror += pid->error;
+ 735              		.loc 1 145 19 view .LVU220
+ 736 005a 84ED097A 		vstr.32	s14, [r4, #36]
+ 146:ACE-ECF/Algorithm/src/pid.c **** 
+ 737              		.loc 1 146 9 is_stmt 1 view .LVU221
+ 146:ACE-ECF/Algorithm/src/pid.c **** 
+ 738              		.loc 1 146 21 is_stmt 0 view .LVU222
+ 739 005e 94ED087A 		vldr.32	s14, [r4, #32]
+ 740 0062 77EE200A 		vadd.f32	s1, s14, s1
+ 741 0066 C4ED080A 		vstr.32	s1, [r4, #32]
+ 149:ACE-ECF/Algorithm/src/pid.c ****             f_Derivative_On_Measurement(pid);
+ 742              		.loc 1 149 9 is_stmt 1 view .LVU223
+ 149:ACE-ECF/Algorithm/src/pid.c ****             f_Derivative_On_Measurement(pid);
+ 743              		.loc 1 149 16 is_stmt 0 view .LVU224
+ 744 006a 236D     		ldr	r3, [r4, #80]
+ 149:ACE-ECF/Algorithm/src/pid.c ****             f_Derivative_On_Measurement(pid);
+ 745              		.loc 1 149 12 view .LVU225
+ 746 006c 13F0080F 		tst	r3, #8
+ 747 0070 52D1     		bne	.L86
+ 152:ACE-ECF/Algorithm/src/pid.c **** 
+ 748              		.loc 1 152 13 is_stmt 1 view .LVU226
+ 152:ACE-ECF/Algorithm/src/pid.c **** 
+ 749              		.loc 1 152 28 is_stmt 0 view .LVU227
+ 750 0072 94ED027A 		vldr.32	s14, [r4, #8]
+ 152:ACE-ECF/Algorithm/src/pid.c **** 
+ 751              		.loc 1 152 33 view .LVU228
+ 752 0076 67EE877A 		vmul.f32	s15, s15, s14
+ 152:ACE-ECF/Algorithm/src/pid.c **** 
+ 753              		.loc 1 152 23 view .LVU229
+ 754 007a C4ED0B7A 		vstr.32	s15, [r4, #44]
+ 755              	.L73:
+ 155:ACE-ECF/Algorithm/src/pid.c ****             Changing_Integration_Rate(pid);
+ 756              		.loc 1 155 9 is_stmt 1 view .LVU230
+ 155:ACE-ECF/Algorithm/src/pid.c ****             Changing_Integration_Rate(pid);
+ 757              		.loc 1 155 16 is_stmt 0 view .LVU231
+ 758 007e 236D     		ldr	r3, [r4, #80]
+ 155:ACE-ECF/Algorithm/src/pid.c ****             Changing_Integration_Rate(pid);
+ 759              		.loc 1 155 12 view .LVU232
+ 760 0080 13F0200F 		tst	r3, #32
+ 761 0084 4CD1     		bne	.L87
+ 762              	.L74:
+ 159:ACE-ECF/Algorithm/src/pid.c ****             f_Integral_Limit(pid);
+ 763              		.loc 1 159 9 is_stmt 1 view .LVU233
+ 159:ACE-ECF/Algorithm/src/pid.c ****             f_Integral_Limit(pid);
+ 764              		.loc 1 159 16 is_stmt 0 view .LVU234
+ 765 0086 236D     		ldr	r3, [r4, #80]
+ 159:ACE-ECF/Algorithm/src/pid.c ****             f_Integral_Limit(pid);
+ 766              		.loc 1 159 12 view .LVU235
+ 767 0088 13F0020F 		tst	r3, #2
+ 768 008c 4CD1     		bne	.L88
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccbfa9Ec.s 			page 23
+
+
+ 769              	.L75:
+ 161:ACE-ECF/Algorithm/src/pid.c **** 
+ 770              		.loc 1 161 9 is_stmt 1 view .LVU236
+ 161:ACE-ECF/Algorithm/src/pid.c **** 
+ 771              		.loc 1 161 24 is_stmt 0 view .LVU237
+ 772 008e D4ED017A 		vldr.32	s15, [r4, #4]
+ 161:ACE-ECF/Algorithm/src/pid.c **** 
+ 773              		.loc 1 161 34 view .LVU238
+ 774 0092 94ED087A 		vldr.32	s14, [r4, #32]
+ 161:ACE-ECF/Algorithm/src/pid.c **** 
+ 775              		.loc 1 161 29 view .LVU239
+ 776 0096 67EE877A 		vmul.f32	s15, s15, s14
+ 161:ACE-ECF/Algorithm/src/pid.c **** 
+ 777              		.loc 1 161 19 view .LVU240
+ 778 009a C4ED0A7A 		vstr.32	s15, [r4, #40]
+ 164:ACE-ECF/Algorithm/src/pid.c ****             f_Separated_Integral(pid);
+ 779              		.loc 1 164 9 is_stmt 1 view .LVU241
+ 164:ACE-ECF/Algorithm/src/pid.c ****             f_Separated_Integral(pid);
+ 780              		.loc 1 164 16 is_stmt 0 view .LVU242
+ 781 009e 236D     		ldr	r3, [r4, #80]
+ 164:ACE-ECF/Algorithm/src/pid.c ****             f_Separated_Integral(pid);
+ 782              		.loc 1 164 12 view .LVU243
+ 783 00a0 13F0100F 		tst	r3, #16
+ 784 00a4 44D1     		bne	.L89
+ 785              	.L76:
+ 168:ACE-ECF/Algorithm/src/pid.c ****             pid->Dout = first_order_filter(&pid->d_filter, pid->Dout);
+ 786              		.loc 1 168 9 is_stmt 1 view .LVU244
+ 168:ACE-ECF/Algorithm/src/pid.c ****             pid->Dout = first_order_filter(&pid->d_filter, pid->Dout);
+ 787              		.loc 1 168 16 is_stmt 0 view .LVU245
+ 788 00a6 236D     		ldr	r3, [r4, #80]
+ 168:ACE-ECF/Algorithm/src/pid.c ****             pid->Dout = first_order_filter(&pid->d_filter, pid->Dout);
+ 789              		.loc 1 168 12 view .LVU246
+ 790 00a8 13F0800F 		tst	r3, #128
+ 791 00ac 44D1     		bne	.L90
+ 792              	.L77:
+ 171:ACE-ECF/Algorithm/src/pid.c ****         pid->out = pid->Pout + pid->Iout + pid->Dout + pid->Fout;
+ 793              		.loc 1 171 9 is_stmt 1 view .LVU247
+ 171:ACE-ECF/Algorithm/src/pid.c ****         pid->out = pid->Pout + pid->Iout + pid->Dout + pid->Fout;
+ 794              		.loc 1 171 25 is_stmt 0 view .LVU248
+ 795 00ae 94ED030A 		vldr.32	s0, [r4, #12]
+ 171:ACE-ECF/Algorithm/src/pid.c ****         pid->out = pid->Pout + pid->Iout + pid->Dout + pid->Fout;
+ 796              		.loc 1 171 34 view .LVU249
+ 797 00b2 D4ED047A 		vldr.32	s15, [r4, #16]
+ 171:ACE-ECF/Algorithm/src/pid.c ****         pid->out = pid->Pout + pid->Iout + pid->Dout + pid->Fout;
+ 798              		.loc 1 171 48 view .LVU250
+ 799 00b6 94ED057A 		vldr.32	s14, [r4, #20]
+ 171:ACE-ECF/Algorithm/src/pid.c ****         pid->out = pid->Pout + pid->Iout + pid->Dout + pid->Fout;
+ 800              		.loc 1 171 44 view .LVU251
+ 801 00ba 77EEC77A 		vsub.f32	s15, s15, s14
+ 171:ACE-ECF/Algorithm/src/pid.c ****         pid->out = pid->Pout + pid->Iout + pid->Dout + pid->Fout;
+ 802              		.loc 1 171 29 view .LVU252
+ 803 00be 20EE270A 		vmul.f32	s0, s0, s15
+ 171:ACE-ECF/Algorithm/src/pid.c ****         pid->out = pid->Pout + pid->Iout + pid->Dout + pid->Fout;
+ 804              		.loc 1 171 19 view .LVU253
+ 805 00c2 84ED0C0A 		vstr.32	s0, [r4, #48]
+ 172:ACE-ECF/Algorithm/src/pid.c **** 
+ 806              		.loc 1 172 9 is_stmt 1 view .LVU254
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccbfa9Ec.s 			page 24
+
+
+ 172:ACE-ECF/Algorithm/src/pid.c **** 
+ 807              		.loc 1 172 23 is_stmt 0 view .LVU255
+ 808 00c6 D4ED097A 		vldr.32	s15, [r4, #36]
+ 172:ACE-ECF/Algorithm/src/pid.c **** 
+ 809              		.loc 1 172 35 view .LVU256
+ 810 00ca 94ED0A7A 		vldr.32	s14, [r4, #40]
+ 172:ACE-ECF/Algorithm/src/pid.c **** 
+ 811              		.loc 1 172 30 view .LVU257
+ 812 00ce 77EE877A 		vadd.f32	s15, s15, s14
+ 172:ACE-ECF/Algorithm/src/pid.c **** 
+ 813              		.loc 1 172 47 view .LVU258
+ 814 00d2 94ED0B7A 		vldr.32	s14, [r4, #44]
+ 172:ACE-ECF/Algorithm/src/pid.c **** 
+ 815              		.loc 1 172 42 view .LVU259
+ 816 00d6 77EE877A 		vadd.f32	s15, s15, s14
+ 172:ACE-ECF/Algorithm/src/pid.c **** 
+ 817              		.loc 1 172 54 view .LVU260
+ 818 00da 30EE270A 		vadd.f32	s0, s0, s15
+ 172:ACE-ECF/Algorithm/src/pid.c **** 
+ 819              		.loc 1 172 18 view .LVU261
+ 820 00de 84ED0D0A 		vstr.32	s0, [r4, #52]
+ 175:ACE-ECF/Algorithm/src/pid.c ****             pid->out = first_order_filter(&pid->out_filter, pid->out);
+ 821              		.loc 1 175 9 is_stmt 1 view .LVU262
+ 175:ACE-ECF/Algorithm/src/pid.c ****             pid->out = first_order_filter(&pid->out_filter, pid->out);
+ 822              		.loc 1 175 16 is_stmt 0 view .LVU263
+ 823 00e2 236D     		ldr	r3, [r4, #80]
+ 175:ACE-ECF/Algorithm/src/pid.c ****             pid->out = first_order_filter(&pid->out_filter, pid->out);
+ 824              		.loc 1 175 12 view .LVU264
+ 825 00e4 13F0400F 		tst	r3, #64
+ 826 00e8 2FD1     		bne	.L91
+ 827              	.L78:
+ 179:ACE-ECF/Algorithm/src/pid.c ****             f_Output_Limit(pid);
+ 828              		.loc 1 179 9 is_stmt 1 view .LVU265
+ 179:ACE-ECF/Algorithm/src/pid.c ****             f_Output_Limit(pid);
+ 829              		.loc 1 179 16 is_stmt 0 view .LVU266
+ 830 00ea 236D     		ldr	r3, [r4, #80]
+ 179:ACE-ECF/Algorithm/src/pid.c ****             f_Output_Limit(pid);
+ 831              		.loc 1 179 12 view .LVU267
+ 832 00ec 13F0040F 		tst	r3, #4
+ 833 00f0 32D1     		bne	.L92
+ 834              	.L79:
+ 187:ACE-ECF/Algorithm/src/pid.c ****     pid->LastSetValue = pid->SetValue;
+ 835              		.loc 1 187 5 is_stmt 1 view .LVU268
+ 187:ACE-ECF/Algorithm/src/pid.c ****     pid->LastSetValue = pid->SetValue;
+ 836              		.loc 1 187 31 is_stmt 0 view .LVU269
+ 837 00f2 E369     		ldr	r3, [r4, #28]	@ float
+ 187:ACE-ECF/Algorithm/src/pid.c ****     pid->LastSetValue = pid->SetValue;
+ 838              		.loc 1 187 26 view .LVU270
+ 839 00f4 A361     		str	r3, [r4, #24]	@ float
+ 188:ACE-ECF/Algorithm/src/pid.c ****     pid->LastDerror = pid->Derror;
+ 840              		.loc 1 188 5 is_stmt 1 view .LVU271
+ 188:ACE-ECF/Algorithm/src/pid.c ****     pid->LastDerror = pid->Derror;
+ 841              		.loc 1 188 28 is_stmt 0 view .LVU272
+ 842 00f6 2369     		ldr	r3, [r4, #16]	@ float
+ 188:ACE-ECF/Algorithm/src/pid.c ****     pid->LastDerror = pid->Derror;
+ 843              		.loc 1 188 23 view .LVU273
+ 844 00f8 6361     		str	r3, [r4, #20]	@ float
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccbfa9Ec.s 			page 25
+
+
+ 189:ACE-ECF/Algorithm/src/pid.c ****     pid->LastError = pid->error;
+ 845              		.loc 1 189 5 is_stmt 1 view .LVU274
+ 189:ACE-ECF/Algorithm/src/pid.c ****     pid->LastError = pid->error;
+ 846              		.loc 1 189 26 is_stmt 0 view .LVU275
+ 847 00fa A36B     		ldr	r3, [r4, #56]	@ float
+ 189:ACE-ECF/Algorithm/src/pid.c ****     pid->LastError = pid->error;
+ 848              		.loc 1 189 21 view .LVU276
+ 849 00fc E363     		str	r3, [r4, #60]	@ float
+ 190:ACE-ECF/Algorithm/src/pid.c **** 
+ 850              		.loc 1 190 5 is_stmt 1 view .LVU277
+ 190:ACE-ECF/Algorithm/src/pid.c **** 
+ 851              		.loc 1 190 25 is_stmt 0 view .LVU278
+ 852 00fe 636C     		ldr	r3, [r4, #68]	@ float
+ 190:ACE-ECF/Algorithm/src/pid.c **** 
+ 853              		.loc 1 190 20 view .LVU279
+ 854 0100 A364     		str	r3, [r4, #72]	@ float
+ 192:ACE-ECF/Algorithm/src/pid.c **** }
+ 855              		.loc 1 192 5 is_stmt 1 view .LVU280
+ 193:ACE-ECF/Algorithm/src/pid.c **** /**
+ 856              		.loc 1 193 1 is_stmt 0 view .LVU281
+ 857 0102 94ED0D0A 		vldr.32	s0, [r4, #52]
+ 858 0106 BDEC028B 		vldm	sp!, {d8}
+ 859              	.LCFI3:
+ 860              		.cfi_remember_state
+ 861              		.cfi_restore 80
+ 862              		.cfi_restore 81
+ 863              		.cfi_def_cfa_offset 8
+ 864              	.LVL32:
+ 193:ACE-ECF/Algorithm/src/pid.c **** /**
+ 865              		.loc 1 193 1 view .LVU282
+ 866 010a 10BD     		pop	{r4, pc}
+ 867              	.LVL33:
+ 868              	.L84:
+ 869              	.LCFI4:
+ 870              		.cfi_restore_state
+ 139:ACE-ECF/Algorithm/src/pid.c ****     pid->ActualValue = ActualValue;
+ 871              		.loc 1 139 9 is_stmt 1 view .LVU283
+ 872 010c FFF7FEFF 		bl	f_StepIn
+ 873              	.LVL34:
+ 139:ACE-ECF/Algorithm/src/pid.c ****     pid->ActualValue = ActualValue;
+ 874              		.loc 1 139 9 is_stmt 0 view .LVU284
+ 875 0110 82E7     		b	.L68
+ 876              	.L85:
+ 143:ACE-ECF/Algorithm/src/pid.c ****     {
+ 877              		.loc 1 143 9 discriminator 2 view .LVU285
+ 878 0112 B1EE607A 		vneg.f32	s14, s1
+ 879 0116 94E7     		b	.L69
+ 880              	.L86:
+ 150:ACE-ECF/Algorithm/src/pid.c ****         else
+ 881              		.loc 1 150 13 is_stmt 1 view .LVU286
+ 882 0118 2046     		mov	r0, r4
+ 883 011a FFF7FEFF 		bl	f_Derivative_On_Measurement
+ 884              	.LVL35:
+ 885 011e AEE7     		b	.L73
+ 886              	.L87:
+ 156:ACE-ECF/Algorithm/src/pid.c **** 
+ 887              		.loc 1 156 13 view .LVU287
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccbfa9Ec.s 			page 26
+
+
+ 888 0120 2046     		mov	r0, r4
+ 889 0122 FFF7FEFF 		bl	Changing_Integration_Rate
+ 890              	.LVL36:
+ 891 0126 AEE7     		b	.L74
+ 892              	.L88:
+ 160:ACE-ECF/Algorithm/src/pid.c ****         pid->Iout = pid->Ki * pid->Ierror;
+ 893              		.loc 1 160 13 view .LVU288
+ 894 0128 2046     		mov	r0, r4
+ 895 012a FFF7FEFF 		bl	f_Integral_Limit
+ 896              	.LVL37:
+ 897 012e AEE7     		b	.L75
+ 898              	.L89:
+ 165:ACE-ECF/Algorithm/src/pid.c **** 
+ 899              		.loc 1 165 13 view .LVU289
+ 900 0130 2046     		mov	r0, r4
+ 901 0132 FFF7FEFF 		bl	f_Separated_Integral
+ 902              	.LVL38:
+ 903 0136 B6E7     		b	.L76
+ 904              	.L90:
+ 169:ACE-ECF/Algorithm/src/pid.c **** 
+ 905              		.loc 1 169 13 view .LVU290
+ 169:ACE-ECF/Algorithm/src/pid.c **** 
+ 906              		.loc 1 169 25 is_stmt 0 view .LVU291
+ 907 0138 94ED0B0A 		vldr.32	s0, [r4, #44]
+ 908 013c 04F17000 		add	r0, r4, #112
+ 909 0140 FFF7FEFF 		bl	first_order_filter
+ 910              	.LVL39:
+ 169:ACE-ECF/Algorithm/src/pid.c **** 
+ 911              		.loc 1 169 23 view .LVU292
+ 912 0144 84ED0B0A 		vstr.32	s0, [r4, #44]
+ 913 0148 B1E7     		b	.L77
+ 914              	.L91:
+ 176:ACE-ECF/Algorithm/src/pid.c **** 
+ 915              		.loc 1 176 13 is_stmt 1 view .LVU293
+ 176:ACE-ECF/Algorithm/src/pid.c **** 
+ 916              		.loc 1 176 24 is_stmt 0 view .LVU294
+ 917 014a 04F18000 		add	r0, r4, #128
+ 918 014e FFF7FEFF 		bl	first_order_filter
+ 919              	.LVL40:
+ 176:ACE-ECF/Algorithm/src/pid.c **** 
+ 920              		.loc 1 176 22 view .LVU295
+ 921 0152 84ED0D0A 		vstr.32	s0, [r4, #52]
+ 922 0156 C8E7     		b	.L78
+ 923              	.L92:
+ 180:ACE-ECF/Algorithm/src/pid.c ****     }
+ 924              		.loc 1 180 13 is_stmt 1 view .LVU296
+ 925 0158 2046     		mov	r0, r4
+ 926 015a FFF7FEFF 		bl	f_Output_Limit
+ 927              	.LVL41:
+ 928 015e C8E7     		b	.L79
+ 929              	.L82:
+ 184:ACE-ECF/Algorithm/src/pid.c ****     }
+ 930              		.loc 1 184 9 view .LVU297
+ 931 0160 2046     		mov	r0, r4
+ 932 0162 FFF7FEFF 		bl	pid_clear
+ 933              	.LVL42:
+ 934 0166 C4E7     		b	.L79
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccbfa9Ec.s 			page 27
+
+
+ 935              		.cfi_endproc
+ 936              	.LFE132:
+ 938              		.section	.text.User_Fun_Callback_Register,"ax",%progbits
+ 939              		.align	1
+ 940              		.global	User_Fun_Callback_Register
+ 941              		.syntax unified
+ 942              		.thumb
+ 943              		.thumb_func
+ 945              	User_Fun_Callback_Register:
+ 946              	.LVL43:
+ 947              	.LFB134:
+ 216:ACE-ECF/Algorithm/src/pid.c ****     pid->User_Fun = User_Fun;
+ 948              		.loc 1 216 1 view -0
+ 949              		.cfi_startproc
+ 950              		@ args = 0, pretend = 0, frame = 0
+ 951              		@ frame_needed = 0, uses_anonymous_args = 0
+ 952              		@ link register save eliminated.
+ 217:ACE-ECF/Algorithm/src/pid.c **** }
+ 953              		.loc 1 217 5 view .LVU299
+ 217:ACE-ECF/Algorithm/src/pid.c **** }
+ 954              		.loc 1 217 19 is_stmt 0 view .LVU300
+ 955 0000 C0F89410 		str	r1, [r0, #148]
+ 218:ACE-ECF/Algorithm/src/pid.c **** 
+ 956              		.loc 1 218 1 view .LVU301
+ 957 0004 7047     		bx	lr
+ 958              		.cfi_endproc
+ 959              	.LFE134:
+ 961              		.section	.text.motor_speed_control,"ax",%progbits
+ 962              		.align	1
+ 963              		.global	motor_speed_control
+ 964              		.syntax unified
+ 965              		.thumb
+ 966              		.thumb_func
+ 968              	motor_speed_control:
+ 969              	.LVL44:
+ 970              	.LFB135:
+ 229:ACE-ECF/Algorithm/src/pid.c ****     return PidCalculate(spid, setSpeed, actualSpeed);
+ 971              		.loc 1 229 1 is_stmt 1 view -0
+ 972              		.cfi_startproc
+ 973              		@ args = 0, pretend = 0, frame = 0
+ 974              		@ frame_needed = 0, uses_anonymous_args = 0
+ 229:ACE-ECF/Algorithm/src/pid.c ****     return PidCalculate(spid, setSpeed, actualSpeed);
+ 975              		.loc 1 229 1 is_stmt 0 view .LVU303
+ 976 0000 08B5     		push	{r3, lr}
+ 977              	.LCFI5:
+ 978              		.cfi_def_cfa_offset 8
+ 979              		.cfi_offset 3, -8
+ 980              		.cfi_offset 14, -4
+ 230:ACE-ECF/Algorithm/src/pid.c **** }
+ 981              		.loc 1 230 5 is_stmt 1 view .LVU304
+ 230:ACE-ECF/Algorithm/src/pid.c **** }
+ 982              		.loc 1 230 12 is_stmt 0 view .LVU305
+ 983 0002 FFF7FEFF 		bl	PidCalculate
+ 984              	.LVL45:
+ 230:ACE-ECF/Algorithm/src/pid.c **** }
+ 985              		.loc 1 230 12 view .LVU306
+ 986 0006 BDEEC00A 		vcvt.s32.f32	s0, s0
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccbfa9Ec.s 			page 28
+
+
+ 231:ACE-ECF/Algorithm/src/pid.c **** 
+ 987              		.loc 1 231 1 view .LVU307
+ 988 000a 10EE103A 		vmov	r3, s0	@ int
+ 989 000e 18B2     		sxth	r0, r3
+ 990 0010 08BD     		pop	{r3, pc}
+ 991              		.cfi_endproc
+ 992              	.LFE135:
+ 994              		.section	.text.motor_position_speed_control,"ax",%progbits
+ 995              		.align	1
+ 996              		.global	motor_position_speed_control
+ 997              		.syntax unified
+ 998              		.thumb
+ 999              		.thumb_func
+ 1001              	motor_position_speed_control:
+ 1002              	.LVL46:
+ 1003              	.LFB136:
+ 243:ACE-ECF/Algorithm/src/pid.c ****     speed_pid->SetValue = PidCalculate(position_pid, setPosition, actual_position); // 速度环设
+ 1004              		.loc 1 243 1 is_stmt 1 view -0
+ 1005              		.cfi_startproc
+ 1006              		@ args = 0, pretend = 0, frame = 0
+ 1007              		@ frame_needed = 0, uses_anonymous_args = 0
+ 243:ACE-ECF/Algorithm/src/pid.c ****     speed_pid->SetValue = PidCalculate(position_pid, setPosition, actual_position); // 速度环设
+ 1008              		.loc 1 243 1 is_stmt 0 view .LVU309
+ 1009 0000 10B5     		push	{r4, lr}
+ 1010              	.LCFI6:
+ 1011              		.cfi_def_cfa_offset 8
+ 1012              		.cfi_offset 4, -8
+ 1013              		.cfi_offset 14, -4
+ 1014 0002 2DED028B 		vpush.64	{d8}
+ 1015              	.LCFI7:
+ 1016              		.cfi_def_cfa_offset 16
+ 1017              		.cfi_offset 80, -16
+ 1018              		.cfi_offset 81, -12
+ 1019 0006 0446     		mov	r4, r0
+ 1020 0008 B0EE418A 		vmov.f32	s16, s2
+ 244:ACE-ECF/Algorithm/src/pid.c ****     return PidCalculate(speed_pid, speed_pid->SetValue, actual_speed);              // 电机输出
+ 1021              		.loc 1 244 5 is_stmt 1 view .LVU310
+ 244:ACE-ECF/Algorithm/src/pid.c ****     return PidCalculate(speed_pid, speed_pid->SetValue, actual_speed);              // 电机输出
+ 1022              		.loc 1 244 27 is_stmt 0 view .LVU311
+ 1023 000c 0846     		mov	r0, r1
+ 1024              	.LVL47:
+ 244:ACE-ECF/Algorithm/src/pid.c ****     return PidCalculate(speed_pid, speed_pid->SetValue, actual_speed);              // 电机输出
+ 1025              		.loc 1 244 27 view .LVU312
+ 1026 000e FFF7FEFF 		bl	PidCalculate
+ 1027              	.LVL48:
+ 244:ACE-ECF/Algorithm/src/pid.c ****     return PidCalculate(speed_pid, speed_pid->SetValue, actual_speed);              // 电机输出
+ 1028              		.loc 1 244 25 view .LVU313
+ 1029 0012 84ED040A 		vstr.32	s0, [r4, #16]
+ 245:ACE-ECF/Algorithm/src/pid.c **** }
+ 1030              		.loc 1 245 5 is_stmt 1 view .LVU314
+ 245:ACE-ECF/Algorithm/src/pid.c **** }
+ 1031              		.loc 1 245 12 is_stmt 0 view .LVU315
+ 1032 0016 F0EE480A 		vmov.f32	s1, s16
+ 1033 001a 2046     		mov	r0, r4
+ 1034 001c FFF7FEFF 		bl	PidCalculate
+ 1035              	.LVL49:
+ 1036 0020 BDEEC00A 		vcvt.s32.f32	s0, s0
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccbfa9Ec.s 			page 29
+
+
+ 246:ACE-ECF/Algorithm/src/pid.c **** 
+ 1037              		.loc 1 246 1 view .LVU316
+ 1038 0024 10EE103A 		vmov	r3, s0	@ int
+ 1039 0028 18B2     		sxth	r0, r3
+ 1040 002a BDEC028B 		vldm	sp!, {d8}
+ 1041              	.LCFI8:
+ 1042              		.cfi_restore 80
+ 1043              		.cfi_restore 81
+ 1044              		.cfi_def_cfa_offset 8
+ 1045              	.LVL50:
+ 246:ACE-ECF/Algorithm/src/pid.c **** 
+ 1046              		.loc 1 246 1 view .LVU317
+ 1047 002e 10BD     		pop	{r4, pc}
+ 246:ACE-ECF/Algorithm/src/pid.c **** 
+ 1048              		.loc 1 246 1 view .LVU318
+ 1049              		.cfi_endproc
+ 1050              	.LFE136:
+ 1052              		.text
+ 1053              	.Letext0:
+ 1054              		.file 2 "ACE-ECF/Algorithm/inc/struct_typedef.h"
+ 1055              		.file 3 "d:\\gcc-arm-none-eabi-10.3-2021.10\\arm-none-eabi\\include\\machine\\_default_types.h"
+ 1056              		.file 4 "d:\\gcc-arm-none-eabi-10.3-2021.10\\arm-none-eabi\\include\\sys\\_stdint.h"
+ 1057              		.file 5 "ACE-ECF/Algorithm/inc/pid.h"
+ 1058              		.file 6 "<built-in>"
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccbfa9Ec.s 			page 30
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 pid.c
+C:\Users\28212\AppData\Local\Temp\ccbfa9Ec.s:20     .text.first_order_filter:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccbfa9Ec.s:25     .text.first_order_filter:00000000 first_order_filter
+C:\Users\28212\AppData\Local\Temp\ccbfa9Ec.s:64     .text.f_Derivative_On_Measurement:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccbfa9Ec.s:69     .text.f_Derivative_On_Measurement:00000000 f_Derivative_On_Measurement
+C:\Users\28212\AppData\Local\Temp\ccbfa9Ec.s:131    .text.f_StepIn:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccbfa9Ec.s:136    .text.f_StepIn:00000000 f_StepIn
+C:\Users\28212\AppData\Local\Temp\ccbfa9Ec.s:200    .text.f_StepIn:00000058 $d
+C:\Users\28212\AppData\Local\Temp\ccbfa9Ec.s:205    .text.f_Separated_Integral:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccbfa9Ec.s:210    .text.f_Separated_Integral:00000000 f_Separated_Integral
+C:\Users\28212\AppData\Local\Temp\ccbfa9Ec.s:244    .text.f_Integral_Limit:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccbfa9Ec.s:249    .text.f_Integral_Limit:00000000 f_Integral_Limit
+C:\Users\28212\AppData\Local\Temp\ccbfa9Ec.s:289    .text.Changing_Integration_Rate:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccbfa9Ec.s:294    .text.Changing_Integration_Rate:00000000 Changing_Integration_Rate
+C:\Users\28212\AppData\Local\Temp\ccbfa9Ec.s:350    .text.f_Output_Limit:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccbfa9Ec.s:355    .text.f_Output_Limit:00000000 f_Output_Limit
+C:\Users\28212\AppData\Local\Temp\ccbfa9Ec.s:395    .text.PidInit:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccbfa9Ec.s:401    .text.PidInit:00000000 PidInit
+C:\Users\28212\AppData\Local\Temp\ccbfa9Ec.s:450    .text.PidInitMode:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccbfa9Ec.s:456    .text.PidInitMode:00000000 PidInitMode
+C:\Users\28212\AppData\Local\Temp\ccbfa9Ec.s:475    .text.PidInitMode:00000010 $d
+C:\Users\28212\AppData\Local\Temp\ccbfa9Ec.s:508    .text.PidInitMode:00000030 $t
+C:\Users\28212\AppData\Local\Temp\ccbfa9Ec.s:604    .text.pid_clear:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccbfa9Ec.s:610    .text.pid_clear:00000000 pid_clear
+C:\Users\28212\AppData\Local\Temp\ccbfa9Ec.s:662    .text.PidCalculate:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccbfa9Ec.s:668    .text.PidCalculate:00000000 PidCalculate
+C:\Users\28212\AppData\Local\Temp\ccbfa9Ec.s:939    .text.User_Fun_Callback_Register:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccbfa9Ec.s:945    .text.User_Fun_Callback_Register:00000000 User_Fun_Callback_Register
+C:\Users\28212\AppData\Local\Temp\ccbfa9Ec.s:962    .text.motor_speed_control:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccbfa9Ec.s:968    .text.motor_speed_control:00000000 motor_speed_control
+C:\Users\28212\AppData\Local\Temp\ccbfa9Ec.s:995    .text.motor_position_speed_control:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccbfa9Ec.s:1001   .text.motor_position_speed_control:00000000 motor_position_speed_control
+
+UNDEFINED SYMBOLS
+memset

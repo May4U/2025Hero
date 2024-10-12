@@ -1,0 +1,14 @@
+{
+    "cortex-debug.armToolchainPath": "D:\\GCC-ARM-NONE-EABI-10.3-2021.10\\BIN",
+    "cortex-debug.openocdPath": "D:\\OPENOCD-20231002-0.12.0\\BIN\\OPENOCD.EXE",
+    "files.associations": {
+        "bsp_dr16.h": "c",
+        "maths.h": "c",
+        "struct_typedef.h": "c",
+        "virtual_task.h": "c",
+        "timers.h": "c",
+        "imu_task.h": "c",
+        "cybergear_motor.h": "c",
+        "gimbal_config.h": "c"
+    }
+}

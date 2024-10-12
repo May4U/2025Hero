@@ -1,0 +1,2540 @@
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.arch armv7e-m
+   3              		.fpu fpv4-sp-d16
+   4              		.eabi_attribute 27, 1
+   5              		.eabi_attribute 28, 1
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.file	"maths.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.invSqrt,"ax",%progbits
+  20              		.align	1
+  21              		.global	invSqrt
+  22              		.syntax unified
+  23              		.thumb
+  24              		.thumb_func
+  26              	invSqrt:
+  27              	.LVL0:
+  28              	.LFB130:
+  29              		.file 1 "ACE-ECF/Algorithm/src/maths.c"
+   1:ACE-ECF/Algorithm/src/maths.c **** #include "maths.h"
+   2:ACE-ECF/Algorithm/src/maths.c **** #include <stddef.h>
+   3:ACE-ECF/Algorithm/src/maths.c **** #include "list_of_function.h"
+   4:ACE-ECF/Algorithm/src/maths.c **** 
+   5:ACE-ECF/Algorithm/src/maths.c **** #define Abs(data)                    \
+   6:ACE-ECF/Algorithm/src/maths.c **** {                                    \
+   7:ACE-ECF/Algorithm/src/maths.c ****      if(data<0)                      \
+   8:ACE-ECF/Algorithm/src/maths.c **** 			 return -data;                 \
+   9:ACE-ECF/Algorithm/src/maths.c **** 			else                           \
+  10:ACE-ECF/Algorithm/src/maths.c **** 			 return data;                  \
+  11:ACE-ECF/Algorithm/src/maths.c **** }                                    \
+  12:ACE-ECF/Algorithm/src/maths.c **** 	
+  13:ACE-ECF/Algorithm/src/maths.c **** 	
+  14:ACE-ECF/Algorithm/src/maths.c **** float invSqrt(float x) //平方根倒数速算法
+  15:ACE-ECF/Algorithm/src/maths.c **** {
+  30              		.loc 1 15 1 view -0
+  31              		.cfi_startproc
+  32              		@ args = 0, pretend = 0, frame = 0
+  33              		@ frame_needed = 0, uses_anonymous_args = 0
+  34              		@ link register save eliminated.
+  16:ACE-ECF/Algorithm/src/maths.c ****     float halfx = 0.5f * x;
+  35              		.loc 1 16 5 view .LVU1
+  36              		.loc 1 16 11 is_stmt 0 view .LVU2
+  37 0000 F6EE007A 		vmov.f32	s15, #5.0e-1
+  38 0004 60EE277A 		vmul.f32	s15, s0, s15
+  39              	.LVL1:
+  17:ACE-ECF/Algorithm/src/maths.c ****     float y = x;
+  40              		.loc 1 17 5 is_stmt 1 view .LVU3
+  18:ACE-ECF/Algorithm/src/maths.c ****     long i = *(long *)&y;
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s 			page 2
+
+
+  41              		.loc 1 18 5 view .LVU4
+  42              		.loc 1 18 14 is_stmt 0 view .LVU5
+  43 0008 10EE103A 		vmov	r3, s0	@ int
+  44              	.LVL2:
+  19:ACE-ECF/Algorithm/src/maths.c ****     i = 0x5f3759df - (i >> 1);
+  45              		.loc 1 19 5 is_stmt 1 view .LVU6
+  20:ACE-ECF/Algorithm/src/maths.c ****     y = *(float *)&i;
+  46              		.loc 1 20 5 view .LVU7
+  47              		.loc 1 20 9 is_stmt 0 view .LVU8
+  48 000c 074A     		ldr	r2, .L2
+  49 000e A2EB6303 		sub	r3, r2, r3, asr #1
+  50              	.LVL3:
+  51              		.loc 1 20 9 view .LVU9
+  52 0012 07EE103A 		vmov	s14, r3	@ int
+  53              	.LVL4:
+  21:ACE-ECF/Algorithm/src/maths.c ****     y = y * (1.5f - (halfx * y * y));
+  54              		.loc 1 21 5 is_stmt 1 view .LVU10
+  55              		.loc 1 21 28 is_stmt 0 view .LVU11
+  56 0016 67EE277A 		vmul.f32	s15, s14, s15
+  57              	.LVL5:
+  58              		.loc 1 21 32 view .LVU12
+  59 001a 67EE277A 		vmul.f32	s15, s14, s15
+  60              		.loc 1 21 19 view .LVU13
+  61 001e B7EE080A 		vmov.f32	s0, #1.5e+0
+  62              	.LVL6:
+  63              		.loc 1 21 19 view .LVU14
+  64 0022 30EE670A 		vsub.f32	s0, s0, s15
+  65              	.LVL7:
+  22:ACE-ECF/Algorithm/src/maths.c ****     return y;
+  66              		.loc 1 22 5 is_stmt 1 view .LVU15
+  23:ACE-ECF/Algorithm/src/maths.c **** }
+  67              		.loc 1 23 1 is_stmt 0 view .LVU16
+  68 0026 27EE000A 		vmul.f32	s0, s14, s0
+  69 002a 7047     		bx	lr
+  70              	.L3:
+  71              		.align	2
+  72              	.L2:
+  73 002c DF59375F 		.word	1597463007
+  74              		.cfi_endproc
+  75              	.LFE130:
+  77              		.section	.text.max_abs,"ax",%progbits
+  78              		.align	1
+  79              		.global	max_abs
+  80              		.syntax unified
+  81              		.thumb
+  82              		.thumb_func
+  84              	max_abs:
+  85              	.LVL8:
+  86              	.LFB131:
+  24:ACE-ECF/Algorithm/src/maths.c **** 
+  25:ACE-ECF/Algorithm/src/maths.c **** /*取两个数最大值的绝对值*/
+  26:ACE-ECF/Algorithm/src/maths.c **** int16_t max_abs(int16_t x, int16_t y)
+  27:ACE-ECF/Algorithm/src/maths.c **** {
+  87              		.loc 1 27 1 is_stmt 1 view -0
+  88              		.cfi_startproc
+  89              		@ args = 0, pretend = 0, frame = 0
+  90              		@ frame_needed = 0, uses_anonymous_args = 0
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s 			page 3
+
+
+  91              		@ link register save eliminated.
+  28:ACE-ECF/Algorithm/src/maths.c ****     if (user_abs(x) >= user_abs(y))
+  92              		.loc 1 28 5 view .LVU18
+  93              		.loc 1 28 9 is_stmt 0 view .LVU19
+  94 0000 0028     		cmp	r0, #0
+  95 0002 B8BF     		it	lt
+  96 0004 4042     		rsblt	r0, r0, #0
+  97              	.LVL9:
+  98              		.loc 1 28 9 view .LVU20
+  99 0006 83B2     		uxth	r3, r0
+ 100              		.loc 1 28 24 view .LVU21
+ 101 0008 0029     		cmp	r1, #0
+ 102 000a B8BF     		it	lt
+ 103 000c 4942     		rsblt	r1, r1, #0
+ 104              	.LVL10:
+ 105              		.loc 1 28 24 view .LVU22
+ 106 000e 88B2     		uxth	r0, r1
+ 107              		.loc 1 28 8 view .LVU23
+ 108 0010 8342     		cmp	r3, r0
+ 109 0012 01D3     		bcc	.L5
+  29:ACE-ECF/Algorithm/src/maths.c ****         return user_abs(x);
+ 110              		.loc 1 29 9 is_stmt 1 view .LVU24
+ 111              		.loc 1 29 16 is_stmt 0 view .LVU25
+ 112 0014 18B2     		sxth	r0, r3
+ 113 0016 7047     		bx	lr
+ 114              	.L5:
+  30:ACE-ECF/Algorithm/src/maths.c ****     else
+  31:ACE-ECF/Algorithm/src/maths.c ****         return user_abs(y);
+ 115              		.loc 1 31 9 is_stmt 1 view .LVU26
+ 116              		.loc 1 31 16 is_stmt 0 view .LVU27
+ 117 0018 00B2     		sxth	r0, r0
+  32:ACE-ECF/Algorithm/src/maths.c **** }
+ 118              		.loc 1 32 1 view .LVU28
+ 119 001a 7047     		bx	lr
+ 120              		.cfi_endproc
+ 121              	.LFE131:
+ 123              		.section	.text.motion_acceleration_control,"ax",%progbits
+ 124              		.align	1
+ 125              		.global	motion_acceleration_control
+ 126              		.syntax unified
+ 127              		.thumb
+ 128              		.thumb_func
+ 130              	motion_acceleration_control:
+ 131              	.LVL11:
+ 132              	.LFB132:
+  33:ACE-ECF/Algorithm/src/maths.c **** 
+  34:ACE-ECF/Algorithm/src/maths.c **** /*
+  35:ACE-ECF/Algorithm/src/maths.c ****  *功能：运动控制斜坡函数（加速度限制）
+  36:ACE-ECF/Algorithm/src/maths.c ****  *传入：1.加速度限制对应结构体  2.控制量 3.限制加速度
+  37:ACE-ECF/Algorithm/src/maths.c ****  *传出：处理量
+  38:ACE-ECF/Algorithm/src/maths.c ****  *类型：16位整形
+  39:ACE-ECF/Algorithm/src/maths.c ****  */
+  40:ACE-ECF/Algorithm/src/maths.c **** int16_t motion_acceleration_control(acceleration_control_type_t *acceleration_control, int16_t Inpu
+  41:ACE-ECF/Algorithm/src/maths.c **** {
+ 133              		.loc 1 41 1 is_stmt 1 view -0
+ 134              		.cfi_startproc
+ 135              		@ args = 0, pretend = 0, frame = 0
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s 			page 4
+
+
+ 136              		@ frame_needed = 0, uses_anonymous_args = 0
+ 137              		@ link register save eliminated.
+ 138              		.loc 1 41 1 is_stmt 0 view .LVU30
+ 139 0000 07EE901A 		vmov	s15, r1	@ int
+ 140 0004 07EE102A 		vmov	s14, r2	@ int
+  42:ACE-ECF/Algorithm/src/maths.c ****     acceleration_control->Input = Input;
+ 141              		.loc 1 42 5 is_stmt 1 view .LVU31
+ 142              		.loc 1 42 33 is_stmt 0 view .LVU32
+ 143 0008 F8EEE77A 		vcvt.f32.s32	s15, s15
+ 144 000c C0ED007A 		vstr.32	s15, [r0]
+  43:ACE-ECF/Algorithm/src/maths.c ****     acceleration_control->acc_limit = Limit;
+ 145              		.loc 1 43 5 is_stmt 1 view .LVU33
+ 146              		.loc 1 43 37 is_stmt 0 view .LVU34
+ 147 0010 B8EEC77A 		vcvt.f32.s32	s14, s14
+ 148 0014 80ED047A 		vstr.32	s14, [r0, #16]
+  44:ACE-ECF/Algorithm/src/maths.c **** 
+  45:ACE-ECF/Algorithm/src/maths.c ****     acceleration_control->acc_now = acceleration_control->Input - acceleration_control->Last_Input;
+ 149              		.loc 1 45 5 is_stmt 1 view .LVU35
+ 150              		.loc 1 45 87 is_stmt 0 view .LVU36
+ 151 0018 D0ED016A 		vldr.32	s13, [r0, #4]
+ 152              		.loc 1 45 65 view .LVU37
+ 153 001c 77EEE67A 		vsub.f32	s15, s15, s13
+ 154              		.loc 1 45 35 view .LVU38
+ 155 0020 C0ED037A 		vstr.32	s15, [r0, #12]
+  46:ACE-ECF/Algorithm/src/maths.c **** 
+  47:ACE-ECF/Algorithm/src/maths.c ****     if (user_abs(acceleration_control->acc_now) > acceleration_control->acc_limit)
+ 156              		.loc 1 47 5 is_stmt 1 view .LVU39
+ 157              		.loc 1 47 9 is_stmt 0 view .LVU40
+ 158 0024 F5EEC07A 		vcmpe.f32	s15, #0
+ 159 0028 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 160 002c 18DD     		ble	.L13
+ 161 002e B0EE676A 		vmov.f32	s12, s15
+ 162              	.L8:
+ 163              		.loc 1 47 8 discriminator 4 view .LVU41
+ 164 0032 B4EEC67A 		vcmpe.f32	s14, s12
+ 165 0036 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 166 003a 07D5     		bpl	.L9
+  48:ACE-ECF/Algorithm/src/maths.c ****     {
+  49:ACE-ECF/Algorithm/src/maths.c ****         acceleration_control->Output = acceleration_control->Last_Input + acceleration_control->acc
+ 167              		.loc 1 49 9 is_stmt 1 discriminator 4 view .LVU42
+ 168              		.loc 1 49 105 is_stmt 0 discriminator 4 view .LVU43
+ 169 003c C7EE865A 		vdiv.f32	s11, s15, s12
+ 170              		.loc 1 49 147 discriminator 4 view .LVU44
+ 171 0040 27EE257A 		vmul.f32	s14, s14, s11
+ 172              		.loc 1 49 73 discriminator 4 view .LVU45
+ 173 0044 36EE877A 		vadd.f32	s14, s13, s14
+ 174              		.loc 1 49 38 discriminator 4 view .LVU46
+ 175 0048 80ED027A 		vstr.32	s14, [r0, #8]
+ 176              	.L9:
+  50:ACE-ECF/Algorithm/src/maths.c ****     }
+  51:ACE-ECF/Algorithm/src/maths.c **** 
+  52:ACE-ECF/Algorithm/src/maths.c ****     acceleration_control->Last_Input = acceleration_control->Output;
+ 177              		.loc 1 52 5 is_stmt 1 view .LVU47
+ 178              		.loc 1 52 60 is_stmt 0 view .LVU48
+ 179 004c D0ED027A 		vldr.32	s15, [r0, #8]
+ 180              		.loc 1 52 38 view .LVU49
+ 181 0050 C0ED017A 		vstr.32	s15, [r0, #4]
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s 			page 5
+
+
+  53:ACE-ECF/Algorithm/src/maths.c **** 
+  54:ACE-ECF/Algorithm/src/maths.c ****     return acceleration_control->Output;
+ 182              		.loc 1 54 5 is_stmt 1 view .LVU50
+ 183              		.loc 1 54 32 is_stmt 0 view .LVU51
+ 184 0054 FDEEE77A 		vcvt.s32.f32	s15, s15
+  55:ACE-ECF/Algorithm/src/maths.c **** }
+ 185              		.loc 1 55 1 view .LVU52
+ 186 0058 17EE903A 		vmov	r3, s15	@ int
+ 187 005c 18B2     		sxth	r0, r3
+ 188              	.LVL12:
+ 189              		.loc 1 55 1 view .LVU53
+ 190 005e 7047     		bx	lr
+ 191              	.LVL13:
+ 192              	.L13:
+  47:ACE-ECF/Algorithm/src/maths.c ****     {
+ 193              		.loc 1 47 9 discriminator 2 view .LVU54
+ 194 0060 B1EE676A 		vneg.f32	s12, s15
+ 195 0064 E5E7     		b	.L8
+ 196              		.cfi_endproc
+ 197              	.LFE132:
+ 199              		.section	.text.loop_restriction_int16,"ax",%progbits
+ 200              		.align	1
+ 201              		.global	loop_restriction_int16
+ 202              		.syntax unified
+ 203              		.thumb
+ 204              		.thumb_func
+ 206              	loop_restriction_int16:
+ 207              	.LVL14:
+ 208              	.LFB133:
+  56:ACE-ECF/Algorithm/src/maths.c **** 
+  57:ACE-ECF/Algorithm/src/maths.c **** /*
+  58:ACE-ECF/Algorithm/src/maths.c ****  *功能：正负循环限制（16位）
+  59:ACE-ECF/Algorithm/src/maths.c ****  *传入：1.输入值  2.限制幅度(正数)
+  60:ACE-ECF/Algorithm/src/maths.c ****  *传出：限幅输出值
+  61:ACE-ECF/Algorithm/src/maths.c ****  *描述：将输入值限制在 +-限制幅度 的范围内
+  62:ACE-ECF/Algorithm/src/maths.c ****  */
+  63:ACE-ECF/Algorithm/src/maths.c **** int16_t loop_restriction_int16(int16_t num, int16_t limit_num)
+  64:ACE-ECF/Algorithm/src/maths.c **** {
+ 209              		.loc 1 64 1 is_stmt 1 view -0
+ 210              		.cfi_startproc
+ 211              		@ args = 0, pretend = 0, frame = 0
+ 212              		@ frame_needed = 0, uses_anonymous_args = 0
+ 213              		@ link register save eliminated.
+  65:ACE-ECF/Algorithm/src/maths.c ****     if (user_abs(num) > limit_num)
+ 214              		.loc 1 65 5 view .LVU56
+ 215              		.loc 1 65 9 is_stmt 0 view .LVU57
+ 216 0000 80EAE073 		eor	r3, r0, r0, asr #31
+ 217 0004 A3EBE073 		sub	r3, r3, r0, asr #31
+ 218 0008 9BB2     		uxth	r3, r3
+ 219              		.loc 1 65 8 view .LVU58
+ 220 000a 8B42     		cmp	r3, r1
+ 221 000c 06DD     		ble	.L15
+  66:ACE-ECF/Algorithm/src/maths.c ****     {
+  67:ACE-ECF/Algorithm/src/maths.c ****         if (num >= 0)
+ 222              		.loc 1 67 9 is_stmt 1 view .LVU59
+ 223              		.loc 1 67 12 is_stmt 0 view .LVU60
+ 224 000e 0028     		cmp	r0, #0
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s 			page 6
+
+
+ 225 0010 02DB     		blt	.L16
+  68:ACE-ECF/Algorithm/src/maths.c ****             num -= limit_num;
+ 226              		.loc 1 68 13 is_stmt 1 view .LVU61
+ 227              		.loc 1 68 17 is_stmt 0 view .LVU62
+ 228 0012 401A     		subs	r0, r0, r1
+ 229              	.LVL15:
+ 230              		.loc 1 68 17 view .LVU63
+ 231 0014 00B2     		sxth	r0, r0
+ 232              	.LVL16:
+ 233              		.loc 1 68 17 view .LVU64
+ 234 0016 7047     		bx	lr
+ 235              	.L16:
+  69:ACE-ECF/Algorithm/src/maths.c ****         else
+  70:ACE-ECF/Algorithm/src/maths.c ****             num += limit_num;
+ 236              		.loc 1 70 13 is_stmt 1 view .LVU65
+ 237              		.loc 1 70 17 is_stmt 0 view .LVU66
+ 238 0018 0844     		add	r0, r0, r1
+ 239              	.LVL17:
+ 240              		.loc 1 70 17 view .LVU67
+ 241 001a 00B2     		sxth	r0, r0
+ 242              	.LVL18:
+ 243              	.L15:
+  71:ACE-ECF/Algorithm/src/maths.c ****     }
+  72:ACE-ECF/Algorithm/src/maths.c ****     return num;
+ 244              		.loc 1 72 5 is_stmt 1 view .LVU68
+  73:ACE-ECF/Algorithm/src/maths.c **** }
+ 245              		.loc 1 73 1 is_stmt 0 view .LVU69
+ 246 001c 7047     		bx	lr
+ 247              		.cfi_endproc
+ 248              	.LFE133:
+ 250              		.section	.text.loop_restriction_float,"ax",%progbits
+ 251              		.align	1
+ 252              		.global	loop_restriction_float
+ 253              		.syntax unified
+ 254              		.thumb
+ 255              		.thumb_func
+ 257              	loop_restriction_float:
+ 258              	.LVL19:
+ 259              	.LFB134:
+  74:ACE-ECF/Algorithm/src/maths.c **** 
+  75:ACE-ECF/Algorithm/src/maths.c **** /*
+  76:ACE-ECF/Algorithm/src/maths.c ****  *功能：正负循环限制（float）
+  77:ACE-ECF/Algorithm/src/maths.c ****  *传入：1.输入值  2.限制幅度(正数)
+  78:ACE-ECF/Algorithm/src/maths.c ****  *传出：限幅输出值
+  79:ACE-ECF/Algorithm/src/maths.c ****  *描述：将输入值限制在 +-限制幅度 的范围内
+  80:ACE-ECF/Algorithm/src/maths.c ****  */
+  81:ACE-ECF/Algorithm/src/maths.c **** float loop_restriction_float(float num, float limit_num)
+  82:ACE-ECF/Algorithm/src/maths.c **** {
+ 260              		.loc 1 82 1 is_stmt 1 view -0
+ 261              		.cfi_startproc
+ 262              		@ args = 0, pretend = 0, frame = 0
+ 263              		@ frame_needed = 0, uses_anonymous_args = 0
+ 264              		@ link register save eliminated.
+  83:ACE-ECF/Algorithm/src/maths.c ****     if (user_abs(num) > limit_num)
+ 265              		.loc 1 83 5 view .LVU71
+ 266              		.loc 1 83 9 is_stmt 0 view .LVU72
+ 267 0000 B5EEC00A 		vcmpe.f32	s0, #0
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s 			page 7
+
+
+ 268 0004 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 269 0008 0EDD     		ble	.L27
+ 270 000a F0EE407A 		vmov.f32	s15, s0
+ 271              	.L18:
+ 272              		.loc 1 83 8 discriminator 4 view .LVU73
+ 273 000e F4EEE07A 		vcmpe.f32	s15, s1
+ 274 0012 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 275 0016 0CDD     		ble	.L19
+  84:ACE-ECF/Algorithm/src/maths.c ****     {
+  85:ACE-ECF/Algorithm/src/maths.c ****         if (num >= 0)
+ 276              		.loc 1 85 9 is_stmt 1 view .LVU74
+ 277              		.loc 1 85 12 is_stmt 0 view .LVU75
+ 278 0018 B5EEC00A 		vcmpe.f32	s0, #0
+ 279 001c F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 280 0020 05DB     		blt	.L26
+  86:ACE-ECF/Algorithm/src/maths.c ****             num -= limit_num;
+ 281              		.loc 1 86 13 is_stmt 1 view .LVU76
+ 282              		.loc 1 86 17 is_stmt 0 view .LVU77
+ 283 0022 30EE600A 		vsub.f32	s0, s0, s1
+ 284              	.LVL20:
+ 285              		.loc 1 86 17 view .LVU78
+ 286 0026 7047     		bx	lr
+ 287              	.L27:
+  83:ACE-ECF/Algorithm/src/maths.c ****     if (user_abs(num) > limit_num)
+ 288              		.loc 1 83 9 discriminator 2 view .LVU79
+ 289 0028 F1EE407A 		vneg.f32	s15, s0
+ 290 002c EFE7     		b	.L18
+ 291              	.L26:
+  87:ACE-ECF/Algorithm/src/maths.c ****         else
+  88:ACE-ECF/Algorithm/src/maths.c ****             num += limit_num;
+ 292              		.loc 1 88 13 is_stmt 1 view .LVU80
+ 293              		.loc 1 88 17 is_stmt 0 view .LVU81
+ 294 002e 30EE200A 		vadd.f32	s0, s0, s1
+ 295              	.LVL21:
+ 296              	.L19:
+  89:ACE-ECF/Algorithm/src/maths.c ****     }
+  90:ACE-ECF/Algorithm/src/maths.c ****     return num;
+ 297              		.loc 1 90 5 is_stmt 1 view .LVU82
+  91:ACE-ECF/Algorithm/src/maths.c **** }
+ 298              		.loc 1 91 1 is_stmt 0 view .LVU83
+ 299 0032 7047     		bx	lr
+ 300              		.cfi_endproc
+ 301              	.LFE134:
+ 303              		.section	.text.loop_fp32_constrain,"ax",%progbits
+ 304              		.align	1
+ 305              		.global	loop_fp32_constrain
+ 306              		.syntax unified
+ 307              		.thumb
+ 308              		.thumb_func
+ 310              	loop_fp32_constrain:
+ 311              	.LVL22:
+ 312              	.LFB135:
+  92:ACE-ECF/Algorithm/src/maths.c **** 
+  93:ACE-ECF/Algorithm/src/maths.c **** /*循环限幅32*/
+  94:ACE-ECF/Algorithm/src/maths.c **** float loop_fp32_constrain(float Input, float minValue, float maxValue)
+  95:ACE-ECF/Algorithm/src/maths.c **** {
+ 313              		.loc 1 95 1 is_stmt 1 view -0
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s 			page 8
+
+
+ 314              		.cfi_startproc
+ 315              		@ args = 0, pretend = 0, frame = 0
+ 316              		@ frame_needed = 0, uses_anonymous_args = 0
+ 317              		@ link register save eliminated.
+  96:ACE-ECF/Algorithm/src/maths.c ****     if (maxValue < minValue)
+ 318              		.loc 1 96 5 view .LVU85
+ 319              		.loc 1 96 8 is_stmt 0 view .LVU86
+ 320 0000 B4EEE01A 		vcmpe.f32	s2, s1
+ 321 0004 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 322 0008 1ED4     		bmi	.L29
+  97:ACE-ECF/Algorithm/src/maths.c ****     {
+  98:ACE-ECF/Algorithm/src/maths.c ****         return Input;
+  99:ACE-ECF/Algorithm/src/maths.c ****     }
+ 100:ACE-ECF/Algorithm/src/maths.c **** 
+ 101:ACE-ECF/Algorithm/src/maths.c ****     if (Input > maxValue)
+ 323              		.loc 1 101 5 is_stmt 1 view .LVU87
+ 324              		.loc 1 101 8 is_stmt 0 view .LVU88
+ 325 000a B4EEC01A 		vcmpe.f32	s2, s0
+ 326 000e F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 327 0012 0AD5     		bpl	.L39
+ 328              	.LBB2:
+ 102:ACE-ECF/Algorithm/src/maths.c ****     {
+ 103:ACE-ECF/Algorithm/src/maths.c ****         float len = maxValue - minValue;
+ 329              		.loc 1 103 9 is_stmt 1 view .LVU89
+ 330              		.loc 1 103 15 is_stmt 0 view .LVU90
+ 331 0014 71EE600A 		vsub.f32	s1, s2, s1
+ 332              	.LVL23:
+ 104:ACE-ECF/Algorithm/src/maths.c ****         while (Input > maxValue)
+ 333              		.loc 1 104 9 is_stmt 1 view .LVU91
+ 334              		.loc 1 104 15 is_stmt 0 view .LVU92
+ 335 0018 01E0     		b	.L32
+ 336              	.L33:
+ 105:ACE-ECF/Algorithm/src/maths.c ****         {
+ 106:ACE-ECF/Algorithm/src/maths.c ****             Input -= len;
+ 337              		.loc 1 106 13 is_stmt 1 view .LVU93
+ 338              		.loc 1 106 19 is_stmt 0 view .LVU94
+ 339 001a 30EE600A 		vsub.f32	s0, s0, s1
+ 340              	.LVL24:
+ 341              	.L32:
+ 104:ACE-ECF/Algorithm/src/maths.c ****         while (Input > maxValue)
+ 342              		.loc 1 104 15 is_stmt 1 view .LVU95
+ 343 001e B4EEC10A 		vcmpe.f32	s0, s2
+ 344 0022 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 345 0026 F8DC     		bgt	.L33
+ 104:ACE-ECF/Algorithm/src/maths.c ****         while (Input > maxValue)
+ 346              		.loc 1 104 15 is_stmt 0 view .LVU96
+ 347 0028 7047     		bx	lr
+ 348              	.LVL25:
+ 349              	.L39:
+ 104:ACE-ECF/Algorithm/src/maths.c ****         while (Input > maxValue)
+ 350              		.loc 1 104 15 view .LVU97
+ 351              	.LBE2:
+ 107:ACE-ECF/Algorithm/src/maths.c ****         }
+ 108:ACE-ECF/Algorithm/src/maths.c ****     }
+ 109:ACE-ECF/Algorithm/src/maths.c ****     else if (Input < minValue)
+ 352              		.loc 1 109 10 is_stmt 1 view .LVU98
+ 353              		.loc 1 109 13 is_stmt 0 view .LVU99
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s 			page 9
+
+
+ 354 002a F4EEC00A 		vcmpe.f32	s1, s0
+ 355 002e F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 356 0032 09DD     		ble	.L29
+ 357              	.LBB3:
+ 110:ACE-ECF/Algorithm/src/maths.c ****     {
+ 111:ACE-ECF/Algorithm/src/maths.c ****         float len = maxValue - minValue;
+ 358              		.loc 1 111 9 is_stmt 1 view .LVU100
+ 359              		.loc 1 111 15 is_stmt 0 view .LVU101
+ 360 0034 31EE601A 		vsub.f32	s2, s2, s1
+ 361              	.LVL26:
+ 112:ACE-ECF/Algorithm/src/maths.c ****         while (Input < minValue)
+ 362              		.loc 1 112 9 is_stmt 1 view .LVU102
+ 363              	.L35:
+ 364              		.loc 1 112 15 view .LVU103
+ 365 0038 B4EEE00A 		vcmpe.f32	s0, s1
+ 366 003c F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 367 0040 02D5     		bpl	.L29
+ 113:ACE-ECF/Algorithm/src/maths.c ****         {
+ 114:ACE-ECF/Algorithm/src/maths.c ****             Input += len;
+ 368              		.loc 1 114 13 view .LVU104
+ 369              		.loc 1 114 19 is_stmt 0 view .LVU105
+ 370 0042 30EE010A 		vadd.f32	s0, s0, s2
+ 371              	.LVL27:
+ 372              		.loc 1 114 19 view .LVU106
+ 373 0046 F7E7     		b	.L35
+ 374              	.LVL28:
+ 375              	.L29:
+ 376              		.loc 1 114 19 view .LVU107
+ 377              	.LBE3:
+ 115:ACE-ECF/Algorithm/src/maths.c ****         }
+ 116:ACE-ECF/Algorithm/src/maths.c ****     }
+ 117:ACE-ECF/Algorithm/src/maths.c ****     return Input;
+ 118:ACE-ECF/Algorithm/src/maths.c **** }
+ 378              		.loc 1 118 1 view .LVU108
+ 379 0048 7047     		bx	lr
+ 380              		.cfi_endproc
+ 381              	.LFE135:
+ 383              		.section	.text.data_accelerated_control,"ax",%progbits
+ 384              		.align	1
+ 385              		.global	data_accelerated_control
+ 386              		.syntax unified
+ 387              		.thumb
+ 388              		.thumb_func
+ 390              	data_accelerated_control:
+ 391              	.LVL29:
+ 392              	.LFB136:
+ 119:ACE-ECF/Algorithm/src/maths.c **** 
+ 120:ACE-ECF/Algorithm/src/maths.c **** //斜坡函数(加速度限制)
+ 121:ACE-ECF/Algorithm/src/maths.c **** void data_accelerated_control(float *input, float acc)
+ 122:ACE-ECF/Algorithm/src/maths.c **** {
+ 393              		.loc 1 122 1 is_stmt 1 view -0
+ 394              		.cfi_startproc
+ 395              		@ args = 0, pretend = 0, frame = 0
+ 396              		@ frame_needed = 0, uses_anonymous_args = 0
+ 397              		@ link register save eliminated.
+ 123:ACE-ECF/Algorithm/src/maths.c ****     static int16_t last_num = 0;
+ 398              		.loc 1 123 5 view .LVU110
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s 			page 10
+
+
+ 124:ACE-ECF/Algorithm/src/maths.c ****     int16_t temp;
+ 399              		.loc 1 124 5 view .LVU111
+ 125:ACE-ECF/Algorithm/src/maths.c ****     temp = *input - last_num;
+ 400              		.loc 1 125 5 view .LVU112
+ 401              		.loc 1 125 12 is_stmt 0 view .LVU113
+ 402 0000 D0ED007A 		vldr.32	s15, [r0]
+ 403              		.loc 1 125 19 view .LVU114
+ 404 0004 1C4B     		ldr	r3, .L46
+ 405 0006 B3F90030 		ldrsh	r3, [r3]
+ 406 000a 07EE103A 		vmov	s14, r3	@ int
+ 407 000e B8EEC77A 		vcvt.f32.s32	s14, s14
+ 408 0012 77EEC77A 		vsub.f32	s15, s15, s14
+ 409              		.loc 1 125 10 view .LVU115
+ 410 0016 FDEEE77A 		vcvt.s32.f32	s15, s15
+ 411 001a 17EE903A 		vmov	r3, s15	@ int
+ 412 001e 1BB2     		sxth	r3, r3
+ 413              	.LVL30:
+ 126:ACE-ECF/Algorithm/src/maths.c **** 
+ 127:ACE-ECF/Algorithm/src/maths.c ****     if (user_abs(temp) > acc)
+ 414              		.loc 1 127 5 is_stmt 1 view .LVU116
+ 415              		.loc 1 127 24 is_stmt 0 view .LVU117
+ 416 0020 002B     		cmp	r3, #0
+ 417 0022 22DD     		ble	.L41
+ 418              		.loc 1 127 24 discriminator 1 view .LVU118
+ 419 0024 07EE903A 		vmov	s15, r3	@ int
+ 420 0028 F8EEE77A 		vcvt.f32.s32	s15, s15
+ 421              	.L42:
+ 422              		.loc 1 127 8 discriminator 4 view .LVU119
+ 423 002c F4EEC07A 		vcmpe.f32	s15, s0
+ 424 0030 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 425 0034 10DD     		ble	.L43
+ 128:ACE-ECF/Algorithm/src/maths.c ****         *input = last_num + temp / user_abs(temp) * acc;
+ 426              		.loc 1 128 9 is_stmt 1 view .LVU120
+ 427              		.loc 1 128 36 is_stmt 0 view .LVU121
+ 428 0036 83EAE372 		eor	r2, r3, r3, asr #31
+ 429 003a A2EBE372 		sub	r2, r2, r3, asr #31
+ 430 003e 92B2     		uxth	r2, r2
+ 431              		.loc 1 128 34 view .LVU122
+ 432 0040 93FBF2F3 		sdiv	r3, r3, r2
+ 433              	.LVL31:
+ 434              		.loc 1 128 51 view .LVU123
+ 435 0044 07EE903A 		vmov	s15, r3	@ int
+ 436 0048 F8EEE77A 		vcvt.f32.s32	s15, s15
+ 437 004c 27EE800A 		vmul.f32	s0, s15, s0
+ 438              	.LVL32:
+ 439              		.loc 1 128 27 view .LVU124
+ 440 0050 37EE000A 		vadd.f32	s0, s14, s0
+ 441              		.loc 1 128 16 view .LVU125
+ 442 0054 80ED000A 		vstr.32	s0, [r0]
+ 443              	.LVL33:
+ 444              	.L43:
+ 129:ACE-ECF/Algorithm/src/maths.c **** 
+ 130:ACE-ECF/Algorithm/src/maths.c ****     last_num = *input;
+ 445              		.loc 1 130 5 is_stmt 1 view .LVU126
+ 446              		.loc 1 130 16 is_stmt 0 view .LVU127
+ 447 0058 D0ED007A 		vldr.32	s15, [r0]
+ 448              		.loc 1 130 14 view .LVU128
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s 			page 11
+
+
+ 449 005c FDEEE77A 		vcvt.s32.f32	s15, s15
+ 450 0060 054B     		ldr	r3, .L46
+ 451 0062 17EE902A 		vmov	r2, s15	@ int
+ 452 0066 1A80     		strh	r2, [r3]	@ movhi
+ 131:ACE-ECF/Algorithm/src/maths.c **** }
+ 453              		.loc 1 131 1 view .LVU129
+ 454 0068 7047     		bx	lr
+ 455              	.LVL34:
+ 456              	.L41:
+ 127:ACE-ECF/Algorithm/src/maths.c ****         *input = last_num + temp / user_abs(temp) * acc;
+ 457              		.loc 1 127 9 discriminator 2 view .LVU130
+ 458 006a 5A42     		rsbs	r2, r3, #0
+ 459 006c 07EE902A 		vmov	s15, r2	@ int
+ 127:ACE-ECF/Algorithm/src/maths.c ****         *input = last_num + temp / user_abs(temp) * acc;
+ 460              		.loc 1 127 24 discriminator 2 view .LVU131
+ 461 0070 F8EEE77A 		vcvt.f32.s32	s15, s15
+ 462 0074 DAE7     		b	.L42
+ 463              	.L47:
+ 464 0076 00BF     		.align	2
+ 465              	.L46:
+ 466 0078 00000000 		.word	.LANCHOR0
+ 467              		.cfi_endproc
+ 468              	.LFE136:
+ 470              		.section	.text.limiting_filter,"ax",%progbits
+ 471              		.align	1
+ 472              		.global	limiting_filter
+ 473              		.syntax unified
+ 474              		.thumb
+ 475              		.thumb_func
+ 477              	limiting_filter:
+ 478              	.LVL35:
+ 479              	.LFB137:
+ 132:ACE-ECF/Algorithm/src/maths.c **** 
+ 133:ACE-ECF/Algorithm/src/maths.c **** // 限幅滤波函数
+ 134:ACE-ECF/Algorithm/src/maths.c **** float limiting_filter(float new_value, float last_value, float delat_max)
+ 135:ACE-ECF/Algorithm/src/maths.c **** {
+ 480              		.loc 1 135 1 is_stmt 1 view -0
+ 481              		.cfi_startproc
+ 482              		@ args = 0, pretend = 0, frame = 0
+ 483              		@ frame_needed = 0, uses_anonymous_args = 0
+ 484              		@ link register save eliminated.
+ 485              		.loc 1 135 1 is_stmt 0 view .LVU133
+ 486 0000 F0EE407A 		vmov.f32	s15, s0
+ 487 0004 B0EE600A 		vmov.f32	s0, s1
+ 488              	.LVL36:
+ 136:ACE-ECF/Algorithm/src/maths.c ****     if ((new_value - last_value > delat_max) || (last_value - new_value > delat_max))
+ 489              		.loc 1 136 5 is_stmt 1 view .LVU134
+ 490              		.loc 1 136 20 is_stmt 0 view .LVU135
+ 491 0008 37EEE07A 		vsub.f32	s14, s15, s1
+ 492              		.loc 1 136 8 view .LVU136
+ 493 000c B4EEC17A 		vcmpe.f32	s14, s2
+ 494 0010 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 495 0014 08DC     		bgt	.L49
+ 496              		.loc 1 136 61 discriminator 1 view .LVU137
+ 497 0016 30EEE77A 		vsub.f32	s14, s1, s15
+ 498              		.loc 1 136 46 discriminator 1 view .LVU138
+ 499 001a B4EEC17A 		vcmpe.f32	s14, s2
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s 			page 12
+
+
+ 500 001e F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 501 0022 01DC     		bgt	.L49
+ 137:ACE-ECF/Algorithm/src/maths.c ****         return last_value;
+ 138:ACE-ECF/Algorithm/src/maths.c ****     return new_value;
+ 502              		.loc 1 138 12 view .LVU139
+ 503 0024 B0EE670A 		vmov.f32	s0, s15
+ 504              	.L49:
+ 139:ACE-ECF/Algorithm/src/maths.c **** }
+ 505              		.loc 1 139 1 view .LVU140
+ 506 0028 7047     		bx	lr
+ 507              		.cfi_endproc
+ 508              	.LFE137:
+ 510              		.section	.text.sin_calculate,"ax",%progbits
+ 511              		.align	1
+ 512              		.global	sin_calculate
+ 513              		.syntax unified
+ 514              		.thumb
+ 515              		.thumb_func
+ 517              	sin_calculate:
+ 518              	.LVL37:
+ 519              	.LFB138:
+ 140:ACE-ECF/Algorithm/src/maths.c **** 
+ 141:ACE-ECF/Algorithm/src/maths.c **** // sin函数查表法
+ 142:ACE-ECF/Algorithm/src/maths.c **** float sin_calculate(float angle)
+ 143:ACE-ECF/Algorithm/src/maths.c **** {
+ 520              		.loc 1 143 1 is_stmt 1 view -0
+ 521              		.cfi_startproc
+ 522              		@ args = 0, pretend = 0, frame = 0
+ 523              		@ frame_needed = 0, uses_anonymous_args = 0
+ 524              		@ link register save eliminated.
+ 144:ACE-ECF/Algorithm/src/maths.c ****     float sin_angle;
+ 525              		.loc 1 144 5 view .LVU142
+ 145:ACE-ECF/Algorithm/src/maths.c **** 
+ 146:ACE-ECF/Algorithm/src/maths.c ****     if (angle >= 0.0f && angle < 90.0f)
+ 526              		.loc 1 146 5 view .LVU143
+ 527              		.loc 1 146 8 is_stmt 0 view .LVU144
+ 528 0000 B5EEC00A 		vcmpe.f32	s0, #0
+ 529 0004 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 530 0008 22DB     		blt	.L51
+ 531              		.loc 1 146 23 discriminator 1 view .LVU145
+ 532 000a 9FED597A 		vldr.32	s14, .L82
+ 533 000e B4EEC70A 		vcmpe.f32	s0, s14
+ 534 0012 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 535 0016 1BD5     		bpl	.L51
+ 147:ACE-ECF/Algorithm/src/maths.c ****         sin_angle = (Trigonometric_Functions[(int)(user_abs(angle) * 10.0f)] / 100.0f);
+ 536              		.loc 1 147 9 is_stmt 1 view .LVU146
+ 537              		.loc 1 147 52 is_stmt 0 view .LVU147
+ 538 0018 B5EEC00A 		vcmpe.f32	s0, #0
+ 539 001c F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 540 0020 13DD     		ble	.L77
+ 541              	.LVL38:
+ 542              	.L54:
+ 543              		.loc 1 147 68 discriminator 4 view .LVU148
+ 544 0022 F2EE047A 		vmov.f32	s15, #1.0e+1
+ 545 0026 20EE270A 		vmul.f32	s0, s0, s15
+ 546              		.loc 1 147 46 discriminator 4 view .LVU149
+ 547 002a BDEEC00A 		vcvt.s32.f32	s0, s0
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s 			page 13
+
+
+ 548              		.loc 1 147 45 discriminator 4 view .LVU150
+ 549 002e 514B     		ldr	r3, .L82+4
+ 550 0030 10EE102A 		vmov	r2, s0	@ int
+ 551 0034 03EB8203 		add	r3, r3, r2, lsl #2
+ 552 0038 D3ED006A 		vldr.32	s13, [r3]
+ 553              		.loc 1 147 19 discriminator 4 view .LVU151
+ 554 003c 9FED4E7A 		vldr.32	s14, .L82+8
+ 555 0040 C6EE877A 		vdiv.f32	s15, s13, s14
+ 556              	.LVL39:
+ 557              	.L50:
+ 148:ACE-ECF/Algorithm/src/maths.c ****     else if (angle >= 90.0f && angle < 180.f)
+ 149:ACE-ECF/Algorithm/src/maths.c ****         sin_angle = (Trigonometric_Functions[(int)(user_abs(180.0f - angle) * 10.0f)] / 100.0f);
+ 150:ACE-ECF/Algorithm/src/maths.c ****     else if (angle >= -180.0f && angle < -90.f)
+ 151:ACE-ECF/Algorithm/src/maths.c ****         sin_angle = -(Trigonometric_Functions[(int)(user_abs(180.0f + angle) * 10.0f)] / 100.0f);
+ 152:ACE-ECF/Algorithm/src/maths.c ****     else if (angle >= -90.0f && angle < 0.f)
+ 153:ACE-ECF/Algorithm/src/maths.c ****         sin_angle = -(Trigonometric_Functions[(int)(user_abs(180.0f - (180.0f + angle)) * 10.0f)] /
+ 154:ACE-ECF/Algorithm/src/maths.c ****     else if (angle == 180.f)
+ 155:ACE-ECF/Algorithm/src/maths.c ****         sin_angle = 0.0f;
+ 156:ACE-ECF/Algorithm/src/maths.c **** 
+ 157:ACE-ECF/Algorithm/src/maths.c ****     return sin_angle;
+ 158:ACE-ECF/Algorithm/src/maths.c **** }
+ 558              		.loc 1 158 1 view .LVU152
+ 559 0044 B0EE670A 		vmov.f32	s0, s15
+ 560 0048 7047     		bx	lr
+ 561              	.LVL40:
+ 562              	.L77:
+ 147:ACE-ECF/Algorithm/src/maths.c ****         sin_angle = (Trigonometric_Functions[(int)(user_abs(angle) * 10.0f)] / 100.0f);
+ 563              		.loc 1 147 52 discriminator 2 view .LVU153
+ 564 004a B1EE400A 		vneg.f32	s0, s0
+ 565              	.LVL41:
+ 147:ACE-ECF/Algorithm/src/maths.c ****         sin_angle = (Trigonometric_Functions[(int)(user_abs(angle) * 10.0f)] / 100.0f);
+ 566              		.loc 1 147 52 discriminator 2 view .LVU154
+ 567 004e E8E7     		b	.L54
+ 568              	.LVL42:
+ 569              	.L51:
+ 148:ACE-ECF/Algorithm/src/maths.c ****     else if (angle >= 90.0f && angle < 180.f)
+ 570              		.loc 1 148 10 is_stmt 1 view .LVU155
+ 148:ACE-ECF/Algorithm/src/maths.c ****     else if (angle >= 90.0f && angle < 180.f)
+ 571              		.loc 1 148 13 is_stmt 0 view .LVU156
+ 572 0050 9FED477A 		vldr.32	s14, .L82
+ 573 0054 B4EEC70A 		vcmpe.f32	s0, s14
+ 574 0058 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 575 005c 22DB     		blt	.L56
+ 148:ACE-ECF/Algorithm/src/maths.c ****     else if (angle >= 90.0f && angle < 180.f)
+ 576              		.loc 1 148 29 discriminator 1 view .LVU157
+ 577 005e 9FED477A 		vldr.32	s14, .L82+12
+ 578 0062 B4EEC70A 		vcmpe.f32	s0, s14
+ 579 0066 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 580 006a 1BD5     		bpl	.L56
+ 149:ACE-ECF/Algorithm/src/maths.c ****     else if (angle >= -180.0f && angle < -90.f)
+ 581              		.loc 1 149 9 is_stmt 1 view .LVU158
+ 149:ACE-ECF/Algorithm/src/maths.c ****     else if (angle >= -180.0f && angle < -90.f)
+ 582              		.loc 1 149 52 is_stmt 0 view .LVU159
+ 583 006c 37EE400A 		vsub.f32	s0, s14, s0
+ 584              	.LVL43:
+ 149:ACE-ECF/Algorithm/src/maths.c ****     else if (angle >= -180.0f && angle < -90.f)
+ 585              		.loc 1 149 52 view .LVU160
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s 			page 14
+
+
+ 586 0070 B5EEC00A 		vcmpe.f32	s0, #0
+ 587 0074 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 588 0078 11DD     		ble	.L78
+ 589              	.L59:
+ 149:ACE-ECF/Algorithm/src/maths.c ****     else if (angle >= -180.0f && angle < -90.f)
+ 590              		.loc 1 149 77 discriminator 4 view .LVU161
+ 591 007a F2EE047A 		vmov.f32	s15, #1.0e+1
+ 592 007e 20EE270A 		vmul.f32	s0, s0, s15
+ 149:ACE-ECF/Algorithm/src/maths.c ****     else if (angle >= -180.0f && angle < -90.f)
+ 593              		.loc 1 149 46 discriminator 4 view .LVU162
+ 594 0082 BDEEC00A 		vcvt.s32.f32	s0, s0
+ 149:ACE-ECF/Algorithm/src/maths.c ****     else if (angle >= -180.0f && angle < -90.f)
+ 595              		.loc 1 149 45 discriminator 4 view .LVU163
+ 596 0086 3B4B     		ldr	r3, .L82+4
+ 597 0088 10EE102A 		vmov	r2, s0	@ int
+ 598 008c 03EB8203 		add	r3, r3, r2, lsl #2
+ 599 0090 D3ED006A 		vldr.32	s13, [r3]
+ 149:ACE-ECF/Algorithm/src/maths.c ****     else if (angle >= -180.0f && angle < -90.f)
+ 600              		.loc 1 149 19 discriminator 4 view .LVU164
+ 601 0094 9FED387A 		vldr.32	s14, .L82+8
+ 602 0098 C6EE877A 		vdiv.f32	s15, s13, s14
+ 603              	.LVL44:
+ 149:ACE-ECF/Algorithm/src/maths.c ****     else if (angle >= -180.0f && angle < -90.f)
+ 604              		.loc 1 149 19 discriminator 4 view .LVU165
+ 605 009c D2E7     		b	.L50
+ 606              	.LVL45:
+ 607              	.L78:
+ 149:ACE-ECF/Algorithm/src/maths.c ****     else if (angle >= -180.0f && angle < -90.f)
+ 608              		.loc 1 149 52 discriminator 2 view .LVU166
+ 609 009e B1EE400A 		vneg.f32	s0, s0
+ 610 00a2 EAE7     		b	.L59
+ 611              	.LVL46:
+ 612              	.L56:
+ 150:ACE-ECF/Algorithm/src/maths.c ****         sin_angle = -(Trigonometric_Functions[(int)(user_abs(180.0f + angle) * 10.0f)] / 100.0f);
+ 613              		.loc 1 150 10 is_stmt 1 view .LVU167
+ 150:ACE-ECF/Algorithm/src/maths.c ****         sin_angle = -(Trigonometric_Functions[(int)(user_abs(180.0f + angle) * 10.0f)] / 100.0f);
+ 614              		.loc 1 150 13 is_stmt 0 view .LVU168
+ 615 00a4 9FED367A 		vldr.32	s14, .L82+16
+ 616 00a8 B4EEC70A 		vcmpe.f32	s0, s14
+ 617 00ac F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 618 00b0 26DB     		blt	.L60
+ 150:ACE-ECF/Algorithm/src/maths.c ****         sin_angle = -(Trigonometric_Functions[(int)(user_abs(180.0f + angle) * 10.0f)] / 100.0f);
+ 619              		.loc 1 150 31 discriminator 1 view .LVU169
+ 620 00b2 9FED347A 		vldr.32	s14, .L82+20
+ 621 00b6 B4EEC70A 		vcmpe.f32	s0, s14
+ 622 00ba F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 623 00be 1FD5     		bpl	.L60
+ 151:ACE-ECF/Algorithm/src/maths.c ****     else if (angle >= -90.0f && angle < 0.f)
+ 624              		.loc 1 151 9 is_stmt 1 view .LVU170
+ 151:ACE-ECF/Algorithm/src/maths.c ****     else if (angle >= -90.0f && angle < 0.f)
+ 625              		.loc 1 151 53 is_stmt 0 view .LVU171
+ 626 00c0 DFED2E7A 		vldr.32	s15, .L82+12
+ 627 00c4 30EE270A 		vadd.f32	s0, s0, s15
+ 628              	.LVL47:
+ 151:ACE-ECF/Algorithm/src/maths.c ****     else if (angle >= -90.0f && angle < 0.f)
+ 629              		.loc 1 151 53 view .LVU172
+ 630 00c8 B5EEC00A 		vcmpe.f32	s0, #0
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s 			page 15
+
+
+ 631 00cc F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 632 00d0 13DD     		ble	.L79
+ 633              	.L63:
+ 151:ACE-ECF/Algorithm/src/maths.c ****     else if (angle >= -90.0f && angle < 0.f)
+ 634              		.loc 1 151 78 discriminator 4 view .LVU173
+ 635 00d2 F2EE047A 		vmov.f32	s15, #1.0e+1
+ 636 00d6 20EE270A 		vmul.f32	s0, s0, s15
+ 151:ACE-ECF/Algorithm/src/maths.c ****     else if (angle >= -90.0f && angle < 0.f)
+ 637              		.loc 1 151 47 discriminator 4 view .LVU174
+ 638 00da BDEEC00A 		vcvt.s32.f32	s0, s0
+ 151:ACE-ECF/Algorithm/src/maths.c ****     else if (angle >= -90.0f && angle < 0.f)
+ 639              		.loc 1 151 46 discriminator 4 view .LVU175
+ 640 00de 254B     		ldr	r3, .L82+4
+ 641 00e0 10EE102A 		vmov	r2, s0	@ int
+ 642 00e4 03EB8203 		add	r3, r3, r2, lsl #2
+ 643 00e8 D3ED006A 		vldr.32	s13, [r3]
+ 151:ACE-ECF/Algorithm/src/maths.c ****     else if (angle >= -90.0f && angle < 0.f)
+ 644              		.loc 1 151 88 discriminator 4 view .LVU176
+ 645 00ec 9FED227A 		vldr.32	s14, .L82+8
+ 646 00f0 C6EE877A 		vdiv.f32	s15, s13, s14
+ 151:ACE-ECF/Algorithm/src/maths.c ****     else if (angle >= -90.0f && angle < 0.f)
+ 647              		.loc 1 151 19 discriminator 4 view .LVU177
+ 648 00f4 F1EE677A 		vneg.f32	s15, s15
+ 649              	.LVL48:
+ 151:ACE-ECF/Algorithm/src/maths.c ****     else if (angle >= -90.0f && angle < 0.f)
+ 650              		.loc 1 151 19 discriminator 4 view .LVU178
+ 651 00f8 A4E7     		b	.L50
+ 652              	.LVL49:
+ 653              	.L79:
+ 151:ACE-ECF/Algorithm/src/maths.c ****     else if (angle >= -90.0f && angle < 0.f)
+ 654              		.loc 1 151 53 discriminator 2 view .LVU179
+ 655 00fa B1EE400A 		vneg.f32	s0, s0
+ 656 00fe E8E7     		b	.L63
+ 657              	.LVL50:
+ 658              	.L60:
+ 152:ACE-ECF/Algorithm/src/maths.c ****         sin_angle = -(Trigonometric_Functions[(int)(user_abs(180.0f - (180.0f + angle)) * 10.0f)] /
+ 659              		.loc 1 152 10 is_stmt 1 view .LVU180
+ 152:ACE-ECF/Algorithm/src/maths.c ****         sin_angle = -(Trigonometric_Functions[(int)(user_abs(180.0f - (180.0f + angle)) * 10.0f)] /
+ 660              		.loc 1 152 13 is_stmt 0 view .LVU181
+ 661 0100 9FED207A 		vldr.32	s14, .L82+20
+ 662 0104 B4EEC70A 		vcmpe.f32	s0, s14
+ 663 0108 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 664 010c 04DB     		blt	.L64
+ 152:ACE-ECF/Algorithm/src/maths.c ****         sin_angle = -(Trigonometric_Functions[(int)(user_abs(180.0f - (180.0f + angle)) * 10.0f)] /
+ 665              		.loc 1 152 30 discriminator 1 view .LVU182
+ 666 010e B5EEC00A 		vcmpe.f32	s0, #0
+ 667 0112 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 668 0116 09D4     		bmi	.L80
+ 669              	.L64:
+ 154:ACE-ECF/Algorithm/src/maths.c ****         sin_angle = 0.0f;
+ 670              		.loc 1 154 10 is_stmt 1 view .LVU183
+ 154:ACE-ECF/Algorithm/src/maths.c ****         sin_angle = 0.0f;
+ 671              		.loc 1 154 13 is_stmt 0 view .LVU184
+ 672 0118 9FED187A 		vldr.32	s14, .L82+12
+ 673 011c B4EE470A 		vcmp.f32	s0, s14
+ 674 0120 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 675 0124 8ED1     		bne	.L50
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s 			page 16
+
+
+ 155:ACE-ECF/Algorithm/src/maths.c **** 
+ 676              		.loc 1 155 19 view .LVU185
+ 677 0126 DFED187A 		vldr.32	s15, .L82+24
+ 678              	.LVL51:
+ 157:ACE-ECF/Algorithm/src/maths.c **** }
+ 679              		.loc 1 157 5 is_stmt 1 view .LVU186
+ 157:ACE-ECF/Algorithm/src/maths.c **** }
+ 680              		.loc 1 157 12 is_stmt 0 view .LVU187
+ 681 012a 8BE7     		b	.L50
+ 682              	.LVL52:
+ 683              	.L80:
+ 153:ACE-ECF/Algorithm/src/maths.c ****     else if (angle == 180.f)
+ 684              		.loc 1 153 9 is_stmt 1 view .LVU188
+ 153:ACE-ECF/Algorithm/src/maths.c ****     else if (angle == 180.f)
+ 685              		.loc 1 153 53 is_stmt 0 view .LVU189
+ 686 012c DFED137A 		vldr.32	s15, .L82+12
+ 687 0130 30EE270A 		vadd.f32	s0, s0, s15
+ 688              	.LVL53:
+ 153:ACE-ECF/Algorithm/src/maths.c ****     else if (angle == 180.f)
+ 689              		.loc 1 153 53 view .LVU190
+ 690 0134 37EEC00A 		vsub.f32	s0, s15, s0
+ 691 0138 B5EEC00A 		vcmpe.f32	s0, #0
+ 692 013c F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 693 0140 13DD     		ble	.L81
+ 694              	.L67:
+ 153:ACE-ECF/Algorithm/src/maths.c ****     else if (angle == 180.f)
+ 695              		.loc 1 153 89 discriminator 4 view .LVU191
+ 696 0142 F2EE047A 		vmov.f32	s15, #1.0e+1
+ 697 0146 20EE270A 		vmul.f32	s0, s0, s15
+ 153:ACE-ECF/Algorithm/src/maths.c ****     else if (angle == 180.f)
+ 698              		.loc 1 153 47 discriminator 4 view .LVU192
+ 699 014a BDEEC00A 		vcvt.s32.f32	s0, s0
+ 153:ACE-ECF/Algorithm/src/maths.c ****     else if (angle == 180.f)
+ 700              		.loc 1 153 46 discriminator 4 view .LVU193
+ 701 014e 094B     		ldr	r3, .L82+4
+ 702 0150 10EE102A 		vmov	r2, s0	@ int
+ 703 0154 03EB8203 		add	r3, r3, r2, lsl #2
+ 704 0158 D3ED006A 		vldr.32	s13, [r3]
+ 153:ACE-ECF/Algorithm/src/maths.c ****     else if (angle == 180.f)
+ 705              		.loc 1 153 99 discriminator 4 view .LVU194
+ 706 015c 9FED067A 		vldr.32	s14, .L82+8
+ 707 0160 C6EE877A 		vdiv.f32	s15, s13, s14
+ 153:ACE-ECF/Algorithm/src/maths.c ****     else if (angle == 180.f)
+ 708              		.loc 1 153 19 discriminator 4 view .LVU195
+ 709 0164 F1EE677A 		vneg.f32	s15, s15
+ 710              	.LVL54:
+ 153:ACE-ECF/Algorithm/src/maths.c ****     else if (angle == 180.f)
+ 711              		.loc 1 153 19 discriminator 4 view .LVU196
+ 712 0168 6CE7     		b	.L50
+ 713              	.LVL55:
+ 714              	.L81:
+ 153:ACE-ECF/Algorithm/src/maths.c ****     else if (angle == 180.f)
+ 715              		.loc 1 153 53 discriminator 2 view .LVU197
+ 716 016a B1EE400A 		vneg.f32	s0, s0
+ 717 016e E8E7     		b	.L67
+ 718              	.L83:
+ 719              		.align	2
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s 			page 17
+
+
+ 720              	.L82:
+ 721 0170 0000B442 		.word	1119092736
+ 722 0174 00000000 		.word	.LANCHOR1
+ 723 0178 0000C842 		.word	1120403456
+ 724 017c 00003443 		.word	1127481344
+ 725 0180 000034C3 		.word	-1020002304
+ 726 0184 0000B4C2 		.word	-1028390912
+ 727 0188 00000000 		.word	0
+ 728              		.cfi_endproc
+ 729              	.LFE138:
+ 731              		.section	.text.cos_calculate,"ax",%progbits
+ 732              		.align	1
+ 733              		.global	cos_calculate
+ 734              		.syntax unified
+ 735              		.thumb
+ 736              		.thumb_func
+ 738              	cos_calculate:
+ 739              	.LVL56:
+ 740              	.LFB139:
+ 159:ACE-ECF/Algorithm/src/maths.c **** 
+ 160:ACE-ECF/Algorithm/src/maths.c **** // cos函数查表法
+ 161:ACE-ECF/Algorithm/src/maths.c **** float cos_calculate(float angle)
+ 162:ACE-ECF/Algorithm/src/maths.c **** {
+ 741              		.loc 1 162 1 is_stmt 1 view -0
+ 742              		.cfi_startproc
+ 743              		@ args = 0, pretend = 0, frame = 0
+ 744              		@ frame_needed = 0, uses_anonymous_args = 0
+ 745              		@ link register save eliminated.
+ 163:ACE-ECF/Algorithm/src/maths.c ****     float cos_angle;
+ 746              		.loc 1 163 5 view .LVU199
+ 164:ACE-ECF/Algorithm/src/maths.c **** 
+ 165:ACE-ECF/Algorithm/src/maths.c ****     angle = user_abs(angle);
+ 747              		.loc 1 165 5 view .LVU200
+ 748              		.loc 1 165 13 is_stmt 0 view .LVU201
+ 749 0000 B5EEC00A 		vcmpe.f32	s0, #0
+ 750 0004 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 751 0008 26DD     		ble	.L100
+ 752              	.LVL57:
+ 753              	.L85:
+ 166:ACE-ECF/Algorithm/src/maths.c **** 
+ 167:ACE-ECF/Algorithm/src/maths.c ****     if (angle >= 0.0f && angle < 90.0f)
+ 754              		.loc 1 167 5 is_stmt 1 discriminator 4 view .LVU202
+ 755              		.loc 1 167 8 is_stmt 0 discriminator 4 view .LVU203
+ 756 000a B5EEC00A 		vcmpe.f32	s0, #0
+ 757 000e F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 758 0012 27DB     		blt	.L86
+ 759              		.loc 1 167 23 discriminator 1 view .LVU204
+ 760 0014 9FED2F7A 		vldr.32	s14, .L103
+ 761 0018 B4EEC70A 		vcmpe.f32	s0, s14
+ 762 001c F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 763 0020 20D5     		bpl	.L86
+ 168:ACE-ECF/Algorithm/src/maths.c ****         cos_angle = (Trigonometric_Functions[(int)(user_abs(90.0f - angle) * 10.0f)] / 100.0f);
+ 764              		.loc 1 168 9 is_stmt 1 view .LVU205
+ 765              		.loc 1 168 52 is_stmt 0 view .LVU206
+ 766 0022 37EE400A 		vsub.f32	s0, s14, s0
+ 767              	.LVL58:
+ 768              		.loc 1 168 52 view .LVU207
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s 			page 18
+
+
+ 769 0026 B5EEC00A 		vcmpe.f32	s0, #0
+ 770 002a F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 771 002e 16DD     		ble	.L101
+ 772              	.L89:
+ 773              		.loc 1 168 76 discriminator 4 view .LVU208
+ 774 0030 F2EE047A 		vmov.f32	s15, #1.0e+1
+ 775 0034 20EE270A 		vmul.f32	s0, s0, s15
+ 776              		.loc 1 168 46 discriminator 4 view .LVU209
+ 777 0038 BDEEC00A 		vcvt.s32.f32	s0, s0
+ 778              		.loc 1 168 45 discriminator 4 view .LVU210
+ 779 003c 264B     		ldr	r3, .L103+4
+ 780 003e 10EE102A 		vmov	r2, s0	@ int
+ 781 0042 03EB8203 		add	r3, r3, r2, lsl #2
+ 782 0046 D3ED006A 		vldr.32	s13, [r3]
+ 783              		.loc 1 168 19 discriminator 4 view .LVU211
+ 784 004a 9FED247A 		vldr.32	s14, .L103+8
+ 785 004e C6EE877A 		vdiv.f32	s15, s13, s14
+ 786              	.LVL59:
+ 787              	.L84:
+ 169:ACE-ECF/Algorithm/src/maths.c ****     else if (angle >= 90.0f && angle < 180.f)
+ 170:ACE-ECF/Algorithm/src/maths.c ****         cos_angle = -(Trigonometric_Functions[(int)(user_abs(angle - 90.0f) * 10.0f)] / 100.0f);
+ 171:ACE-ECF/Algorithm/src/maths.c ****     else if (angle == 180.f)
+ 172:ACE-ECF/Algorithm/src/maths.c ****         cos_angle = -1.0f;
+ 173:ACE-ECF/Algorithm/src/maths.c **** 
+ 174:ACE-ECF/Algorithm/src/maths.c ****     return cos_angle;
+ 175:ACE-ECF/Algorithm/src/maths.c **** }
+ 788              		.loc 1 175 1 view .LVU212
+ 789 0052 B0EE670A 		vmov.f32	s0, s15
+ 790 0056 7047     		bx	lr
+ 791              	.LVL60:
+ 792              	.L100:
+ 165:ACE-ECF/Algorithm/src/maths.c **** 
+ 793              		.loc 1 165 13 discriminator 2 view .LVU213
+ 794 0058 B1EE400A 		vneg.f32	s0, s0
+ 795              	.LVL61:
+ 165:ACE-ECF/Algorithm/src/maths.c **** 
+ 796              		.loc 1 165 13 discriminator 2 view .LVU214
+ 797 005c D5E7     		b	.L85
+ 798              	.LVL62:
+ 799              	.L101:
+ 168:ACE-ECF/Algorithm/src/maths.c ****         cos_angle = (Trigonometric_Functions[(int)(user_abs(90.0f - angle) * 10.0f)] / 100.0f);
+ 800              		.loc 1 168 52 discriminator 2 view .LVU215
+ 801 005e B1EE400A 		vneg.f32	s0, s0
+ 802 0062 E5E7     		b	.L89
+ 803              	.LVL63:
+ 804              	.L86:
+ 169:ACE-ECF/Algorithm/src/maths.c ****     else if (angle >= 90.0f && angle < 180.f)
+ 805              		.loc 1 169 10 is_stmt 1 view .LVU216
+ 169:ACE-ECF/Algorithm/src/maths.c ****     else if (angle >= 90.0f && angle < 180.f)
+ 806              		.loc 1 169 13 is_stmt 0 view .LVU217
+ 807 0064 9FED1B7A 		vldr.32	s14, .L103
+ 808 0068 B4EEC70A 		vcmpe.f32	s0, s14
+ 809 006c F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 810 0070 26DB     		blt	.L91
+ 169:ACE-ECF/Algorithm/src/maths.c ****     else if (angle >= 90.0f && angle < 180.f)
+ 811              		.loc 1 169 29 discriminator 1 view .LVU218
+ 812 0072 9FED1B7A 		vldr.32	s14, .L103+12
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s 			page 19
+
+
+ 813 0076 B4EEC70A 		vcmpe.f32	s0, s14
+ 814 007a F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 815 007e 1FD5     		bpl	.L91
+ 170:ACE-ECF/Algorithm/src/maths.c ****     else if (angle == 180.f)
+ 816              		.loc 1 170 9 is_stmt 1 view .LVU219
+ 170:ACE-ECF/Algorithm/src/maths.c ****     else if (angle == 180.f)
+ 817              		.loc 1 170 53 is_stmt 0 view .LVU220
+ 818 0080 DFED147A 		vldr.32	s15, .L103
+ 819 0084 30EE670A 		vsub.f32	s0, s0, s15
+ 820              	.LVL64:
+ 170:ACE-ECF/Algorithm/src/maths.c ****     else if (angle == 180.f)
+ 821              		.loc 1 170 53 view .LVU221
+ 822 0088 B5EEC00A 		vcmpe.f32	s0, #0
+ 823 008c F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 824 0090 13DD     		ble	.L102
+ 825              	.L94:
+ 170:ACE-ECF/Algorithm/src/maths.c ****     else if (angle == 180.f)
+ 826              		.loc 1 170 77 discriminator 4 view .LVU222
+ 827 0092 F2EE047A 		vmov.f32	s15, #1.0e+1
+ 828 0096 20EE270A 		vmul.f32	s0, s0, s15
+ 170:ACE-ECF/Algorithm/src/maths.c ****     else if (angle == 180.f)
+ 829              		.loc 1 170 47 discriminator 4 view .LVU223
+ 830 009a BDEEC00A 		vcvt.s32.f32	s0, s0
+ 170:ACE-ECF/Algorithm/src/maths.c ****     else if (angle == 180.f)
+ 831              		.loc 1 170 46 discriminator 4 view .LVU224
+ 832 009e 0E4B     		ldr	r3, .L103+4
+ 833 00a0 10EE102A 		vmov	r2, s0	@ int
+ 834 00a4 03EB8203 		add	r3, r3, r2, lsl #2
+ 835 00a8 D3ED006A 		vldr.32	s13, [r3]
+ 170:ACE-ECF/Algorithm/src/maths.c ****     else if (angle == 180.f)
+ 836              		.loc 1 170 87 discriminator 4 view .LVU225
+ 837 00ac 9FED0B7A 		vldr.32	s14, .L103+8
+ 838 00b0 C6EE877A 		vdiv.f32	s15, s13, s14
+ 170:ACE-ECF/Algorithm/src/maths.c ****     else if (angle == 180.f)
+ 839              		.loc 1 170 19 discriminator 4 view .LVU226
+ 840 00b4 F1EE677A 		vneg.f32	s15, s15
+ 841              	.LVL65:
+ 170:ACE-ECF/Algorithm/src/maths.c ****     else if (angle == 180.f)
+ 842              		.loc 1 170 19 discriminator 4 view .LVU227
+ 843 00b8 CBE7     		b	.L84
+ 844              	.LVL66:
+ 845              	.L102:
+ 170:ACE-ECF/Algorithm/src/maths.c ****     else if (angle == 180.f)
+ 846              		.loc 1 170 53 discriminator 2 view .LVU228
+ 847 00ba B1EE400A 		vneg.f32	s0, s0
+ 848 00be E8E7     		b	.L94
+ 849              	.LVL67:
+ 850              	.L91:
+ 171:ACE-ECF/Algorithm/src/maths.c ****         cos_angle = -1.0f;
+ 851              		.loc 1 171 10 is_stmt 1 view .LVU229
+ 171:ACE-ECF/Algorithm/src/maths.c ****         cos_angle = -1.0f;
+ 852              		.loc 1 171 13 is_stmt 0 view .LVU230
+ 853 00c0 9FED077A 		vldr.32	s14, .L103+12
+ 854 00c4 B4EE470A 		vcmp.f32	s0, s14
+ 855 00c8 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 856 00cc C1D1     		bne	.L84
+ 172:ACE-ECF/Algorithm/src/maths.c **** 
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s 			page 20
+
+
+ 857              		.loc 1 172 19 view .LVU231
+ 858 00ce FFEE007A 		vmov.f32	s15, #-1.0e+0
+ 859              	.LVL68:
+ 174:ACE-ECF/Algorithm/src/maths.c **** }
+ 860              		.loc 1 174 5 is_stmt 1 view .LVU232
+ 174:ACE-ECF/Algorithm/src/maths.c **** }
+ 861              		.loc 1 174 12 is_stmt 0 view .LVU233
+ 862 00d2 BEE7     		b	.L84
+ 863              	.L104:
+ 864              		.align	2
+ 865              	.L103:
+ 866 00d4 0000B442 		.word	1119092736
+ 867 00d8 00000000 		.word	.LANCHOR1
+ 868 00dc 0000C842 		.word	1120403456
+ 869 00e0 00003443 		.word	1127481344
+ 870              		.cfi_endproc
+ 871              	.LFE139:
+ 873              		.section	.text.float_min_distance,"ax",%progbits
+ 874              		.align	1
+ 875              		.global	float_min_distance
+ 876              		.syntax unified
+ 877              		.thumb
+ 878              		.thumb_func
+ 880              	float_min_distance:
+ 881              	.LVL69:
+ 882              	.LFB140:
+ 176:ACE-ECF/Algorithm/src/maths.c **** 
+ 177:ACE-ECF/Algorithm/src/maths.c **** 
+ 178:ACE-ECF/Algorithm/src/maths.c **** float float_min_distance(float target, float actual, float minValue, float maxValue)
+ 179:ACE-ECF/Algorithm/src/maths.c **** {
+ 883              		.loc 1 179 1 is_stmt 1 view -0
+ 884              		.cfi_startproc
+ 885              		@ args = 0, pretend = 0, frame = 0
+ 886              		@ frame_needed = 0, uses_anonymous_args = 0
+ 180:ACE-ECF/Algorithm/src/maths.c ****     if (maxValue < minValue)
+ 887              		.loc 1 180 5 view .LVU235
+ 888              		.loc 1 180 8 is_stmt 0 view .LVU236
+ 889 0000 F4EEC11A 		vcmpe.f32	s3, s2
+ 890 0004 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 891 0008 02D5     		bpl	.L120
+ 181:ACE-ECF/Algorithm/src/maths.c ****     {
+ 182:ACE-ECF/Algorithm/src/maths.c ****         return 0;
+ 892              		.loc 1 182 16 view .LVU237
+ 893 000a 9FED200A 		vldr.32	s0, .L122
+ 894              	.LVL70:
+ 183:ACE-ECF/Algorithm/src/maths.c ****     }
+ 184:ACE-ECF/Algorithm/src/maths.c ****     
+ 185:ACE-ECF/Algorithm/src/maths.c ****     target = loop_fp32_constrain(target, minValue,maxValue);
+ 186:ACE-ECF/Algorithm/src/maths.c ****         
+ 187:ACE-ECF/Algorithm/src/maths.c ****     if (user_abs(target - actual) > (maxValue - minValue) / 2.0f)
+ 188:ACE-ECF/Algorithm/src/maths.c ****     {
+ 189:ACE-ECF/Algorithm/src/maths.c ****         if(maxValue - actual < (maxValue - minValue) / 2.0f)
+ 190:ACE-ECF/Algorithm/src/maths.c ****         {
+ 191:ACE-ECF/Algorithm/src/maths.c ****             return maxValue - actual + target - minValue;
+ 192:ACE-ECF/Algorithm/src/maths.c ****         }
+ 193:ACE-ECF/Algorithm/src/maths.c ****         else
+ 194:ACE-ECF/Algorithm/src/maths.c ****         {
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s 			page 21
+
+
+ 195:ACE-ECF/Algorithm/src/maths.c ****             return minValue - actual + target - maxValue;
+ 196:ACE-ECF/Algorithm/src/maths.c ****         }
+ 197:ACE-ECF/Algorithm/src/maths.c ****     }
+ 198:ACE-ECF/Algorithm/src/maths.c ****     else 
+ 199:ACE-ECF/Algorithm/src/maths.c ****     {
+ 200:ACE-ECF/Algorithm/src/maths.c ****         return target - actual;
+ 201:ACE-ECF/Algorithm/src/maths.c ****     }
+ 202:ACE-ECF/Algorithm/src/maths.c **** }
+ 895              		.loc 1 202 1 view .LVU238
+ 896 000e 7047     		bx	lr
+ 897              	.LVL71:
+ 898              	.L120:
+ 179:ACE-ECF/Algorithm/src/maths.c ****     if (maxValue < minValue)
+ 899              		.loc 1 179 1 view .LVU239
+ 900 0010 08B5     		push	{r3, lr}
+ 901              	.LCFI0:
+ 902              		.cfi_def_cfa_offset 8
+ 903              		.cfi_offset 3, -8
+ 904              		.cfi_offset 14, -4
+ 905 0012 2DED048B 		vpush.64	{d8, d9}
+ 906              	.LCFI1:
+ 907              		.cfi_def_cfa_offset 24
+ 908              		.cfi_offset 80, -24
+ 909              		.cfi_offset 81, -20
+ 910              		.cfi_offset 82, -16
+ 911              		.cfi_offset 83, -12
+ 912 0016 B0EE609A 		vmov.f32	s18, s1
+ 913 001a B0EE418A 		vmov.f32	s16, s2
+ 914 001e F0EE618A 		vmov.f32	s17, s3
+ 185:ACE-ECF/Algorithm/src/maths.c ****         
+ 915              		.loc 1 185 5 is_stmt 1 view .LVU240
+ 185:ACE-ECF/Algorithm/src/maths.c ****         
+ 916              		.loc 1 185 14 is_stmt 0 view .LVU241
+ 917 0022 B0EE611A 		vmov.f32	s2, s3
+ 918              	.LVL72:
+ 185:ACE-ECF/Algorithm/src/maths.c ****         
+ 919              		.loc 1 185 14 view .LVU242
+ 920 0026 F0EE480A 		vmov.f32	s1, s16
+ 921              	.LVL73:
+ 185:ACE-ECF/Algorithm/src/maths.c ****         
+ 922              		.loc 1 185 14 view .LVU243
+ 923 002a FFF7FEFF 		bl	loop_fp32_constrain
+ 924              	.LVL74:
+ 185:ACE-ECF/Algorithm/src/maths.c ****         
+ 925              		.loc 1 185 14 view .LVU244
+ 926 002e B0EE407A 		vmov.f32	s14, s0
+ 927              	.LVL75:
+ 187:ACE-ECF/Algorithm/src/maths.c ****     {
+ 928              		.loc 1 187 5 is_stmt 1 view .LVU245
+ 187:ACE-ECF/Algorithm/src/maths.c ****     {
+ 929              		.loc 1 187 9 is_stmt 0 view .LVU246
+ 930 0032 30EE490A 		vsub.f32	s0, s0, s18
+ 931              	.LVL76:
+ 187:ACE-ECF/Algorithm/src/maths.c ****     {
+ 932              		.loc 1 187 9 view .LVU247
+ 933 0036 B5EEC00A 		vcmpe.f32	s0, #0
+ 934 003a F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s 			page 22
+
+
+ 935 003e 1ADD     		ble	.L121
+ 187:ACE-ECF/Algorithm/src/maths.c ****     {
+ 936              		.loc 1 187 9 view .LVU248
+ 937 0040 F0EE407A 		vmov.f32	s15, s0
+ 938              	.L107:
+ 187:ACE-ECF/Algorithm/src/maths.c ****     {
+ 939              		.loc 1 187 47 discriminator 4 view .LVU249
+ 940 0044 78EEC86A 		vsub.f32	s13, s17, s16
+ 187:ACE-ECF/Algorithm/src/maths.c ****     {
+ 941              		.loc 1 187 59 discriminator 4 view .LVU250
+ 942 0048 B6EE006A 		vmov.f32	s12, #5.0e-1
+ 943 004c 66EE866A 		vmul.f32	s13, s13, s12
+ 187:ACE-ECF/Algorithm/src/maths.c ****     {
+ 944              		.loc 1 187 8 discriminator 4 view .LVU251
+ 945 0050 F4EEE76A 		vcmpe.f32	s13, s15
+ 946 0054 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 947 0058 0AD5     		bpl	.L105
+ 189:ACE-ECF/Algorithm/src/maths.c ****         {
+ 948              		.loc 1 189 9 is_stmt 1 view .LVU252
+ 189:ACE-ECF/Algorithm/src/maths.c ****         {
+ 949              		.loc 1 189 21 is_stmt 0 view .LVU253
+ 950 005a 78EEC97A 		vsub.f32	s15, s17, s18
+ 189:ACE-ECF/Algorithm/src/maths.c ****         {
+ 951              		.loc 1 189 11 view .LVU254
+ 952 005e F4EEE76A 		vcmpe.f32	s13, s15
+ 953 0062 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 954 0066 09DD     		ble	.L115
+ 191:ACE-ECF/Algorithm/src/maths.c ****         }
+ 955              		.loc 1 191 13 is_stmt 1 view .LVU255
+ 191:ACE-ECF/Algorithm/src/maths.c ****         }
+ 956              		.loc 1 191 38 is_stmt 0 view .LVU256
+ 957 0068 37EE870A 		vadd.f32	s0, s15, s14
+ 191:ACE-ECF/Algorithm/src/maths.c ****         }
+ 958              		.loc 1 191 47 view .LVU257
+ 959 006c 30EE480A 		vsub.f32	s0, s0, s16
+ 960              	.LVL77:
+ 961              	.L105:
+ 962              		.loc 1 202 1 view .LVU258
+ 963 0070 BDEC048B 		vldm	sp!, {d8-d9}
+ 964              	.LCFI2:
+ 965              		.cfi_remember_state
+ 966              		.cfi_restore 82
+ 967              		.cfi_restore 83
+ 968              		.cfi_restore 80
+ 969              		.cfi_restore 81
+ 970              		.cfi_def_cfa_offset 8
+ 971              	.LVL78:
+ 972              		.loc 1 202 1 view .LVU259
+ 973 0074 08BD     		pop	{r3, pc}
+ 974              	.LVL79:
+ 975              	.L121:
+ 976              	.LCFI3:
+ 977              		.cfi_restore_state
+ 187:ACE-ECF/Algorithm/src/maths.c ****     {
+ 978              		.loc 1 187 9 discriminator 2 view .LVU260
+ 979 0076 F1EE407A 		vneg.f32	s15, s0
+ 980 007a E3E7     		b	.L107
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s 			page 23
+
+
+ 981              	.L115:
+ 195:ACE-ECF/Algorithm/src/maths.c ****         }
+ 982              		.loc 1 195 13 is_stmt 1 view .LVU261
+ 195:ACE-ECF/Algorithm/src/maths.c ****         }
+ 983              		.loc 1 195 29 is_stmt 0 view .LVU262
+ 984 007c 38EE498A 		vsub.f32	s16, s16, s18
+ 985              	.LVL80:
+ 195:ACE-ECF/Algorithm/src/maths.c ****         }
+ 986              		.loc 1 195 38 view .LVU263
+ 987 0080 38EE070A 		vadd.f32	s0, s16, s14
+ 195:ACE-ECF/Algorithm/src/maths.c ****         }
+ 988              		.loc 1 195 47 view .LVU264
+ 989 0084 30EE680A 		vsub.f32	s0, s0, s17
+ 990 0088 F2E7     		b	.L105
+ 991              	.L123:
+ 992 008a 00BF     		.align	2
+ 993              	.L122:
+ 994 008c 00000000 		.word	0
+ 995              		.cfi_endproc
+ 996              	.LFE140:
+ 998              		.section	.text.IMU_AngleLimit,"ax",%progbits
+ 999              		.align	1
+ 1000              		.global	IMU_AngleLimit
+ 1001              		.syntax unified
+ 1002              		.thumb
+ 1003              		.thumb_func
+ 1005              	IMU_AngleLimit:
+ 1006              	.LVL81:
+ 1007              	.LFB141:
+ 203:ACE-ECF/Algorithm/src/maths.c **** 
+ 204:ACE-ECF/Algorithm/src/maths.c **** 
+ 205:ACE-ECF/Algorithm/src/maths.c **** //IMU根据电机反馈做出限位
+ 206:ACE-ECF/Algorithm/src/maths.c **** void IMU_AngleLimit(float motor_coord_min,float motor_coord_max,
+ 207:ACE-ECF/Algorithm/src/maths.c ****     float real_motor_angle,float real_imu_angle,float* imu_min_limit,float* imu_max_limit)
+ 208:ACE-ECF/Algorithm/src/maths.c **** {
+ 1008              		.loc 1 208 1 is_stmt 1 view -0
+ 1009              		.cfi_startproc
+ 1010              		@ args = 0, pretend = 0, frame = 0
+ 1011              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1012              		@ link register save eliminated.
+ 209:ACE-ECF/Algorithm/src/maths.c ****     float temp;
+ 1013              		.loc 1 209 5 view .LVU266
+ 210:ACE-ECF/Algorithm/src/maths.c ****     temp=real_imu_angle-real_motor_angle;
+ 1014              		.loc 1 210 5 view .LVU267
+ 1015              		.loc 1 210 9 is_stmt 0 view .LVU268
+ 1016 0000 71EEC11A 		vsub.f32	s3, s3, s2
+ 1017              	.LVL82:
+ 211:ACE-ECF/Algorithm/src/maths.c ****     *imu_min_limit=temp+motor_coord_min;
+ 1018              		.loc 1 211 5 is_stmt 1 view .LVU269
+ 1019              		.loc 1 211 24 is_stmt 0 view .LVU270
+ 1020 0004 31EE800A 		vadd.f32	s0, s3, s0
+ 1021              	.LVL83:
+ 1022              		.loc 1 211 19 view .LVU271
+ 1023 0008 80ED000A 		vstr.32	s0, [r0]
+ 212:ACE-ECF/Algorithm/src/maths.c ****     *imu_max_limit=temp+motor_coord_max;
+ 1024              		.loc 1 212 5 is_stmt 1 view .LVU272
+ 1025              		.loc 1 212 24 is_stmt 0 view .LVU273
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s 			page 24
+
+
+ 1026 000c 71EEA01A 		vadd.f32	s3, s3, s1
+ 1027              	.LVL84:
+ 1028              		.loc 1 212 19 view .LVU274
+ 1029 0010 C1ED001A 		vstr.32	s3, [r1]
+ 213:ACE-ECF/Algorithm/src/maths.c **** }
+ 1030              		.loc 1 213 1 view .LVU275
+ 1031 0014 7047     		bx	lr
+ 1032              		.cfi_endproc
+ 1033              	.LFE141:
+ 1035              		.section	.text.isMotorInPlace,"ax",%progbits
+ 1036              		.align	1
+ 1037              		.global	isMotorInPlace
+ 1038              		.syntax unified
+ 1039              		.thumb
+ 1040              		.thumb_func
+ 1042              	isMotorInPlace:
+ 1043              	.LVL85:
+ 1044              	.LFB142:
+ 214:ACE-ECF/Algorithm/src/maths.c **** 
+ 215:ACE-ECF/Algorithm/src/maths.c **** //检测电机是否转到指定位置
+ 216:ACE-ECF/Algorithm/src/maths.c **** uint8_t isMotorInPlace(float set_position,float real_position,float judge_close_num)
+ 217:ACE-ECF/Algorithm/src/maths.c **** {
+ 1045              		.loc 1 217 1 is_stmt 1 view -0
+ 1046              		.cfi_startproc
+ 1047              		@ args = 0, pretend = 0, frame = 0
+ 1048              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1049              		@ link register save eliminated.
+ 218:ACE-ECF/Algorithm/src/maths.c ****     // 电机检测逻辑:通过将旋转到的位置与实际的位置作差，取绝对值，只�
+ 219:ACE-ECF/Algorithm/src/maths.c ****     if (user_abs(set_position-real_position)<judge_close_num)   return 1;
+ 1050              		.loc 1 219 5 view .LVU277
+ 1051              		.loc 1 219 9 is_stmt 0 view .LVU278
+ 1052 0000 70EE600A 		vsub.f32	s1, s0, s1
+ 1053              	.LVL86:
+ 1054              		.loc 1 219 9 view .LVU279
+ 1055 0004 F5EEC00A 		vcmpe.f32	s1, #0
+ 1056 0008 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 1057 000c 06DD     		ble	.L132
+ 1058              	.L126:
+ 1059              		.loc 1 219 8 discriminator 4 view .LVU280
+ 1060 000e F4EEC10A 		vcmpe.f32	s1, s2
+ 1061 0012 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 1062 0016 04D5     		bpl	.L131
+ 1063              		.loc 1 219 72 view .LVU281
+ 1064 0018 0120     		movs	r0, #1
+ 1065 001a 7047     		bx	lr
+ 1066              	.L132:
+ 1067              		.loc 1 219 9 discriminator 2 view .LVU282
+ 1068 001c F1EE600A 		vneg.f32	s1, s1
+ 1069 0020 F5E7     		b	.L126
+ 1070              	.L131:
+ 220:ACE-ECF/Algorithm/src/maths.c ****     else    return 0;
+ 1071              		.loc 1 220 20 view .LVU283
+ 1072 0022 0020     		movs	r0, #0
+ 221:ACE-ECF/Algorithm/src/maths.c **** }
+ 1073              		.loc 1 221 1 view .LVU284
+ 1074 0024 7047     		bx	lr
+ 1075              		.cfi_endproc
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s 			page 25
+
+
+ 1076              	.LFE142:
+ 1078              		.section	.text.int_value_abs_limit,"ax",%progbits
+ 1079              		.align	1
+ 1080              		.global	int_value_abs_limit
+ 1081              		.syntax unified
+ 1082              		.thumb
+ 1083              		.thumb_func
+ 1085              	int_value_abs_limit:
+ 1086              	.LVL87:
+ 1087              	.LFB143:
+ 222:ACE-ECF/Algorithm/src/maths.c **** 
+ 223:ACE-ECF/Algorithm/src/maths.c **** int64_t int_value_abs_limit(int64_t num, int64_t abs_limit)
+ 224:ACE-ECF/Algorithm/src/maths.c **** {
+ 1088              		.loc 1 224 1 is_stmt 1 view -0
+ 1089              		.cfi_startproc
+ 1090              		@ args = 0, pretend = 0, frame = 0
+ 1091              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1092              		@ link register save eliminated.
+ 1093              		.loc 1 224 1 is_stmt 0 view .LVU286
+ 1094 0000 10B4     		push	{r4}
+ 1095              	.LCFI4:
+ 1096              		.cfi_def_cfa_offset 4
+ 1097              		.cfi_offset 4, -4
+ 225:ACE-ECF/Algorithm/src/maths.c ****     if (num > 0 && num > abs_limit)    return  abs_limit;
+ 1098              		.loc 1 225 5 is_stmt 1 view .LVU287
+ 1099              		.loc 1 225 8 is_stmt 0 view .LVU288
+ 1100 0002 0128     		cmp	r0, #1
+ 1101 0004 71F10004 		sbcs	r4, r1, #0
+ 1102 0008 03DB     		blt	.L134
+ 1103              		.loc 1 225 17 discriminator 1 view .LVU289
+ 1104 000a 8242     		cmp	r2, r0
+ 1105 000c 73EB0104 		sbcs	r4, r3, r1
+ 1106 0010 0EDB     		blt	.L136
+ 1107              	.L134:
+ 226:ACE-ECF/Algorithm/src/maths.c ****     if (num < 0 && num <-abs_limit)    return -abs_limit;
+ 1108              		.loc 1 226 5 is_stmt 1 view .LVU290
+ 1109              		.loc 1 226 8 is_stmt 0 view .LVU291
+ 1110 0012 0029     		cmp	r1, #0
+ 1111 0014 02DB     		blt	.L139
+ 1112              	.LVL88:
+ 1113              	.L135:
+ 227:ACE-ECF/Algorithm/src/maths.c ****     return num;
+ 228:ACE-ECF/Algorithm/src/maths.c **** }...
+ 1114              		.loc 1 228 1 view .LVU292
+ 1115 0016 5DF8044B 		ldr	r4, [sp], #4
+ 1116              	.LCFI5:
+ 1117              		.cfi_remember_state
+ 1118              		.cfi_restore 4
+ 1119              		.cfi_def_cfa_offset 0
+ 1120 001a 7047     		bx	lr
+ 1121              	.LVL89:
+ 1122              	.L139:
+ 1123              	.LCFI6:
+ 1124              		.cfi_restore_state
+ 226:ACE-ECF/Algorithm/src/maths.c ****     if (num < 0 && num <-abs_limit)    return -abs_limit;
+ 1125              		.loc 1 226 25 discriminator 1 view .LVU293
+ 1126 001c 5242     		negs	r2, r2
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s 			page 26
+
+
+ 1127              	.LVL90:
+ 226:ACE-ECF/Algorithm/src/maths.c ****     if (num < 0 && num <-abs_limit)    return -abs_limit;
+ 1128              		.loc 1 226 25 discriminator 1 view .LVU294
+ 1129 001e 63EB4303 		sbc	r3, r3, r3, lsl #1
+ 226:ACE-ECF/Algorithm/src/maths.c ****     if (num < 0 && num <-abs_limit)    return -abs_limit;
+ 1130              		.loc 1 226 17 discriminator 1 view .LVU295
+ 1131 0022 9042     		cmp	r0, r2
+ 1132 0024 71EB0304 		sbcs	r4, r1, r3
+ 1133 0028 F5DA     		bge	.L135
+ 226:ACE-ECF/Algorithm/src/maths.c ****     if (num < 0 && num <-abs_limit)    return -abs_limit;
+ 1134              		.loc 1 226 47 view .LVU296
+ 1135 002a 1046     		mov	r0, r2
+ 1136              	.LVL91:
+ 226:ACE-ECF/Algorithm/src/maths.c ****     if (num < 0 && num <-abs_limit)    return -abs_limit;
+ 1137              		.loc 1 226 47 view .LVU297
+ 1138 002c 1946     		mov	r1, r3
+ 1139 002e F2E7     		b	.L135
+ 1140              	.LVL92:
+ 1141              	.L136:
+ 225:ACE-ECF/Algorithm/src/maths.c ****     if (num > 0 && num > abs_limit)    return  abs_limit;
+ 1142              		.loc 1 225 48 view .LVU298
+ 1143 0030 1046     		mov	r0, r2
+ 1144              	.LVL93:
+ 225:ACE-ECF/Algorithm/src/maths.c ****     if (num > 0 && num > abs_limit)    return  abs_limit;
+ 1145              		.loc 1 225 48 view .LVU299
+ 1146 0032 1946     		mov	r1, r3
+ 1147 0034 EFE7     		b	.L135
+ 1148              		.cfi_endproc
+ 1149              	.LFE143:
+ 1151              		.global	Trigonometric_Functions
+ 1152              		.section	.bss.last_num.0,"aw",%nobits
+ 1153              		.align	1
+ 1154              		.set	.LANCHOR0,. + 0
+ 1157              	last_num.0:
+ 1158 0000 0000     		.space	2
+ 1159              		.section	.rodata.Trigonometric_Functions,"a"
+ 1160              		.align	2
+ 1161              		.set	.LANCHOR1,. + 0
+ 1164              	Trigonometric_Functions:
+ 1165 0000 00000000 		.word	0
+ 1166 0004 BCB8323E 		.word	1043511484
+ 1167 0008 ABB8B23E 		.word	1051900075
+ 1168 000c 6A0A063F 		.word	1057360490
+ 1169 0010 63B8323F 		.word	1060288611
+ 1170 0014 39665F3F 		.word	1063216697
+ 1171 0018 F109863F 		.word	1065748977
+ 1172 001c AB609C3F 		.word	1067212971
+ 1173 0020 46B7B23F 		.word	1068676934
+ 1174 0024 BD0DC93F 		.word	1070140861
+ 1175 0028 0C64DF3F 		.word	1071604748
+ 1176 002c 2EBAF53F 		.word	1073068590
+ 1177 0030 10080640 		.word	1074137104
+ 1178 0034 ED321140 		.word	1074868973
+ 1179 0038 AE5D1C40 		.word	1075600814
+ 1180 003c 50882740 		.word	1076332624
+ 1181 0040 D0B23240 		.word	1077064400
+ 1182 0044 2DDD3D40 		.word	1077796141
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s 			page 27
+
+
+ 1183 0048 63074940 		.word	1078527843
+ 1184 004c 72315440 		.word	1079259506
+ 1185 0050 565B5F40 		.word	1079991126
+ 1186 0054 0D856A40 		.word	1080722701
+ 1187 0058 96AE7540 		.word	1081454230
+ 1188 005c F76B8040 		.word	1082158071
+ 1189 0060 89008640 		.word	1082523785
+ 1190 0064 01958B40 		.word	1082889473
+ 1191 0068 5C299140 		.word	1083255132
+ 1192 006c 9BBD9640 		.word	1083620763
+ 1193 0070 BB519C40 		.word	1083986363
+ 1194 0074 BDE5A140 		.word	1084351933
+ 1195 0078 9E79A740 		.word	1084717470
+ 1196 007c 5D0DAD40 		.word	1085082973
+ 1197 0080 FAA0B240 		.word	1085448442
+ 1198 0084 7334B840 		.word	1085813875
+ 1199 0088 C8C7BD40 		.word	1086179272
+ 1200 008c F75AC340 		.word	1086544631
+ 1201 0090 FEEDC840 		.word	1086909950
+ 1202 0094 DE80CE40 		.word	1087275230
+ 1203 0098 9413D440 		.word	1087640468
+ 1204 009c 20A6D940 		.word	1088005664
+ 1205 00a0 8138DF40 		.word	1088370817
+ 1206 00a4 B5CAE440 		.word	1088735925
+ 1207 00a8 BB5CEA40 		.word	1089100987
+ 1208 00ac 93EEEF40 		.word	1089466003
+ 1209 00b0 3A80F540 		.word	1089830970
+ 1210 00b4 B111FB40 		.word	1090195889
+ 1211 00b8 7B510041 		.word	1090539899
+ 1212 00bc 031A0341 		.word	1090722307
+ 1213 00c0 72E20541 		.word	1090904690
+ 1214 00c4 C6AA0841 		.word	1091087046
+ 1215 00c8 FE720B41 		.word	1091269374
+ 1216 00cc 1B3B0E41 		.word	1091451675
+ 1217 00d0 1B031141 		.word	1091633947
+ 1218 00d4 FECA1341 		.word	1091816190
+ 1219 00d8 C4921641 		.word	1091998404
+ 1220 00dc 6C5A1941 		.word	1092180588
+ 1221 00e0 F5211C41 		.word	1092362741
+ 1222 00e4 5FE91E41 		.word	1092544863
+ 1223 00e8 A9B02141 		.word	1092726953
+ 1224 00ec D3772441 		.word	1092909011
+ 1225 00f0 DC3E2741 		.word	1093091036
+ 1226 00f4 C3052A41 		.word	1093273027
+ 1227 00f8 89CC2C41 		.word	1093454985
+ 1228 00fc 2C932F41 		.word	1093636908
+ 1229 0100 AD593241 		.word	1093818797
+ 1230 0104 09203541 		.word	1094000649
+ 1231 0108 42E63741 		.word	1094182466
+ 1232 010c 55AC3A41 		.word	1094364245
+ 1233 0110 44723D41 		.word	1094545988
+ 1234 0114 0D384041 		.word	1094727693
+ 1235 0118 AFFD4241 		.word	1094909359
+ 1236 011c 2AC34541 		.word	1095090986
+ 1237 0120 7E884841 		.word	1095272574
+ 1238 0124 AA4D4B41 		.word	1095454122
+ 1239 0128 AD124E41 		.word	1095635629
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s 			page 28
+
+
+ 1240 012c 87D75041 		.word	1095817095
+ 1241 0130 389C5341 		.word	1095998520
+ 1242 0134 BE605641 		.word	1096179902
+ 1243 0138 19255941 		.word	1096361241
+ 1244 013c 49E95B41 		.word	1096542537
+ 1245 0140 4DAD5E41 		.word	1096723789
+ 1246 0144 25716141 		.word	1096904997
+ 1247 0148 D0346441 		.word	1097086160
+ 1248 014c 4DF86641 		.word	1097267277
+ 1249 0150 9CBB6941 		.word	1097448348
+ 1250 0154 BC7E6C41 		.word	1097629372
+ 1251 0158 AD416F41 		.word	1097810349
+ 1252 015c 6F047241 		.word	1097991279
+ 1253 0160 00C77441 		.word	1098172160
+ 1254 0164 60897741 		.word	1098352992
+ 1255 0168 8F4B7A41 		.word	1098533775
+ 1256 016c 8B0D7D41 		.word	1098714507
+ 1257 0170 56CF7F41 		.word	1098895190
+ 1258 0174 76488141 		.word	1098991734
+ 1259 0178 28A98241 		.word	1099082024
+ 1260 017c C0098441 		.word	1099172288
+ 1261 0180 3D6A8541 		.word	1099262525
+ 1262 0184 A0CA8641 		.word	1099352736
+ 1263 0188 E82A8841 		.word	1099442920
+ 1264 018c 148B8941 		.word	1099533076
+ 1265 0190 26EB8A41 		.word	1099623206
+ 1266 0194 1B4B8C41 		.word	1099713307
+ 1267 0198 F4AA8D41 		.word	1099803380
+ 1268 019c B20A8F41 		.word	1099893426
+ 1269 01a0 526A9041 		.word	1099983442
+ 1270 01a4 D6C99141 		.word	1100073430
+ 1271 01a8 3D299341 		.word	1100163389
+ 1272 01ac 86889441 		.word	1100253318
+ 1273 01b0 B1E79541 		.word	1100343217
+ 1274 01b4 BF469741 		.word	1100433087
+ 1275 01b8 AFA59841 		.word	1100522927
+ 1276 01bc 80049A41 		.word	1100612736
+ 1277 01c0 32639B41 		.word	1100702514
+ 1278 01c4 C5C19C41 		.word	1100792261
+ 1279 01c8 39209E41 		.word	1100881977
+ 1280 01cc 8E7E9F41 		.word	1100971662
+ 1281 01d0 C2DCA041 		.word	1101061314
+ 1282 01d4 D73AA241 		.word	1101150935
+ 1283 01d8 CB98A341 		.word	1101240523
+ 1284 01dc 9EF6A441 		.word	1101330078
+ 1285 01e0 5054A641 		.word	1101419600
+ 1286 01e4 E2B1A741 		.word	1101509090
+ 1287 01e8 510FA941 		.word	1101598545
+ 1288 01ec A06CAA41 		.word	1101687968
+ 1289 01f0 CCC9AB41 		.word	1101777356
+ 1290 01f4 D526AD41 		.word	1101866709
+ 1291 01f8 BC83AE41 		.word	1101956028
+ 1292 01fc 81E0AF41 		.word	1102045313
+ 1293 0200 223DB141 		.word	1102134562
+ 1294 0204 A099B241 		.word	1102223776
+ 1295 0208 FAF5B341 		.word	1102312954
+ 1296 020c 3052B541 		.word	1102402096
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s 			page 29
+
+
+ 1297 0210 42AEB641 		.word	1102491202
+ 1298 0214 300AB841 		.word	1102580272
+ 1299 0218 F865B941 		.word	1102669304
+ 1300 021c 9CC1BA41 		.word	1102758300
+ 1301 0220 1B1DBC41 		.word	1102847259
+ 1302 0224 7478BD41 		.word	1102936180
+ 1303 0228 A7D3BE41 		.word	1103025063
+ 1304 022c B42EC041 		.word	1103113908
+ 1305 0230 9B89C141 		.word	1103202715
+ 1306 0234 5BE4C241 		.word	1103291483
+ 1307 0238 F43EC441 		.word	1103380212
+ 1308 023c 6699C541 		.word	1103468902
+ 1309 0240 B0F3C641 		.word	1103557552
+ 1310 0244 D34DC841 		.word	1103646163
+ 1311 0248 CEA7C941 		.word	1103734734
+ 1312 024c A101CB41 		.word	1103823265
+ 1313 0250 4B5BCC41 		.word	1103911755
+ 1314 0254 CCB4CD41 		.word	1104000204
+ 1315 0258 240ECF41 		.word	1104088612
+ 1316 025c 5367D041 		.word	1104176979
+ 1317 0260 58C0D141 		.word	1104265304
+ 1318 0264 3319D341 		.word	1104353587
+ 1319 0268 E571D441 		.word	1104441829
+ 1320 026c 6BCAD541 		.word	1104530027
+ 1321 0270 C722D741 		.word	1104618183
+ 1322 0274 F97AD841 		.word	1104706297
+ 1323 0278 FFD2D941 		.word	1104794367
+ 1324 027c D92ADB41 		.word	1104882393
+ 1325 0280 8882DC41 		.word	1104970376
+ 1326 0284 0ADADD41 		.word	1105058314
+ 1327 0288 6131DF41 		.word	1105146209
+ 1328 028c 8B88E041 		.word	1105234059
+ 1329 0290 88DFE141 		.word	1105321864
+ 1330 0294 5836E341 		.word	1105409624
+ 1331 0298 FA8CE441 		.word	1105497338
+ 1332 029c 6FE3E541 		.word	1105585007
+ 1333 02a0 B639E741 		.word	1105672630
+ 1334 02a4 CF8FE841 		.word	1105760207
+ 1335 02a8 BAE5E941 		.word	1105847738
+ 1336 02ac 753BEB41 		.word	1105935221
+ 1337 02b0 0291EC41 		.word	1106022658
+ 1338 02b4 60E6ED41 		.word	1106110048
+ 1339 02b8 8E3BEF41 		.word	1106197390
+ 1340 02bc 8C90F041 		.word	1106284684
+ 1341 02c0 5BE5F141 		.word	1106371931
+ 1342 02c4 F939F341 		.word	1106459129
+ 1343 02c8 668EF441 		.word	1106546278
+ 1344 02cc A3E2F541 		.word	1106633379
+ 1345 02d0 AE36F741 		.word	1106720430
+ 1346 02d4 888AF841 		.word	1106807432
+ 1347 02d8 31DEF941 		.word	1106894385
+ 1348 02dc A831FB41 		.word	1106981288
+ 1349 02e0 EC84FC41 		.word	1107068140
+ 1350 02e4 FED7FD41 		.word	1107154942
+ 1351 02e8 DE2AFF41 		.word	1107241694
+ 1352 02ec C53E0042 		.word	1107312325
+ 1353 02f0 02E80042 		.word	1107355650
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s 			page 30
+
+
+ 1354 02f4 25910142 		.word	1107398949
+ 1355 02f8 2E3A0242 		.word	1107442222
+ 1356 02fc 1DE30242 		.word	1107485469
+ 1357 0300 F28B0342 		.word	1107528690
+ 1358 0304 AC340442 		.word	1107571884
+ 1359 0308 4DDD0442 		.word	1107615053
+ 1360 030c D3850542 		.word	1107658195
+ 1361 0310 3E2E0642 		.word	1107701310
+ 1362 0314 8ED60642 		.word	1107744398
+ 1363 0318 C37E0742 		.word	1107787459
+ 1364 031c DE260842 		.word	1107830494
+ 1365 0320 DDCE0842 		.word	1107873501
+ 1366 0324 C1760942 		.word	1107916481
+ 1367 0328 891E0A42 		.word	1107959433
+ 1368 032c 36C60A42 		.word	1108002358
+ 1369 0330 C76D0B42 		.word	1108045255
+ 1370 0334 3C150C42 		.word	1108088124
+ 1371 0338 96BC0C42 		.word	1108130966
+ 1372 033c D3630D42 		.word	1108173779
+ 1373 0340 F40A0E42 		.word	1108216564
+ 1374 0344 F9B10E42 		.word	1108259321
+ 1375 0348 E1580F42 		.word	1108302049
+ 1376 034c ACFF0F42 		.word	1108344748
+ 1377 0350 5BA61042 		.word	1108387419
+ 1378 0354 ED4C1142 		.word	1108430061
+ 1379 0358 62F31142 		.word	1108472674
+ 1380 035c BA991242 		.word	1108515258
+ 1381 0360 F43F1342 		.word	1108557812
+ 1382 0364 11E61342 		.word	1108600337
+ 1383 0368 118C1442 		.word	1108642833
+ 1384 036c F3311542 		.word	1108685299
+ 1385 0370 B7D71542 		.word	1108727735
+ 1386 0374 5D7D1642 		.word	1108770141
+ 1387 0378 E6221742 		.word	1108812518
+ 1388 037c 50C81742 		.word	1108854864
+ 1389 0380 9B6D1842 		.word	1108897179
+ 1390 0384 C9121942 		.word	1108939465
+ 1391 0388 D7B71942 		.word	1108981719
+ 1392 038c C75C1A42 		.word	1109023943
+ 1393 0390 99011B42 		.word	1109066137
+ 1394 0394 4BA61B42 		.word	1109108299
+ 1395 0398 DE4A1C42 		.word	1109150430
+ 1396 039c 52EF1C42 		.word	1109192530
+ 1397 03a0 A7931D42 		.word	1109234599
+ 1398 03a4 DC371E42 		.word	1109276636
+ 1399 03a8 F2DB1E42 		.word	1109318642
+ 1400 03ac E87F1F42 		.word	1109360616
+ 1401 03b0 BE232042 		.word	1109402558
+ 1402 03b4 74C72042 		.word	1109444468
+ 1403 03b8 0A6B2142 		.word	1109486346
+ 1404 03bc 800E2242 		.word	1109528192
+ 1405 03c0 D5B12242 		.word	1109570005
+ 1406 03c4 0A552342 		.word	1109611786
+ 1407 03c8 1EF82342 		.word	1109653534
+ 1408 03cc 129B2442 		.word	1109695250
+ 1409 03d0 E53D2542 		.word	1109736933
+ 1410 03d4 97E02542 		.word	1109778583
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s 			page 31
+
+
+ 1411 03d8 27832642 		.word	1109820199
+ 1412 03dc 97252742 		.word	1109861783
+ 1413 03e0 E5C72742 		.word	1109903333
+ 1414 03e4 116A2842 		.word	1109944849
+ 1415 03e8 1C0C2942 		.word	1109986332
+ 1416 03ec 05AE2942 		.word	1110027781
+ 1417 03f0 CD4F2A42 		.word	1110069197
+ 1418 03f4 72F12A42 		.word	1110110578
+ 1419 03f8 F5922B42 		.word	1110151925
+ 1420 03fc 56342C42 		.word	1110193238
+ 1421 0400 95D52C42 		.word	1110234517
+ 1422 0404 B1762D42 		.word	1110275761
+ 1423 0408 AA172E42 		.word	1110316970
+ 1424 040c 81B82E42 		.word	1110358145
+ 1425 0410 35592F42 		.word	1110399285
+ 1426 0414 C5F92F42 		.word	1110440389
+ 1427 0418 339A3042 		.word	1110481459
+ 1428 041c 7D3A3142 		.word	1110522493
+ 1429 0420 A4DA3142 		.word	1110563492
+ 1430 0424 A87A3242 		.word	1110604456
+ 1431 0428 881A3342 		.word	1110645384
+ 1432 042c 44BA3342 		.word	1110686276
+ 1433 0430 DC593442 		.word	1110727132
+ 1434 0434 50F93442 		.word	1110767952
+ 1435 0438 A1983542 		.word	1110808737
+ 1436 043c CC373642 		.word	1110849484
+ 1437 0440 D4D63642 		.word	1110890196
+ 1438 0444 B7753742 		.word	1110930871
+ 1439 0448 75143842 		.word	1110971509
+ 1440 044c 0FB33842 		.word	1111012111
+ 1441 0450 84513942 		.word	1111052676
+ 1442 0454 D3EF3942 		.word	1111093203
+ 1443 0458 FE8D3A42 		.word	1111133694
+ 1444 045c 032C3B42 		.word	1111174147
+ 1445 0460 E3C93B42 		.word	1111214563
+ 1446 0464 9E673C42 		.word	1111254942
+ 1447 0468 33053D42 		.word	1111295283
+ 1448 046c A2A23D42 		.word	1111335586
+ 1449 0470 EB3F3E42 		.word	1111375851
+ 1450 0474 0FDD3E42 		.word	1111416079
+ 1451 0478 0C7A3F42 		.word	1111456268
+ 1452 047c E3164042 		.word	1111496419
+ 1453 0480 94B34042 		.word	1111536532
+ 1454 0484 1E504142 		.word	1111576606
+ 1455 0488 81EC4142 		.word	1111616641
+ 1456 048c BE884242 		.word	1111656638
+ 1457 0490 D4244342 		.word	1111696596
+ 1458 0494 C3C04342 		.word	1111736515
+ 1459 0498 8B5C4442 		.word	1111776395
+ 1460 049c 2CF84442 		.word	1111816236
+ 1461 04a0 A6934542 		.word	1111856038
+ 1462 04a4 F82E4642 		.word	1111895800
+ 1463 04a8 22CA4642 		.word	1111935522
+ 1464 04ac 25654742 		.word	1111975205
+ 1465 04b0 00004842 		.word	1112014848
+ 1466 04b4 B39A4842 		.word	1112054451
+ 1467 04b8 3E354942 		.word	1112094014
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s 			page 32
+
+
+ 1468 04bc A1CF4942 		.word	1112133537
+ 1469 04c0 DC694A42 		.word	1112173020
+ 1470 04c4 EE034B42 		.word	1112212462
+ 1471 04c8 D79D4B42 		.word	1112251863
+ 1472 04cc 98374C42 		.word	1112291224
+ 1473 04d0 30D14C42 		.word	1112330544
+ 1474 04d4 A06A4D42 		.word	1112369824
+ 1475 04d8 E6034E42 		.word	1112409062
+ 1476 04dc 039D4E42 		.word	1112448259
+ 1477 04e0 F7354F42 		.word	1112487415
+ 1478 04e4 C2CE4F42 		.word	1112526530
+ 1479 04e8 63675042 		.word	1112565603
+ 1480 04ec DAFF5042 		.word	1112604634
+ 1481 04f0 28985142 		.word	1112643624
+ 1482 04f4 4C305242 		.word	1112682572
+ 1483 04f8 46C85242 		.word	1112721478
+ 1484 04fc 16605342 		.word	1112760342
+ 1485 0500 BCF75342 		.word	1112799164
+ 1486 0504 378F5442 		.word	1112837943
+ 1487 0508 88265542 		.word	1112876680
+ 1488 050c AEBD5542 		.word	1112915374
+ 1489 0510 AA545642 		.word	1112954026
+ 1490 0514 7BEB5642 		.word	1112992635
+ 1491 0518 21825742 		.word	1113031201
+ 1492 051c 9C185842 		.word	1113069724
+ 1493 0520 ECAE5842 		.word	1113108204
+ 1494 0524 10455942 		.word	1113146640
+ 1495 0528 0ADB5942 		.word	1113185034
+ 1496 052c D7705A42 		.word	1113223383
+ 1497 0530 79065B42 		.word	1113261689
+ 1498 0534 F09B5B42 		.word	1113299952
+ 1499 0538 3A315C42 		.word	1113338170
+ 1500 053c 59C65C42 		.word	1113376345
+ 1501 0540 4B5B5D42 		.word	1113414475
+ 1502 0544 12F05D42 		.word	1113452562
+ 1503 0548 AC845E42 		.word	1113490604
+ 1504 054c 19195F42 		.word	1113528601
+ 1505 0550 5AAD5F42 		.word	1113566554
+ 1506 0554 6F416042 		.word	1113604463
+ 1507 0558 57D56042 		.word	1113642327
+ 1508 055c 11696142 		.word	1113680145
+ 1509 0560 9FFC6142 		.word	1113717919
+ 1510 0564 00906242 		.word	1113755648
+ 1511 0568 33236342 		.word	1113793331
+ 1512 056c 39B66342 		.word	1113830969
+ 1513 0570 12496442 		.word	1113868562
+ 1514 0574 BDDB6442 		.word	1113906109
+ 1515 0578 3A6E6542 		.word	1113943610
+ 1516 057c 8A006642 		.word	1113981066
+ 1517 0580 AB926642 		.word	1114018475
+ 1518 0584 9F246742 		.word	1114055839
+ 1519 0588 64B66742 		.word	1114093156
+ 1520 058c FC476842 		.word	1114130428
+ 1521 0590 64D96842 		.word	1114167652
+ 1522 0594 9F6A6942 		.word	1114204831
+ 1523 0598 AAFB6942 		.word	1114241962
+ 1524 059c 888C6A42 		.word	1114279048
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s 			page 33
+
+
+ 1525 05a0 361D6B42 		.word	1114316086
+ 1526 05a4 B5AD6B42 		.word	1114353077
+ 1527 05a8 053E6C42 		.word	1114390021
+ 1528 05ac 26CE6C42 		.word	1114426918
+ 1529 05b0 185E6D42 		.word	1114463768
+ 1530 05b4 DAED6D42 		.word	1114500570
+ 1531 05b8 6D7D6E42 		.word	1114537325
+ 1532 05bc D10C6F42 		.word	1114574033
+ 1533 05c0 049C6F42 		.word	1114610692
+ 1534 05c4 082B7042 		.word	1114647304
+ 1535 05c8 DCB97042 		.word	1114683868
+ 1536 05cc 7F487142 		.word	1114720383
+ 1537 05d0 F3D67142 		.word	1114756851
+ 1538 05d4 36657242 		.word	1114793270
+ 1539 05d8 49F37242 		.word	1114829641
+ 1540 05dc 2C817342 		.word	1114865964
+ 1541 05e0 DD0E7442 		.word	1114902237
+ 1542 05e4 5E9C7442 		.word	1114938462
+ 1543 05e8 AF297542 		.word	1114974639
+ 1544 05ec CEB67542 		.word	1115010766
+ 1545 05f0 BC437642 		.word	1115046844
+ 1546 05f4 79D07642 		.word	1115082873
+ 1547 05f8 055D7742 		.word	1115118853
+ 1548 05fc 5FE97742 		.word	1115154783
+ 1549 0600 88757842 		.word	1115190664
+ 1550 0604 80017942 		.word	1115226496
+ 1551 0608 458D7942 		.word	1115262277
+ 1552 060c D9187A42 		.word	1115298009
+ 1553 0610 3BA47A42 		.word	1115333691
+ 1554 0614 6B2F7B42 		.word	1115369323
+ 1555 0618 68BA7B42 		.word	1115404904
+ 1556 061c 34457C42 		.word	1115440436
+ 1557 0620 CDCF7C42 		.word	1115475917
+ 1558 0624 345A7D42 		.word	1115511348
+ 1559 0628 68E47D42 		.word	1115546728
+ 1560 062c 696E7E42 		.word	1115582057
+ 1561 0630 37F87E42 		.word	1115617335
+ 1562 0634 D3817F42 		.word	1115652563
+ 1563 0638 9E058042 		.word	1115686302
+ 1564 063c 394A8042 		.word	1115703865
+ 1565 0640 BA8E8042 		.word	1115721402
+ 1566 0644 21D38042 		.word	1115738913
+ 1567 0648 6F178142 		.word	1115756399
+ 1568 064c A35B8142 		.word	1115773859
+ 1569 0650 BD9F8142 		.word	1115791293
+ 1570 0654 BDE38142 		.word	1115808701
+ 1571 0658 A4278242 		.word	1115826084
+ 1572 065c 706B8242 		.word	1115843440
+ 1573 0660 23AF8242 		.word	1115860771
+ 1574 0664 BBF28242 		.word	1115878075
+ 1575 0668 39368342 		.word	1115895353
+ 1576 066c 9D798342 		.word	1115912605
+ 1577 0670 E6BC8342 		.word	1115929830
+ 1578 0674 16008442 		.word	1115947030
+ 1579 0678 2B438442 		.word	1115964203
+ 1580 067c 25868442 		.word	1115981349
+ 1581 0680 06C98442 		.word	1115998470
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s 			page 34
+
+
+ 1582 0684 CB0B8542 		.word	1116015563
+ 1583 0688 764E8542 		.word	1116032630
+ 1584 068c 07918542 		.word	1116049671
+ 1585 0690 7DD38542 		.word	1116066685
+ 1586 0694 D8158642 		.word	1116083672
+ 1587 0698 18588642 		.word	1116100632
+ 1588 069c 3E9A8642 		.word	1116117566
+ 1589 06a0 48DC8642 		.word	1116134472
+ 1590 06a4 381E8742 		.word	1116151352
+ 1591 06a8 0D608742 		.word	1116168205
+ 1592 06ac C6A18742 		.word	1116185030
+ 1593 06b0 65E38742 		.word	1116201829
+ 1594 06b4 E9248842 		.word	1116218601
+ 1595 06b8 51668842 		.word	1116235345
+ 1596 06bc 9EA78842 		.word	1116252062
+ 1597 06c0 D0E88842 		.word	1116268752
+ 1598 06c4 E6298942 		.word	1116285414
+ 1599 06c8 E16A8942 		.word	1116302049
+ 1600 06cc C1AB8942 		.word	1116318657
+ 1601 06d0 85EC8942 		.word	1116335237
+ 1602 06d4 2E2D8A42 		.word	1116351790
+ 1603 06d8 BB6D8A42 		.word	1116368315
+ 1604 06dc 2CAE8A42 		.word	1116384812
+ 1605 06e0 82EE8A42 		.word	1116401282
+ 1606 06e4 BC2E8B42 		.word	1116417724
+ 1607 06e8 DA6E8B42 		.word	1116434138
+ 1608 06ec DDAE8B42 		.word	1116450525
+ 1609 06f0 C3EE8B42 		.word	1116466883
+ 1610 06f4 8E2E8C42 		.word	1116483214
+ 1611 06f8 3C6E8C42 		.word	1116499516
+ 1612 06fc CFAD8C42 		.word	1116515791
+ 1613 0700 46ED8C42 		.word	1116532038
+ 1614 0704 A02C8D42 		.word	1116548256
+ 1615 0708 DE6B8D42 		.word	1116564446
+ 1616 070c 00AB8D42 		.word	1116580608
+ 1617 0710 06EA8D42 		.word	1116596742
+ 1618 0714 EF288E42 		.word	1116612847
+ 1619 0718 BC678E42 		.word	1116628924
+ 1620 071c 6CA68E42 		.word	1116644972
+ 1621 0720 00E58E42 		.word	1116660992
+ 1622 0724 78238F42 		.word	1116676984
+ 1623 0728 D3618F42 		.word	1116692947
+ 1624 072c 11A08F42 		.word	1116708881
+ 1625 0730 33DE8F42 		.word	1116724787
+ 1626 0734 381C9042 		.word	1116740664
+ 1627 0738 205A9042 		.word	1116756512
+ 1628 073c EB979042 		.word	1116772331
+ 1629 0740 99D59042 		.word	1116788121
+ 1630 0744 2B139142 		.word	1116803883
+ 1631 0748 A0509142 		.word	1116819616
+ 1632 074c F78D9142 		.word	1116835319
+ 1633 0750 32CB9142 		.word	1116850994
+ 1634 0754 4F089242 		.word	1116866639
+ 1635 0758 4F459242 		.word	1116882255
+ 1636 075c 32829242 		.word	1116897842
+ 1637 0760 F8BE9242 		.word	1116913400
+ 1638 0764 A1FB9242 		.word	1116928929
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s 			page 35
+
+
+ 1639 0768 2C389342 		.word	1116944428
+ 1640 076c 9A749342 		.word	1116959898
+ 1641 0770 EAB09342 		.word	1116975338
+ 1642 0774 1DED9342 		.word	1116990749
+ 1643 0778 32299442 		.word	1117006130
+ 1644 077c 2A659442 		.word	1117021482
+ 1645 0780 04A19442 		.word	1117036804
+ 1646 0784 C0DC9442 		.word	1117052096
+ 1647 0788 5F189542 		.word	1117067359
+ 1648 078c E0539542 		.word	1117082592
+ 1649 0790 438F9542 		.word	1117097795
+ 1650 0794 88CA9542 		.word	1117112968
+ 1651 0798 B0059642 		.word	1117128112
+ 1652 079c B9409642 		.word	1117143225
+ 1653 07a0 A57B9642 		.word	1117158309
+ 1654 07a4 72B69642 		.word	1117173362
+ 1655 07a8 21F19642 		.word	1117188385
+ 1656 07ac B32B9742 		.word	1117203379
+ 1657 07b0 26669742 		.word	1117218342
+ 1658 07b4 7AA09742 		.word	1117233274
+ 1659 07b8 B1DA9742 		.word	1117248177
+ 1660 07bc C9149842 		.word	1117263049
+ 1661 07c0 C34E9842 		.word	1117277891
+ 1662 07c4 9E889842 		.word	1117292702
+ 1663 07c8 5BC29842 		.word	1117307483
+ 1664 07cc FAFB9842 		.word	1117322234
+ 1665 07d0 7A359942 		.word	1117336954
+ 1666 07d4 DB6E9942 		.word	1117351643
+ 1667 07d8 1EA89942 		.word	1117366302
+ 1668 07dc 42E19942 		.word	1117380930
+ 1669 07e0 471A9A42 		.word	1117395527
+ 1670 07e4 2E539A42 		.word	1117410094
+ 1671 07e8 F58B9A42 		.word	1117424629
+ 1672 07ec 9EC49A42 		.word	1117439134
+ 1673 07f0 28FD9A42 		.word	1117453608
+ 1674 07f4 93359B42 		.word	1117468051
+ 1675 07f8 E06D9B42 		.word	1117482464
+ 1676 07fc 0DA69B42 		.word	1117496845
+ 1677 0800 1BDE9B42 		.word	1117511195
+ 1678 0804 09169C42 		.word	1117525513
+ 1679 0808 D94D9C42 		.word	1117539801
+ 1680 080c 8A859C42 		.word	1117554058
+ 1681 0810 1BBD9C42 		.word	1117568283
+ 1682 0814 8DF49C42 		.word	1117582477
+ 1683 0818 DF2B9D42 		.word	1117596639
+ 1684 081c 13639D42 		.word	1117610771
+ 1685 0820 279A9D42 		.word	1117624871
+ 1686 0824 1BD19D42 		.word	1117638939
+ 1687 0828 F0079E42 		.word	1117652976
+ 1688 082c A53E9E42 		.word	1117666981
+ 1689 0830 3B759E42 		.word	1117680955
+ 1690 0834 B1AB9E42 		.word	1117694897
+ 1691 0838 07E29E42 		.word	1117708807
+ 1692 083c 3E189F42 		.word	1117722686
+ 1693 0840 554E9F42 		.word	1117736533
+ 1694 0844 4C849F42 		.word	1117750348
+ 1695 0848 23BA9F42 		.word	1117764131
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s 			page 36
+
+
+ 1696 084c DBEF9F42 		.word	1117777883
+ 1697 0850 7225A042 		.word	1117791602
+ 1698 0854 EA5AA042 		.word	1117805290
+ 1699 0858 4190A042 		.word	1117818945
+ 1700 085c 79C5A042 		.word	1117832569
+ 1701 0860 90FAA042 		.word	1117846160
+ 1702 0864 872FA142 		.word	1117859719
+ 1703 0868 5E64A142 		.word	1117873246
+ 1704 086c 1599A142 		.word	1117886741
+ 1705 0870 ACCDA142 		.word	1117900204
+ 1706 0874 2202A242 		.word	1117913634
+ 1707 0878 7836A242 		.word	1117927032
+ 1708 087c AD6AA242 		.word	1117940397
+ 1709 0880 C29EA242 		.word	1117953730
+ 1710 0884 B7D2A242 		.word	1117967031
+ 1711 0888 8B06A342 		.word	1117980299
+ 1712 088c 3F3AA342 		.word	1117993535
+ 1713 0890 D26DA342 		.word	1118006738
+ 1714 0894 44A1A342 		.word	1118019908
+ 1715 0898 96D4A342 		.word	1118033046
+ 1716 089c C707A442 		.word	1118046151
+ 1717 08a0 D73AA442 		.word	1118059223
+ 1718 08a4 C66DA442 		.word	1118072262
+ 1719 08a8 95A0A442 		.word	1118085269
+ 1720 08ac 43D3A442 		.word	1118098243
+ 1721 08b0 D005A542 		.word	1118111184
+ 1722 08b4 3C38A542 		.word	1118124092
+ 1723 08b8 876AA542 		.word	1118136967
+ 1724 08bc B09CA542 		.word	1118149808
+ 1725 08c0 B9CEA542 		.word	1118162617
+ 1726 08c4 A100A642 		.word	1118175393
+ 1727 08c8 6832A642 		.word	1118188136
+ 1728 08cc 0D64A642 		.word	1118200845
+ 1729 08d0 9195A642 		.word	1118213521
+ 1730 08d4 F4C6A642 		.word	1118226164
+ 1731 08d8 36F8A642 		.word	1118238774
+ 1732 08dc 5629A742 		.word	1118251350
+ 1733 08e0 555AA742 		.word	1118263893
+ 1734 08e4 338BA742 		.word	1118276403
+ 1735 08e8 EFBBA742 		.word	1118288879
+ 1736 08ec 89ECA742 		.word	1118301321
+ 1737 08f0 031DA842 		.word	1118313731
+ 1738 08f4 5A4DA842 		.word	1118326106
+ 1739 08f8 907DA842 		.word	1118338448
+ 1740 08fc A4ADA842 		.word	1118350756
+ 1741 0900 97DDA842 		.word	1118363031
+ 1742 0904 680DA942 		.word	1118375272
+ 1743 0908 173DA942 		.word	1118387479
+ 1744 090c A46CA942 		.word	1118399652
+ 1745 0910 109CA942 		.word	1118411792
+ 1746 0914 5ACBA942 		.word	1118423898
+ 1747 0918 82FAA942 		.word	1118435970
+ 1748 091c 8729AA42 		.word	1118448007
+ 1749 0920 6B58AA42 		.word	1118460011
+ 1750 0924 2D87AA42 		.word	1118471981
+ 1751 0928 CDB5AA42 		.word	1118483917
+ 1752 092c 4BE4AA42 		.word	1118495819
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s 			page 37
+
+
+ 1753 0930 A612AB42 		.word	1118507686
+ 1754 0934 E040AB42 		.word	1118519520
+ 1755 0938 F76EAB42 		.word	1118531319
+ 1756 093c EC9CAB42 		.word	1118543084
+ 1757 0940 BFCAAB42 		.word	1118554815
+ 1758 0944 70F8AB42 		.word	1118566512
+ 1759 0948 FE25AC42 		.word	1118578174
+ 1760 094c 6A53AC42 		.word	1118589802
+ 1761 0950 B380AC42 		.word	1118601395
+ 1762 0954 DAADAC42 		.word	1118612954
+ 1763 0958 DFDAAC42 		.word	1118624479
+ 1764 095c C107AD42 		.word	1118635969
+ 1765 0960 8034AD42 		.word	1118647424
+ 1766 0964 1D61AD42 		.word	1118658845
+ 1767 0968 978DAD42 		.word	1118670231
+ 1768 096c EFB9AD42 		.word	1118681583
+ 1769 0970 24E6AD42 		.word	1118692900
+ 1770 0974 3612AE42 		.word	1118704182
+ 1771 0978 263EAE42 		.word	1118715430
+ 1772 097c F269AE42 		.word	1118726642
+ 1773 0980 9C95AE42 		.word	1118737820
+ 1774 0984 23C1AE42 		.word	1118748963
+ 1775 0988 87ECAE42 		.word	1118760071
+ 1776 098c C917AF42 		.word	1118771145
+ 1777 0990 E742AF42 		.word	1118782183
+ 1778 0994 E26DAF42 		.word	1118793186
+ 1779 0998 BA98AF42 		.word	1118804154
+ 1780 099c 70C3AF42 		.word	1118815088
+ 1781 09a0 02EEAF42 		.word	1118825986
+ 1782 09a4 7118B042 		.word	1118836849
+ 1783 09a8 BD42B042 		.word	1118847677
+ 1784 09ac E56CB042 		.word	1118858469
+ 1785 09b0 EB96B042 		.word	1118869227
+ 1786 09b4 CDC0B042 		.word	1118879949
+ 1787 09b8 8CEAB042 		.word	1118890636
+ 1788 09bc 2714B142 		.word	1118901287
+ 1789 09c0 A03DB142 		.word	1118911904
+ 1790 09c4 F466B142 		.word	1118922484
+ 1791 09c8 2690B142 		.word	1118933030
+ 1792 09cc 34B9B142 		.word	1118943540
+ 1793 09d0 1EE2B142 		.word	1118954014
+ 1794 09d4 E50AB242 		.word	1118964453
+ 1795 09d8 8933B242 		.word	1118974857
+ 1796 09dc 095CB242 		.word	1118985225
+ 1797 09e0 6584B242 		.word	1118995557
+ 1798 09e4 9DACB242 		.word	1119005853
+ 1799 09e8 B2D4B242 		.word	1119016114
+ 1800 09ec A4FCB242 		.word	1119026340
+ 1801 09f0 7124B342 		.word	1119036529
+ 1802 09f4 1B4CB342 		.word	1119046683
+ 1803 09f8 A173B342 		.word	1119056801
+ 1804 09fc 039BB342 		.word	1119066883
+ 1805 0a00 41C2B342 		.word	1119076929
+ 1806 0a04 5CE9B342 		.word	1119086940
+ 1807 0a08 5210B442 		.word	1119096914
+ 1808 0a0c 2537B442 		.word	1119106853
+ 1809 0a10 D35DB442 		.word	1119116755
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s 			page 38
+
+
+ 1810 0a14 5E84B442 		.word	1119126622
+ 1811 0a18 C4AAB442 		.word	1119136452
+ 1812 0a1c 07D1B442 		.word	1119146247
+ 1813 0a20 25F7B442 		.word	1119156005
+ 1814 0a24 1F1DB542 		.word	1119165727
+ 1815 0a28 F542B542 		.word	1119175413
+ 1816 0a2c A768B542 		.word	1119185063
+ 1817 0a30 358EB542 		.word	1119194677
+ 1818 0a34 9EB3B542 		.word	1119204254
+ 1819 0a38 E4D8B542 		.word	1119213796
+ 1820 0a3c 04FEB542 		.word	1119223300
+ 1821 0a40 0123B642 		.word	1119232769
+ 1822 0a44 D947B642 		.word	1119242201
+ 1823 0a48 8D6CB642 		.word	1119251597
+ 1824 0a4c 1C91B642 		.word	1119260956
+ 1825 0a50 87B5B642 		.word	1119270279
+ 1826 0a54 CDD9B642 		.word	1119279565
+ 1827 0a58 EFFDB642 		.word	1119288815
+ 1828 0a5c ED21B742 		.word	1119298029
+ 1829 0a60 C645B742 		.word	1119307206
+ 1830 0a64 7A69B742 		.word	1119316346
+ 1831 0a68 098DB742 		.word	1119325449
+ 1832 0a6c 74B0B742 		.word	1119334516
+ 1833 0a70 BBD3B742 		.word	1119343547
+ 1834 0a74 DCF6B742 		.word	1119352540
+ 1835 0a78 D919B842 		.word	1119361497
+ 1836 0a7c B13CB842 		.word	1119370417
+ 1837 0a80 655FB842 		.word	1119379301
+ 1838 0a84 F381B842 		.word	1119388147
+ 1839 0a88 5DA4B842 		.word	1119396957
+ 1840 0a8c A2C6B842 		.word	1119405730
+ 1841 0a90 C2E8B842 		.word	1119414466
+ 1842 0a94 BD0AB942 		.word	1119423165
+ 1843 0a98 932CB942 		.word	1119431827
+ 1844 0a9c 444EB942 		.word	1119440452
+ 1845 0aa0 D06FB942 		.word	1119449040
+ 1846 0aa4 3791B942 		.word	1119457591
+ 1847 0aa8 79B2B942 		.word	1119466105
+ 1848 0aac 96D3B942 		.word	1119474582
+ 1849 0ab0 8EF4B942 		.word	1119483022
+ 1850 0ab4 6115BA42 		.word	1119491425
+ 1851 0ab8 0F36BA42 		.word	1119499791
+ 1852 0abc 9756BA42 		.word	1119508119
+ 1853 0ac0 FB76BA42 		.word	1119516411
+ 1854 0ac4 3997BA42 		.word	1119524665
+ 1855 0ac8 51B7BA42 		.word	1119532881
+ 1856 0acc 45D7BA42 		.word	1119541061
+ 1857 0ad0 13F7BA42 		.word	1119549203
+ 1858 0ad4 BC16BB42 		.word	1119557308
+ 1859 0ad8 4036BB42 		.word	1119565376
+ 1860 0adc 9E55BB42 		.word	1119573406
+ 1861 0ae0 D674BB42 		.word	1119581398
+ 1862 0ae4 EA93BB42 		.word	1119589354
+ 1863 0ae8 D8B2BB42 		.word	1119597272
+ 1864 0aec A0D1BB42 		.word	1119605152
+ 1865 0af0 43F0BB42 		.word	1119612995
+ 1866 0af4 C10EBC42 		.word	1119620801
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s 			page 39
+
+
+ 1867 0af8 182DBC42 		.word	1119628568
+ 1868 0afc 4B4BBC42 		.word	1119636299
+ 1869 0b00 5769BC42 		.word	1119643991
+ 1870 0b04 3F87BC42 		.word	1119651647
+ 1871 0b08 00A5BC42 		.word	1119659264
+ 1872 0b0c 9CC2BC42 		.word	1119666844
+ 1873 0b10 12E0BC42 		.word	1119674386
+ 1874 0b14 62FDBC42 		.word	1119681890
+ 1875 0b18 8D1ABD42 		.word	1119689357
+ 1876 0b1c 9237BD42 		.word	1119696786
+ 1877 0b20 7154BD42 		.word	1119704177
+ 1878 0b24 2B71BD42 		.word	1119711531
+ 1879 0b28 BE8DBD42 		.word	1119718846
+ 1880 0b2c 2CAABD42 		.word	1119726124
+ 1881 0b30 74C6BD42 		.word	1119733364
+ 1882 0b34 96E2BD42 		.word	1119740566
+ 1883 0b38 92FEBD42 		.word	1119747730
+ 1884 0b3c 681ABE42 		.word	1119754856
+ 1885 0b40 1836BE42 		.word	1119761944
+ 1886 0b44 A251BE42 		.word	1119768994
+ 1887 0b48 066DBE42 		.word	1119776006
+ 1888 0b4c 4588BE42 		.word	1119782981
+ 1889 0b50 5DA3BE42 		.word	1119789917
+ 1890 0b54 4FBEBE42 		.word	1119796815
+ 1891 0b58 1BD9BE42 		.word	1119803675
+ 1892 0b5c C1F3BE42 		.word	1119810497
+ 1893 0b60 410EBF42 		.word	1119817281
+ 1894 0b64 9A28BF42 		.word	1119824026
+ 1895 0b68 CE42BF42 		.word	1119830734
+ 1896 0b6c DB5CBF42 		.word	1119837403
+ 1897 0b70 C276BF42 		.word	1119844034
+ 1898 0b74 8390BF42 		.word	1119850627
+ 1899 0b78 1EAABF42 		.word	1119857182
+ 1900 0b7c 92C3BF42 		.word	1119863698
+ 1901 0b80 E0DCBF42 		.word	1119870176
+ 1902 0b84 08F6BF42 		.word	1119876616
+ 1903 0b88 090FC042 		.word	1119883017
+ 1904 0b8c E527C042 		.word	1119889381
+ 1905 0b90 9940C042 		.word	1119895705
+ 1906 0b94 2859C042 		.word	1119901992
+ 1907 0b98 9071C042 		.word	1119908240
+ 1908 0b9c D189C042 		.word	1119914449
+ 1909 0ba0 ECA1C042 		.word	1119920620
+ 1910 0ba4 E1B9C042 		.word	1119926753
+ 1911 0ba8 AFD1C042 		.word	1119932847
+ 1912 0bac 57E9C042 		.word	1119938903
+ 1913 0bb0 D800C142 		.word	1119944920
+ 1914 0bb4 3318C142 		.word	1119950899
+ 1915 0bb8 672FC142 		.word	1119956839
+ 1916 0bbc 7546C142 		.word	1119962741
+ 1917 0bc0 5C5DC142 		.word	1119968604
+ 1918 0bc4 1C74C142 		.word	1119974428
+ 1919 0bc8 B68AC142 		.word	1119980214
+ 1920 0bcc 29A1C142 		.word	1119985961
+ 1921 0bd0 75B7C142 		.word	1119991669
+ 1922 0bd4 9BCDC142 		.word	1119997339
+ 1923 0bd8 9AE3C142 		.word	1120002970
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s 			page 40
+
+
+ 1924 0bdc 72F9C142 		.word	1120008562
+ 1925 0be0 240FC242 		.word	1120014116
+ 1926 0be4 AF24C242 		.word	1120019631
+ 1927 0be8 133AC242 		.word	1120025107
+ 1928 0bec 514FC242 		.word	1120030545
+ 1929 0bf0 6764C242 		.word	1120035943
+ 1930 0bf4 5779C242 		.word	1120041303
+ 1931 0bf8 208EC242 		.word	1120046624
+ 1932 0bfc C2A2C242 		.word	1120051906
+ 1933 0c00 3DB7C242 		.word	1120057149
+ 1934 0c04 92CBC242 		.word	1120062354
+ 1935 0c08 BFDFC242 		.word	1120067519
+ 1936 0c0c C6F3C242 		.word	1120072646
+ 1937 0c10 A607C342 		.word	1120077734
+ 1938 0c14 5E1BC342 		.word	1120082782
+ 1939 0c18 F02EC342 		.word	1120087792
+ 1940 0c1c 5B42C342 		.word	1120092763
+ 1941 0c20 9F55C342 		.word	1120097695
+ 1942 0c24 BC68C342 		.word	1120102588
+ 1943 0c28 B27BC342 		.word	1120107442
+ 1944 0c2c 808EC342 		.word	1120112256
+ 1945 0c30 28A1C342 		.word	1120117032
+ 1946 0c34 A9B3C342 		.word	1120121769
+ 1947 0c38 03C6C342 		.word	1120126467
+ 1948 0c3c 35D8C342 		.word	1120131125
+ 1949 0c40 41EAC342 		.word	1120135745
+ 1950 0c44 25FCC342 		.word	1120140325
+ 1951 0c48 E20DC442 		.word	1120144866
+ 1952 0c4c 781FC442 		.word	1120149368
+ 1953 0c50 E730C442 		.word	1120153831
+ 1954 0c54 2F42C442 		.word	1120158255
+ 1955 0c58 5053C442 		.word	1120162640
+ 1956 0c5c 4964C442 		.word	1120166985
+ 1957 0c60 1B75C442 		.word	1120171291
+ 1958 0c64 C685C442 		.word	1120175558
+ 1959 0c68 4A96C442 		.word	1120179786
+ 1960 0c6c A7A6C442 		.word	1120183975
+ 1961 0c70 DCB6C442 		.word	1120188124
+ 1962 0c74 EAC6C442 		.word	1120192234
+ 1963 0c78 D1D6C442 		.word	1120196305
+ 1964 0c7c 90E6C442 		.word	1120200336
+ 1965 0c80 28F6C442 		.word	1120204328
+ 1966 0c84 9905C542 		.word	1120208281
+ 1967 0c88 E214C542 		.word	1120212194
+ 1968 0c8c 0524C542 		.word	1120216069
+ 1969 0c90 FF32C542 		.word	1120219903
+ 1970 0c94 D341C542 		.word	1120223699
+ 1971 0c98 7F50C542 		.word	1120227455
+ 1972 0c9c 035FC542 		.word	1120231171
+ 1973 0ca0 606DC542 		.word	1120234848
+ 1974 0ca4 967BC542 		.word	1120238486
+ 1975 0ca8 A589C542 		.word	1120242085
+ 1976 0cac 8C97C542 		.word	1120245644
+ 1977 0cb0 4BA5C542 		.word	1120249163
+ 1978 0cb4 E3B2C542 		.word	1120252643
+ 1979 0cb8 54C0C542 		.word	1120256084
+ 1980 0cbc 9DCDC542 		.word	1120259485
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s 			page 41
+
+
+ 1981 0cc0 BEDAC542 		.word	1120262846
+ 1982 0cc4 B8E7C542 		.word	1120266168
+ 1983 0cc8 8BF4C542 		.word	1120269451
+ 1984 0ccc 3601C642 		.word	1120272694
+ 1985 0cd0 BA0DC642 		.word	1120275898
+ 1986 0cd4 161AC642 		.word	1120279062
+ 1987 0cd8 4A26C642 		.word	1120282186
+ 1988 0cdc 5732C642 		.word	1120285271
+ 1989 0ce0 3C3EC642 		.word	1120288316
+ 1990 0ce4 FA49C642 		.word	1120291322
+ 1991 0ce8 9055C642 		.word	1120294288
+ 1992 0cec FF60C642 		.word	1120297215
+ 1993 0cf0 466CC642 		.word	1120300102
+ 1994 0cf4 6577C642 		.word	1120302949
+ 1995 0cf8 5D82C642 		.word	1120305757
+ 1996 0cfc 2D8DC642 		.word	1120308525
+ 1997 0d00 D697C642 		.word	1120311254
+ 1998 0d04 56A2C642 		.word	1120313942
+ 1999 0d08 B0ACC642 		.word	1120316592
+ 2000 0d0c E1B6C642 		.word	1120319201
+ 2001 0d10 EBC0C642 		.word	1120321771
+ 2002 0d14 CDCAC642 		.word	1120324301
+ 2003 0d18 88D4C642 		.word	1120326792
+ 2004 0d1c 1ADEC642 		.word	1120329242
+ 2005 0d20 85E7C642 		.word	1120331653
+ 2006 0d24 C9F0C642 		.word	1120334025
+ 2007 0d28 E4F9C642 		.word	1120336356
+ 2008 0d2c D802C742 		.word	1120338648
+ 2009 0d30 A50BC742 		.word	1120340901
+ 2010 0d34 4914C742 		.word	1120343113
+ 2011 0d38 C61CC742 		.word	1120345286
+ 2012 0d3c 1B25C742 		.word	1120347419
+ 2013 0d40 482DC742 		.word	1120349512
+ 2014 0d44 4D35C742 		.word	1120351565
+ 2015 0d48 2B3DC742 		.word	1120353579
+ 2016 0d4c E144C742 		.word	1120355553
+ 2017 0d50 6F4CC742 		.word	1120357487
+ 2018 0d54 D653C742 		.word	1120359382
+ 2019 0d58 145BC742 		.word	1120361236
+ 2020 0d5c 2B62C742 		.word	1120363051
+ 2021 0d60 1A69C742 		.word	1120364826
+ 2022 0d64 E16FC742 		.word	1120366561
+ 2023 0d68 8076C742 		.word	1120368256
+ 2024 0d6c F87CC742 		.word	1120369912
+ 2025 0d70 4883C742 		.word	1120371528
+ 2026 0d74 6F89C742 		.word	1120373103
+ 2027 0d78 6F8FC742 		.word	1120374639
+ 2028 0d7c 4895C742 		.word	1120376136
+ 2029 0d80 F89AC742 		.word	1120377592
+ 2030 0d84 80A0C742 		.word	1120379008
+ 2031 0d88 E1A5C742 		.word	1120380385
+ 2032 0d8c 1AABC742 		.word	1120381722
+ 2033 0d90 2BB0C742 		.word	1120383019
+ 2034 0d94 14B5C742 		.word	1120384276
+ 2035 0d98 D5B9C742 		.word	1120385493
+ 2036 0d9c 6EBEC742 		.word	1120386670
+ 2037 0da0 E0C2C742 		.word	1120387808
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s 			page 42
+
+
+ 2038 0da4 29C7C742 		.word	1120388905
+ 2039 0da8 4BCBC742 		.word	1120389963
+ 2040 0dac 45CFC742 		.word	1120390981
+ 2041 0db0 17D3C742 		.word	1120391959
+ 2042 0db4 C1D6C742 		.word	1120392897
+ 2043 0db8 43DAC742 		.word	1120393795
+ 2044 0dbc 9DDDC742 		.word	1120394653
+ 2045 0dc0 CFE0C742 		.word	1120395471
+ 2046 0dc4 DAE3C742 		.word	1120396250
+ 2047 0dc8 BCE6C742 		.word	1120396988
+ 2048 0dcc 77E9C742 		.word	1120397687
+ 2049 0dd0 0AECC742 		.word	1120398346
+ 2050 0dd4 74EEC742 		.word	1120398964
+ 2051 0dd8 B7F0C742 		.word	1120399543
+ 2052 0ddc D2F2C742 		.word	1120400082
+ 2053 0de0 C5F4C742 		.word	1120400581
+ 2054 0de4 91F6C742 		.word	1120401041
+ 2055 0de8 34F8C742 		.word	1120401460
+ 2056 0dec AFF9C742 		.word	1120401839
+ 2057 0df0 02FBC742 		.word	1120402178
+ 2058 0df4 2EFCC742 		.word	1120402478
+ 2059 0df8 31FDC742 		.word	1120402737
+ 2060 0dfc 0DFEC742 		.word	1120402957
+ 2061 0e00 C1FEC742 		.word	1120403137
+ 2062 0e04 4CFFC742 		.word	1120403276
+ 2063 0e08 B0FFC742 		.word	1120403376
+ 2064 0e0c ECFFC742 		.word	1120403436
+ 2065 0e10 0000C842 		.word	1120403456
+ 2066              		.text
+ 2067              	.Letext0:
+ 2068              		.file 2 "ACE-ECF/Algorithm/inc/struct_typedef.h"
+ 2069              		.file 3 "ACE-ECF/Algorithm/inc/maths.h"
+ 2070              		.file 4 "ACE-ECF/Algorithm/inc/list_of_function.h"
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s 			page 43
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 maths.c
+C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s:20     .text.invSqrt:00000000 $t
+C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s:26     .text.invSqrt:00000000 invSqrt
+C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s:73     .text.invSqrt:0000002c $d
+C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s:78     .text.max_abs:00000000 $t
+C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s:84     .text.max_abs:00000000 max_abs
+C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s:124    .text.motion_acceleration_control:00000000 $t
+C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s:130    .text.motion_acceleration_control:00000000 motion_acceleration_control
+C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s:200    .text.loop_restriction_int16:00000000 $t
+C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s:206    .text.loop_restriction_int16:00000000 loop_restriction_int16
+C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s:251    .text.loop_restriction_float:00000000 $t
+C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s:257    .text.loop_restriction_float:00000000 loop_restriction_float
+C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s:304    .text.loop_fp32_constrain:00000000 $t
+C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s:310    .text.loop_fp32_constrain:00000000 loop_fp32_constrain
+C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s:384    .text.data_accelerated_control:00000000 $t
+C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s:390    .text.data_accelerated_control:00000000 data_accelerated_control
+C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s:466    .text.data_accelerated_control:00000078 $d
+C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s:471    .text.limiting_filter:00000000 $t
+C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s:477    .text.limiting_filter:00000000 limiting_filter
+C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s:511    .text.sin_calculate:00000000 $t
+C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s:517    .text.sin_calculate:00000000 sin_calculate
+C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s:721    .text.sin_calculate:00000170 $d
+C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s:732    .text.cos_calculate:00000000 $t
+C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s:738    .text.cos_calculate:00000000 cos_calculate
+C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s:866    .text.cos_calculate:000000d4 $d
+C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s:874    .text.float_min_distance:00000000 $t
+C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s:880    .text.float_min_distance:00000000 float_min_distance
+C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s:994    .text.float_min_distance:0000008c $d
+C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s:999    .text.IMU_AngleLimit:00000000 $t
+C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s:1005   .text.IMU_AngleLimit:00000000 IMU_AngleLimit
+C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s:1036   .text.isMotorInPlace:00000000 $t
+C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s:1042   .text.isMotorInPlace:00000000 isMotorInPlace
+C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s:1079   .text.int_value_abs_limit:00000000 $t
+C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s:1085   .text.int_value_abs_limit:00000000 int_value_abs_limit
+C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s:1164   .rodata.Trigonometric_Functions:00000000 Trigonometric_Functions
+C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s:1153   .bss.last_num.0:00000000 $d
+C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s:1157   .bss.last_num.0:00000000 last_num.0
+C:\Users\28212\AppData\Local\Temp\cc1DaFVX.s:1160   .rodata.Trigonometric_Functions:00000000 $d
+
+NO UNDEFINED SYMBOLS

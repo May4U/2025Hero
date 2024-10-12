@@ -1,0 +1,241 @@
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccj7zuBA.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.arch armv7e-m
+   3              		.fpu fpv4-sp-d16
+   4              		.eabi_attribute 27, 1
+   5              		.eabi_attribute 28, 1
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.file	"bsp_usb.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.printf_usb,"ax",%progbits
+  20              		.align	1
+  21              		.global	printf_usb
+  22              		.syntax unified
+  23              		.thumb
+  24              		.thumb_func
+  26              	printf_usb:
+  27              	.LVL0:
+  28              	.LFB134:
+  29              		.file 1 "ACE-ECF/Bsp/Src/bsp_usb.c"
+   1:ACE-ECF/Bsp/Src/bsp_usb.c **** /************************** Dongguan-University of Technology -ACE**************************
+   2:ACE-ECF/Bsp/Src/bsp_usb.c ****  * @file bsp_usb.c
+   3:ACE-ECF/Bsp/Src/bsp_usb.c ****  * @brief 
+   4:ACE-ECF/Bsp/Src/bsp_usb.c ****  * @author pansyhou侯文辉 (1677195845lyb@gmail.com)
+   5:ACE-ECF/Bsp/Src/bsp_usb.c ****  * @version 1.0
+   6:ACE-ECF/Bsp/Src/bsp_usb.c ****  * @date 2022-10-11
+   7:ACE-ECF/Bsp/Src/bsp_usb.c ****  * 
+   8:ACE-ECF/Bsp/Src/bsp_usb.c ****  * 
+   9:ACE-ECF/Bsp/Src/bsp_usb.c ****  * @history
+  10:ACE-ECF/Bsp/Src/bsp_usb.c ****  * <table>
+  11:ACE-ECF/Bsp/Src/bsp_usb.c ****  * Date       Version Author Description
+  12:ACE-ECF/Bsp/Src/bsp_usb.c ****  * 2022-10-11   1.0   侯文辉     
+  13:ACE-ECF/Bsp/Src/bsp_usb.c ****  * @verbatim 
+  14:ACE-ECF/Bsp/Src/bsp_usb.c ****  * ==============================================================================
+  15:ACE-ECF/Bsp/Src/bsp_usb.c ****  * ==============================================================================
+  16:ACE-ECF/Bsp/Src/bsp_usb.c ****  * @endverbatim
+  17:ACE-ECF/Bsp/Src/bsp_usb.c **** ************************** Dongguan-University of Technology -ACE***************************/
+  18:ACE-ECF/Bsp/Src/bsp_usb.c **** #include "bsp_usb.h"
+  19:ACE-ECF/Bsp/Src/bsp_usb.c **** #include "usbd_cdc_if.h"
+  20:ACE-ECF/Bsp/Src/bsp_usb.c **** #include "usb_device.h"
+  21:ACE-ECF/Bsp/Src/bsp_usb.c **** #include "stdarg.h"
+  22:ACE-ECF/Bsp/Src/bsp_usb.c **** 
+  23:ACE-ECF/Bsp/Src/bsp_usb.c **** /**
+  24:ACE-ECF/Bsp/Src/bsp_usb.c ****  * 重写printf,通过usbcdc虚拟串口
+  25:ACE-ECF/Bsp/Src/bsp_usb.c ****  * 注意：buff可能要足够大，不然发送乱码或者不全
+  26:ACE-ECF/Bsp/Src/bsp_usb.c ****  * @param format
+  27:ACE-ECF/Bsp/Src/bsp_usb.c ****  * @param ...
+  28:ACE-ECF/Bsp/Src/bsp_usb.c ****  */
+  29:ACE-ECF/Bsp/Src/bsp_usb.c **** void printf_usb(const char *format, ...){
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccj7zuBA.s 			page 2
+
+
+  30              		.loc 1 29 41 view -0
+  31              		.cfi_startproc
+  32              		@ args = 4, pretend = 16, frame = 2056
+  33              		@ frame_needed = 0, uses_anonymous_args = 1
+  34              		.loc 1 29 41 is_stmt 0 view .LVU1
+  35 0000 0FB4     		push	{r0, r1, r2, r3}
+  36              	.LCFI0:
+  37              		.cfi_def_cfa_offset 16
+  38              		.cfi_offset 0, -16
+  39              		.cfi_offset 1, -12
+  40              		.cfi_offset 2, -8
+  41              		.cfi_offset 3, -4
+  42 0002 00B5     		push	{lr}
+  43              	.LCFI1:
+  44              		.cfi_def_cfa_offset 20
+  45              		.cfi_offset 14, -20
+  46 0004 ADF60C0D 		subw	sp, sp, #2060
+  47              	.LCFI2:
+  48              		.cfi_def_cfa_offset 2080
+  49 0008 0DF50163 		add	r3, sp, #2064
+  50 000c 53F8042B 		ldr	r2, [r3], #4
+  30:ACE-ECF/Bsp/Src/bsp_usb.c ****     va_list  args;
+  51              		.loc 1 30 5 is_stmt 1 view .LVU2
+  31:ACE-ECF/Bsp/Src/bsp_usb.c ****     uint32_t length;
+  52              		.loc 1 31 5 view .LVU3
+  32:ACE-ECF/Bsp/Src/bsp_usb.c ****     uint8_t buff[APP_TX_DATA_SIZE];
+  53              		.loc 1 32 5 view .LVU4
+  33:ACE-ECF/Bsp/Src/bsp_usb.c **** 
+  34:ACE-ECF/Bsp/Src/bsp_usb.c ****     va_start(args, format);
+  54              		.loc 1 34 5 view .LVU5
+  55 0010 CDF80438 		str	r3, [sp, #2052]
+  35:ACE-ECF/Bsp/Src/bsp_usb.c ****     length = vsnprintf((char *)buff, APP_TX_DATA_SIZE, (char *)format, args);
+  56              		.loc 1 35 5 view .LVU6
+  57              		.loc 1 35 14 is_stmt 0 view .LVU7
+  58 0014 4FF40061 		mov	r1, #2048
+  59 0018 01A8     		add	r0, sp, #4
+  60 001a FFF7FEFF 		bl	vsnprintf
+  61              	.LVL1:
+  36:ACE-ECF/Bsp/Src/bsp_usb.c ****     va_end(args);
+  62              		.loc 1 36 5 is_stmt 1 view .LVU8
+  37:ACE-ECF/Bsp/Src/bsp_usb.c ****     CDC_Transmit_FS(buff, length);
+  63              		.loc 1 37 5 view .LVU9
+  64 001e 81B2     		uxth	r1, r0
+  65 0020 01A8     		add	r0, sp, #4
+  66 0022 FFF7FEFF 		bl	CDC_Transmit_FS
+  67              	.LVL2:
+  38:ACE-ECF/Bsp/Src/bsp_usb.c **** }
+  68              		.loc 1 38 1 is_stmt 0 view .LVU10
+  69 0026 0DF60C0D 		addw	sp, sp, #2060
+  70              	.LCFI3:
+  71              		.cfi_def_cfa_offset 20
+  72              		@ sp needed
+  73 002a 5DF804EB 		ldr	lr, [sp], #4
+  74              	.LCFI4:
+  75              		.cfi_restore 14
+  76              		.cfi_def_cfa_offset 16
+  77 002e 04B0     		add	sp, sp, #16
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccj7zuBA.s 			page 3
+
+
+  78              	.LCFI5:
+  79              		.cfi_restore 3
+  80              		.cfi_restore 2
+  81              		.cfi_restore 1
+  82              		.cfi_restore 0
+  83              		.cfi_def_cfa_offset 0
+  84 0030 7047     		bx	lr
+  85              		.cfi_endproc
+  86              	.LFE134:
+  88              		.section	.text.Usb_RX,"ax",%progbits
+  89              		.align	1
+  90              		.global	Usb_RX
+  91              		.syntax unified
+  92              		.thumb
+  93              		.thumb_func
+  95              	Usb_RX:
+  96              	.LVL3:
+  97              	.LFB135:
+  39:ACE-ECF/Bsp/Src/bsp_usb.c **** 
+  40:ACE-ECF/Bsp/Src/bsp_usb.c **** uint8_t Rx_Data[64];
+  41:ACE-ECF/Bsp/Src/bsp_usb.c **** /**
+  42:ACE-ECF/Bsp/Src/bsp_usb.c ****  *  其实usb可能要考虑双缓冲
+  43:ACE-ECF/Bsp/Src/bsp_usb.c ****  * @param buf
+  44:ACE-ECF/Bsp/Src/bsp_usb.c ****  */
+  45:ACE-ECF/Bsp/Src/bsp_usb.c **** void Usb_RX(uint8_t *buf,uint8_t *len)
+  46:ACE-ECF/Bsp/Src/bsp_usb.c **** {
+  98              		.loc 1 46 1 is_stmt 1 view -0
+  99              		.cfi_startproc
+ 100              		@ args = 0, pretend = 0, frame = 0
+ 101              		@ frame_needed = 0, uses_anonymous_args = 0
+ 102              		@ link register save eliminated.
+  47:ACE-ECF/Bsp/Src/bsp_usb.c ****     for (int i = 0; i < *len; i++) {
+ 103              		.loc 1 47 5 view .LVU12
+ 104              	.LBB2:
+ 105              		.loc 1 47 10 view .LVU13
+ 106              		.loc 1 47 14 is_stmt 0 view .LVU14
+ 107 0000 0023     		movs	r3, #0
+ 108              		.loc 1 47 5 view .LVU15
+ 109 0002 05E0     		b	.L4
+ 110              	.LVL4:
+ 111              	.L5:
+  48:ACE-ECF/Bsp/Src/bsp_usb.c ****       Rx_Data[i]=*buf;
+ 112              		.loc 1 48 7 is_stmt 1 discriminator 3 view .LVU16
+ 113              		.loc 1 48 18 is_stmt 0 discriminator 3 view .LVU17
+ 114 0004 10F801CB 		ldrb	ip, [r0], #1	@ zero_extendqisi2
+ 115              	.LVL5:
+ 116              		.loc 1 48 17 discriminator 3 view .LVU18
+ 117 0008 034A     		ldr	r2, .L6
+ 118 000a 02F803C0 		strb	ip, [r2, r3]
+  49:ACE-ECF/Bsp/Src/bsp_usb.c ****       buf++;
+ 119              		.loc 1 49 7 is_stmt 1 discriminator 3 view .LVU19
+ 120              	.LVL6:
+  47:ACE-ECF/Bsp/Src/bsp_usb.c ****     for (int i = 0; i < *len; i++) {
+ 121              		.loc 1 47 31 discriminator 3 view .LVU20
+  47:ACE-ECF/Bsp/Src/bsp_usb.c ****     for (int i = 0; i < *len; i++) {
+ 122              		.loc 1 47 32 is_stmt 0 discriminator 3 view .LVU21
+ 123 000e 0133     		adds	r3, r3, #1
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccj7zuBA.s 			page 4
+
+
+ 124              	.LVL7:
+ 125              	.L4:
+  47:ACE-ECF/Bsp/Src/bsp_usb.c ****     for (int i = 0; i < *len; i++) {
+ 126              		.loc 1 47 21 is_stmt 1 discriminator 1 view .LVU22
+  47:ACE-ECF/Bsp/Src/bsp_usb.c ****     for (int i = 0; i < *len; i++) {
+ 127              		.loc 1 47 25 is_stmt 0 discriminator 1 view .LVU23
+ 128 0010 0A78     		ldrb	r2, [r1]	@ zero_extendqisi2
+  47:ACE-ECF/Bsp/Src/bsp_usb.c ****     for (int i = 0; i < *len; i++) {
+ 129              		.loc 1 47 5 discriminator 1 view .LVU24
+ 130 0012 9A42     		cmp	r2, r3
+ 131 0014 F6DC     		bgt	.L5
+  47:ACE-ECF/Bsp/Src/bsp_usb.c ****     for (int i = 0; i < *len; i++) {
+ 132              		.loc 1 47 5 discriminator 1 view .LVU25
+ 133              	.LBE2:
+  50:ACE-ECF/Bsp/Src/bsp_usb.c ****     }
+  51:ACE-ECF/Bsp/Src/bsp_usb.c **** }
+ 134              		.loc 1 51 1 view .LVU26
+ 135 0016 7047     		bx	lr
+ 136              	.L7:
+ 137              		.align	2
+ 138              	.L6:
+ 139 0018 00000000 		.word	.LANCHOR0
+ 140              		.cfi_endproc
+ 141              	.LFE135:
+ 143              		.global	Rx_Data
+ 144              		.section	.bss.Rx_Data,"aw",%nobits
+ 145              		.align	2
+ 146              		.set	.LANCHOR0,. + 0
+ 149              	Rx_Data:
+ 150 0000 00000000 		.space	64
+ 150      00000000 
+ 150      00000000 
+ 150      00000000 
+ 150      00000000 
+ 151              		.text
+ 152              	.Letext0:
+ 153              		.file 2 "d:\\gcc-arm-none-eabi-10.3-2021.10\\arm-none-eabi\\include\\machine\\_default_types.h"
+ 154              		.file 3 "d:\\gcc-arm-none-eabi-10.3-2021.10\\arm-none-eabi\\include\\sys\\_stdint.h"
+ 155              		.file 4 "d:\\gcc-arm-none-eabi-10.3-2021.10\\lib\\gcc\\arm-none-eabi\\10.3.1\\include\\stdarg.h"
+ 156              		.file 5 "d:\\gcc-arm-none-eabi-10.3-2021.10\\arm-none-eabi\\include\\stdio.h"
+ 157              		.file 6 "USB_DEVICE/App/usbd_cdc_if.h"
+ 158              		.file 7 "<built-in>"
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccj7zuBA.s 			page 5
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 bsp_usb.c
+C:\Users\28212\AppData\Local\Temp\ccj7zuBA.s:20     .text.printf_usb:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccj7zuBA.s:26     .text.printf_usb:00000000 printf_usb
+C:\Users\28212\AppData\Local\Temp\ccj7zuBA.s:89     .text.Usb_RX:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccj7zuBA.s:95     .text.Usb_RX:00000000 Usb_RX
+C:\Users\28212\AppData\Local\Temp\ccj7zuBA.s:139    .text.Usb_RX:00000018 $d
+C:\Users\28212\AppData\Local\Temp\ccj7zuBA.s:149    .bss.Rx_Data:00000000 Rx_Data
+C:\Users\28212\AppData\Local\Temp\ccj7zuBA.s:145    .bss.Rx_Data:00000000 $d
+
+UNDEFINED SYMBOLS
+vsnprintf
+CDC_Transmit_FS

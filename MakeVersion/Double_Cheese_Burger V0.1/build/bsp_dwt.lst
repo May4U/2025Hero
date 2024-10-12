@@ -1,0 +1,1096 @@
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccM1O0QE.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.arch armv7e-m
+   3              		.fpu fpv4-sp-d16
+   4              		.eabi_attribute 27, 1
+   5              		.eabi_attribute 28, 1
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.file	"bsp_dwt.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.DWT_CNT_Update,"ax",%progbits
+  20              		.align	1
+  21              		.syntax unified
+  22              		.thumb
+  23              		.thumb_func
+  25              	DWT_CNT_Update:
+  26              	.LFB137:
+  27              		.file 1 "ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c"
+   1:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** /**
+   2:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****  ******************************************************************************
+   3:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****  * @file	bsp_dwt.c
+   4:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****  * @author  Wang Hongxi
+   5:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****  * @version V1.1.0
+   6:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****  * @date    2022/3/8
+   7:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****  * @brief
+   8:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****  ******************************************************************************
+   9:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****  * @attention
+  10:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****  *
+  11:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****  ******************************************************************************
+  12:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****  */
+  13:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** #include "bsp_dwt.h"
+  14:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** 
+  15:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** DWT_Time_t SysTime;
+  16:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** static uint32_t CPU_FREQ_Hz, CPU_FREQ_Hz_ms, CPU_FREQ_Hz_us;
+  17:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** static uint32_t CYCCNT_RountCount;
+  18:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** static uint32_t CYCCNT_LAST;
+  19:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** uint64_t CYCCNT64;
+  20:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** static void DWT_CNT_Update(void);
+  21:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** 
+  22:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** void DWT_Init(uint32_t CPU_Freq_mHz)
+  23:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** {
+  24:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     /* 使能DWT外设 */
+  25:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
+  26:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** 
+  27:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     /* DWT CYCCNT寄存器计数清0 */
+  28:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     DWT->CYCCNT = (uint32_t)0u;
+  29:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** 
+  30:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     /* 使能Cortex-M DWT CYCCNT寄存器 */
+  31:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccM1O0QE.s 			page 2
+
+
+  32:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** 
+  33:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     CPU_FREQ_Hz = CPU_Freq_mHz * 1000000;
+  34:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     CPU_FREQ_Hz_ms = CPU_FREQ_Hz / 1000;
+  35:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     CPU_FREQ_Hz_us = CPU_FREQ_Hz / 1000000;
+  36:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     CYCCNT_RountCount = 0;
+  37:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** }
+  38:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** 
+  39:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** float DWT_GetDeltaT(uint32_t *cnt_last)
+  40:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** {
+  41:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     volatile uint32_t cnt_now = DWT->CYCCNT;
+  42:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     float dt = ((uint32_t)(cnt_now - *cnt_last)) / ((float)(CPU_FREQ_Hz));
+  43:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     *cnt_last = cnt_now;
+  44:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** 
+  45:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     DWT_CNT_Update();
+  46:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** 
+  47:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     return dt;
+  48:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** }
+  49:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** 
+  50:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** double DWT_GetDeltaT64(uint32_t *cnt_last)
+  51:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** {
+  52:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     volatile uint32_t cnt_now = DWT->CYCCNT;
+  53:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     double dt = ((uint32_t)(cnt_now - *cnt_last)) / ((double)(CPU_FREQ_Hz));
+  54:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     *cnt_last = cnt_now;
+  55:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** 
+  56:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     DWT_CNT_Update();
+  57:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** 
+  58:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     return dt;
+  59:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** }
+  60:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** 
+  61:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** void DWT_SysTimeUpdate(void)
+  62:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** {
+  63:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     volatile uint32_t cnt_now = DWT->CYCCNT;
+  64:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     static uint64_t CNT_TEMP1, CNT_TEMP2, CNT_TEMP3;
+  65:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** 
+  66:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     DWT_CNT_Update();
+  67:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** 
+  68:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     CYCCNT64 = (uint64_t)CYCCNT_RountCount * (uint64_t)UINT32_MAX + (uint64_t)cnt_now;
+  69:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     CNT_TEMP1 = CYCCNT64 / CPU_FREQ_Hz;
+  70:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     CNT_TEMP2 = CYCCNT64 - CNT_TEMP1 * CPU_FREQ_Hz;
+  71:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     SysTime.s = CNT_TEMP1;
+  72:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     SysTime.ms = CNT_TEMP2 / CPU_FREQ_Hz_ms;
+  73:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     CNT_TEMP3 = CNT_TEMP2 - SysTime.ms * CPU_FREQ_Hz_ms;
+  74:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     SysTime.us = CNT_TEMP3 / CPU_FREQ_Hz_us;
+  75:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** }
+  76:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** 
+  77:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** float DWT_GetTimeline_s(void)
+  78:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** {
+  79:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     DWT_SysTimeUpdate();
+  80:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** 
+  81:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     float DWT_Timelinef32 = SysTime.s + SysTime.ms * 0.001f + SysTime.us * 0.000001f;
+  82:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** 
+  83:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     return DWT_Timelinef32;
+  84:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** }
+  85:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** 
+  86:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** float DWT_GetTimeline_ms(void)
+  87:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** {
+  88:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     DWT_SysTimeUpdate();
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccM1O0QE.s 			page 3
+
+
+  89:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** 
+  90:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     float DWT_Timelinef32 = SysTime.s * 1000 + SysTime.ms + SysTime.us * 0.001f;
+  91:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** 
+  92:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     return DWT_Timelinef32;
+  93:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** }
+  94:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** 
+  95:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** uint64_t DWT_GetTimeline_us(void)
+  96:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** {
+  97:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     DWT_SysTimeUpdate();
+  98:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** 
+  99:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     uint64_t DWT_Timelinef32 = SysTime.s * 1000000 + SysTime.ms * 1000 + SysTime.us;
+ 100:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** 
+ 101:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     return DWT_Timelinef32;
+ 102:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** }
+ 103:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** 
+ 104:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** static void DWT_CNT_Update(void)
+ 105:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** {
+  28              		.loc 1 105 1 view -0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 8
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32              		@ link register save eliminated.
+  33 0000 82B0     		sub	sp, sp, #8
+  34              	.LCFI0:
+  35              		.cfi_def_cfa_offset 8
+ 106:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     volatile uint32_t cnt_now = DWT->CYCCNT;
+  36              		.loc 1 106 5 view .LVU1
+  37              		.loc 1 106 36 is_stmt 0 view .LVU2
+  38 0002 084B     		ldr	r3, .L4
+  39 0004 5B68     		ldr	r3, [r3, #4]
+  40              		.loc 1 106 23 view .LVU3
+  41 0006 0193     		str	r3, [sp, #4]
+ 107:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** 
+ 108:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     if (cnt_now < CYCCNT_LAST)
+  42              		.loc 1 108 5 is_stmt 1 view .LVU4
+  43              		.loc 1 108 17 is_stmt 0 view .LVU5
+  44 0008 019A     		ldr	r2, [sp, #4]
+  45 000a 074B     		ldr	r3, .L4+4
+  46 000c 1B68     		ldr	r3, [r3]
+  47              		.loc 1 108 8 view .LVU6
+  48 000e 9A42     		cmp	r2, r3
+  49 0010 03D2     		bcs	.L2
+ 109:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****         CYCCNT_RountCount++;
+  50              		.loc 1 109 9 is_stmt 1 view .LVU7
+  51              		.loc 1 109 26 is_stmt 0 view .LVU8
+  52 0012 064A     		ldr	r2, .L4+8
+  53 0014 1368     		ldr	r3, [r2]
+  54 0016 0133     		adds	r3, r3, #1
+  55 0018 1360     		str	r3, [r2]
+  56              	.L2:
+ 110:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** 
+ 111:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     CYCCNT_LAST = cnt_now;
+  57              		.loc 1 111 5 is_stmt 1 view .LVU9
+  58              		.loc 1 111 17 is_stmt 0 view .LVU10
+  59 001a 019A     		ldr	r2, [sp, #4]
+  60 001c 024B     		ldr	r3, .L4+4
+  61 001e 1A60     		str	r2, [r3]
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccM1O0QE.s 			page 4
+
+
+ 112:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** }
+  62              		.loc 1 112 1 view .LVU11
+  63 0020 02B0     		add	sp, sp, #8
+  64              	.LCFI1:
+  65              		.cfi_def_cfa_offset 0
+  66              		@ sp needed
+  67 0022 7047     		bx	lr
+  68              	.L5:
+  69              		.align	2
+  70              	.L4:
+  71 0024 001000E0 		.word	-536866816
+  72 0028 00000000 		.word	.LANCHOR0
+  73 002c 00000000 		.word	.LANCHOR1
+  74              		.cfi_endproc
+  75              	.LFE137:
+  77              		.section	.text.DWT_Init,"ax",%progbits
+  78              		.align	1
+  79              		.global	DWT_Init
+  80              		.syntax unified
+  81              		.thumb
+  82              		.thumb_func
+  84              	DWT_Init:
+  85              	.LVL0:
+  86              	.LFB130:
+  23:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     /* 使能DWT外设 */
+  87              		.loc 1 23 1 is_stmt 1 view -0
+  88              		.cfi_startproc
+  89              		@ args = 0, pretend = 0, frame = 0
+  90              		@ frame_needed = 0, uses_anonymous_args = 0
+  91              		@ link register save eliminated.
+  25:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** 
+  92              		.loc 1 25 5 view .LVU13
+  25:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** 
+  93              		.loc 1 25 22 is_stmt 0 view .LVU14
+  94 0000 104A     		ldr	r2, .L7
+  95 0002 D2F8FC30 		ldr	r3, [r2, #252]
+  96 0006 43F08073 		orr	r3, r3, #16777216
+  97 000a C2F8FC30 		str	r3, [r2, #252]
+  28:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** 
+  98              		.loc 1 28 5 is_stmt 1 view .LVU15
+  28:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** 
+  99              		.loc 1 28 17 is_stmt 0 view .LVU16
+ 100 000e 0E4B     		ldr	r3, .L7+4
+ 101 0010 0021     		movs	r1, #0
+ 102 0012 5960     		str	r1, [r3, #4]
+  31:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** 
+ 103              		.loc 1 31 5 is_stmt 1 view .LVU17
+  31:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** 
+ 104              		.loc 1 31 15 is_stmt 0 view .LVU18
+ 105 0014 1A68     		ldr	r2, [r3]
+ 106 0016 42F00102 		orr	r2, r2, #1
+ 107 001a 1A60     		str	r2, [r3]
+  33:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     CPU_FREQ_Hz_ms = CPU_FREQ_Hz / 1000;
+ 108              		.loc 1 33 5 is_stmt 1 view .LVU19
+  33:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     CPU_FREQ_Hz_ms = CPU_FREQ_Hz / 1000;
+ 109              		.loc 1 33 32 is_stmt 0 view .LVU20
+ 110 001c 0B4B     		ldr	r3, .L7+8
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccM1O0QE.s 			page 5
+
+
+ 111 001e 03FB00F0 		mul	r0, r3, r0
+ 112              	.LVL1:
+  33:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     CPU_FREQ_Hz_ms = CPU_FREQ_Hz / 1000;
+ 113              		.loc 1 33 17 view .LVU21
+ 114 0022 0B4B     		ldr	r3, .L7+12
+ 115 0024 1860     		str	r0, [r3]
+  34:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     CPU_FREQ_Hz_us = CPU_FREQ_Hz / 1000000;
+ 116              		.loc 1 34 5 is_stmt 1 view .LVU22
+  34:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     CPU_FREQ_Hz_us = CPU_FREQ_Hz / 1000000;
+ 117              		.loc 1 34 34 is_stmt 0 view .LVU23
+ 118 0026 0B4B     		ldr	r3, .L7+16
+ 119 0028 A3FB0023 		umull	r2, r3, r3, r0
+ 120 002c 9B09     		lsrs	r3, r3, #6
+  34:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     CPU_FREQ_Hz_us = CPU_FREQ_Hz / 1000000;
+ 121              		.loc 1 34 20 view .LVU24
+ 122 002e 0A4A     		ldr	r2, .L7+20
+ 123 0030 1360     		str	r3, [r2]
+  35:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     CYCCNT_RountCount = 0;
+ 124              		.loc 1 35 5 is_stmt 1 view .LVU25
+  35:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     CYCCNT_RountCount = 0;
+ 125              		.loc 1 35 34 is_stmt 0 view .LVU26
+ 126 0032 0A4B     		ldr	r3, .L7+24
+ 127 0034 A3FB0030 		umull	r3, r0, r3, r0
+ 128 0038 800C     		lsrs	r0, r0, #18
+  35:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     CYCCNT_RountCount = 0;
+ 129              		.loc 1 35 20 view .LVU27
+ 130 003a 094B     		ldr	r3, .L7+28
+ 131 003c 1860     		str	r0, [r3]
+  36:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** }
+ 132              		.loc 1 36 5 is_stmt 1 view .LVU28
+  36:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** }
+ 133              		.loc 1 36 23 is_stmt 0 view .LVU29
+ 134 003e 094B     		ldr	r3, .L7+32
+ 135 0040 1960     		str	r1, [r3]
+  37:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** 
+ 136              		.loc 1 37 1 view .LVU30
+ 137 0042 7047     		bx	lr
+ 138              	.L8:
+ 139              		.align	2
+ 140              	.L7:
+ 141 0044 00ED00E0 		.word	-536810240
+ 142 0048 001000E0 		.word	-536866816
+ 143 004c 40420F00 		.word	1000000
+ 144 0050 00000000 		.word	.LANCHOR2
+ 145 0054 D34D6210 		.word	274877907
+ 146 0058 00000000 		.word	.LANCHOR3
+ 147 005c 83DE1B43 		.word	1125899907
+ 148 0060 00000000 		.word	.LANCHOR4
+ 149 0064 00000000 		.word	.LANCHOR1
+ 150              		.cfi_endproc
+ 151              	.LFE130:
+ 153              		.section	.text.DWT_GetDeltaT,"ax",%progbits
+ 154              		.align	1
+ 155              		.global	DWT_GetDeltaT
+ 156              		.syntax unified
+ 157              		.thumb
+ 158              		.thumb_func
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccM1O0QE.s 			page 6
+
+
+ 160              	DWT_GetDeltaT:
+ 161              	.LVL2:
+ 162              	.LFB131:
+  40:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     volatile uint32_t cnt_now = DWT->CYCCNT;
+ 163              		.loc 1 40 1 is_stmt 1 view -0
+ 164              		.cfi_startproc
+ 165              		@ args = 0, pretend = 0, frame = 8
+ 166              		@ frame_needed = 0, uses_anonymous_args = 0
+  40:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     volatile uint32_t cnt_now = DWT->CYCCNT;
+ 167              		.loc 1 40 1 is_stmt 0 view .LVU32
+ 168 0000 00B5     		push	{lr}
+ 169              	.LCFI2:
+ 170              		.cfi_def_cfa_offset 4
+ 171              		.cfi_offset 14, -4
+ 172 0002 2DED028B 		vpush.64	{d8}
+ 173              	.LCFI3:
+ 174              		.cfi_def_cfa_offset 12
+ 175              		.cfi_offset 80, -12
+ 176              		.cfi_offset 81, -8
+ 177 0006 83B0     		sub	sp, sp, #12
+ 178              	.LCFI4:
+ 179              		.cfi_def_cfa_offset 24
+  41:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     float dt = ((uint32_t)(cnt_now - *cnt_last)) / ((float)(CPU_FREQ_Hz));
+ 180              		.loc 1 41 5 is_stmt 1 view .LVU33
+  41:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     float dt = ((uint32_t)(cnt_now - *cnt_last)) / ((float)(CPU_FREQ_Hz));
+ 181              		.loc 1 41 36 is_stmt 0 view .LVU34
+ 182 0008 0D4B     		ldr	r3, .L11
+ 183 000a 5B68     		ldr	r3, [r3, #4]
+  41:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     float dt = ((uint32_t)(cnt_now - *cnt_last)) / ((float)(CPU_FREQ_Hz));
+ 184              		.loc 1 41 23 view .LVU35
+ 185 000c 0193     		str	r3, [sp, #4]
+  42:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     *cnt_last = cnt_now;
+ 186              		.loc 1 42 5 is_stmt 1 view .LVU36
+  42:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     *cnt_last = cnt_now;
+ 187              		.loc 1 42 17 is_stmt 0 view .LVU37
+ 188 000e 019B     		ldr	r3, [sp, #4]
+  42:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     *cnt_last = cnt_now;
+ 189              		.loc 1 42 38 view .LVU38
+ 190 0010 0268     		ldr	r2, [r0]
+  42:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     *cnt_last = cnt_now;
+ 191              		.loc 1 42 17 view .LVU39
+ 192 0012 9B1A     		subs	r3, r3, r2
+  42:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     *cnt_last = cnt_now;
+ 193              		.loc 1 42 50 view .LVU40
+ 194 0014 07EE903A 		vmov	s15, r3	@ int
+ 195 0018 F8EE677A 		vcvt.f32.u32	s15, s15
+  42:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     *cnt_last = cnt_now;
+ 196              		.loc 1 42 53 view .LVU41
+ 197 001c 094B     		ldr	r3, .L11+4
+ 198 001e 93ED007A 		vldr.32	s14, [r3]	@ int
+ 199 0022 B8EE477A 		vcvt.f32.u32	s14, s14
+  42:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     *cnt_last = cnt_now;
+ 200              		.loc 1 42 11 view .LVU42
+ 201 0026 87EE878A 		vdiv.f32	s16, s15, s14
+ 202              	.LVL3:
+  43:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** 
+ 203              		.loc 1 43 5 is_stmt 1 view .LVU43
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccM1O0QE.s 			page 7
+
+
+  43:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** 
+ 204              		.loc 1 43 15 is_stmt 0 view .LVU44
+ 205 002a 019B     		ldr	r3, [sp, #4]
+ 206 002c 0360     		str	r3, [r0]
+  45:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** 
+ 207              		.loc 1 45 5 is_stmt 1 view .LVU45
+ 208 002e FFF7FEFF 		bl	DWT_CNT_Update
+ 209              	.LVL4:
+  47:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** }
+ 210              		.loc 1 47 5 view .LVU46
+  48:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** 
+ 211              		.loc 1 48 1 is_stmt 0 view .LVU47
+ 212 0032 B0EE480A 		vmov.f32	s0, s16
+ 213 0036 03B0     		add	sp, sp, #12
+ 214              	.LCFI5:
+ 215              		.cfi_def_cfa_offset 12
+ 216              		@ sp needed
+ 217 0038 BDEC028B 		vldm	sp!, {d8}
+ 218              	.LCFI6:
+ 219              		.cfi_restore 80
+ 220              		.cfi_restore 81
+ 221              		.cfi_def_cfa_offset 4
+ 222              	.LVL5:
+  48:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** 
+ 223              		.loc 1 48 1 view .LVU48
+ 224 003c 5DF804FB 		ldr	pc, [sp], #4
+ 225              	.L12:
+ 226              		.align	2
+ 227              	.L11:
+ 228 0040 001000E0 		.word	-536866816
+ 229 0044 00000000 		.word	.LANCHOR2
+ 230              		.cfi_endproc
+ 231              	.LFE131:
+ 233              		.global	__aeabi_ui2d
+ 234              		.global	__aeabi_ddiv
+ 235              		.section	.text.DWT_GetDeltaT64,"ax",%progbits
+ 236              		.align	1
+ 237              		.global	DWT_GetDeltaT64
+ 238              		.syntax unified
+ 239              		.thumb
+ 240              		.thumb_func
+ 242              	DWT_GetDeltaT64:
+ 243              	.LVL6:
+ 244              	.LFB132:
+  51:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     volatile uint32_t cnt_now = DWT->CYCCNT;
+ 245              		.loc 1 51 1 is_stmt 1 view -0
+ 246              		.cfi_startproc
+ 247              		@ args = 0, pretend = 0, frame = 8
+ 248              		@ frame_needed = 0, uses_anonymous_args = 0
+  51:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     volatile uint32_t cnt_now = DWT->CYCCNT;
+ 249              		.loc 1 51 1 is_stmt 0 view .LVU50
+ 250 0000 D0B5     		push	{r4, r6, r7, lr}
+ 251              	.LCFI7:
+ 252              		.cfi_def_cfa_offset 16
+ 253              		.cfi_offset 4, -16
+ 254              		.cfi_offset 6, -12
+ 255              		.cfi_offset 7, -8
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccM1O0QE.s 			page 8
+
+
+ 256              		.cfi_offset 14, -4
+ 257 0002 2DED028B 		vpush.64	{d8}
+ 258              	.LCFI8:
+ 259              		.cfi_def_cfa_offset 24
+ 260              		.cfi_offset 80, -24
+ 261              		.cfi_offset 81, -20
+ 262 0006 82B0     		sub	sp, sp, #8
+ 263              	.LCFI9:
+ 264              		.cfi_def_cfa_offset 32
+ 265 0008 0446     		mov	r4, r0
+  52:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     double dt = ((uint32_t)(cnt_now - *cnt_last)) / ((double)(CPU_FREQ_Hz));
+ 266              		.loc 1 52 5 is_stmt 1 view .LVU51
+  52:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     double dt = ((uint32_t)(cnt_now - *cnt_last)) / ((double)(CPU_FREQ_Hz));
+ 267              		.loc 1 52 36 is_stmt 0 view .LVU52
+ 268 000a 114B     		ldr	r3, .L15
+ 269 000c 5B68     		ldr	r3, [r3, #4]
+  52:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     double dt = ((uint32_t)(cnt_now - *cnt_last)) / ((double)(CPU_FREQ_Hz));
+ 270              		.loc 1 52 23 view .LVU53
+ 271 000e 0193     		str	r3, [sp, #4]
+  53:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     *cnt_last = cnt_now;
+ 272              		.loc 1 53 5 is_stmt 1 view .LVU54
+  53:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     *cnt_last = cnt_now;
+ 273              		.loc 1 53 18 is_stmt 0 view .LVU55
+ 274 0010 0198     		ldr	r0, [sp, #4]
+ 275              	.LVL7:
+  53:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     *cnt_last = cnt_now;
+ 276              		.loc 1 53 39 view .LVU56
+ 277 0012 2368     		ldr	r3, [r4]
+  53:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     *cnt_last = cnt_now;
+ 278              		.loc 1 53 51 view .LVU57
+ 279 0014 C01A     		subs	r0, r0, r3
+ 280 0016 FFF7FEFF 		bl	__aeabi_ui2d
+ 281              	.LVL8:
+ 282 001a 0646     		mov	r6, r0
+ 283 001c 0F46     		mov	r7, r1
+  53:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     *cnt_last = cnt_now;
+ 284              		.loc 1 53 54 view .LVU58
+ 285 001e 0D4B     		ldr	r3, .L15+4
+ 286 0020 1868     		ldr	r0, [r3]
+ 287 0022 FFF7FEFF 		bl	__aeabi_ui2d
+ 288              	.LVL9:
+ 289 0026 0246     		mov	r2, r0
+ 290 0028 0B46     		mov	r3, r1
+  53:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     *cnt_last = cnt_now;
+ 291              		.loc 1 53 12 view .LVU59
+ 292 002a 3046     		mov	r0, r6
+ 293 002c 3946     		mov	r1, r7
+ 294 002e FFF7FEFF 		bl	__aeabi_ddiv
+ 295              	.LVL10:
+ 296 0032 41EC180B 		vmov	d8, r0, r1
+ 297              	.LVL11:
+  54:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** 
+ 298              		.loc 1 54 5 is_stmt 1 view .LVU60
+  54:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** 
+ 299              		.loc 1 54 15 is_stmt 0 view .LVU61
+ 300 0036 019B     		ldr	r3, [sp, #4]
+ 301 0038 2360     		str	r3, [r4]
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccM1O0QE.s 			page 9
+
+
+  56:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** 
+ 302              		.loc 1 56 5 is_stmt 1 view .LVU62
+ 303 003a FFF7FEFF 		bl	DWT_CNT_Update
+ 304              	.LVL12:
+  58:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** }
+ 305              		.loc 1 58 5 view .LVU63
+  59:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** 
+ 306              		.loc 1 59 1 is_stmt 0 view .LVU64
+ 307 003e B0EE480A 		vmov.f32	s0, s16
+ 308 0042 F0EE680A 		vmov.f32	s1, s17
+ 309 0046 02B0     		add	sp, sp, #8
+ 310              	.LCFI10:
+ 311              		.cfi_def_cfa_offset 24
+ 312              		@ sp needed
+ 313 0048 BDEC028B 		vldm	sp!, {d8}
+ 314              	.LCFI11:
+ 315              		.cfi_restore 80
+ 316              		.cfi_restore 81
+ 317              		.cfi_def_cfa_offset 16
+ 318              	.LVL13:
+  59:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** 
+ 319              		.loc 1 59 1 view .LVU65
+ 320 004c D0BD     		pop	{r4, r6, r7, pc}
+ 321              	.LVL14:
+ 322              	.L16:
+  59:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** 
+ 323              		.loc 1 59 1 view .LVU66
+ 324 004e 00BF     		.align	2
+ 325              	.L15:
+ 326 0050 001000E0 		.word	-536866816
+ 327 0054 00000000 		.word	.LANCHOR2
+ 328              		.cfi_endproc
+ 329              	.LFE132:
+ 331              		.global	__aeabi_uldivmod
+ 332              		.section	.text.DWT_SysTimeUpdate,"ax",%progbits
+ 333              		.align	1
+ 334              		.global	DWT_SysTimeUpdate
+ 335              		.syntax unified
+ 336              		.thumb
+ 337              		.thumb_func
+ 339              	DWT_SysTimeUpdate:
+ 340              	.LFB133:
+  62:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     volatile uint32_t cnt_now = DWT->CYCCNT;
+ 341              		.loc 1 62 1 is_stmt 1 view -0
+ 342              		.cfi_startproc
+ 343              		@ args = 0, pretend = 0, frame = 8
+ 344              		@ frame_needed = 0, uses_anonymous_args = 0
+ 345 0000 2DE9F041 		push	{r4, r5, r6, r7, r8, lr}
+ 346              	.LCFI12:
+ 347              		.cfi_def_cfa_offset 24
+ 348              		.cfi_offset 4, -24
+ 349              		.cfi_offset 5, -20
+ 350              		.cfi_offset 6, -16
+ 351              		.cfi_offset 7, -12
+ 352              		.cfi_offset 8, -8
+ 353              		.cfi_offset 14, -4
+ 354 0004 82B0     		sub	sp, sp, #8
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccM1O0QE.s 			page 10
+
+
+ 355              	.LCFI13:
+ 356              		.cfi_def_cfa_offset 32
+  63:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     static uint64_t CNT_TEMP1, CNT_TEMP2, CNT_TEMP3;
+ 357              		.loc 1 63 5 view .LVU68
+  63:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     static uint64_t CNT_TEMP1, CNT_TEMP2, CNT_TEMP3;
+ 358              		.loc 1 63 36 is_stmt 0 view .LVU69
+ 359 0006 274B     		ldr	r3, .L19
+ 360 0008 5B68     		ldr	r3, [r3, #4]
+  63:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     static uint64_t CNT_TEMP1, CNT_TEMP2, CNT_TEMP3;
+ 361              		.loc 1 63 23 view .LVU70
+ 362 000a 0193     		str	r3, [sp, #4]
+  64:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** 
+ 363              		.loc 1 64 5 is_stmt 1 view .LVU71
+  66:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** 
+ 364              		.loc 1 66 5 view .LVU72
+ 365 000c FFF7FEFF 		bl	DWT_CNT_Update
+ 366              	.LVL15:
+  68:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     CNT_TEMP1 = CYCCNT64 / CPU_FREQ_Hz;
+ 367              		.loc 1 68 5 view .LVU73
+  68:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     CNT_TEMP1 = CYCCNT64 / CPU_FREQ_Hz;
+ 368              		.loc 1 68 16 is_stmt 0 view .LVU74
+ 369 0010 254B     		ldr	r3, .L19+4
+ 370 0012 1C68     		ldr	r4, [r3]
+ 371 0014 0026     		movs	r6, #0
+  68:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     CNT_TEMP1 = CYCCNT64 / CPU_FREQ_Hz;
+ 372              		.loc 1 68 44 view .LVU75
+ 373 0016 6508     		lsrs	r5, r4, #1
+ 374 0018 E307     		lsls	r3, r4, #31
+ 375 001a 1B1B     		subs	r3, r3, r4
+ 376 001c 65F10005 		sbc	r5, r5, #0
+ 377 0020 DB18     		adds	r3, r3, r3
+ 378 0022 6D41     		adcs	r5, r5, r5
+ 379 0024 1C19     		adds	r4, r3, r4
+ 380 0026 45F10005 		adc	r5, r5, #0
+  68:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     CNT_TEMP1 = CYCCNT64 / CPU_FREQ_Hz;
+ 381              		.loc 1 68 69 view .LVU76
+ 382 002a 019B     		ldr	r3, [sp, #4]
+  68:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     CNT_TEMP1 = CYCCNT64 / CPU_FREQ_Hz;
+ 383              		.loc 1 68 67 view .LVU77
+ 384 002c E418     		adds	r4, r4, r3
+ 385 002e 45F10007 		adc	r7, r5, #0
+  68:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     CNT_TEMP1 = CYCCNT64 / CPU_FREQ_Hz;
+ 386              		.loc 1 68 14 view .LVU78
+ 387 0032 1E4B     		ldr	r3, .L19+8
+ 388 0034 1C60     		str	r4, [r3]
+ 389 0036 5F60     		str	r7, [r3, #4]
+  69:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     CNT_TEMP2 = CYCCNT64 - CNT_TEMP1 * CPU_FREQ_Hz;
+ 390              		.loc 1 69 5 is_stmt 1 view .LVU79
+  69:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     CNT_TEMP2 = CYCCNT64 - CNT_TEMP1 * CPU_FREQ_Hz;
+ 391              		.loc 1 69 26 is_stmt 0 view .LVU80
+ 392 0038 1D4B     		ldr	r3, .L19+12
+ 393 003a 1D68     		ldr	r5, [r3]
+ 394 003c 2A46     		mov	r2, r5
+ 395 003e 3346     		mov	r3, r6
+ 396 0040 2046     		mov	r0, r4
+ 397 0042 3946     		mov	r1, r7
+ 398 0044 FFF7FEFF 		bl	__aeabi_uldivmod
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccM1O0QE.s 			page 11
+
+
+ 399              	.LVL16:
+  69:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     CNT_TEMP2 = CYCCNT64 - CNT_TEMP1 * CPU_FREQ_Hz;
+ 400              		.loc 1 69 15 view .LVU81
+ 401 0048 1A4A     		ldr	r2, .L19+16
+ 402 004a 1060     		str	r0, [r2]
+ 403 004c 5160     		str	r1, [r2, #4]
+  70:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     SysTime.s = CNT_TEMP1;
+ 404              		.loc 1 70 5 is_stmt 1 view .LVU82
+  70:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     SysTime.s = CNT_TEMP1;
+ 405              		.loc 1 70 38 is_stmt 0 view .LVU83
+ 406 004e A5FB0032 		umull	r3, r2, r5, r0
+ 407 0052 05FB0125 		mla	r5, r5, r1, r2
+  70:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     SysTime.s = CNT_TEMP1;
+ 408              		.loc 1 70 26 view .LVU84
+ 409 0056 E41A     		subs	r4, r4, r3
+ 410 0058 67EB0505 		sbc	r5, r7, r5
+  70:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     SysTime.s = CNT_TEMP1;
+ 411              		.loc 1 70 15 view .LVU85
+ 412 005c 164B     		ldr	r3, .L19+20
+ 413 005e 1C60     		str	r4, [r3]
+ 414 0060 5D60     		str	r5, [r3, #4]
+  71:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     SysTime.ms = CNT_TEMP2 / CPU_FREQ_Hz_ms;
+ 415              		.loc 1 71 5 is_stmt 1 view .LVU86
+  71:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     SysTime.ms = CNT_TEMP2 / CPU_FREQ_Hz_ms;
+ 416              		.loc 1 71 15 is_stmt 0 view .LVU87
+ 417 0062 DFF86480 		ldr	r8, .L19+36
+ 418 0066 C8F80000 		str	r0, [r8]
+  72:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     CNT_TEMP3 = CNT_TEMP2 - SysTime.ms * CPU_FREQ_Hz_ms;
+ 419              		.loc 1 72 5 is_stmt 1 view .LVU88
+  72:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     CNT_TEMP3 = CNT_TEMP2 - SysTime.ms * CPU_FREQ_Hz_ms;
+ 420              		.loc 1 72 28 is_stmt 0 view .LVU89
+ 421 006a 144B     		ldr	r3, .L19+24
+ 422 006c 1F68     		ldr	r7, [r3]
+ 423 006e 3A46     		mov	r2, r7
+ 424 0070 3346     		mov	r3, r6
+ 425 0072 2046     		mov	r0, r4
+ 426 0074 2946     		mov	r1, r5
+ 427 0076 FFF7FEFF 		bl	__aeabi_uldivmod
+ 428              	.LVL17:
+  72:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     CNT_TEMP3 = CNT_TEMP2 - SysTime.ms * CPU_FREQ_Hz_ms;
+ 429              		.loc 1 72 16 view .LVU90
+ 430 007a 80B2     		uxth	r0, r0
+ 431 007c A8F80400 		strh	r0, [r8, #4]	@ movhi
+  73:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     SysTime.us = CNT_TEMP3 / CPU_FREQ_Hz_us;
+ 432              		.loc 1 73 5 is_stmt 1 view .LVU91
+  73:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     SysTime.us = CNT_TEMP3 / CPU_FREQ_Hz_us;
+ 433              		.loc 1 73 40 is_stmt 0 view .LVU92
+ 434 0080 07FB00F0 		mul	r0, r7, r0
+  73:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     SysTime.us = CNT_TEMP3 / CPU_FREQ_Hz_us;
+ 435              		.loc 1 73 27 view .LVU93
+ 436 0084 201A     		subs	r0, r4, r0
+ 437 0086 65F10001 		sbc	r1, r5, #0
+  73:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     SysTime.us = CNT_TEMP3 / CPU_FREQ_Hz_us;
+ 438              		.loc 1 73 15 view .LVU94
+ 439 008a 0D4B     		ldr	r3, .L19+28
+ 440 008c 1860     		str	r0, [r3]
+ 441 008e 5960     		str	r1, [r3, #4]
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccM1O0QE.s 			page 12
+
+
+  74:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** }
+ 442              		.loc 1 74 5 is_stmt 1 view .LVU95
+  74:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** }
+ 443              		.loc 1 74 28 is_stmt 0 view .LVU96
+ 444 0090 0C4B     		ldr	r3, .L19+32
+ 445 0092 1A68     		ldr	r2, [r3]
+ 446 0094 3346     		mov	r3, r6
+ 447 0096 FFF7FEFF 		bl	__aeabi_uldivmod
+ 448              	.LVL18:
+  74:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** }
+ 449              		.loc 1 74 16 view .LVU97
+ 450 009a A8F80600 		strh	r0, [r8, #6]	@ movhi
+  75:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** 
+ 451              		.loc 1 75 1 view .LVU98
+ 452 009e 02B0     		add	sp, sp, #8
+ 453              	.LCFI14:
+ 454              		.cfi_def_cfa_offset 24
+ 455              		@ sp needed
+ 456 00a0 BDE8F081 		pop	{r4, r5, r6, r7, r8, pc}
+ 457              	.L20:
+ 458              		.align	2
+ 459              	.L19:
+ 460 00a4 001000E0 		.word	-536866816
+ 461 00a8 00000000 		.word	.LANCHOR1
+ 462 00ac 00000000 		.word	.LANCHOR5
+ 463 00b0 00000000 		.word	.LANCHOR2
+ 464 00b4 00000000 		.word	.LANCHOR6
+ 465 00b8 00000000 		.word	.LANCHOR7
+ 466 00bc 00000000 		.word	.LANCHOR3
+ 467 00c0 00000000 		.word	.LANCHOR9
+ 468 00c4 00000000 		.word	.LANCHOR4
+ 469 00c8 00000000 		.word	.LANCHOR8
+ 470              		.cfi_endproc
+ 471              	.LFE133:
+ 473              		.section	.text.DWT_GetTimeline_s,"ax",%progbits
+ 474              		.align	1
+ 475              		.global	DWT_GetTimeline_s
+ 476              		.syntax unified
+ 477              		.thumb
+ 478              		.thumb_func
+ 480              	DWT_GetTimeline_s:
+ 481              	.LFB134:
+  78:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     DWT_SysTimeUpdate();
+ 482              		.loc 1 78 1 is_stmt 1 view -0
+ 483              		.cfi_startproc
+ 484              		@ args = 0, pretend = 0, frame = 0
+ 485              		@ frame_needed = 0, uses_anonymous_args = 0
+ 486 0000 08B5     		push	{r3, lr}
+ 487              	.LCFI15:
+ 488              		.cfi_def_cfa_offset 8
+ 489              		.cfi_offset 3, -8
+ 490              		.cfi_offset 14, -4
+  79:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** 
+ 491              		.loc 1 79 5 view .LVU100
+ 492 0002 FFF7FEFF 		bl	DWT_SysTimeUpdate
+ 493              	.LVL19:
+  81:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** 
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccM1O0QE.s 			page 13
+
+
+ 494              		.loc 1 81 5 view .LVU101
+  81:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** 
+ 495              		.loc 1 81 36 is_stmt 0 view .LVU102
+ 496 0006 0E4B     		ldr	r3, .L23
+  81:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** 
+ 497              		.loc 1 81 48 view .LVU103
+ 498 0008 9A88     		ldrh	r2, [r3, #4]
+ 499 000a 00EE102A 		vmov	s0, r2	@ int
+  81:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** 
+ 500              		.loc 1 81 52 view .LVU104
+ 501 000e B8EEC00A 		vcvt.f32.s32	s0, s0
+ 502 0012 DFED0C7A 		vldr.32	s15, .L23+4
+ 503 0016 60EE277A 		vmul.f32	s15, s0, s15
+  81:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** 
+ 504              		.loc 1 81 39 view .LVU105
+ 505 001a 93ED007A 		vldr.32	s14, [r3]	@ int
+ 506 001e B8EE470A 		vcvt.f32.u32	s0, s14
+ 507 0022 30EE270A 		vadd.f32	s0, s0, s15
+  81:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** 
+ 508              		.loc 1 81 70 view .LVU106
+ 509 0026 DB88     		ldrh	r3, [r3, #6]
+ 510 0028 07EE903A 		vmov	s15, r3	@ int
+  81:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** 
+ 511              		.loc 1 81 74 view .LVU107
+ 512 002c F8EEE77A 		vcvt.f32.s32	s15, s15
+ 513 0030 9FED057A 		vldr.32	s14, .L23+8
+ 514 0034 67EE877A 		vmul.f32	s15, s15, s14
+ 515              	.LVL20:
+  83:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** }
+ 516              		.loc 1 83 5 is_stmt 1 view .LVU108
+  84:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** 
+ 517              		.loc 1 84 1 is_stmt 0 view .LVU109
+ 518 0038 30EE270A 		vadd.f32	s0, s0, s15
+ 519              	.LVL21:
+  84:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** 
+ 520              		.loc 1 84 1 view .LVU110
+ 521 003c 08BD     		pop	{r3, pc}
+ 522              	.L24:
+ 523 003e 00BF     		.align	2
+ 524              	.L23:
+ 525 0040 00000000 		.word	.LANCHOR8
+ 526 0044 6F12833A 		.word	981668463
+ 527 0048 BD378635 		.word	897988541
+ 528              		.cfi_endproc
+ 529              	.LFE134:
+ 531              		.section	.text.DWT_GetTimeline_ms,"ax",%progbits
+ 532              		.align	1
+ 533              		.global	DWT_GetTimeline_ms
+ 534              		.syntax unified
+ 535              		.thumb
+ 536              		.thumb_func
+ 538              	DWT_GetTimeline_ms:
+ 539              	.LFB135:
+  87:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     DWT_SysTimeUpdate();
+ 540              		.loc 1 87 1 is_stmt 1 view -0
+ 541              		.cfi_startproc
+ 542              		@ args = 0, pretend = 0, frame = 0
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccM1O0QE.s 			page 14
+
+
+ 543              		@ frame_needed = 0, uses_anonymous_args = 0
+ 544 0000 08B5     		push	{r3, lr}
+ 545              	.LCFI16:
+ 546              		.cfi_def_cfa_offset 8
+ 547              		.cfi_offset 3, -8
+ 548              		.cfi_offset 14, -4
+  88:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** 
+ 549              		.loc 1 88 5 view .LVU112
+ 550 0002 FFF7FEFF 		bl	DWT_SysTimeUpdate
+ 551              	.LVL22:
+  90:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** 
+ 552              		.loc 1 90 5 view .LVU113
+  90:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** 
+ 553              		.loc 1 90 36 is_stmt 0 view .LVU114
+ 554 0006 0B4A     		ldr	r2, .L27
+ 555 0008 1168     		ldr	r1, [r2]
+  90:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** 
+ 556              		.loc 1 90 55 view .LVU115
+ 557 000a 9388     		ldrh	r3, [r2, #4]
+  90:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** 
+ 558              		.loc 1 90 46 view .LVU116
+ 559 000c 4FF47A70 		mov	r0, #1000
+ 560 0010 00FB0133 		mla	r3, r0, r1, r3
+ 561 0014 00EE103A 		vmov	s0, r3	@ int
+  90:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** 
+ 562              		.loc 1 90 59 view .LVU117
+ 563 0018 B8EE400A 		vcvt.f32.u32	s0, s0
+  90:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** 
+ 564              		.loc 1 90 68 view .LVU118
+ 565 001c D388     		ldrh	r3, [r2, #6]
+ 566 001e 07EE903A 		vmov	s15, r3	@ int
+  90:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** 
+ 567              		.loc 1 90 72 view .LVU119
+ 568 0022 F8EEE77A 		vcvt.f32.s32	s15, s15
+ 569 0026 9FED047A 		vldr.32	s14, .L27+4
+ 570 002a 67EE877A 		vmul.f32	s15, s15, s14
+ 571              	.LVL23:
+  92:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** }
+ 572              		.loc 1 92 5 is_stmt 1 view .LVU120
+  93:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** 
+ 573              		.loc 1 93 1 is_stmt 0 view .LVU121
+ 574 002e 30EE270A 		vadd.f32	s0, s0, s15
+ 575              	.LVL24:
+  93:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** 
+ 576              		.loc 1 93 1 view .LVU122
+ 577 0032 08BD     		pop	{r3, pc}
+ 578              	.L28:
+ 579              		.align	2
+ 580              	.L27:
+ 581 0034 00000000 		.word	.LANCHOR8
+ 582 0038 6F12833A 		.word	981668463
+ 583              		.cfi_endproc
+ 584              	.LFE135:
+ 586              		.section	.text.DWT_GetTimeline_us,"ax",%progbits
+ 587              		.align	1
+ 588              		.global	DWT_GetTimeline_us
+ 589              		.syntax unified
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccM1O0QE.s 			page 15
+
+
+ 590              		.thumb
+ 591              		.thumb_func
+ 593              	DWT_GetTimeline_us:
+ 594              	.LFB136:
+  96:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     DWT_SysTimeUpdate();
+ 595              		.loc 1 96 1 is_stmt 1 view -0
+ 596              		.cfi_startproc
+ 597              		@ args = 0, pretend = 0, frame = 0
+ 598              		@ frame_needed = 0, uses_anonymous_args = 0
+ 599 0000 08B5     		push	{r3, lr}
+ 600              	.LCFI17:
+ 601              		.cfi_def_cfa_offset 8
+ 602              		.cfi_offset 3, -8
+ 603              		.cfi_offset 14, -4
+  97:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** 
+ 604              		.loc 1 97 5 view .LVU124
+ 605 0002 FFF7FEFF 		bl	DWT_SysTimeUpdate
+ 606              	.LVL25:
+  99:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** 
+ 607              		.loc 1 99 5 view .LVU125
+  99:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** 
+ 608              		.loc 1 99 39 is_stmt 0 view .LVU126
+ 609 0006 074A     		ldr	r2, .L31
+ 610 0008 1068     		ldr	r0, [r2]
+  99:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** 
+ 611              		.loc 1 99 61 view .LVU127
+ 612 000a 9388     		ldrh	r3, [r2, #4]
+  99:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** 
+ 613              		.loc 1 99 65 view .LVU128
+ 614 000c 4FF47A71 		mov	r1, #1000
+ 615 0010 01FB03F3 		mul	r3, r1, r3
+  99:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** 
+ 616              		.loc 1 99 52 view .LVU129
+ 617 0014 0449     		ldr	r1, .L31+4
+ 618 0016 01FB0033 		mla	r3, r1, r0, r3
+  99:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** 
+ 619              		.loc 1 99 81 view .LVU130
+ 620 001a D088     		ldrh	r0, [r2, #6]
+ 621              	.LVL26:
+ 101:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** }
+ 622              		.loc 1 101 5 is_stmt 1 view .LVU131
+ 102:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** 
+ 623              		.loc 1 102 1 is_stmt 0 view .LVU132
+ 624 001c 1844     		add	r0, r0, r3
+ 625              	.LVL27:
+ 102:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** 
+ 626              		.loc 1 102 1 view .LVU133
+ 627 001e 0021     		movs	r1, #0
+ 628 0020 08BD     		pop	{r3, pc}
+ 629              	.L32:
+ 630 0022 00BF     		.align	2
+ 631              	.L31:
+ 632 0024 00000000 		.word	.LANCHOR8
+ 633 0028 40420F00 		.word	1000000
+ 634              		.cfi_endproc
+ 635              	.LFE136:
+ 637              		.section	.text.DWT_Delay,"ax",%progbits
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccM1O0QE.s 			page 16
+
+
+ 638              		.align	1
+ 639              		.global	DWT_Delay
+ 640              		.syntax unified
+ 641              		.thumb
+ 642              		.thumb_func
+ 644              	DWT_Delay:
+ 645              	.LVL28:
+ 646              	.LFB138:
+ 113:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** 
+ 114:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** void DWT_Delay(float Delay)
+ 115:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** {
+ 647              		.loc 1 115 1 is_stmt 1 view -0
+ 648              		.cfi_startproc
+ 649              		@ args = 0, pretend = 0, frame = 0
+ 650              		@ frame_needed = 0, uses_anonymous_args = 0
+ 651              		@ link register save eliminated.
+ 116:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     uint32_t tickstart = DWT->CYCCNT;
+ 652              		.loc 1 116 5 view .LVU135
+ 653              		.loc 1 116 14 is_stmt 0 view .LVU136
+ 654 0000 0A4B     		ldr	r3, .L35
+ 655 0002 5A68     		ldr	r2, [r3, #4]
+ 656              	.LVL29:
+ 117:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     float wait = Delay;
+ 657              		.loc 1 117 5 is_stmt 1 view .LVU137
+ 118:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** 
+ 119:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     while ((DWT->CYCCNT - tickstart) < wait * (float)CPU_FREQ_Hz)
+ 658              		.loc 1 119 5 view .LVU138
+ 659              	.L34:
+ 120:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     {
+ 121:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     }
+ 660              		.loc 1 121 5 discriminator 1 view .LVU139
+ 119:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     {
+ 661              		.loc 1 119 11 discriminator 1 view .LVU140
+ 119:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     {
+ 662              		.loc 1 119 16 is_stmt 0 discriminator 1 view .LVU141
+ 663 0004 094B     		ldr	r3, .L35
+ 664 0006 5B68     		ldr	r3, [r3, #4]
+ 119:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     {
+ 665              		.loc 1 119 25 discriminator 1 view .LVU142
+ 666 0008 9B1A     		subs	r3, r3, r2
+ 119:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     {
+ 667              		.loc 1 119 38 discriminator 1 view .LVU143
+ 668 000a 07EE903A 		vmov	s15, r3	@ int
+ 669 000e B8EE677A 		vcvt.f32.u32	s14, s15
+ 119:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     {
+ 670              		.loc 1 119 47 discriminator 1 view .LVU144
+ 671 0012 074B     		ldr	r3, .L35+4
+ 672 0014 D3ED007A 		vldr.32	s15, [r3]	@ int
+ 673 0018 F8EE677A 		vcvt.f32.u32	s15, s15
+ 119:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     {
+ 674              		.loc 1 119 45 discriminator 1 view .LVU145
+ 675 001c 67EE807A 		vmul.f32	s15, s15, s0
+ 119:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c ****     {
+ 676              		.loc 1 119 11 discriminator 1 view .LVU146
+ 677 0020 B4EEE77A 		vcmpe.f32	s14, s15
+ 678 0024 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 679 0028 ECD4     		bmi	.L34
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccM1O0QE.s 			page 17
+
+
+ 122:ACE-ECF/Application/src/IMU_Driver/bsp_dwt.c **** }
+ 680              		.loc 1 122 1 view .LVU147
+ 681 002a 7047     		bx	lr
+ 682              	.L36:
+ 683              		.align	2
+ 684              	.L35:
+ 685 002c 001000E0 		.word	-536866816
+ 686 0030 00000000 		.word	.LANCHOR2
+ 687              		.cfi_endproc
+ 688              	.LFE138:
+ 690              		.global	CYCCNT64
+ 691              		.global	SysTime
+ 692              		.section	.bss.CNT_TEMP1.2,"aw",%nobits
+ 693              		.align	3
+ 694              		.set	.LANCHOR6,. + 0
+ 697              	CNT_TEMP1.2:
+ 698 0000 00000000 		.space	8
+ 698      00000000 
+ 699              		.section	.bss.CNT_TEMP2.1,"aw",%nobits
+ 700              		.align	3
+ 701              		.set	.LANCHOR7,. + 0
+ 704              	CNT_TEMP2.1:
+ 705 0000 00000000 		.space	8
+ 705      00000000 
+ 706              		.section	.bss.CNT_TEMP3.0,"aw",%nobits
+ 707              		.align	3
+ 708              		.set	.LANCHOR9,. + 0
+ 711              	CNT_TEMP3.0:
+ 712 0000 00000000 		.space	8
+ 712      00000000 
+ 713              		.section	.bss.CPU_FREQ_Hz,"aw",%nobits
+ 714              		.align	2
+ 715              		.set	.LANCHOR2,. + 0
+ 718              	CPU_FREQ_Hz:
+ 719 0000 00000000 		.space	4
+ 720              		.section	.bss.CPU_FREQ_Hz_ms,"aw",%nobits
+ 721              		.align	2
+ 722              		.set	.LANCHOR3,. + 0
+ 725              	CPU_FREQ_Hz_ms:
+ 726 0000 00000000 		.space	4
+ 727              		.section	.bss.CPU_FREQ_Hz_us,"aw",%nobits
+ 728              		.align	2
+ 729              		.set	.LANCHOR4,. + 0
+ 732              	CPU_FREQ_Hz_us:
+ 733 0000 00000000 		.space	4
+ 734              		.section	.bss.CYCCNT64,"aw",%nobits
+ 735              		.align	3
+ 736              		.set	.LANCHOR5,. + 0
+ 739              	CYCCNT64:
+ 740 0000 00000000 		.space	8
+ 740      00000000 
+ 741              		.section	.bss.CYCCNT_LAST,"aw",%nobits
+ 742              		.align	2
+ 743              		.set	.LANCHOR0,. + 0
+ 746              	CYCCNT_LAST:
+ 747 0000 00000000 		.space	4
+ 748              		.section	.bss.CYCCNT_RountCount,"aw",%nobits
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccM1O0QE.s 			page 18
+
+
+ 749              		.align	2
+ 750              		.set	.LANCHOR1,. + 0
+ 753              	CYCCNT_RountCount:
+ 754 0000 00000000 		.space	4
+ 755              		.section	.bss.SysTime,"aw",%nobits
+ 756              		.align	2
+ 757              		.set	.LANCHOR8,. + 0
+ 760              	SysTime:
+ 761 0000 00000000 		.space	8
+ 761      00000000 
+ 762              		.text
+ 763              	.Letext0:
+ 764              		.file 2 "d:\\gcc-arm-none-eabi-10.3-2021.10\\arm-none-eabi\\include\\machine\\_default_types.h"
+ 765              		.file 3 "d:\\gcc-arm-none-eabi-10.3-2021.10\\arm-none-eabi\\include\\sys\\_stdint.h"
+ 766              		.file 4 "Drivers/CMSIS/Include/core_cm4.h"
+ 767              		.file 5 "ACE-ECF/Application/inc/IMU_Driver/bsp_dwt.h"
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccM1O0QE.s 			page 19
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 bsp_dwt.c
+C:\Users\28212\AppData\Local\Temp\ccM1O0QE.s:20     .text.DWT_CNT_Update:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccM1O0QE.s:25     .text.DWT_CNT_Update:00000000 DWT_CNT_Update
+C:\Users\28212\AppData\Local\Temp\ccM1O0QE.s:71     .text.DWT_CNT_Update:00000024 $d
+C:\Users\28212\AppData\Local\Temp\ccM1O0QE.s:78     .text.DWT_Init:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccM1O0QE.s:84     .text.DWT_Init:00000000 DWT_Init
+C:\Users\28212\AppData\Local\Temp\ccM1O0QE.s:141    .text.DWT_Init:00000044 $d
+C:\Users\28212\AppData\Local\Temp\ccM1O0QE.s:154    .text.DWT_GetDeltaT:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccM1O0QE.s:160    .text.DWT_GetDeltaT:00000000 DWT_GetDeltaT
+C:\Users\28212\AppData\Local\Temp\ccM1O0QE.s:228    .text.DWT_GetDeltaT:00000040 $d
+C:\Users\28212\AppData\Local\Temp\ccM1O0QE.s:236    .text.DWT_GetDeltaT64:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccM1O0QE.s:242    .text.DWT_GetDeltaT64:00000000 DWT_GetDeltaT64
+C:\Users\28212\AppData\Local\Temp\ccM1O0QE.s:326    .text.DWT_GetDeltaT64:00000050 $d
+C:\Users\28212\AppData\Local\Temp\ccM1O0QE.s:333    .text.DWT_SysTimeUpdate:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccM1O0QE.s:339    .text.DWT_SysTimeUpdate:00000000 DWT_SysTimeUpdate
+C:\Users\28212\AppData\Local\Temp\ccM1O0QE.s:460    .text.DWT_SysTimeUpdate:000000a4 $d
+C:\Users\28212\AppData\Local\Temp\ccM1O0QE.s:474    .text.DWT_GetTimeline_s:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccM1O0QE.s:480    .text.DWT_GetTimeline_s:00000000 DWT_GetTimeline_s
+C:\Users\28212\AppData\Local\Temp\ccM1O0QE.s:525    .text.DWT_GetTimeline_s:00000040 $d
+C:\Users\28212\AppData\Local\Temp\ccM1O0QE.s:532    .text.DWT_GetTimeline_ms:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccM1O0QE.s:538    .text.DWT_GetTimeline_ms:00000000 DWT_GetTimeline_ms
+C:\Users\28212\AppData\Local\Temp\ccM1O0QE.s:581    .text.DWT_GetTimeline_ms:00000034 $d
+C:\Users\28212\AppData\Local\Temp\ccM1O0QE.s:587    .text.DWT_GetTimeline_us:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccM1O0QE.s:593    .text.DWT_GetTimeline_us:00000000 DWT_GetTimeline_us
+C:\Users\28212\AppData\Local\Temp\ccM1O0QE.s:632    .text.DWT_GetTimeline_us:00000024 $d
+C:\Users\28212\AppData\Local\Temp\ccM1O0QE.s:638    .text.DWT_Delay:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccM1O0QE.s:644    .text.DWT_Delay:00000000 DWT_Delay
+C:\Users\28212\AppData\Local\Temp\ccM1O0QE.s:685    .text.DWT_Delay:0000002c $d
+C:\Users\28212\AppData\Local\Temp\ccM1O0QE.s:739    .bss.CYCCNT64:00000000 CYCCNT64
+C:\Users\28212\AppData\Local\Temp\ccM1O0QE.s:760    .bss.SysTime:00000000 SysTime
+C:\Users\28212\AppData\Local\Temp\ccM1O0QE.s:693    .bss.CNT_TEMP1.2:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccM1O0QE.s:697    .bss.CNT_TEMP1.2:00000000 CNT_TEMP1.2
+C:\Users\28212\AppData\Local\Temp\ccM1O0QE.s:700    .bss.CNT_TEMP2.1:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccM1O0QE.s:704    .bss.CNT_TEMP2.1:00000000 CNT_TEMP2.1
+C:\Users\28212\AppData\Local\Temp\ccM1O0QE.s:707    .bss.CNT_TEMP3.0:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccM1O0QE.s:711    .bss.CNT_TEMP3.0:00000000 CNT_TEMP3.0
+C:\Users\28212\AppData\Local\Temp\ccM1O0QE.s:714    .bss.CPU_FREQ_Hz:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccM1O0QE.s:718    .bss.CPU_FREQ_Hz:00000000 CPU_FREQ_Hz
+C:\Users\28212\AppData\Local\Temp\ccM1O0QE.s:721    .bss.CPU_FREQ_Hz_ms:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccM1O0QE.s:725    .bss.CPU_FREQ_Hz_ms:00000000 CPU_FREQ_Hz_ms
+C:\Users\28212\AppData\Local\Temp\ccM1O0QE.s:728    .bss.CPU_FREQ_Hz_us:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccM1O0QE.s:732    .bss.CPU_FREQ_Hz_us:00000000 CPU_FREQ_Hz_us
+C:\Users\28212\AppData\Local\Temp\ccM1O0QE.s:735    .bss.CYCCNT64:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccM1O0QE.s:742    .bss.CYCCNT_LAST:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccM1O0QE.s:746    .bss.CYCCNT_LAST:00000000 CYCCNT_LAST
+C:\Users\28212\AppData\Local\Temp\ccM1O0QE.s:749    .bss.CYCCNT_RountCount:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccM1O0QE.s:753    .bss.CYCCNT_RountCount:00000000 CYCCNT_RountCount
+C:\Users\28212\AppData\Local\Temp\ccM1O0QE.s:756    .bss.SysTime:00000000 $d
+
+UNDEFINED SYMBOLS
+__aeabi_ui2d
+__aeabi_ddiv
+__aeabi_uldivmod

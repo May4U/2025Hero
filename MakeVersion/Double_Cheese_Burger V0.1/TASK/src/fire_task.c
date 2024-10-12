@@ -28,6 +28,7 @@ int16_t left_speed = 0;
 int16_t right_speed = 0;
 int16_t left_speed_up = 0;
 int16_t right_speed_up = 0;
+int8_t speed_error = 0;
 void Send_Fire_Current()
 {
     static CAN_TxHeaderTypeDef CAN_TxHeader;
@@ -65,6 +66,7 @@ void FIRE_TASK(void const *argument)
         right_speed = -Fire.right_motor->Motor_Information.speed;
         left_speed_up = Fire.left_motor_up->Motor_Information.speed;
         right_speed_up = -Fire.right_motor_up->Motor_Information.speed;
+        speed_error = left_speed - right_speed;
         
         Deal_Fire_Set_Rpm();//改变摩擦轮转速
         Send_Fire_Set_Rpm();//发送底盘摩擦轮设定转速
@@ -102,12 +104,16 @@ void fire_task_init(void)
     Fire.right_motor_up->Using_PID = Speed_PID;
     Fire.right_motor->Using_PID = Speed_PID;
     
-    PidInit(&Fire.left_motor->Speed_PID,1.0f,0,0,Output_Limit|StepIn);
+    PidInit(&Fire.left_motor->Speed_PID,1.0f,0,0,Output_Limit|StepIn|Integral_Limit);
  	PidInitMode(&Fire.left_motor->Speed_PID,Output_Limit,16000,0);//输出限幅模式设置
     PidInitMode(&Fire.left_motor->Speed_PID,StepIn,10,0);//过大的加减速会导致发射机构超电流断电
-    PidInit(&Fire.right_motor->Speed_PID,1.0f,0,0,Output_Limit|StepIn);
+    PidInitMode(&Fire.left_motor->Speed_PID,Integral_Limit,1000,0);
+
+    PidInit(&Fire.right_motor->Speed_PID,2.75f,0,0,Output_Limit|StepIn|Integral_Limit);
  	PidInitMode(&Fire.right_motor->Speed_PID,Output_Limit,16000,0);//输出限幅模式设置
     PidInitMode(&Fire.right_motor->Speed_PID,StepIn,10,0);//逐渐减速，实测发现最大速度减速会导致发射机构超电流断电
+    PidInitMode(&Fire.left_motor->Speed_PID,Integral_Limit,1000,0);
+
     PidInit(&Fire.left_motor_up->Speed_PID,1.0f,0,0,Output_Limit|StepIn);
  	PidInitMode(&Fire.left_motor_up->Speed_PID,Output_Limit,16000,0);//输出限幅模式设置
     PidInitMode(&Fire.left_motor_up->Speed_PID,StepIn,10,0);//过大的加减速会导致发射机构超电流断电
@@ -126,6 +132,7 @@ void fire_behaviour_choose(void)
         DJIMotor_Set_val(Fire.right_motor_up, 0);
         DJIMotor_Set_val(Fire.left_motor, 0);
         DJIMotor_Set_val(Fire.right_motor, 0);
+        HAL_GPIO_WritePin(fire_set_GPIO_Port, fire_set_Pin, GPIO_PIN_SET);
     }
     else
     {
@@ -133,6 +140,7 @@ void fire_behaviour_choose(void)
         DJIMotor_Set_val(Fire.right_motor_up,Fire.Gimbal_CMD->Fire_Set_Rpm);
         DJIMotor_Set_val(Fire.left_motor,    Fire.Gimbal_CMD->Fire_Set_Rpm);
         DJIMotor_Set_val(Fire.right_motor,   Fire.Gimbal_CMD->Fire_Set_Rpm);
+        HAL_GPIO_WritePin(fire_set_GPIO_Port, fire_set_Pin, GPIO_PIN_RESET);
     }
 
 }

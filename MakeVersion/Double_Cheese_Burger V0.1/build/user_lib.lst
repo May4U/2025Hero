@@ -1,4 +1,4 @@
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 1
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s 			page 1
 
 
    1              		.cpu cortex-m4
@@ -58,7 +58,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 1
   27:ACE-ECF/Algorithm/src/user_lib.c **** //快速开方
   28:ACE-ECF/Algorithm/src/user_lib.c **** float Sqrt(float x)
   29:ACE-ECF/Algorithm/src/user_lib.c **** {
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 2
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s 			page 2
 
 
   30              		.loc 1 29 1 view -0
@@ -118,7 +118,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 1
   65 0026 70EE006A 		vadd.f32	s13, s0, s0
   66              		.loc 1 48 20 discriminator 3 view .LVU17
   67 002a 87EEA67A 		vdiv.f32	s14, s15, s13
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 3
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s 			page 3
 
 
   68              		.loc 1 48 11 discriminator 3 view .LVU18
@@ -178,7 +178,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 1
   64:ACE-ECF/Algorithm/src/user_lib.c ****     return y;
   65:ACE-ECF/Algorithm/src/user_lib.c **** }*/
   66:ACE-ECF/Algorithm/src/user_lib.c **** 
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 4
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s 			page 4
 
 
   67:ACE-ECF/Algorithm/src/user_lib.c **** /**
@@ -238,7 +238,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 1
   87:ACE-ECF/Algorithm/src/user_lib.c ****   * @author         RM
   88:ACE-ECF/Algorithm/src/user_lib.c ****   * @param[in]      斜波函数结构体
   89:ACE-ECF/Algorithm/src/user_lib.c ****   * @param[in]      输入值
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 5
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s 			page 5
 
 
   90:ACE-ECF/Algorithm/src/user_lib.c ****   * @retval         返回空
@@ -298,7 +298,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 1
  180 0030 D0ED027A 		vldr.32	s15, [r0, #8]
  100:ACE-ECF/Algorithm/src/user_lib.c ****     {
  181              		.loc 1 100 13 view .LVU53
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 6
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s 			page 6
 
 
  182 0034 B4EEE70A 		vcmpe.f32	s0, s15
@@ -358,7 +358,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 1
  116:ACE-ECF/Algorithm/src/user_lib.c ****         num = -Limit;
  117:ACE-ECF/Algorithm/src/user_lib.c ****     }
  118:ACE-ECF/Algorithm/src/user_lib.c ****     return num;
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 7
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s 			page 7
 
 
  226              		.loc 1 118 5 is_stmt 1 view .LVU63
@@ -418,7 +418,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 1
  269              		.global	float_deadband
  270              		.syntax unified
  271              		.thumb
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 8
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s 			page 8
 
 
  272              		.thumb_func
@@ -478,7 +478,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 1
  315              		.loc 1 146 1 is_stmt 1 view -0
  316              		.cfi_startproc
  317              		@ args = 0, pretend = 0, frame = 0
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 9
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s 			page 9
 
 
  318              		@ frame_needed = 0, uses_anonymous_args = 0
@@ -538,7 +538,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 1
  361 0012 04DD     		ble	.L35
  160:ACE-ECF/Algorithm/src/user_lib.c ****         return maxValue;
  362              		.loc 1 160 16 view .LVU91
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 10
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s 			page 10
 
 
  363 0014 B0EE410A 		vmov.f32	s0, s2
@@ -598,7 +598,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 1
  407              	.L44:
  169:ACE-ECF/Algorithm/src/user_lib.c ****         return minValue;
  408              		.loc 1 169 16 view .LVU102
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 11
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s 			page 11
 
 
  409 000c 0846     		mov	r0, r1
@@ -658,7 +658,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 1
  449 0018 01E0     		b	.L50
  450              	.L51:
  188:ACE-ECF/Algorithm/src/user_lib.c ****         {
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 12
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s 			page 12
 
 
  189:ACE-ECF/Algorithm/src/user_lib.c ****             Input -= len;
@@ -718,7 +718,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 1
  199:ACE-ECF/Algorithm/src/user_lib.c ****     }
  200:ACE-ECF/Algorithm/src/user_lib.c ****     return Input;
  201:ACE-ECF/Algorithm/src/user_lib.c **** }
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 13
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s 			page 13
 
 
  492              		.loc 1 201 1 view .LVU128
@@ -778,7 +778,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 1
  542              	.LFB146:
  210:ACE-ECF/Algorithm/src/user_lib.c **** 
  211:ACE-ECF/Algorithm/src/user_lib.c **** int float_rounding(float raw)
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 14
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s 			page 14
 
 
  212:ACE-ECF/Algorithm/src/user_lib.c **** {
@@ -838,7 +838,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 1
  588              	.LFE146:
  590              		.section	.text.OLS_Init,"ax",%progbits
  591              		.align	1
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 15
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s 			page 15
 
 
  592              		.global	OLS_Init
@@ -898,7 +898,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 1
  610              		.cfi_offset 6, -8
  611              		.cfi_offset 14, -4
  612 0002 0446     		mov	r4, r0
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 16
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s 			page 16
 
 
  258:ACE-ECF/Algorithm/src/user_lib.c ****     OLS->Order = order;
@@ -958,7 +958,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 1
  658 0038 2662     		str	r6, [r4, #32]	@ unaligned
  659 003a 6662     		str	r6, [r4, #36]	@ unaligned
  660 003c A662     		str	r6, [r4, #40]	@ unaligned
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 17
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s 			page 17
 
 
  267:ACE-ECF/Algorithm/src/user_lib.c **** }
@@ -1018,7 +1018,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 1
  702 0010 8268     		ldr	r2, [r0, #8]
  703              		.loc 1 281 27 discriminator 3 view .LVU182
  704 0012 591C     		adds	r1, r3, #1
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 18
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s 			page 18
 
 
  705 0014 02EB810C 		add	ip, r2, r1, lsl #2
@@ -1078,7 +1078,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 1
  751              		.loc 1 284 53 view .LVU201
  752 005a 37EE800A 		vadd.f32	s0, s15, s0
  753              	.LVL52:
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 19
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s 			page 19
 
 
  754              		.loc 1 284 28 view .LVU202
@@ -1138,7 +1138,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 1
  293:ACE-ECF/Algorithm/src/user_lib.c ****     {
  294:ACE-ECF/Algorithm/src/user_lib.c ****         OLS->t[0] += OLS->x[i] * OLS->x[i];
  800              		.loc 1 294 9 is_stmt 1 discriminator 3 view .LVU221
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 20
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s 			page 20
 
 
  801              		.loc 1 294 25 is_stmt 0 discriminator 3 view .LVU222
@@ -1198,7 +1198,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 1
  848              		.loc 1 292 5 is_stmt 0 discriminator 1 view .LVU241
  849 00f0 9445     		cmp	ip, r2
  850 00f2 CFD8     		bhi	.L75
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 21
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s 			page 21
 
 
  851              	.LBE5:
@@ -1258,7 +1258,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 1
  898              		.loc 1 304 10 view .LVU265
  899              	.LVL58:
  900              		.loc 1 304 5 is_stmt 0 view .LVU266
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 22
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s 			page 22
 
 
  901 0144 19E0     		b	.L76
@@ -1318,7 +1318,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 1
  945 018a 7047     		bx	lr
  946              	.L79:
  947              		.align	2
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 23
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s 			page 23
 
 
  948              	.L78:
@@ -1378,7 +1378,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 1
  989              		.loc 1 324 27 discriminator 3 view .LVU296
  990 0012 591C     		adds	r1, r3, #1
  991 0014 02EB810C 		add	ip, r2, r1, lsl #2
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 24
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s 			page 24
 
 
  992 0018 DCED007A 		vldr.32	s15, [ip]
@@ -1438,7 +1438,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 1
  1038 005a 37EE800A 		vadd.f32	s0, s15, s0
  1039              	.LVL67:
  1040              		.loc 1 327 28 view .LVU316
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 25
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s 			page 25
 
 
  1041 005e 82ED000A 		vstr.32	s0, [r2]
@@ -1498,7 +1498,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 1
  337:ACE-ECF/Algorithm/src/user_lib.c ****     {
  338:ACE-ECF/Algorithm/src/user_lib.c ****         OLS->t[0] += OLS->x[i] * OLS->x[i];
  1086              		.loc 1 338 9 is_stmt 1 discriminator 3 view .LVU335
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 26
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s 			page 26
 
 
  1087              		.loc 1 338 25 is_stmt 0 discriminator 3 view .LVU336
@@ -1558,7 +1558,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 1
  1134              		.loc 1 336 5 is_stmt 0 discriminator 1 view .LVU355
  1135 00f0 9445     		cmp	ip, r2
  1136 00f2 CFD8     		bhi	.L85
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 27
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s 			page 27
 
 
  1137              	.LBE8:
@@ -1618,7 +1618,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 1
  1183 0138 D2ED007A 		vldr.32	s15, [r2]
  1184              		.loc 1 349 48 discriminator 3 view .LVU378
  1185 013c 60EE277A 		vmul.f32	s15, s0, s15
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 28
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s 			page 28
 
 
  1186              		.loc 1 349 65 discriminator 3 view .LVU379
@@ -1678,7 +1678,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 1
  1231              		.section	.text.Get_OLS_Derivative,"ax",%progbits
  1232              		.align	1
  1233              		.global	Get_OLS_Derivative
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 29
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s 			page 29
 
 
  1234              		.syntax unified
@@ -1738,7 +1738,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 1
  1269              		.loc 1 376 5 view .LVU400
  1270              		.loc 1 376 15 is_stmt 0 view .LVU401
  1271 0000 8368     		ldr	r3, [r0, #8]
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 30
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s 			page 30
 
 
  1272              		.loc 1 376 10 view .LVU402
@@ -1798,7 +1798,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 1
  1318 003a 511E     		subs	r1, r2, #1
  377:ACE-ECF/Algorithm/src/user_lib.c ****     for (uint16_t i = 0; i < OLS->Order - 1; ++i)
  1319              		.loc 1 377 5 discriminator 1 view .LVU422
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 31
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s 			page 31
 
 
  1320 003c 8B42     		cmp	r3, r1
@@ -1858,7 +1858,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 1
  390:ACE-ECF/Algorithm/src/user_lib.c ****     memset((void *)OLS->t, 0, sizeof(float) * 4);
  1365              		.loc 1 390 5 is_stmt 1 view .LVU441
  1366 007e 0023     		movs	r3, #0
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 32
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s 			page 32
 
 
  1367 0080 C361     		str	r3, [r0, #28]	@ unaligned
@@ -1918,7 +1918,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 1
  1416 00d0 D0ED097A 		vldr.32	s15, [r0, #36]
  1417 00d4 77EE877A 		vadd.f32	s15, s15, s14
  1418 00d8 C0ED097A 		vstr.32	s15, [r0, #36]
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 33
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s 			page 33
 
 
  396:ACE-ECF/Algorithm/src/user_lib.c ****         OLS->t[3] += OLS->y[i];
@@ -1978,7 +1978,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 1
  400:ACE-ECF/Algorithm/src/user_lib.c ****     OLS->b = (OLS->t[0] * OLS->t[3] - OLS->t[1] * OLS->t[2]) / (OLS->t[0] * OLS->Order - OLS->t[1] 
  1465              		.loc 1 400 5 is_stmt 1 view .LVU482
  1466              		.loc 1 400 25 is_stmt 0 view .LVU483
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 34
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s 			page 34
 
 
  1467 012c 67EE847A 		vmul.f32	s15, s15, s8
@@ -2038,7 +2038,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 1
  403:ACE-ECF/Algorithm/src/user_lib.c ****     for (uint16_t i = OLS->Order - OLS->Count; i < OLS->Order; ++i)
  1515              		.loc 1 403 64 is_stmt 0 discriminator 3 view .LVU505
  1516 0178 9BB2     		uxth	r3, r3
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 35
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s 			page 35
 
 
  1517              	.LVL91:
@@ -2098,7 +2098,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 1
  415:ACE-ECF/Algorithm/src/user_lib.c ****   * @retval         返回平滑输出
  416:ACE-ECF/Algorithm/src/user_lib.c ****   */
  417:ACE-ECF/Algorithm/src/user_lib.c **** float Get_OLS_Smooth(Ordinary_Least_Squares_t *OLS)
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 36
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s 			page 36
 
 
  418:ACE-ECF/Algorithm/src/user_lib.c **** {
@@ -2158,7 +2158,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 1
  1623 0000 00000000 		.space	4
  1624              		.section	.data.GlobalDebugMode,"aw"
  1627              	GlobalDebugMode:
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 37
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s 			page 37
 
 
  1628 0000 07       		.byte	7
@@ -2169,67 +2169,67 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 1
  1633              		.file 4 "ACE-ECF/Algorithm/inc/user_lib.h"
  1634              		.file 5 "Middlewares/Third_Party/FreeRTOS/Source/include/portable.h"
  1635              		.file 6 "<built-in>"
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 38
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s 			page 38
 
 
 DEFINED SYMBOLS
                             *ABS*:00000000 user_lib.c
-C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:20     .text.Sqrt:00000000 $t
-C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:26     .text.Sqrt:00000000 Sqrt
-C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:93     .text.Sqrt:00000054 $d
-C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:99     .text.ramp_init:00000000 $t
-C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:105    .text.ramp_init:00000000 ramp_init
-C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:135    .text.ramp_calc:00000000 $t
-C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:141    .text.ramp_calc:00000000 ramp_calc
-C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:193    .text.abs_limit:00000000 $t
-C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:199    .text.abs_limit:00000000 abs_limit
-C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:233    .text.sign:00000000 $t
-C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:239    .text.sign:00000000 sign
-C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:268    .text.float_deadband:00000000 $t
-C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:274    .text.float_deadband:00000000 float_deadband
-C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:301    .text.float_deadband:0000001c $d
-C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:306    .text.int16_deadline:00000000 $t
-C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:312    .text.int16_deadline:00000000 int16_deadline
-C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:338    .text.float_constrain:00000000 $t
-C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:344    .text.float_constrain:00000000 float_constrain
-C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:379    .text.int16_constrain:00000000 $t
-C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:385    .text.int16_constrain:00000000 int16_constrain
-C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:418    .text.loop_float_constrain:00000000 $t
-C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:424    .text.loop_float_constrain:00000000 loop_float_constrain
-C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:498    .text.theta_format:00000000 $t
-C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:504    .text.theta_format:00000000 theta_format
-C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:528    .text.theta_format:00000010 $d
-C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:534    .text.float_rounding:00000000 $t
-C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:540    .text.float_rounding:00000000 float_rounding
-C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:585    .text.float_rounding:00000038 $d
-C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:591    .text.OLS_Init:00000000 $t
-C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:597    .text.OLS_Init:00000000 OLS_Init
-C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:668    .text.OLS_Update:00000000 $t
-C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:674    .text.OLS_Update:00000000 OLS_Update
-C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:949    .text.OLS_Update:0000018c $d
-C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:954    .text.OLS_Derivative:00000000 $t
-C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:960    .text.OLS_Derivative:00000000 OLS_Derivative
-C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:1227   .text.OLS_Derivative:0000017c $d
-C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:1232   .text.Get_OLS_Derivative:00000000 $t
-C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:1238   .text.Get_OLS_Derivative:00000000 Get_OLS_Derivative
-C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:1254   .text.OLS_Smooth:00000000 $t
-C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:1260   .text.OLS_Smooth:00000000 OLS_Smooth
-C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:1547   .text.OLS_Smooth:000001a8 $d
-C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:1552   .text.Get_OLS_Smooth:00000000 $t
-C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:1558   .text.Get_OLS_Smooth:00000000 Get_OLS_Smooth
-C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:1627   .data.GlobalDebugMode:00000000 GlobalDebugMode
-C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:1590   .bss.decimal.3:00000000 $d
-C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:1594   .bss.decimal.3:00000000 decimal.3
-C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:1597   .bss.integer.4:00000000 $d
-C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:1601   .bss.integer.4:00000000 integer.4
-C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:1604   .bss.temp.0:00000000 $d
-C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:1608   .bss.temp.0:00000000 temp.0
-C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:1611   .bss.temp.1:00000000 $d
-C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:1615   .bss.temp.1:00000000 temp.1
-C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:1618   .bss.temp.2:00000000 $d
-C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s:1622   .bss.temp.2:00000000 temp.2
+C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s:20     .text.Sqrt:00000000 $t
+C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s:26     .text.Sqrt:00000000 Sqrt
+C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s:93     .text.Sqrt:00000054 $d
+C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s:99     .text.ramp_init:00000000 $t
+C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s:105    .text.ramp_init:00000000 ramp_init
+C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s:135    .text.ramp_calc:00000000 $t
+C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s:141    .text.ramp_calc:00000000 ramp_calc
+C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s:193    .text.abs_limit:00000000 $t
+C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s:199    .text.abs_limit:00000000 abs_limit
+C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s:233    .text.sign:00000000 $t
+C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s:239    .text.sign:00000000 sign
+C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s:268    .text.float_deadband:00000000 $t
+C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s:274    .text.float_deadband:00000000 float_deadband
+C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s:301    .text.float_deadband:0000001c $d
+C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s:306    .text.int16_deadline:00000000 $t
+C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s:312    .text.int16_deadline:00000000 int16_deadline
+C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s:338    .text.float_constrain:00000000 $t
+C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s:344    .text.float_constrain:00000000 float_constrain
+C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s:379    .text.int16_constrain:00000000 $t
+C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s:385    .text.int16_constrain:00000000 int16_constrain
+C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s:418    .text.loop_float_constrain:00000000 $t
+C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s:424    .text.loop_float_constrain:00000000 loop_float_constrain
+C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s:498    .text.theta_format:00000000 $t
+C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s:504    .text.theta_format:00000000 theta_format
+C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s:528    .text.theta_format:00000010 $d
+C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s:534    .text.float_rounding:00000000 $t
+C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s:540    .text.float_rounding:00000000 float_rounding
+C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s:585    .text.float_rounding:00000038 $d
+C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s:591    .text.OLS_Init:00000000 $t
+C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s:597    .text.OLS_Init:00000000 OLS_Init
+C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s:668    .text.OLS_Update:00000000 $t
+C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s:674    .text.OLS_Update:00000000 OLS_Update
+C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s:949    .text.OLS_Update:0000018c $d
+C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s:954    .text.OLS_Derivative:00000000 $t
+C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s:960    .text.OLS_Derivative:00000000 OLS_Derivative
+C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s:1227   .text.OLS_Derivative:0000017c $d
+C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s:1232   .text.Get_OLS_Derivative:00000000 $t
+C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s:1238   .text.Get_OLS_Derivative:00000000 Get_OLS_Derivative
+C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s:1254   .text.OLS_Smooth:00000000 $t
+C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s:1260   .text.OLS_Smooth:00000000 OLS_Smooth
+C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s:1547   .text.OLS_Smooth:000001a8 $d
+C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s:1552   .text.Get_OLS_Smooth:00000000 $t
+C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s:1558   .text.Get_OLS_Smooth:00000000 Get_OLS_Smooth
+C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s:1627   .data.GlobalDebugMode:00000000 GlobalDebugMode
+C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s:1590   .bss.decimal.3:00000000 $d
+C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s:1594   .bss.decimal.3:00000000 decimal.3
+C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s:1597   .bss.integer.4:00000000 $d
+C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s:1601   .bss.integer.4:00000000 integer.4
+C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s:1604   .bss.temp.0:00000000 $d
+C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s:1608   .bss.temp.0:00000000 temp.0
+C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s:1611   .bss.temp.1:00000000 $d
+C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s:1615   .bss.temp.1:00000000 temp.1
+C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s:1618   .bss.temp.2:00000000 $d
+C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s:1622   .bss.temp.2:00000000 temp.2
 
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccDCU9Mr.s 			page 39
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc0xjvq5.s 			page 39
 
 
 UNDEFINED SYMBOLS

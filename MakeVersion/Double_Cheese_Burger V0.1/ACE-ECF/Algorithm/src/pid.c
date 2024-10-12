@@ -179,10 +179,10 @@ fp32 PidCalculate(pid_parameter_t *pid, fp32 SetValue, fp32 ActualValue)
         if (pid->mode & Output_Limit)
             f_Output_Limit(pid);
     }
-    else
-    {
-        pid_clear(pid);
-    }
+    // else
+    // {
+    //     pid_clear(pid);
+    // }
 
     pid->LastActualValue = pid->ActualValue;
     pid->LastSetValue = pid->SetValue;

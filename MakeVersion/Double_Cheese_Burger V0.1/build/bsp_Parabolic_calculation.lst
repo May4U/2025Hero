@@ -1,4 +1,4 @@
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 1
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccITt37l.s 			page 1
 
 
    1              		.cpu cortex-m4
@@ -58,7 +58,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 1
   26:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****         float time = m/(k*Vo*cos)*(pow(e,k/m*Distance)-1);
   27:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****         return time;
   28:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     }
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 2
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccITt37l.s 			page 2
 
 
   29:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** #elif PLAN == PLAN_B
@@ -118,7 +118,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 1
   77              		.loc 1 37 1 is_stmt 1 view -0
   78              		.cfi_startproc
   79              		@ args = 0, pretend = 0, frame = 0
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 3
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccITt37l.s 			page 3
 
 
   80              		@ frame_needed = 0, uses_anonymous_args = 0
@@ -178,7 +178,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 1
  124              		.cfi_offset 80, -16
  125              		.cfi_offset 81, -12
  126 0006 B0EE608A 		vmov.f32	s16, s1
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 4
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccITt37l.s 			page 4
 
 
   48:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     if (X == 0 && Y == 0) return 0;
@@ -238,7 +238,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 1
  174              		.cfi_restore_state
   48:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     float root;
  175              		.loc 1 48 34 view .LVU31
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 5
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccITt37l.s 			page 5
 
 
  176 0042 9FED020A 		vldr.32	s0, .L13+4
@@ -298,7 +298,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 1
  227 001c 21D0     		beq	.L18
  228              	.L16:
   59:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     double s = X*X+Y*Y;
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 6
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccITt37l.s 			page 6
 
 
  229              		.loc 1 59 5 is_stmt 1 view .LVU38
@@ -358,7 +358,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 1
  278 0062 9FED020A 		vldr.32	s0, .L20+4
  279              	.LVL24:
   58:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     double s = X*X+Y*Y;
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 7
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccITt37l.s 			page 7
 
 
  280              		.loc 1 58 34 view .LVU51
@@ -418,7 +418,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 1
   71:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     if (Y_ == 0 || X_ == 0) return 0;
  329              		.loc 1 71 5 is_stmt 1 view .LVU54
  330              		.loc 1 71 8 is_stmt 0 view .LVU55
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 8
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccITt37l.s 			page 8
 
 
  331 0008 B5EE400A 		vcmp.f32	s0, #0
@@ -478,7 +478,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 1
  346              	.LVL26:
  111:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** 	float Temp_cos_Y_X = cos_Y_X(Y_, X_);//Ê×´Îµü´úÑö½ÇÖ¸ÏòÇ°ÉÚÕ¾
  347              		.loc 1 111 2 view .LVU59
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 9
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccITt37l.s 			page 9
 
 
  348              		.loc 1 111 23 is_stmt 0 view .LVU60
@@ -538,7 +538,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 1
  396 007c 17EE900A 		vmov	r0, s15
  397              	.LVL38:
  398              		.loc 1 117 13 view .LVU77
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 10
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccITt37l.s 			page 10
 
 
  399 0080 FFF7FEFF 		bl	__aeabi_f2d
@@ -598,7 +598,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 1
  452 00ec 0B46     		mov	r3, r1
  453              		.loc 1 118 30 view .LVU86
  454 00ee 4046     		mov	r0, r8
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 11
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccITt37l.s 			page 11
 
 
  455 00f0 4946     		mov	r1, r9
@@ -658,7 +658,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 1
  132:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** 		static float last_Y_error = 0;
  133:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** 		if(Y_error < 0)//ÂäµãµÍ£¬Ñö½ÇÔö¼Ó
  134:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** 		{
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 12
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccITt37l.s 			page 12
 
 
  135:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** 			if (last_Y_error>0)    try_change /= 2;//ÉÏÒ»´ÎÔËËãÎªÂäµã¹ý¸ß£¬µ«Õâ´ÎÈ·ÊµÂäµã¹ýµÍ£¬Ö¤Ã÷Ñö½Ç¼õÌ«¶
@@ -718,7 +718,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 1
  538 015c F0EE6A1A 		vmov.f32	s3, s21
  539 0160 9FED6B0B 		vldr.64	d0, .L45+8
  540              	.LVL65:
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 13
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccITt37l.s 			page 13
 
 
  541              		.loc 1 144 9 view .LVU118
@@ -778,7 +778,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 1
  594 01c8 4946     		mov	r1, r9
  595 01ca FFF7FEFF 		bl	__aeabi_dmul
  596              	.LVL76:
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 14
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccITt37l.s 			page 14
 
 
  597 01ce 0246     		mov	r2, r0
@@ -838,7 +838,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 1
  638              	.LVL86:
  159:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****             V_x = Temp_cos_Y_X*Vo;
  639              		.loc 1 159 13 is_stmt 1 view .LVU142
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 15
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccITt37l.s 			page 15
 
 
  640              		.loc 1 159 17 is_stmt 0 view .LVU143
@@ -898,7 +898,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 1
  690              	.LVL97:
  691 0262 0646     		mov	r6, r0
  692 0264 0F46     		mov	r7, r1
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 16
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccITt37l.s 			page 16
 
 
  693              		.loc 1 163 24 view .LVU156
@@ -958,7 +958,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 1
  741 02b6 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
  742 02ba 17DD     		ble	.L42
  743              	.LBB3:
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 17
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccITt37l.s 			page 17
 
 
  125:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****         if (calc_time > 20)
@@ -1018,7 +1018,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 1
  780              		.loc 1 169 15 is_stmt 0 view .LVU184
  781 02ec 85ED008A 		vstr.32	s16, [r5]
  170:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** 	return Angle;
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 18
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccITt37l.s 			page 18
 
 
  782              		.loc 1 170 2 is_stmt 1 view .LVU185
@@ -1078,7 +1078,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 1
  175:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****   *@brief YAWÓëÇ°ÉÚÕ¾Æ«×ªµÄ½Ç¶È
  176:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****   *@param X Ë®Æ½XÖá¾àÀë,¾µÍ·×ø±êÏµÓÒÎªÕý
  177:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****   *@param Y Ë®Æ½YÖá¾àÀë,¾µÍ·×ø±êÏµÇ°ÎªÕý
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 19
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccITt37l.s 			page 19
 
 
  178:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****   *@note  ÄæÊ±ÕëÕý
@@ -1138,7 +1138,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 1
  873 0032 27EEA70A 		vmul.f32	s0, s15, s15
  874              		.loc 1 190 23 view .LVU200
  875 0036 38EE008A 		vadd.f32	s16, s16, s0
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 20
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccITt37l.s 			page 20
 
 
  876              		.loc 1 190 27 view .LVU201
@@ -1198,7 +1198,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 1
  926              	.L49:
  927 0080 00003443 		.word	1127481344
  928 0084 DB0F4940 		.word	1078530011
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 21
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccITt37l.s 			page 21
 
 
  929              		.cfi_endproc
@@ -1258,7 +1258,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 1
  970              		.loc 1 208 11 is_stmt 0 view .LVU222
  971 0014 DFED158A 		vldr.32	s17, .L60
  972 0018 70EE288A 		vadd.f32	s17, s0, s17
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 22
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccITt37l.s 			page 22
 
 
  973              	.LVL127:
@@ -1318,7 +1318,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 1
  215:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****     return  fire_time;
  1015              		.loc 1 215 5 is_stmt 1 view .LVU238
  216:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c **** }
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 23
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccITt37l.s 			page 23
 
 
  1016              		.loc 1 216 1 is_stmt 0 view .LVU239
@@ -1378,7 +1378,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 1
  1061              		.loc 1 226 5 view .LVU244
  1062              		.loc 1 226 8 is_stmt 0 view .LVU245
  1063 0000 B5EE400A 		vcmp.f32	s0, #0
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 24
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccITt37l.s 			page 24
 
 
  1064 0004 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
@@ -1438,7 +1438,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 1
  1104              	.LVL140:
  1105              	.L78:
  230:ACE-ECF/Bsp/Src/bsp_Parabolic_calculation.c ****         return 2;
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 25
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccITt37l.s 			page 25
 
 
  1106              		.loc 1 230 9 is_stmt 1 view .LVU259
@@ -1498,7 +1498,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 1
  1149 005a 00BF     		.align	2
  1150              	.L80:
  1151 005c 00000000 		.word	.LANCHOR3
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 26
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccITt37l.s 			page 26
 
 
  1152              		.cfi_endproc
@@ -1558,7 +1558,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 1
  1201 0032 51EC100B 		vmov	r0, r1, d0
  1202              		.loc 1 245 7 view .LVU282
  1203 0036 FFF7FEFF 		bl	__aeabi_d2f
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 27
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccITt37l.s 			page 27
 
 
  1204              	.LVL152:
@@ -1618,7 +1618,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 1
  1261              		.align	3
  1264              	Fire_delay:
  1265 0000 C8000000 		.word	200
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 28
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccITt37l.s 			page 28
 
 
  1266 0004 00000000 		.word	0
@@ -1632,48 +1632,48 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 1
  1276              		.file 2 "ACE-ECF/Algorithm/inc/struct_typedef.h"
  1277              		.file 3 "<built-in>"
  1278              		.file 4 "ACE-ECF/Algorithm/inc/maths.h"
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s 			page 29
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccITt37l.s 			page 29
 
 
 DEFINED SYMBOLS
                             *ABS*:00000000 bsp_Parabolic_calculation.c
-C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s:21     .text.abs_d:00000000 $t
-C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s:27     .text.abs_d:00000000 abs_d
-C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s:68     .text.abs_f:00000000 $t
-C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s:74     .text.abs_f:00000000 abs_f
-C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s:102    .text.cos_Y_X:00000000 $t
-C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s:108    .text.cos_Y_X:00000000 cos_Y_X
-C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s:183    .text.cos_Y_X:00000048 $d
-C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s:192    .text.sin_Y_X:00000000 $t
-C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s:198    .text.sin_Y_X:00000000 sin_Y_X
-C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s:285    .text.sin_Y_X:00000068 $d
-C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s:293    .text.Calc_Pitch_Angle:00000000 $t
-C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s:299    .text.Calc_Pitch_Angle:00000000 Calc_Pitch_Angle
-C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s:808    .text.Calc_Pitch_Angle:00000308 $d
-C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s:823    .text.Yaw_Angle_close:00000000 $t
-C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s:829    .text.Yaw_Angle_close:00000000 Yaw_Angle_close
-C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s:927    .text.Yaw_Angle_close:00000080 $d
-C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s:935    .text.calc_fire_time:00000000 $t
-C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s:941    .text.calc_fire_time:00000000 calc_fire_time
-C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s:1041   .text.calc_fire_time:0000006c $d
-C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s:1048   .text.JudgeCanFire:00000000 $t
-C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s:1054   .text.JudgeCanFire:00000000 JudgeCanFire
-C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s:1151   .text.JudgeCanFire:0000005c $d
-C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s:1156   .text.Calc_The_Distance:00000000 $t
-C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s:1162   .text.Calc_The_Distance:00000000 Calc_The_Distance
-C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s:1224   .text.Calc_The_Distance:00000048 $d
-C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s:1237   .bss.in_place_time:00000000 in_place_time
-C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s:1264   .data.Fire_delay:00000000 Fire_delay
-C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s:1272   .data.fla:00000000 fla
-C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s:1251   .bss.root:00000000 root
-C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s:1258   .bss.s:00000000 s
-C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s:1234   .bss.in_place_time:00000000 $d
-C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s:1240   .bss.last_Y_error.0:00000000 $d
-C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s:1244   .bss.last_Y_error.0:00000000 last_Y_error.0
-C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s:1247   .bss.root:00000000 $d
-C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s:1254   .bss.s:00000000 $d
-C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s:1261   .data.Fire_delay:00000000 $d
-C:\Users\28212\AppData\Local\Temp\ccUo3LB0.s:1268   .data.fla:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccITt37l.s:21     .text.abs_d:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccITt37l.s:27     .text.abs_d:00000000 abs_d
+C:\Users\28212\AppData\Local\Temp\ccITt37l.s:68     .text.abs_f:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccITt37l.s:74     .text.abs_f:00000000 abs_f
+C:\Users\28212\AppData\Local\Temp\ccITt37l.s:102    .text.cos_Y_X:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccITt37l.s:108    .text.cos_Y_X:00000000 cos_Y_X
+C:\Users\28212\AppData\Local\Temp\ccITt37l.s:183    .text.cos_Y_X:00000048 $d
+C:\Users\28212\AppData\Local\Temp\ccITt37l.s:192    .text.sin_Y_X:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccITt37l.s:198    .text.sin_Y_X:00000000 sin_Y_X
+C:\Users\28212\AppData\Local\Temp\ccITt37l.s:285    .text.sin_Y_X:00000068 $d
+C:\Users\28212\AppData\Local\Temp\ccITt37l.s:293    .text.Calc_Pitch_Angle:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccITt37l.s:299    .text.Calc_Pitch_Angle:00000000 Calc_Pitch_Angle
+C:\Users\28212\AppData\Local\Temp\ccITt37l.s:808    .text.Calc_Pitch_Angle:00000308 $d
+C:\Users\28212\AppData\Local\Temp\ccITt37l.s:823    .text.Yaw_Angle_close:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccITt37l.s:829    .text.Yaw_Angle_close:00000000 Yaw_Angle_close
+C:\Users\28212\AppData\Local\Temp\ccITt37l.s:927    .text.Yaw_Angle_close:00000080 $d
+C:\Users\28212\AppData\Local\Temp\ccITt37l.s:935    .text.calc_fire_time:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccITt37l.s:941    .text.calc_fire_time:00000000 calc_fire_time
+C:\Users\28212\AppData\Local\Temp\ccITt37l.s:1041   .text.calc_fire_time:0000006c $d
+C:\Users\28212\AppData\Local\Temp\ccITt37l.s:1048   .text.JudgeCanFire:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccITt37l.s:1054   .text.JudgeCanFire:00000000 JudgeCanFire
+C:\Users\28212\AppData\Local\Temp\ccITt37l.s:1151   .text.JudgeCanFire:0000005c $d
+C:\Users\28212\AppData\Local\Temp\ccITt37l.s:1156   .text.Calc_The_Distance:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccITt37l.s:1162   .text.Calc_The_Distance:00000000 Calc_The_Distance
+C:\Users\28212\AppData\Local\Temp\ccITt37l.s:1224   .text.Calc_The_Distance:00000048 $d
+C:\Users\28212\AppData\Local\Temp\ccITt37l.s:1237   .bss.in_place_time:00000000 in_place_time
+C:\Users\28212\AppData\Local\Temp\ccITt37l.s:1264   .data.Fire_delay:00000000 Fire_delay
+C:\Users\28212\AppData\Local\Temp\ccITt37l.s:1272   .data.fla:00000000 fla
+C:\Users\28212\AppData\Local\Temp\ccITt37l.s:1251   .bss.root:00000000 root
+C:\Users\28212\AppData\Local\Temp\ccITt37l.s:1258   .bss.s:00000000 s
+C:\Users\28212\AppData\Local\Temp\ccITt37l.s:1234   .bss.in_place_time:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccITt37l.s:1240   .bss.last_Y_error.0:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccITt37l.s:1244   .bss.last_Y_error.0:00000000 last_Y_error.0
+C:\Users\28212\AppData\Local\Temp\ccITt37l.s:1247   .bss.root:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccITt37l.s:1254   .bss.s:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccITt37l.s:1261   .data.Fire_delay:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccITt37l.s:1268   .data.fla:00000000 $d
 
 UNDEFINED SYMBOLS
 __aeabi_dcmpge

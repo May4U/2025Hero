@@ -114,10 +114,10 @@ void Send_Photo_Current()
 
 /*LQR参数列表*/
 //手瞄lqr参数
-float k_pitch_lqr[2] = {1.5f, 2.0f};
+float k_pitch_lqr[2] = {1.45f, 2.006f};
 
 float k_pitch_lqr_down[2] = {0.8f, 2.0f};
-float k_yaw_lqr[2] = {-80.0f, -1.0f};
+float k_yaw_lqr[2] = {-79.0f, -1.0f};
 //自瞄lqr参数
 float k_virtual_pitch_lqr[2] = {60.0f, 1.2f};
 float k_virtual_yaw_lqr[2] = {-40.0f, -1.0f};

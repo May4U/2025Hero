@@ -94,8 +94,8 @@ void fire_task_init(void)
 {
 	memset(&Fire, 0, sizeof(Fire_t));
 	// ��ò���ָ��
-    Fire.left_motor_up = DJIMotor_Init(1,2,false,M3508,30);
-    Fire.right_motor_up = DJIMotor_Init(1,4,true,M3508,30);
+    Fire.left_motor_up = DJIMotor_Init(1,4,false,M3508,30);
+    Fire.right_motor_up = DJIMotor_Init(1,2,true,M3508,30);
     Fire.left_motor  = DJIMotor_Init(1,1,false,M3508,30);
     Fire.right_motor = DJIMotor_Init(1,3,true,M3508,30);
 
@@ -109,12 +109,12 @@ void fire_task_init(void)
     PidInitMode(&Fire.left_motor->Speed_PID,StepIn,10,0);//����ļӼ��ٻᵼ�·�������������ϵ�
     PidInitMode(&Fire.left_motor->Speed_PID,Integral_Limit,1000,0);
 
-    PidInit(&Fire.right_motor->Speed_PID,2.75f,0,0,Output_Limit|StepIn|Integral_Limit);
+    PidInit(&Fire.right_motor->Speed_PID,1.02f,0,0,Output_Limit|StepIn|Integral_Limit);
  	PidInitMode(&Fire.right_motor->Speed_PID,Output_Limit,16000,0);//����޷�ģʽ����
     PidInitMode(&Fire.right_motor->Speed_PID,StepIn,10,0);//�𽥼��٣�ʵ�ⷢ������ٶȼ��ٻᵼ�·�������������ϵ�
     PidInitMode(&Fire.left_motor->Speed_PID,Integral_Limit,1000,0);
 
-    PidInit(&Fire.left_motor_up->Speed_PID,1.55f,0,0,Output_Limit|StepIn);
+    PidInit(&Fire.left_motor_up->Speed_PID,1.02f,0,0,Output_Limit|StepIn);
  	PidInitMode(&Fire.left_motor_up->Speed_PID,Output_Limit,16000,0);//����޷�ģʽ����
     PidInitMode(&Fire.left_motor_up->Speed_PID,StepIn,10,0);//����ļӼ��ٻᵼ�·�������������ϵ�
     PidInit(&Fire.right_motor_up->Speed_PID,1.0f,0,0,Output_Limit|StepIn);

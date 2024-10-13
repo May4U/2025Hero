@@ -833,7 +833,7 @@ void Gimbal_CMD_Set(fp32 Pitch_Up_Angle_Limit, fp32 Pitch_Down_Angle_Limit, fp32
 void Gimbal_Fire_State_Set(void)
 {
     static uint8_t first_down = 1;
-    if (Gimbal_CMD.rc_ctl->kb.bit.F == 1 || Gimbal_CMD.rc_ctl->rc.s2 == RC_SW_UP || Gimbal_CMD.rc_ctl->rc.s2 == RC_SW_MID)
+    if (Gimbal_CMD.rc_ctl->kb.bit.F == 1 || Gimbal_CMD.rc_ctl->rc.s2 == RC_SW_UP) //|| Gimbal_CMD.rc_ctl->rc.s2 == RC_SW_MID) 现在只有拨到最上方才会开摩擦轮，请等摩擦轮转速达标再发射
         Gimbal_CMD.Fire_Ready = 1;
     
     if (Gimbal_CMD.rc_ctl->rc.s2 == RC_SW_DOWN && first_down == 1)//�״β���ʱ�ر�Ħ���֣����Է�ֹ���ش�������£���F����Ħ���ֱ����˸��ǹر�

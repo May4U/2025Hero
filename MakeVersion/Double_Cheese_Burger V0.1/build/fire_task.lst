@@ -1,4 +1,4 @@
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s 			page 1
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccHAhhue.s 			page 1
 
 
    1              		.cpu cortex-m4
@@ -58,7 +58,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s 			page 1
   29:TASK/src/fire_task.c **** int16_t left_speed_up = 0;
   30:TASK/src/fire_task.c **** int16_t right_speed_up = 0;
   31:TASK/src/fire_task.c **** int8_t speed_error = 0;
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s 			page 2
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccHAhhue.s 			page 2
 
 
   32:TASK/src/fire_task.c **** void Send_Fire_Current()
@@ -118,7 +118,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s 			page 1
   86:TASK/src/fire_task.c **** 
   87:TASK/src/fire_task.c **** 
   88:TASK/src/fire_task.c ****         
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s 			page 3
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccHAhhue.s 			page 3
 
 
   89:TASK/src/fire_task.c **** 		vTaskDelay(1);
@@ -150,7 +150,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s 			page 1
   48              		.cfi_def_cfa_offset 40
   95:TASK/src/fire_task.c **** 	memset(&Fire, 0, sizeof(Fire_t));
   49              		.loc 1 95 2 view .LVU1
-  50 0008 684C     		ldr	r4, .L3
+  50 0008 674C     		ldr	r4, .L3
   51 000a 0025     		movs	r5, #0
   52 000c 2560     		str	r5, [r4]
   53 000e 6560     		str	r5, [r4, #4]
@@ -178,7 +178,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s 			page 1
   72 002a 2B46     		mov	r3, r5
   73 002c 0122     		movs	r2, #1
   74 002e 0221     		movs	r1, #2
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s 			page 4
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccHAhhue.s 			page 4
 
 
   75 0030 1046     		mov	r0, r2
@@ -186,25 +186,25 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s 			page 1
   77              	.LVL1:
   78              		.loc 1 98 25 view .LVU7
   79 0036 2060     		str	r0, [r4]
-  99:TASK/src/fire_task.c ****     Fire.left_motor  = DJIMotor_Init(1,1,false,M3508,30);
+  99:TASK/src/fire_task.c ****     Fire.left_motor  = DJIMotor_Init(1,3,false,M3508,30);
   80              		.loc 1 99 5 is_stmt 1 view .LVU8
   81              		.loc 1 99 24 is_stmt 0 view .LVU9
   82 0038 0096     		str	r6, [sp]
   83 003a 2B46     		mov	r3, r5
   84 003c 2A46     		mov	r2, r5
-  85 003e 0121     		movs	r1, #1
-  86 0040 0846     		mov	r0, r1
+  85 003e 0321     		movs	r1, #3
+  86 0040 0120     		movs	r0, #1
   87 0042 FFF7FEFF 		bl	DJIMotor_Init
   88              	.LVL2:
   89              		.loc 1 99 22 view .LVU10
   90 0046 A060     		str	r0, [r4, #8]
- 100:TASK/src/fire_task.c ****     Fire.right_motor = DJIMotor_Init(1,3,true,M3508,30);
+ 100:TASK/src/fire_task.c ****     Fire.right_motor = DJIMotor_Init(1,1,true,M3508,30);
   91              		.loc 1 100 5 is_stmt 1 view .LVU11
   92              		.loc 1 100 24 is_stmt 0 view .LVU12
   93 0048 0096     		str	r6, [sp]
   94 004a 2B46     		mov	r3, r5
   95 004c 0122     		movs	r2, #1
-  96 004e 0321     		movs	r1, #3
+  96 004e 1146     		mov	r1, r2
   97 0050 1046     		mov	r0, r2
   98 0052 FFF7FEFF 		bl	DJIMotor_Init
   99              	.LVL3:
@@ -237,8 +237,8 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s 			page 1
  106:TASK/src/fire_task.c ****     
  107:TASK/src/fire_task.c ****     PidInit(&Fire.left_motor->Speed_PID,1.0f,0,0,Output_Limit|StepIn|Integral_Limit);
  121              		.loc 1 107 5 is_stmt 1 view .LVU25
- 122 0070 9FED4F8A 		vldr.32	s16, .L3+4
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s 			page 5
+ 122 0070 9FED4E8A 		vldr.32	s16, .L3+4
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccHAhhue.s 			page 5
 
 
  123 0074 4FF48371 		mov	r1, #262
@@ -253,7 +253,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s 			page 1
  131              		.loc 1 108 20 is_stmt 0 view .LVU27
  132 008c A068     		ldr	r0, [r4, #8]
  133              		.loc 1 108 3 view .LVU28
- 134 008e DFED498A 		vldr.32	s17, .L3+8
+ 134 008e DFED488A 		vldr.32	s17, .L3+8
  135 0092 F0EE480A 		vmov.f32	s1, s16
  136 0096 B0EE680A 		vmov.f32	s0, s17
  137 009a 0421     		movs	r1, #4
@@ -276,167 +276,167 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s 			page 1
  152              		.loc 1 110 22 is_stmt 0 view .LVU33
  153 00b6 A068     		ldr	r0, [r4, #8]
  154              		.loc 1 110 5 view .LVU34
- 155 00b8 DFED3F9A 		vldr.32	s19, .L3+12
+ 155 00b8 9FED3E9A 		vldr.32	s18, .L3+12
  156 00bc F0EE480A 		vmov.f32	s1, s16
- 157 00c0 B0EE690A 		vmov.f32	s0, s19
+ 157 00c0 B0EE490A 		vmov.f32	s0, s18
  158 00c4 0221     		movs	r1, #2
  159 00c6 6430     		adds	r0, r0, #100
  160 00c8 FFF7FEFF 		bl	PidInitMode
  161              	.LVL7:
  111:TASK/src/fire_task.c **** 
- 112:TASK/src/fire_task.c ****     PidInit(&Fire.right_motor->Speed_PID,1.02f,0,0,Output_Limit|StepIn|Integral_Limit);
+ 112:TASK/src/fire_task.c ****     PidInit(&Fire.right_motor->Speed_PID,1.0435f,0,0,Output_Limit|StepIn|Integral_Limit);
  162              		.loc 1 112 5 is_stmt 1 view .LVU35
  163              		.loc 1 112 18 is_stmt 0 view .LVU36
  164 00cc E068     		ldr	r0, [r4, #12]
  165              		.loc 1 112 5 view .LVU37
- 166 00ce 9FED3B9A 		vldr.32	s18, .L3+16
- 167 00d2 4FF48371 		mov	r1, #262
- 168 00d6 B0EE481A 		vmov.f32	s2, s16
- 169 00da F0EE480A 		vmov.f32	s1, s16
- 170 00de B0EE490A 		vmov.f32	s0, s18
- 171 00e2 6430     		adds	r0, r0, #100
- 172 00e4 FFF7FEFF 		bl	PidInit
- 173              	.LVL8:
+ 166 00ce 4FF48371 		mov	r1, #262
+ 167 00d2 B0EE481A 		vmov.f32	s2, s16
+ 168 00d6 F0EE480A 		vmov.f32	s1, s16
+ 169 00da 9FED370A 		vldr.32	s0, .L3+16
+ 170 00de 6430     		adds	r0, r0, #100
+ 171 00e0 FFF7FEFF 		bl	PidInit
+ 172              	.LVL8:
  113:TASK/src/fire_task.c ****  	PidInitMode(&Fire.right_motor->Speed_PID,Output_Limit,16000,0);//����޷�ģʽ����
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s 			page 6
+ 173              		.loc 1 113 3 is_stmt 1 view .LVU38
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccHAhhue.s 			page 6
 
 
- 174              		.loc 1 113 3 is_stmt 1 view .LVU38
- 175              		.loc 1 113 20 is_stmt 0 view .LVU39
- 176 00e8 E068     		ldr	r0, [r4, #12]
- 177              		.loc 1 113 3 view .LVU40
- 178 00ea F0EE480A 		vmov.f32	s1, s16
- 179 00ee B0EE680A 		vmov.f32	s0, s17
- 180 00f2 0421     		movs	r1, #4
- 181 00f4 6430     		adds	r0, r0, #100
- 182 00f6 FFF7FEFF 		bl	PidInitMode
- 183              	.LVL9:
+ 174              		.loc 1 113 20 is_stmt 0 view .LVU39
+ 175 00e4 E068     		ldr	r0, [r4, #12]
+ 176              		.loc 1 113 3 view .LVU40
+ 177 00e6 F0EE480A 		vmov.f32	s1, s16
+ 178 00ea B0EE680A 		vmov.f32	s0, s17
+ 179 00ee 0421     		movs	r1, #4
+ 180 00f0 6430     		adds	r0, r0, #100
+ 181 00f2 FFF7FEFF 		bl	PidInitMode
+ 182              	.LVL9:
  114:TASK/src/fire_task.c ****     PidInitMode(&Fire.right_motor->Speed_PID,StepIn,10,0);//�𽥼��٣�ʵ�ⷢ�����
- 184              		.loc 1 114 5 is_stmt 1 view .LVU41
- 185              		.loc 1 114 22 is_stmt 0 view .LVU42
- 186 00fa E068     		ldr	r0, [r4, #12]
- 187              		.loc 1 114 5 view .LVU43
- 188 00fc F0EE480A 		vmov.f32	s1, s16
- 189 0100 B2EE040A 		vmov.f32	s0, #1.0e+1
- 190 0104 4FF48071 		mov	r1, #256
- 191 0108 6430     		adds	r0, r0, #100
- 192 010a FFF7FEFF 		bl	PidInitMode
- 193              	.LVL10:
+ 183              		.loc 1 114 5 is_stmt 1 view .LVU41
+ 184              		.loc 1 114 22 is_stmt 0 view .LVU42
+ 185 00f6 E068     		ldr	r0, [r4, #12]
+ 186              		.loc 1 114 5 view .LVU43
+ 187 00f8 F0EE480A 		vmov.f32	s1, s16
+ 188 00fc B2EE040A 		vmov.f32	s0, #1.0e+1
+ 189 0100 4FF48071 		mov	r1, #256
+ 190 0104 6430     		adds	r0, r0, #100
+ 191 0106 FFF7FEFF 		bl	PidInitMode
+ 192              	.LVL10:
  115:TASK/src/fire_task.c ****     PidInitMode(&Fire.left_motor->Speed_PID,Integral_Limit,1000,0);
- 194              		.loc 1 115 5 is_stmt 1 view .LVU44
- 195              		.loc 1 115 22 is_stmt 0 view .LVU45
- 196 010e A068     		ldr	r0, [r4, #8]
- 197              		.loc 1 115 5 view .LVU46
- 198 0110 F0EE480A 		vmov.f32	s1, s16
- 199 0114 B0EE690A 		vmov.f32	s0, s19
- 200 0118 0221     		movs	r1, #2
- 201 011a 6430     		adds	r0, r0, #100
- 202 011c FFF7FEFF 		bl	PidInitMode
- 203              	.LVL11:
+ 193              		.loc 1 115 5 is_stmt 1 view .LVU44
+ 194              		.loc 1 115 22 is_stmt 0 view .LVU45
+ 195 010a A068     		ldr	r0, [r4, #8]
+ 196              		.loc 1 115 5 view .LVU46
+ 197 010c F0EE480A 		vmov.f32	s1, s16
+ 198 0110 B0EE490A 		vmov.f32	s0, s18
+ 199 0114 0221     		movs	r1, #2
+ 200 0116 6430     		adds	r0, r0, #100
+ 201 0118 FFF7FEFF 		bl	PidInitMode
+ 202              	.LVL11:
  116:TASK/src/fire_task.c **** 
  117:TASK/src/fire_task.c ****     PidInit(&Fire.left_motor_up->Speed_PID,1.02f,0,0,Output_Limit|StepIn);
- 204              		.loc 1 117 5 is_stmt 1 view .LVU47
- 205              		.loc 1 117 18 is_stmt 0 view .LVU48
- 206 0120 6068     		ldr	r0, [r4, #4]
- 207              		.loc 1 117 5 view .LVU49
- 208 0122 4FF48271 		mov	r1, #260
- 209 0126 B0EE481A 		vmov.f32	s2, s16
- 210 012a F0EE480A 		vmov.f32	s1, s16
- 211 012e B0EE490A 		vmov.f32	s0, s18
- 212 0132 6430     		adds	r0, r0, #100
- 213 0134 FFF7FEFF 		bl	PidInit
- 214              	.LVL12:
+ 203              		.loc 1 117 5 is_stmt 1 view .LVU47
+ 204              		.loc 1 117 18 is_stmt 0 view .LVU48
+ 205 011c 6068     		ldr	r0, [r4, #4]
+ 206              		.loc 1 117 5 view .LVU49
+ 207 011e 4FF48271 		mov	r1, #260
+ 208 0122 B0EE481A 		vmov.f32	s2, s16
+ 209 0126 F0EE480A 		vmov.f32	s1, s16
+ 210 012a 9FED240A 		vldr.32	s0, .L3+20
+ 211 012e 6430     		adds	r0, r0, #100
+ 212 0130 FFF7FEFF 		bl	PidInit
+ 213              	.LVL12:
  118:TASK/src/fire_task.c ****  	PidInitMode(&Fire.left_motor_up->Speed_PID,Output_Limit,16000,0);//����޷�ģʽ���
- 215              		.loc 1 118 3 is_stmt 1 view .LVU50
- 216              		.loc 1 118 20 is_stmt 0 view .LVU51
- 217 0138 6068     		ldr	r0, [r4, #4]
- 218              		.loc 1 118 3 view .LVU52
- 219 013a F0EE480A 		vmov.f32	s1, s16
- 220 013e B0EE680A 		vmov.f32	s0, s17
- 221 0142 0421     		movs	r1, #4
- 222 0144 6430     		adds	r0, r0, #100
- 223 0146 FFF7FEFF 		bl	PidInitMode
- 224              	.LVL13:
+ 214              		.loc 1 118 3 is_stmt 1 view .LVU50
+ 215              		.loc 1 118 20 is_stmt 0 view .LVU51
+ 216 0134 6068     		ldr	r0, [r4, #4]
+ 217              		.loc 1 118 3 view .LVU52
+ 218 0136 F0EE480A 		vmov.f32	s1, s16
+ 219 013a B0EE680A 		vmov.f32	s0, s17
+ 220 013e 0421     		movs	r1, #4
+ 221 0140 6430     		adds	r0, r0, #100
+ 222 0142 FFF7FEFF 		bl	PidInitMode
+ 223              	.LVL13:
  119:TASK/src/fire_task.c ****     PidInitMode(&Fire.left_motor_up->Speed_PID,StepIn,10,0);//����ļӼ��ٻᵼ�·��
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s 			page 7
+ 224              		.loc 1 119 5 is_stmt 1 view .LVU53
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccHAhhue.s 			page 7
 
 
- 225              		.loc 1 119 5 is_stmt 1 view .LVU53
- 226              		.loc 1 119 22 is_stmt 0 view .LVU54
- 227 014a 6068     		ldr	r0, [r4, #4]
- 228              		.loc 1 119 5 view .LVU55
- 229 014c F0EE480A 		vmov.f32	s1, s16
- 230 0150 B2EE040A 		vmov.f32	s0, #1.0e+1
- 231 0154 4FF48071 		mov	r1, #256
- 232 0158 6430     		adds	r0, r0, #100
- 233 015a FFF7FEFF 		bl	PidInitMode
- 234              	.LVL14:
+ 225              		.loc 1 119 22 is_stmt 0 view .LVU54
+ 226 0146 6068     		ldr	r0, [r4, #4]
+ 227              		.loc 1 119 5 view .LVU55
+ 228 0148 F0EE480A 		vmov.f32	s1, s16
+ 229 014c B2EE040A 		vmov.f32	s0, #1.0e+1
+ 230 0150 4FF48071 		mov	r1, #256
+ 231 0154 6430     		adds	r0, r0, #100
+ 232 0156 FFF7FEFF 		bl	PidInitMode
+ 233              	.LVL14:
  120:TASK/src/fire_task.c ****     PidInit(&Fire.right_motor_up->Speed_PID,1.0f,0,0,Output_Limit|StepIn);
- 235              		.loc 1 120 5 is_stmt 1 view .LVU56
- 236              		.loc 1 120 18 is_stmt 0 view .LVU57
- 237 015e 2068     		ldr	r0, [r4]
- 238              		.loc 1 120 5 view .LVU58
- 239 0160 4FF48271 		mov	r1, #260
- 240 0164 B0EE481A 		vmov.f32	s2, s16
- 241 0168 F0EE480A 		vmov.f32	s1, s16
- 242 016c B7EE000A 		vmov.f32	s0, #1.0e+0
- 243 0170 6430     		adds	r0, r0, #100
- 244 0172 FFF7FEFF 		bl	PidInit
- 245              	.LVL15:
+ 234              		.loc 1 120 5 is_stmt 1 view .LVU56
+ 235              		.loc 1 120 18 is_stmt 0 view .LVU57
+ 236 015a 2068     		ldr	r0, [r4]
+ 237              		.loc 1 120 5 view .LVU58
+ 238 015c 4FF48271 		mov	r1, #260
+ 239 0160 B0EE481A 		vmov.f32	s2, s16
+ 240 0164 F0EE480A 		vmov.f32	s1, s16
+ 241 0168 B7EE000A 		vmov.f32	s0, #1.0e+0
+ 242 016c 6430     		adds	r0, r0, #100
+ 243 016e FFF7FEFF 		bl	PidInit
+ 244              	.LVL15:
  121:TASK/src/fire_task.c ****  	PidInitMode(&Fire.right_motor_up->Speed_PID,Output_Limit,16000,0);//����޷�ģʽ���
- 246              		.loc 1 121 3 is_stmt 1 view .LVU59
- 247              		.loc 1 121 20 is_stmt 0 view .LVU60
- 248 0176 2068     		ldr	r0, [r4]
- 249              		.loc 1 121 3 view .LVU61
- 250 0178 F0EE480A 		vmov.f32	s1, s16
- 251 017c B0EE680A 		vmov.f32	s0, s17
- 252 0180 0421     		movs	r1, #4
- 253 0182 6430     		adds	r0, r0, #100
- 254 0184 FFF7FEFF 		bl	PidInitMode
- 255              	.LVL16:
+ 245              		.loc 1 121 3 is_stmt 1 view .LVU59
+ 246              		.loc 1 121 20 is_stmt 0 view .LVU60
+ 247 0172 2068     		ldr	r0, [r4]
+ 248              		.loc 1 121 3 view .LVU61
+ 249 0174 F0EE480A 		vmov.f32	s1, s16
+ 250 0178 B0EE680A 		vmov.f32	s0, s17
+ 251 017c 0421     		movs	r1, #4
+ 252 017e 6430     		adds	r0, r0, #100
+ 253 0180 FFF7FEFF 		bl	PidInitMode
+ 254              	.LVL16:
  122:TASK/src/fire_task.c ****     PidInitMode(&Fire.right_motor_up->Speed_PID,StepIn,10,0);//�𽥼��٣�ʵ�ⷢ����
- 256              		.loc 1 122 5 is_stmt 1 view .LVU62
- 257              		.loc 1 122 22 is_stmt 0 view .LVU63
- 258 0188 2068     		ldr	r0, [r4]
- 259              		.loc 1 122 5 view .LVU64
- 260 018a F0EE480A 		vmov.f32	s1, s16
- 261 018e B2EE040A 		vmov.f32	s0, #1.0e+1
- 262 0192 4FF48071 		mov	r1, #256
- 263 0196 6430     		adds	r0, r0, #100
- 264 0198 FFF7FEFF 		bl	PidInitMode
- 265              	.LVL17:
+ 255              		.loc 1 122 5 is_stmt 1 view .LVU62
+ 256              		.loc 1 122 22 is_stmt 0 view .LVU63
+ 257 0184 2068     		ldr	r0, [r4]
+ 258              		.loc 1 122 5 view .LVU64
+ 259 0186 F0EE480A 		vmov.f32	s1, s16
+ 260 018a B2EE040A 		vmov.f32	s0, #1.0e+1
+ 261 018e 4FF48071 		mov	r1, #256
+ 262 0192 6430     		adds	r0, r0, #100
+ 263 0194 FFF7FEFF 		bl	PidInitMode
+ 264              	.LVL17:
  123:TASK/src/fire_task.c ****     
  124:TASK/src/fire_task.c **** 	Fire.Gimbal_CMD = Get_Gimbal_CMD_point();
- 266              		.loc 1 124 2 is_stmt 1 view .LVU65
- 267              		.loc 1 124 20 is_stmt 0 view .LVU66
- 268 019c FFF7FEFF 		bl	Get_Gimbal_CMD_point
- 269              	.LVL18:
- 270              		.loc 1 124 18 view .LVU67
- 271 01a0 2061     		str	r0, [r4, #16]
+ 265              		.loc 1 124 2 is_stmt 1 view .LVU65
+ 266              		.loc 1 124 20 is_stmt 0 view .LVU66
+ 267 0198 FFF7FEFF 		bl	Get_Gimbal_CMD_point
+ 268              	.LVL18:
+ 269              		.loc 1 124 18 view .LVU67
+ 270 019c 2061     		str	r0, [r4, #16]
  125:TASK/src/fire_task.c **** }
- 272              		.loc 1 125 1 view .LVU68
- 273 01a2 02B0     		add	sp, sp, #8
- 274              	.LCFI3:
- 275              		.cfi_def_cfa_offset 32
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s 			page 8
+ 271              		.loc 1 125 1 view .LVU68
+ 272 019e 02B0     		add	sp, sp, #8
+ 273              	.LCFI3:
+ 274              		.cfi_def_cfa_offset 32
+ 275              		@ sp needed
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccHAhhue.s 			page 8
 
 
- 276              		@ sp needed
- 277 01a4 BDEC048B 		vldm	sp!, {d8-d9}
- 278              	.LCFI4:
- 279              		.cfi_restore 82
- 280              		.cfi_restore 83
- 281              		.cfi_restore 80
- 282              		.cfi_restore 81
- 283              		.cfi_def_cfa_offset 16
- 284 01a8 70BD     		pop	{r4, r5, r6, pc}
- 285              	.L4:
- 286 01aa 00BF     		.align	2
- 287              	.L3:
- 288 01ac 00000000 		.word	.LANCHOR0
- 289 01b0 00000000 		.word	0
- 290 01b4 00007A46 		.word	1182400512
- 291 01b8 00007A44 		.word	1148846080
+ 276 01a0 BDEC048B 		vldm	sp!, {d8-d9}
+ 277              	.LCFI4:
+ 278              		.cfi_restore 82
+ 279              		.cfi_restore 83
+ 280              		.cfi_restore 80
+ 281              		.cfi_restore 81
+ 282              		.cfi_def_cfa_offset 16
+ 283 01a4 70BD     		pop	{r4, r5, r6, pc}
+ 284              	.L4:
+ 285 01a6 00BF     		.align	2
+ 286              	.L3:
+ 287 01a8 00000000 		.word	.LANCHOR0
+ 288 01ac 00000000 		.word	0
+ 289 01b0 00007A46 		.word	1182400512
+ 290 01b4 00007A44 		.word	1148846080
+ 291 01b8 6891853F 		.word	1065718120
  292 01bc 5C8F823F 		.word	1065520988
  293              		.cfi_endproc
  294              	.LFE140:
@@ -478,7 +478,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s 			page 1
  326              		.loc 1 131 9 is_stmt 1 view .LVU74
  327 0010 9FED288A 		vldr.32	s16, .L9+4
  328 0014 264C     		ldr	r4, .L9
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s 			page 9
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccHAhhue.s 			page 9
 
 
  329 0016 B0EE480A 		vmov.f32	s0, s16
@@ -538,7 +538,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s 			page 1
  139:TASK/src/fire_task.c ****         DJIMotor_Set_val(Fire.right_motor_up,Fire.Gimbal_CMD->Fire_Set_Rpm);
  367              		.loc 1 139 61 is_stmt 0 view .LVU81
  368 0050 B3F92A30 		ldrsh	r3, [r3, #42]
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s 			page 10
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccHAhhue.s 			page 10
 
 
  369 0054 00EE103A 		vmov	s0, r3	@ int
@@ -598,7 +598,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s 			page 1
  409              		.loc 1 143 9 is_stmt 1 view .LVU95
  410 00a0 0022     		movs	r2, #0
  411 00a2 4FF40071 		mov	r1, #512
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s 			page 11
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccHAhhue.s 			page 11
 
 
  412 00a6 0448     		ldr	r0, .L9+8
@@ -658,7 +658,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s 			page 1
  153:TASK/src/fire_task.c ****     Fire.right_motor->current_input = motor_speed_control(&Fire.right_motor->Speed_PID,
  460              		.loc 1 153 5 is_stmt 1 view .LVU103
  461              		.loc 1 153 64 is_stmt 0 view .LVU104
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s 			page 12
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccHAhhue.s 			page 12
 
 
  462 0022 E568     		ldr	r5, [r4, #12]
@@ -718,7 +718,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s 			page 1
  162:TASK/src/fire_task.c **** }
  502              		.loc 1 162 1 view .LVU118
  503 007c 38BD     		pop	{r3, r4, r5, pc}
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s 			page 13
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccHAhhue.s 			page 13
 
 
  504              	.L14:
@@ -778,7 +778,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s 			page 1
  556              		.loc 1 166 59 discriminator 2 view .LVU126
  557 0038 B3F5FA6F 		cmp	r3, #2000
  558 003c 09D8     		bhi	.L16
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s 			page 14
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccHAhhue.s 			page 14
 
 
  559              		.loc 1 166 91 discriminator 3 view .LVU127
@@ -838,7 +838,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s 			page 1
   33:TASK/src/fire_task.c **** {
  603              		.loc 1 33 1 view -0
  604              		.cfi_startproc
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s 			page 15
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccHAhhue.s 			page 15
 
 
  605              		@ args = 0, pretend = 0, frame = 0
@@ -898,7 +898,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s 			page 1
  642 0024 B1F9A001 		ldrsh	r0, [r1, #416]
   40:TASK/src/fire_task.c ****     Can_Tx_Data[4] = Fire.left_motor->current_input >> 8;
  643              		.loc 1 40 20 view .LVU151
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s 			page 16
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccHAhhue.s 			page 16
 
 
  644 0028 91F9A111 		ldrsb	r1, [r1, #417]
@@ -958,7 +958,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s 			page 1
  680 0054 FFF7FEFF 		bl	HAL_CAN_AddTxMessage
  681              	.LVL35:
   51:TASK/src/fire_task.c **** }
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s 			page 17
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccHAhhue.s 			page 17
 
 
  682              		.loc 1 51 1 is_stmt 0 view .LVU170
@@ -1018,7 +1018,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s 			page 1
  730 000e FFF7FEFF 		bl	vPortEnterCritical
  731              	.LVL38:
   65:TASK/src/fire_task.c ****         left_speed = Fire.left_motor->Motor_Information.speed;
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s 			page 18
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccHAhhue.s 			page 18
 
 
  732              		.loc 1 65 9 view .LVU179
@@ -1078,7 +1078,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s 			page 1
  769              		.loc 1 69 34 is_stmt 0 view .LVU196
  770 0042 D31A     		subs	r3, r2, r3
   69:TASK/src/fire_task.c ****         speed_error = left_speed - right_speed;
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s 			page 19
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccHAhhue.s 			page 19
 
 
  771              		.loc 1 69 21 view .LVU197
@@ -1138,7 +1138,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s 			page 1
   61:TASK/src/fire_task.c ****         time ++;
  813              		.loc 1 61 9 view .LVU210
   61:TASK/src/fire_task.c ****         time ++;
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s 			page 20
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccHAhhue.s 			page 20
 
 
  814              		.loc 1 61 14 is_stmt 0 view .LVU211
@@ -1198,7 +1198,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s 			page 1
  865      00000000 
  865      00000000 
  866              		.section	.bss.left_speed,"aw",%nobits
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s 			page 21
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccHAhhue.s 			page 21
 
 
  867              		.align	1
@@ -1257,51 +1257,51 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s 			page 1
  936              		.file 16 "Core/Inc/can.h"
  937              		.file 17 "Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/portmacro.h"
  938              		.file 18 "Middlewares/Third_Party/FreeRTOS/Source/include/task.h"
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s 			page 22
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccHAhhue.s 			page 22
 
 
 DEFINED SYMBOLS
                             *ABS*:00000000 fire_task.c
-C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s:20     .text.fire_task_init:00000000 $t
-C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s:25     .text.fire_task_init:00000000 fire_task_init
-C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s:288    .text.fire_task_init:000001ac $d
-C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s:297    .text.fire_behaviour_choose:00000000 $t
-C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s:302    .text.fire_behaviour_choose:00000000 fire_behaviour_choose
-C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s:420    .text.fire_behaviour_choose:000000b0 $d
-C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s:427    .text.fire_pid_calculate:00000000 $t
-C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s:432    .text.fire_pid_calculate:00000000 fire_pid_calculate
-C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s:507    .text.fire_pid_calculate:00000080 $d
-C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s:512    .text.Shoot_Check:00000000 $t
-C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s:517    .text.Shoot_Check:00000000 Shoot_Check
-C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s:587    .text.Shoot_Check:00000064 $d
-C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s:595    .text.Send_Fire_Current:00000000 $t
-C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s:601    .text.Send_Fire_Current:00000000 Send_Fire_Current
-C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s:687    .text.Send_Fire_Current:0000005c $d
-C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s:696    .text.FIRE_TASK:00000000 $t
-C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s:702    .text.FIRE_TASK:00000000 FIRE_TASK
-C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s:828    .text.FIRE_TASK:00000090 $d
-C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s:918    .data.fla_speed:00000000 fla_speed
-C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s:905    .bss.speed_error:00000000 speed_error
-C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s:892    .bss.right_speed_up:00000000 right_speed_up
-C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s:878    .bss.left_speed_up:00000000 left_speed_up
-C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s:885    .bss.right_speed:00000000 right_speed
-C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s:871    .bss.left_speed:00000000 left_speed
-C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s:864    .bss.Fire:00000000 Fire
-C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s:846    .bss.CAN_TxHeader.2:00000000 $d
-C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s:850    .bss.CAN_TxHeader.2:00000000 CAN_TxHeader.2
-C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s:853    .bss.Can_Tx_Data.3:00000000 $d
-C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s:857    .bss.Can_Tx_Data.3:00000000 Can_Tx_Data.3
-C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s:860    .bss.Fire:00000000 $d
-C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s:867    .bss.left_speed:00000000 $d
-C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s:874    .bss.left_speed_up:00000000 $d
-C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s:881    .bss.right_speed:00000000 $d
-C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s:888    .bss.right_speed_up:00000000 $d
-C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s:895    .bss.send_mail_box.1:00000000 $d
-C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s:899    .bss.send_mail_box.1:00000000 send_mail_box.1
-C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s:906    .bss.speed_error:00000000 $d
-C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s:908    .bss.time.0:00000000 $d
-C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s:912    .bss.time.0:00000000 time.0
-C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s:915    .data.fla_speed:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccHAhhue.s:20     .text.fire_task_init:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccHAhhue.s:25     .text.fire_task_init:00000000 fire_task_init
+C:\Users\28212\AppData\Local\Temp\ccHAhhue.s:287    .text.fire_task_init:000001a8 $d
+C:\Users\28212\AppData\Local\Temp\ccHAhhue.s:297    .text.fire_behaviour_choose:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccHAhhue.s:302    .text.fire_behaviour_choose:00000000 fire_behaviour_choose
+C:\Users\28212\AppData\Local\Temp\ccHAhhue.s:420    .text.fire_behaviour_choose:000000b0 $d
+C:\Users\28212\AppData\Local\Temp\ccHAhhue.s:427    .text.fire_pid_calculate:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccHAhhue.s:432    .text.fire_pid_calculate:00000000 fire_pid_calculate
+C:\Users\28212\AppData\Local\Temp\ccHAhhue.s:507    .text.fire_pid_calculate:00000080 $d
+C:\Users\28212\AppData\Local\Temp\ccHAhhue.s:512    .text.Shoot_Check:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccHAhhue.s:517    .text.Shoot_Check:00000000 Shoot_Check
+C:\Users\28212\AppData\Local\Temp\ccHAhhue.s:587    .text.Shoot_Check:00000064 $d
+C:\Users\28212\AppData\Local\Temp\ccHAhhue.s:595    .text.Send_Fire_Current:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccHAhhue.s:601    .text.Send_Fire_Current:00000000 Send_Fire_Current
+C:\Users\28212\AppData\Local\Temp\ccHAhhue.s:687    .text.Send_Fire_Current:0000005c $d
+C:\Users\28212\AppData\Local\Temp\ccHAhhue.s:696    .text.FIRE_TASK:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccHAhhue.s:702    .text.FIRE_TASK:00000000 FIRE_TASK
+C:\Users\28212\AppData\Local\Temp\ccHAhhue.s:828    .text.FIRE_TASK:00000090 $d
+C:\Users\28212\AppData\Local\Temp\ccHAhhue.s:918    .data.fla_speed:00000000 fla_speed
+C:\Users\28212\AppData\Local\Temp\ccHAhhue.s:905    .bss.speed_error:00000000 speed_error
+C:\Users\28212\AppData\Local\Temp\ccHAhhue.s:892    .bss.right_speed_up:00000000 right_speed_up
+C:\Users\28212\AppData\Local\Temp\ccHAhhue.s:878    .bss.left_speed_up:00000000 left_speed_up
+C:\Users\28212\AppData\Local\Temp\ccHAhhue.s:885    .bss.right_speed:00000000 right_speed
+C:\Users\28212\AppData\Local\Temp\ccHAhhue.s:871    .bss.left_speed:00000000 left_speed
+C:\Users\28212\AppData\Local\Temp\ccHAhhue.s:864    .bss.Fire:00000000 Fire
+C:\Users\28212\AppData\Local\Temp\ccHAhhue.s:846    .bss.CAN_TxHeader.2:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccHAhhue.s:850    .bss.CAN_TxHeader.2:00000000 CAN_TxHeader.2
+C:\Users\28212\AppData\Local\Temp\ccHAhhue.s:853    .bss.Can_Tx_Data.3:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccHAhhue.s:857    .bss.Can_Tx_Data.3:00000000 Can_Tx_Data.3
+C:\Users\28212\AppData\Local\Temp\ccHAhhue.s:860    .bss.Fire:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccHAhhue.s:867    .bss.left_speed:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccHAhhue.s:874    .bss.left_speed_up:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccHAhhue.s:881    .bss.right_speed:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccHAhhue.s:888    .bss.right_speed_up:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccHAhhue.s:895    .bss.send_mail_box.1:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccHAhhue.s:899    .bss.send_mail_box.1:00000000 send_mail_box.1
+C:\Users\28212\AppData\Local\Temp\ccHAhhue.s:906    .bss.speed_error:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccHAhhue.s:908    .bss.time.0:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccHAhhue.s:912    .bss.time.0:00000000 time.0
+C:\Users\28212\AppData\Local\Temp\ccHAhhue.s:915    .data.fla_speed:00000000 $d
 
 UNDEFINED SYMBOLS
 DJIMotor_Init
@@ -1317,7 +1317,7 @@ hcan1
 vPortEnterCritical
 Deal_Fire_Set_Rpm
 Send_Fire_Set_Rpm
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccus7Rwh.s 			page 23
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccHAhhue.s 			page 23
 
 
 Send_Fire_Motor_Speed

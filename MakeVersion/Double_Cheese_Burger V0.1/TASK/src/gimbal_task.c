@@ -43,7 +43,7 @@ typedef struct{
     DJIMotor_object_t   *YAW_Motor;
     DJIMotor_object_t   *Photo_Motor;
     MI_Motor_t   *PITCH_Motor;
-    //ÍÓÂÝÒÇLQR
+    //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½LQR
     LQR_t lqr_pitch;
     LQR_t lqr_pitch_litter;
     LQR_t lqr_yaw;
@@ -51,7 +51,7 @@ typedef struct{
     LQR_t lqr_encoder_pitch;
     LQR_t lqr_encoder_yaw;
     pid_parameter_t     yaw_only_i_pid;
-    //±àÂëÖµPID
+    //ï¿½ï¿½ï¿½ï¿½ÖµPID
     pid_parameter_t      PITCH_Motor_Speed_PID;
     pid_parameter_t      PITCH_Motor_Position_PID;   
     pid_parameter_t      YAW_Motor_SPEED_PID;
@@ -65,7 +65,7 @@ Gimbal_t Gimbal;
 
 
 
-/*µç»úÔÚÏß×´Ì¬*/
+/*ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×´Ì¬*/
 uint16_t pitch_motor_init_flag = 0;
 safe_task_t *Pitch_Motor_Safe;
 
@@ -112,39 +112,39 @@ void Send_Photo_Current()
     HAL_CAN_AddTxMessage(&hcan1, &CAN_TxHeader, Can_Tx_Data, &send_mail_box);
 }
 
-/*LQR²ÎÊýÁÐ±í*/
-//ÊÖÃélqr²ÎÊý
-float k_pitch_lqr[2] = {1.45f, 2.006f};
+/*LQRï¿½ï¿½ï¿½ï¿½ï¿½Ð±ï¿½*/
+//ï¿½ï¿½ï¿½ï¿½lqrï¿½ï¿½ï¿½ï¿½
+float k_pitch_lqr[2] = {1.43f, 2.005f};
 
 float k_pitch_lqr_down[2] = {0.8f, 2.0f};
-float k_yaw_lqr[2] = {-79.0f, -1.0f};
-//×ÔÃélqr²ÎÊý
+float k_yaw_lqr[2] = {-77.3f, -1.0f};
+//ï¿½ï¿½ï¿½ï¿½lqrï¿½ï¿½ï¿½ï¿½
 float k_virtual_pitch_lqr[2] = {60.0f, 1.2f};
 float k_virtual_yaw_lqr[2] = {-40.0f, -1.0f};
-//¾Ñ»÷lqr²ÎÊý
+//ï¿½Ñ»ï¿½lqrï¿½ï¿½ï¿½ï¿½
 float k_encoder_pitch_lqr[2] = {6,1};
 float k_encoder_yaw_lqr[2] = {500,100};
 /**
- * @brief  ÔÆÌ¨Ö÷ÈÎÎñ
+ * @brief  ï¿½ï¿½Ì¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
  * @param
- * @note 6020µç»ú·´À¡ÐÅÏ¢²¨ÌØÂÊ 135.25bit*1000hz = 135,250 bps
-         6020µç»ú¿ØÖÆÐÅÏ¢²¨ÌØÂÊ 135.25bit*1000hz = 135,250 bps
-         ×ª·¢Í¼´«¿ØÖÆÐÅÏ¢²¨ÌØÂÊ 85.25 bit*  36hz  = 3069   bps
-         ×ª·¢ÊÓ¾õ¿ª»ðÐÅÏ¢²¨ÌØÂÊ 65.25 bit* 100hz  = 6925   bps    
-         ×ª·¢ËÄÄ¦²ÁÂÖ×ªËÙ²¨ÌØÂÊ 135.25bit*  10hz  = 1352.5 bps   
+ * @note 6020ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ 135.25bit*1000hz = 135,250 bps
+         6020ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ 135.25bit*1000hz = 135,250 bps
+         ×ªï¿½ï¿½Í¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ 85.25 bit*  36hz  = 3069   bps
+         ×ªï¿½ï¿½ï¿½Ó¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ 65.25 bit* 100hz  = 6925   bps    
+         ×ªï¿½ï¿½ï¿½ï¿½Ä¦ï¿½ï¿½ï¿½ï¿½×ªï¿½Ù²ï¿½ï¿½ï¿½ï¿½ï¿½ 135.25bit*  10hz  = 1352.5 bps   
  * @retval void
  */
 fp32 UP_ANGLE = 0;
 fp32 DOWN_ANGLE = 0;
 fp32 Pitch_output_torque;
-fp32 Pitch_gravity_feedforward_torque = 1.0f;//PÖáÖØÁ¦Ç°À¡²¹³¥
-uint8_t  Enable_pitch_motor = 100;//Á¬Ðø·¢ËÍ100´ÎÊ¹ÄÜºó¾Í²»·¢ËÍÁË
+fp32 Pitch_gravity_feedforward_torque = 1.0f;//Pï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+uint8_t  Enable_pitch_motor = 100;//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½100ï¿½ï¿½Ê¹ï¿½Üºï¿½Í²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 void GIMBAL_TASK(void const * argument)
 {    
     static uint16_t time = 0;
 
-    // while(Get_Virtual_task_init_falg() == 0)    vTaskDelay(1);//µÈ´ýÊÓ¾õÈÎÎñ³õÊ¼»¯
-    while(Gimbal.ins->imu_ok_falg == 0)         vTaskDelay(1);//µÈ´ýIMUÈÎÎñÔËÐÐ
+    // while(Get_Virtual_task_init_falg() == 0)    vTaskDelay(1);//ï¿½È´ï¿½ï¿½Ó¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¼ï¿½ï¿½
+    while(Gimbal.ins->imu_ok_falg == 0)         vTaskDelay(1);//ï¿½È´ï¿½IMUï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
     Gimbal_Init();
     
@@ -156,7 +156,7 @@ void GIMBAL_TASK(void const * argument)
         
     #ifdef Using_MI_Motor_Init
         
-        if (Gimbal.PITCH_Motor->have_pos_flag < 100)//ÊÕ¼¯1k´ÎÎ»ÖÃÐÅÏ¢
+        if (Gimbal.PITCH_Motor->have_pos_flag < 100)//ï¿½Õ¼ï¿½1kï¿½ï¿½Î»ï¿½ï¿½ï¿½ï¿½Ï¢
         {
             __HAL_TIM_SET_COMPARE(&htim5,TIM_CHANNEL_1,1000000);
             __HAL_TIM_SET_COMPARE(&htim5,TIM_CHANNEL_2,0);
@@ -167,7 +167,7 @@ void GIMBAL_TASK(void const * argument)
             continue;
         }
         
-        if (pitch_motor_init_flag < 500)//¶Â×ª1000´ÎÈÎÎñÖÜÆÚ×÷Îª³õÊ¼»¯
+        if (pitch_motor_init_flag < 500)//ï¿½ï¿½×ª1000ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½Ê¼ï¿½ï¿½
         {
             __HAL_TIM_SET_COMPARE(&htim5,TIM_CHANNEL_1,0);
             __HAL_TIM_SET_COMPARE(&htim5,TIM_CHANNEL_2,1000000);
@@ -182,19 +182,19 @@ void GIMBAL_TASK(void const * argument)
         if (pitch_motor_init_flag ==  500)
         {
             pitch_motor_init_flag ++;
-                        Set_Pitch_Motor_down_encoder(Gimbal.PITCH_Motor->postion);//³õÊ¼»¯Ð£ÑéÍê³É£¬Éè¶¨×îµÍÏÞÎ»
+                        Set_Pitch_Motor_down_encoder(Gimbal.PITCH_Motor->postion);//ï¿½ï¿½Ê¼ï¿½ï¿½Ð£ï¿½ï¿½ï¿½ï¿½É£ï¿½ï¿½è¶¨ï¿½ï¿½ï¿½ï¿½ï¿½Î»
 
         }
 
     #endif
     
         
-        taskENTER_CRITICAL();         // ½øÈëÁÙ½çÇø
+        taskENTER_CRITICAL();         // ï¿½ï¿½ï¿½ï¿½ï¿½Ù½ï¿½ï¿½ï¿½
         
-        Gimbal_Deal_TLcontrol();//Í¼´«ÐÅÏ¢´¦Àí¼°×ª·¢
+        Gimbal_Deal_TLcontrol();//Í¼ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½
         
-        IMU_PITCH_Angle_Set_Limit(&UP_ANGLE,&DOWN_ANGLE);//¸©Ñö½ÇÏÞÖÆ
-        Gimbal_CMD_Set(UP_ANGLE,DOWN_ANGLE, Gimbal.ins->Pitch, Gimbal.Gimbal_CMD->Pitch_Motor_down_encoder - Gimbal.PITCH_Motor->postion);//ÍÓÂÝÒÇÉÏÏÂ¼«ÏÞ
+        IMU_PITCH_Angle_Set_Limit(&UP_ANGLE,&DOWN_ANGLE);//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+        Gimbal_CMD_Set(UP_ANGLE,DOWN_ANGLE, Gimbal.ins->Pitch, Gimbal.Gimbal_CMD->Pitch_Motor_down_encoder - Gimbal.PITCH_Motor->postion);//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â¼ï¿½ï¿½ï¿½
         
         
         if (Gimbal.Gimbal_CMD->Fire_Ready == 0)//Gimbal.Gimbal_CMD->rc_ctl->rc.s2 == RC_SW_DOWN)
@@ -208,11 +208,11 @@ void GIMBAL_TASK(void const * argument)
         }
         else
         {
-            Gimbal_Work();      //ÔÆÌ¨Õý³£¹¤×÷
+            Gimbal_Work();      //ï¿½ï¿½Ì¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         }
         
-        RGB_LED();//ìÅ²Êrgb
-        Photo_Control();//¿ª¾µÊ±±£³ÖÍ¼´«Æ½ÐÐ
+        RGB_LED();//ï¿½Å²ï¿½rgb
+        Photo_Control();//ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½Í¼ï¿½ï¿½Æ½ï¿½ï¿½
         
         
         if (time % 2 == 0)    
@@ -221,8 +221,8 @@ void GIMBAL_TASK(void const * argument)
         DJMotor_Send_only_one(Gimbal.YAW_Motor);
         MI_motor_controlmode(Gimbal.PITCH_Motor, Pitch_output_torque, 0, 0, 0, 0);
 
-		taskEXIT_CRITICAL();              // ÍË³öÁÙ½çÇø
-        vTaskDelay(1); // ¾ø¶ÔÑÓÊ±//vTaskDelay(2);
+		taskEXIT_CRITICAL();              // ï¿½Ë³ï¿½ï¿½Ù½ï¿½ï¿½ï¿½
+        vTaskDelay(1); // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±//vTaskDelay(2);
         
     }
 }
@@ -238,36 +238,36 @@ void Gimbal_Init()
     Gimbal.PITCH_Motor = MI_motor_init(&hcan1);
     
     PidInit(&Gimbal.PITCH_Motor_Speed_PID,0.f,0.f,0.0f,Integral_Limit | Output_Limit);
-    PidInitMode(&Gimbal.PITCH_Motor_Speed_PID,Integral_Limit,0,0);//»ý·ÖÏÞ·ù
-    PidInitMode(&Gimbal.PITCH_Motor_Speed_PID,Output_Limit,4,0);//Êä³öÏÞ·ù
+    PidInitMode(&Gimbal.PITCH_Motor_Speed_PID,Integral_Limit,0,0);//ï¿½ï¿½ï¿½ï¿½ï¿½Þ·ï¿½
+    PidInitMode(&Gimbal.PITCH_Motor_Speed_PID,Output_Limit,4,0);//ï¿½ï¿½ï¿½ï¿½Þ·ï¿½
     
     PidInit(&Gimbal.PITCH_Motor_Position_PID,0.0f,0,0.0f,Integral_Limit | Output_Limit | StepIn);
     PidInitMode(&Gimbal.PITCH_Motor_Position_PID, Integral_Limit, 0, 0);
     PidInitMode(&Gimbal.PITCH_Motor_Position_PID, Output_Limit, 0, 0);
     PidInitMode(&Gimbal.PITCH_Motor_Position_PID, StepIn, 30, 0);
     
-    PidInit(&Gimbal.YAW_Motor_SPEED_PID,200.0f,0.0f,15.0f,Output_Limit | Integral_Limit );//Ê¹ÓÃÊä³öÏÞ·ùºÍ»ý·ÖÏÞ·ùÄ£Ê½
-    PidInitMode(&Gimbal.YAW_Motor_SPEED_PID,Integral_Limit,1000,0);//»ý·ÖÏÞ·ùÄ£Ê½ÉèÖÃ
-    PidInitMode(&Gimbal.YAW_Motor_SPEED_PID,Output_Limit,25000,0);//Êä³öÏÞ·ùÄ£Ê½ÉèÖÃ
+    PidInit(&Gimbal.YAW_Motor_SPEED_PID,200.0f,0.0f,15.0f,Output_Limit | Integral_Limit );//Ê¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Þ·ï¿½ï¿½Í»ï¿½ï¿½ï¿½ï¿½Þ·ï¿½Ä£Ê½
+    PidInitMode(&Gimbal.YAW_Motor_SPEED_PID,Integral_Limit,1000,0);//ï¿½ï¿½ï¿½ï¿½ï¿½Þ·ï¿½Ä£Ê½ï¿½ï¿½ï¿½ï¿½
+    PidInitMode(&Gimbal.YAW_Motor_SPEED_PID,Output_Limit,25000,0);//ï¿½ï¿½ï¿½ï¿½Þ·ï¿½Ä£Ê½ï¿½ï¿½ï¿½ï¿½
     
-    PidInit(&Gimbal.YAW_Motor_Position_PID,2.0f,0,0.0f,Output_Limit | Integral_Limit);//Ê¹ÓÃÊä³öÏÞ·ùºÍ»ý·ÖÏÞ·ùÄ£Ê½
-    PidInitMode(&Gimbal.YAW_Motor_Position_PID,Output_Limit,200,0);//Êä³öÏÞ·ùÄ£Ê½ÉèÖÃ
-    PidInitMode(&Gimbal.YAW_Motor_Position_PID,Integral_Limit,200,0);//Êä³öÏÞ·ùÄ£Ê½ÉèÖÃ
+    PidInit(&Gimbal.YAW_Motor_Position_PID,2.0f,0,0.0f,Output_Limit | Integral_Limit);//Ê¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Þ·ï¿½ï¿½Í»ï¿½ï¿½ï¿½ï¿½Þ·ï¿½Ä£Ê½
+    PidInitMode(&Gimbal.YAW_Motor_Position_PID,Output_Limit,200,0);//ï¿½ï¿½ï¿½ï¿½Þ·ï¿½Ä£Ê½ï¿½ï¿½ï¿½ï¿½
+    PidInitMode(&Gimbal.YAW_Motor_Position_PID,Integral_Limit,200,0);//ï¿½ï¿½ï¿½ï¿½Þ·ï¿½Ä£Ê½ï¿½ï¿½ï¿½ï¿½
 
-    PidInit(&Gimbal.yaw_only_i_pid,0.0f,1.5f,0.0f,Output_Limit | Integral_Limit | Separated_Integral);//Ê¹ÓÃÊä³öÏÞ·ùºÍ»ý·ÖÏÞ·ùÄ£Ê½
-    PidInitMode(&Gimbal.yaw_only_i_pid,Integral_Limit,10000,0);//»ý·ÖÏÞ·ùÄ£Ê½ÉèÖÃ
-    PidInitMode(&Gimbal.yaw_only_i_pid,Output_Limit,10000,0);//Êä³öÏÞ·ùÄ£Ê½ÉèÖÃ
+    PidInit(&Gimbal.yaw_only_i_pid,0.0f,1.5f,0.0f,Output_Limit | Integral_Limit | Separated_Integral);//Ê¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Þ·ï¿½ï¿½Í»ï¿½ï¿½ï¿½ï¿½Þ·ï¿½Ä£Ê½
+    PidInitMode(&Gimbal.yaw_only_i_pid,Integral_Limit,10000,0);//ï¿½ï¿½ï¿½ï¿½ï¿½Þ·ï¿½Ä£Ê½ï¿½ï¿½ï¿½ï¿½
+    PidInitMode(&Gimbal.yaw_only_i_pid,Output_Limit,10000,0);//ï¿½ï¿½ï¿½ï¿½Þ·ï¿½Ä£Ê½ï¿½ï¿½ï¿½ï¿½
     PidInitMode(&Gimbal.yaw_only_i_pid,Separated_Integral,20,-20);
    
-    PidInit(&Gimbal.Photo_Motor_SPEED_PID,10.0f,0.0f,0.0f,Output_Limit | Integral_Limit );//Ê¹ÓÃÊä³öÏÞ·ùºÍ»ý·ÖÏÞ·ùÄ£Ê½
-    PidInitMode(&Gimbal.Photo_Motor_SPEED_PID,Integral_Limit,1000,0);//»ý·ÖÏÞ·ùÄ£Ê½ÉèÖÃ
-    PidInitMode(&Gimbal.Photo_Motor_SPEED_PID,Output_Limit,5000,0);//Êä³öÏÞ·ùÄ£Ê½ÉèÖÃ
+    PidInit(&Gimbal.Photo_Motor_SPEED_PID,10.0f,0.0f,0.0f,Output_Limit | Integral_Limit );//Ê¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Þ·ï¿½ï¿½Í»ï¿½ï¿½ï¿½ï¿½Þ·ï¿½Ä£Ê½
+    PidInitMode(&Gimbal.Photo_Motor_SPEED_PID,Integral_Limit,1000,0);//ï¿½ï¿½ï¿½ï¿½ï¿½Þ·ï¿½Ä£Ê½ï¿½ï¿½ï¿½ï¿½
+    PidInitMode(&Gimbal.Photo_Motor_SPEED_PID,Output_Limit,5000,0);//ï¿½ï¿½ï¿½ï¿½Þ·ï¿½Ä£Ê½ï¿½ï¿½ï¿½ï¿½
     
-    PidInit(&Gimbal.Photo_Motor_Position_PID,0.1f,0,0.0f,Output_Limit | Integral_Limit);//Ê¹ÓÃÊä³öÏÞ·ùºÍ»ý·ÖÏÞ·ùÄ£Ê½
-    PidInitMode(&Gimbal.Photo_Motor_Position_PID,Output_Limit,1000,0);//Êä³öÏÞ·ùÄ£Ê½ÉèÖÃ
-    PidInitMode(&Gimbal.Photo_Motor_Position_PID,Integral_Limit,200,0);//Êä³öÏÞ·ùÄ£Ê½ÉèÖÃ
+    PidInit(&Gimbal.Photo_Motor_Position_PID,0.1f,0,0.0f,Output_Limit | Integral_Limit);//Ê¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Þ·ï¿½ï¿½Í»ï¿½ï¿½ï¿½ï¿½Þ·ï¿½Ä£Ê½
+    PidInitMode(&Gimbal.Photo_Motor_Position_PID,Output_Limit,1000,0);//ï¿½ï¿½ï¿½ï¿½Þ·ï¿½Ä£Ê½ï¿½ï¿½ï¿½ï¿½
+    PidInitMode(&Gimbal.Photo_Motor_Position_PID,Integral_Limit,200,0);//ï¿½ï¿½ï¿½ï¿½Þ·ï¿½Ä£Ê½ï¿½ï¿½ï¿½ï¿½
     
-    //LQR³õÊ¼»¯
+    //LQRï¿½ï¿½Ê¼ï¿½ï¿½
     LQR_Init(&Gimbal.lqr_pitch, 2, 1, k_pitch_lqr);
     LQR_Init(&Gimbal.lqr_pitch_litter, 2, 1, k_pitch_lqr_down);
     LQR_Init(&Gimbal.lqr_yaw, 2, 1, k_yaw_lqr);
@@ -275,9 +275,9 @@ void Gimbal_Init()
     LQR_Init(&Gimbal.lqr_encoder_yaw, 2, 1, k_encoder_yaw_lqr);
     
     
-    //´´½¨°²È«ÈÎÎñ
+    //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È«ï¿½ï¿½ï¿½ï¿½
     Pitch_Motor_Safe = Safe_task_add("Pitch_Motor_Safe", 30, pitch_motor_disconnect, pitch_motor_online);
-    //µç»ú»Øµ÷º¯ÊýÉèÖÃ
+    //ï¿½ï¿½ï¿½ï¿½Øµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     MI_Motor_CanRx_Callback(Gimbal.PITCH_Motor, pitch_can_rx_CallBack);
     DJIMotor_CanRx_Callback(Gimbal.YAW_Motor, yaw_can_rx_CallBack);
     DJIMotor_CanRx_Callback(Gimbal.Photo_Motor, Photo_motor_CanRx_callback);
@@ -286,15 +286,15 @@ void Gimbal_Init()
 }
 
 /**
-  *@brief ¸ù¾Ýµç»ú¾ø¶Ô±àÂëÖµÅÐ¶ÏIMUµÄPitchÄ¿±ê½Ç¶È¿ÉÒÔÔö¼Ó¼õÉÙ¶àÉÙ
+  *@brief ï¿½ï¿½ï¿½Ýµï¿½ï¿½ï¿½ï¿½ï¿½Ô±ï¿½ï¿½ï¿½Öµï¿½Ð¶ï¿½IMUï¿½ï¿½PitchÄ¿ï¿½ï¿½Ç¶È¿ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó¼ï¿½ï¿½Ù¶ï¿½ï¿½ï¿½
   */
 void IMU_PITCH_Angle_Set_Limit(fp32 *IMU_Pitch_Up_Limit, fp32 *IMU_Pitch_Down_Limit)
 {
     #ifdef Using_MI_Motor_Init
-    //¼ÆËãµç»ú¾ø¶Ô½Ç¶È¿ÉÒÔ»¹ÄÜÔö¼Ó¼õÉÙ¶àÉÙ
+    //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô½Ç¶È¿ï¿½ï¿½Ô»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó¼ï¿½ï¿½Ù¶ï¿½ï¿½ï¿½
 
 
-     fp32 Motor_Can_reduced_Pitch_Angle   = Gimbal.Gimbal_CMD->Pitch_Motor_down_encoder - Gimbal.PITCH_Motor->postion ;//¸ù¾ÝÉÏµçÊ±¼ÇÂ¼µÄµÍÍ·×î´óÖµÍÆËã
+     fp32 Motor_Can_reduced_Pitch_Angle   = Gimbal.Gimbal_CMD->Pitch_Motor_down_encoder - Gimbal.PITCH_Motor->postion ;//ï¿½ï¿½ï¿½ï¿½ï¿½Ïµï¿½Ê±ï¿½ï¿½Â¼ï¿½Äµï¿½Í·ï¿½ï¿½ï¿½Öµï¿½ï¿½ï¿½ï¿½
      fp32 Motor_Can_increased_Pitch_Angle = Gimbal.PITCH_Motor->postion - (Gimbal.Gimbal_CMD->Pitch_Motor_down_encoder - PITCH_ANGLE_RANGE);
     #else
      fp32 Motor_Can_increased_Pitch_Angle = Gimbal.PITCH_Motor->postion - PITCH_MOTOR_UP_MIN_ACTUAL_ANGLE ;
@@ -318,7 +318,7 @@ void IMU_PITCH_Angle_Set_Limit(fp32 *IMU_Pitch_Up_Limit, fp32 *IMU_Pitch_Down_Li
         Recursive_ave_filter_init(&filter_IMU_Pitch_Down_Limit);
 
     }
-    //Æ½»¬imuÏÞ·ù ·ÀÖ¹Õðµ´·¢É¢
+    //Æ½ï¿½ï¿½imuï¿½Þ·ï¿½ ï¿½ï¿½Ö¹ï¿½ðµ´·ï¿½É¢
     *IMU_Pitch_Up_Limit =  Recursive_ave_filter(&filter_IMU_Pitch_Up_Limit,*IMU_Pitch_Up_Limit,30);
     *IMU_Pitch_Down_Limit =  Recursive_ave_filter(&filter_IMU_Pitch_Down_Limit,*IMU_Pitch_Down_Limit,30);
 }
@@ -326,20 +326,20 @@ void IMU_PITCH_Angle_Set_Limit(fp32 *IMU_Pitch_Up_Limit, fp32 *IMU_Pitch_Down_Li
 
 void Motor_Choice_Lock_Type(void)
 {
-    if (Gimbal.Gimbal_CMD->Gimbal_Work_State == LONG_SHOOT)//Ç°ÉÚÕ¾Ä£Ê½£¬¸ÄÎªËø±àÂëÖµ
+    if (Gimbal.Gimbal_CMD->Gimbal_Work_State == LONG_SHOOT)//Ç°ï¿½ï¿½Õ¾Ä£Ê½ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµ
     {
         if (ABS(Gimbal.ins->Pitch - Gimbal.Gimbal_CMD->Pitch_Set_IMU) < 8.0f && Gimbal.Gimbal_CMD->Pitch_Lock_type == IMU)
-        {//´ïµ½Ä¿±êIMU PITCH
+        {//ï¿½ïµ½Ä¿ï¿½ï¿½IMU PITCH
             Gimbal_Pitch_Lock(ENCODER);
             Gimbal_Pitch_Set_Encoder(Gimbal.PITCH_Motor->postion);
         }
         if (ABS(Gimbal.ins->Yaw - Gimbal.Gimbal_CMD->Yaw_Set_IMU) < 8.0f && Gimbal.Gimbal_CMD->Yaw_Lock_type == IMU)
-        {//´ïµ½Ä¿±êIMU PITCH
+        {//ï¿½ïµ½Ä¿ï¿½ï¿½IMU PITCH
             Gimbal_Yaw_Lock(ENCODER);
             Gimbal_Yaw_Set_Encoder(Gimbal.YAW_Motor->Motor_encoder.Encode_Record_Val);
         }
     }
-    else//¸ÄÎªËøIMU
+    else//ï¿½ï¿½Îªï¿½ï¿½IMU
     {
         if (Gimbal.Gimbal_CMD->Pitch_Lock_type == ENCODER)
         {
@@ -357,7 +357,7 @@ void Motor_Choice_Lock_Type(void)
 float PITCH_TORQUE_LIMIT =  8;
 void Pitch_Calc(void)
 {
-    if (Gimbal.Gimbal_CMD->Pitch_Lock_type == ENCODER)//Ëøµç»ú
+    if (Gimbal.Gimbal_CMD->Pitch_Lock_type == ENCODER)//ï¿½ï¿½ï¿½ï¿½ï¿½
     {
         Gimbal.lqr_encoder_pitch.k[0] = k_encoder_pitch_lqr[0];
         Gimbal.lqr_encoder_pitch.k[1] = k_encoder_pitch_lqr[1];
@@ -372,12 +372,12 @@ void Pitch_Calc(void)
         Pitch_output_torque = Gimbal.lqr_encoder_pitch.Output[0];
         value_limit(Pitch_output_torque,-PITCH_TORQUE_LIMIT,PITCH_TORQUE_LIMIT);
         
-        //¸©½ÇÏÞ·ù
+        //ï¿½ï¿½ï¿½ï¿½ï¿½Þ·ï¿½
         if((Gimbal.Gimbal_CMD->Pitch_Set_Encoder > Gimbal.PITCH_Motor->postion) && (Gimbal.PITCH_Motor->postion > PITCH_MOTOR_DOWN_MAX_ACTUAL_ANGLE+2))
         {
             //MI_motor_controlmode(Gimbal.PITCH_Motor, 0, 0, 0, 0, 0);
         }
-        //Ñö½ÇÏÞ·ù
+        //ï¿½ï¿½ï¿½ï¿½ï¿½Þ·ï¿½
         else if( (Gimbal.Gimbal_CMD->Pitch_Set_Encoder < Gimbal.PITCH_Motor->postion) && (Gimbal.PITCH_Motor->postion < PITCH_MOTOR_UP_MIN_ACTUAL_ANGLE - 2 ))
         {
             //MI_motor_controlmode(Gimbal.PITCH_Motor, 0, 0, 0, 0, 0);
@@ -389,7 +389,7 @@ void Pitch_Calc(void)
         }
     }
 
-    else//Ëøimu
+    else//ï¿½ï¿½imu
     {
         Gimbal.lqr_pitch.k[0] = k_pitch_lqr[0];
         Gimbal.lqr_pitch.k[1] = k_pitch_lqr[1];
@@ -401,7 +401,7 @@ void Pitch_Calc(void)
         static uint8_t litter_lqr_time = 0;
         if (Gimbal.Gimbal_CMD->Pitch_Set_IMU < lastPitch_Set_IMU)
         {
-            litter_lqr_time = 32;//µÍËÙ32´Î
+            litter_lqr_time = 32;//ï¿½ï¿½ï¿½ï¿½32ï¿½ï¿½
         }
         if ( litter_lqr_time > 0)
         {
@@ -425,12 +425,12 @@ void Pitch_Calc(void)
         lastPitch_Set_IMU = Gimbal.Gimbal_CMD->Pitch_Set_IMU;
         value_limit(Pitch_output_torque,-PITCH_TORQUE_LIMIT,PITCH_TORQUE_LIMIT);
         
-        //Ñö½ÇÏÞ·ù
+        //ï¿½ï¿½ï¿½ï¿½ï¿½Þ·ï¿½
         if((Gimbal.Gimbal_CMD->Pitch_Set_IMU > Gimbal.ins->Pitch) && (Gimbal.PITCH_Motor->postion < PITCH_MOTOR_UP_MIN_ACTUAL_ANGLE - 2 ))
         {
             //MI_motor_controlmode(Gimbal.PITCH_Motor, 0, 0, 0, 0, 0);
         }
-        //¸©½ÇÏÞ·ù
+        //ï¿½ï¿½ï¿½ï¿½ï¿½Þ·ï¿½
         else if( (Gimbal.Gimbal_CMD->Pitch_Set_IMU < Gimbal.ins->Pitch) && (Gimbal.PITCH_Motor->postion > PITCH_MOTOR_DOWN_MAX_ACTUAL_ANGLE + 2 ))
         {
             //MI_motor_controlmode(Gimbal.PITCH_Motor, 0, 0, 0, 0, 0);
@@ -445,7 +445,7 @@ void Pitch_Calc(void)
 
 void Yaw_Calc(void)
 {
-    if (Gimbal.Gimbal_CMD->Yaw_Lock_type == ENCODER)//Ëøµç»ú
+    if (Gimbal.Gimbal_CMD->Yaw_Lock_type == ENCODER)//ï¿½ï¿½ï¿½ï¿½ï¿½
     {   
         Gimbal.lqr_encoder_yaw.k[0] = k_encoder_yaw_lqr[0];
         Gimbal.lqr_encoder_yaw.k[1] = k_encoder_yaw_lqr[1];
@@ -457,10 +457,10 @@ void Yaw_Calc(void)
         LQR_Calculate(&Gimbal.lqr_encoder_yaw);
         
         int64_t Yaw_Motor_Output =  Gimbal.lqr_encoder_yaw.Output[0] + PidCalculate(&Gimbal.yaw_only_i_pid, Gimbal.Gimbal_CMD->Yaw_Set_Encoder, Gimbal.YAW_Motor->Motor_encoder.Encode_Record_Val);;
-        value_limit(Yaw_Motor_Output,-25000,25000);//LQRÔËËãÓÐºÜ´ó¸ÅÂÊ³¬int16
+        value_limit(Yaw_Motor_Output,-25000,25000);//LQRï¿½ï¿½ï¿½ï¿½ï¿½ÐºÜ´ï¿½ï¿½ï¿½Ê³ï¿½int16
         Gimbal.YAW_Motor->voltage_input = Yaw_Motor_Output;
     }
-    else//ËøIMU
+    else//ï¿½ï¿½IMU
     {
         Gimbal.lqr_yaw.k[0] = k_yaw_lqr[0];
         Gimbal.lqr_yaw.k[1] = k_yaw_lqr[1];
@@ -476,16 +476,16 @@ void Yaw_Calc(void)
 }
 
 /**
-*@brief Í¼´«Ð¡ÔÆÌ¨¿ØÖÆ
+*@brief Í¼ï¿½ï¿½Ð¡ï¿½ï¿½Ì¨ï¿½ï¿½ï¿½ï¿½
 *@param Shoot
-*@note  ÏòÏÂ½Ç¶ÈÎªÔö¼Ó
+*@note  ï¿½ï¿½ï¿½Â½Ç¶ï¿½Îªï¿½ï¿½ï¿½ï¿½
 */
 int64_t lock_position_encoder = 0;
 int64_t move = 9500;
 float spin = 0.6f;
 
 /**
-  *@brief ¶æ»ú½Ç¶È×ªÂö³å
+  *@brief ï¿½ï¿½ï¿½ï¿½Ç¶ï¿½×ªï¿½ï¿½ï¿½ï¿½
   */
 uint16_t GetCCR(float Inputangle)
 {
@@ -495,35 +495,35 @@ uint16_t GetCCR(float Inputangle)
 
 void Photo_Control(void)
 {
-        /*°´¼ü²Ù¿Ø*/
+        /*ï¿½ï¿½ï¿½ï¿½ï¿½Ù¿ï¿½*/
     /*
-    F ¶æ»ú¡ü
-    V ¶æ»ú¡ý
-    C ¿ª¾µ     
-    B ¹Ø¾µ
+    F ï¿½ï¿½ï¿½ï¿½ï¿½
+    V ï¿½ï¿½ï¿½ï¿½ï¿½
+    C ï¿½ï¿½ï¿½ï¿½     
+    B ï¿½Ø¾ï¿½
     */
     __HAL_TIM_SET_COMPARE(&htim8,TIM_CHANNEL_3,GetCCR(Gimbal.Phtot_Angle));
     
-    //¶¯×÷×é 
-    //µõÉä ±¶¾µµ½Î» ¶æ»úÒ¡ÏÂ
-    //Õý³£ ¶æ»úÒ¡ÉÏ ±¶¾µ²àÖÃ
-    static int16_t Set_Photo_Angle_delay = 300;//µÈ´ý¶æ»úÏòÉÏµ½Î»ºóÔÙ°Ñ±¶¾µÅ²¿ªµÄÊ±¼äÑÓ³Ù
-    static uint8_t Set_MG995_Angle_flag = 1;//½ö¿ª¹Ø¾µÊ±×Ô¶¯ÇÐ»»Ò»´Î¶æ»ú½Ç¶È
+    //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ 
+    //ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î» ï¿½ï¿½ï¿½Ò¡ï¿½ï¿½
+    //ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ò¡ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    static int16_t Set_Photo_Angle_delay = 300;//ï¿½È´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ïµï¿½Î»ï¿½ï¿½ï¿½Ù°Ñ±ï¿½ï¿½ï¿½Å²ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½Ó³ï¿½
+    static uint8_t Set_MG995_Angle_flag = 1;//ï¿½ï¿½ï¿½ï¿½ï¿½Ø¾ï¿½Ê±ï¿½Ô¶ï¿½ï¿½Ð»ï¿½Ò»ï¿½Î¶ï¿½ï¿½ï¿½Ç¶ï¿½
     
     static int64_t last_Photo_Motor_encoder = 0;
-    static int16_t to_lock = 300;//Ð£×¼ÏÞÎ»¶Â×ª¼ÆÊ±Æ÷
-    static int16_t to_unlock = 300;//¶Â×ªºó»áÓÐÐÎ±ä£¬´ËÊ±Éè¶¨ÎªÏÞÎ»±àÂëÖµ²»×¼
-    static uint8_t Reset_flag = 1;//Ð£×¼±êÖ¾Î»
+    static int16_t to_lock = 300;//Ð£×¼ï¿½ï¿½Î»ï¿½ï¿½×ªï¿½ï¿½Ê±ï¿½ï¿½
+    static int16_t to_unlock = 300;//ï¿½ï¿½×ªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î±ä£¬ï¿½ï¿½Ê±ï¿½è¶¨Îªï¿½ï¿½Î»ï¿½ï¿½ï¿½ï¿½Öµï¿½ï¿½×¼
+    static uint8_t Reset_flag = 1;//Ð£×¼ï¿½ï¿½Ö¾Î»
    
-    static int64_t Set_encoder = 0;//ËøµÄ±àÂë
-    static int8_t  Status = 0;//¿ª¹Ø¾µÇé¿ö
-    static uint16_t On_set_time = 0;//³¤°´¿ª¾µ¼ÆÊ±Æ÷
-    static uint16_t Off_set_time = 0;//³¤°´¹Ø¾µ¼ÆÊ±Æ÷
-    static uint8_t  Left_move_flag = 0;//Ïò×óÎ¢µ÷±êÖ¾
-    static uint8_t  Right_move_flag = 0;//ÏòÓÒÎ¢µ÷±êÖ¾
+    static int64_t Set_encoder = 0;//ï¿½ï¿½ï¿½Ä±ï¿½ï¿½ï¿½
+    static int8_t  Status = 0;//ï¿½ï¿½ï¿½Ø¾ï¿½ï¿½ï¿½ï¿½
+    static uint16_t On_set_time = 0;//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½
+    static uint16_t Off_set_time = 0;//ï¿½ï¿½ï¿½ï¿½ï¿½Ø¾ï¿½ï¿½ï¿½Ê±ï¿½ï¿½
+    static uint8_t  Left_move_flag = 0;//ï¿½ï¿½ï¿½ï¿½Î¢ï¿½ï¿½ï¿½ï¿½Ö¾
+    static uint8_t  Right_move_flag = 0;//ï¿½ï¿½ï¿½ï¿½Î¢ï¿½ï¿½ï¿½ï¿½Ö¾
     static uint8_t  FUCK = 1;
 
-    if (Photo_motor_online == 0) return;//µÈ´ý2006ÉÏµçºóÔÙÐ£×¼
+    if (Photo_motor_online == 0) return;//ï¿½È´ï¿½2006ï¿½Ïµï¿½ï¿½ï¿½ï¿½Ð£×¼
     
     if (Reset_flag)
     {
@@ -531,28 +531,28 @@ void Photo_Control(void)
         Status = 0;
         Gimbal.Phtot_Angle = 92;
         
-        Gimbal.Photo_Motor->current_input = to_lock > 0? (-2000):0 ;//×ª¶¯µ½ÏÞÎ»
+        Gimbal.Photo_Motor->current_input = to_lock > 0? (-2000):0 ;//×ªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î»
         
-        if (abs(Gimbal.Photo_Motor->Motor_Information.speed) < 10)//µ½Î»ºó¶Â×ª
+        if (abs(Gimbal.Photo_Motor->Motor_Information.speed) < 10)//ï¿½ï¿½Î»ï¿½ï¿½ï¿½×ª
         {
-            if (to_lock > 0)    to_lock--;//ÍíÉÏºÃÒ¹Ö®³Ç 
+            if (to_lock > 0)    to_lock--;//ï¿½ï¿½ï¿½Ïºï¿½Ò¹Ö®ï¿½ï¿½ 
         }
-        if (to_lock == 0)//¶Â×ª¼ÆÊ±µ½
+        if (to_lock == 0)//ï¿½ï¿½×ªï¿½ï¿½Ê±ï¿½ï¿½
         {
-            to_unlock--;//µçÁ÷Éè¶¨Îª0£¬ÊÍ·Å¶Â×ª²úÉúµÄµ¯ÐÔÐÎ±ä
+            to_unlock--;//ï¿½ï¿½ï¿½ï¿½ï¿½è¶¨Îª0ï¿½ï¿½ï¿½Í·Å¶ï¿½×ªï¿½ï¿½ï¿½ï¿½ï¿½Äµï¿½ï¿½ï¿½ï¿½Î±ï¿½
             if (to_unlock == 0)
             {
-                Reset_flag = 0;//ÒÑÍê³ÉÐ£×¼
-                lock_position_encoder = Gimbal.Photo_Motor->Motor_encoder.Encode_Record_Val;//¼ÇÂ¼¶Â×ª±àÂëÖµ
-                Set_encoder = lock_position_encoder + move;//¶Â×ªÎ»ºÍ¿ª¾µÎ»¼äÓÐ²îÒì
+                Reset_flag = 0;//ï¿½ï¿½ï¿½ï¿½ï¿½Ð£×¼
+                lock_position_encoder = Gimbal.Photo_Motor->Motor_encoder.Encode_Record_Val;//ï¿½ï¿½Â¼ï¿½ï¿½×ªï¿½ï¿½ï¿½ï¿½Öµ
+                Set_encoder = lock_position_encoder + move;//ï¿½ï¿½×ªÎ»ï¿½Í¿ï¿½ï¿½ï¿½Î»ï¿½ï¿½ï¿½Ð²ï¿½ï¿½ï¿½
             }
             
         }
     }
     else 
     {
-    /*¶Ì°´Î¢µ÷*/
-    /*³¤°´¿ª¾µ*/
+    /*ï¿½Ì°ï¿½Î¢ï¿½ï¿½*/
+    /*ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½*/
         
         
     uint8_t unlook_C_flag = 1;
@@ -560,36 +560,36 @@ void Photo_Control(void)
     if (Gimbal.Gimbal_CMD->rc_ctl->kb.bit.B == 1)
     {
         unlook_C_flag = 0;
-        Off_set_time++;//³¤°´¼ÆÊ±Æ÷
-        if (B_set)//°´ÏÂ¼´Î¢µ÷
+        Off_set_time++;//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½
+        if (B_set)//ï¿½ï¿½ï¿½Â¼ï¿½Î¢ï¿½ï¿½
         {
             B_set = 0;
-            if (Status == -1) Right_move_flag = 1;//ÏòÓÒÎ¢µ÷
+            if (Status == -1) Right_move_flag = 1;//ï¿½ï¿½ï¿½ï¿½Î¢ï¿½ï¿½
         }
     }
     else
     {
         B_set = 1;
-        if (Off_set_time > 0) Off_set_time = 0;//ÇåÁã³¤°´¼ÆÊ±Æ÷
+        if (Off_set_time > 0) Off_set_time = 0;//ï¿½ï¿½ï¿½ã³¤ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½
     }
 
     static uint8_t C_set = 1;
     if (Gimbal.Gimbal_CMD->rc_ctl->kb.bit.C == 1 && unlook_C_flag) 
     {
-        On_set_time++;//³¤°´¼ÆÊ±Æ÷
-        if (C_set)//°´ÏÂ¼´Î¢µ÷
+        On_set_time++;//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½
+        if (C_set)//ï¿½ï¿½ï¿½Â¼ï¿½Î¢ï¿½ï¿½
         {
             C_set = 0;
-            if (Status == -1)   Left_move_flag = 1;//¿ª±¶¾µÊ±²ÅÔÊÐíÏò×óÎ¢µ÷
+            if (Status == -1)   Left_move_flag = 1;//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î¢ï¿½ï¿½
         }
     }
     else
     {
-        C_set = 1;//°´¼üËÉ¿ª¼ì²â
-        if (On_set_time > 0) On_set_time = 0;//ÇåÁã³¤°´¼ÆÊ±Æ÷
+        C_set = 1;//ï¿½ï¿½ï¿½ï¿½ï¿½É¿ï¿½ï¿½ï¿½ï¿½
+        if (On_set_time > 0) On_set_time = 0;//ï¿½ï¿½ï¿½ã³¤ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½
     }
     
-    if (On_set_time > 500)//³¤°´Ò»Ãë¿ª¾µ
+    if (On_set_time > 500)//ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ë¿ªï¿½ï¿½
     {
         if (Status != -1)
         {
@@ -602,11 +602,11 @@ void Photo_Control(void)
         }
     }
     
-    if (Off_set_time > 500)//³¤°´Ò»Ãë¹Ø¾µ
+    if (Off_set_time > 500)//ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½Ø¾ï¿½
     {
         if (Status != 1)
         {
-            Left_move_flag = 1;//²¹³¥³¤°´¹Ø¾µ±»ÎóÊ¶±ðµÄ¶Ì°´
+            Left_move_flag = 1;//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ø¾ï¿½ï¿½ï¿½ï¿½ï¿½Ê¶ï¿½ï¿½Ä¶Ì°ï¿½
             Set_Photo_Angle_delay = 200;
             Set_MG995_Angle_flag = 1;
             Status = 1;
@@ -614,12 +614,12 @@ void Photo_Control(void)
 
     }
 
-    if (Left_move_flag == 1)//Ïò×óÎ¢µ÷
+    if (Left_move_flag == 1)//ï¿½ï¿½ï¿½ï¿½Î¢ï¿½ï¿½
     {
         Left_move_flag = 0;
         move-=500;
     }
-    if (Right_move_flag == 1)//ÏòÓÒÎ¢µ÷
+    if (Right_move_flag == 1)//ï¿½ï¿½ï¿½ï¿½Î¢ï¿½ï¿½
     {
         Right_move_flag = 0;
         move+=500;
@@ -627,7 +627,7 @@ void Photo_Control(void)
     
     
     
-        /*F¶Ì°´*/
+        /*Fï¿½Ì°ï¿½*/
         static uint8_t F_set = 1;
         if (Gimbal.Gimbal_CMD->rc_ctl->kb.bit.F == 1)
         {
@@ -640,7 +640,7 @@ void Photo_Control(void)
         else
             F_set = 1;
         
-        /*V¶Ì°´*/
+        /*Vï¿½Ì°ï¿½*/
         static uint8_t V_set = 1;
         if (Gimbal.Gimbal_CMD->rc_ctl->kb.bit.V == 1)
         {
@@ -657,10 +657,10 @@ void Photo_Control(void)
         Gimbal.Photo_Motor->current_input = motor_position_speed_control(&Gimbal.Photo_Motor_SPEED_PID, &Gimbal.Photo_Motor_Position_PID, Set_encoder, Gimbal.Photo_Motor->Motor_encoder.Encode_Record_Val, Gimbal.Photo_Motor->Motor_Information.speed);
     }
         
-    //Ö´ÐÐ¶¯×÷
-    if (Status == 1)//¹Ø¾µ
+    //Ö´ï¿½Ð¶ï¿½ï¿½ï¿½
+    if (Status == 1)//ï¿½Ø¾ï¿½
     {
-        if (Set_MG995_Angle_flag)//Ê×´ÎÖ´ÐÐ¶¯×÷£¬Ò»¼üÉè¶¨¶æ»ú½Ç¶È
+        if (Set_MG995_Angle_flag)//ï¿½×´ï¿½Ö´ï¿½Ð¶ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½è¶¨ï¿½ï¿½ï¿½ï¿½Ç¶ï¿½
         {
             Set_MG995_Angle_flag = 0;
             Gimbal.Phtot_Angle = 85;
@@ -668,32 +668,32 @@ void Photo_Control(void)
         value_limit(Gimbal.Phtot_Angle,85,130);
         
         
-        if (Set_Photo_Angle_delay > 0)   Set_Photo_Angle_delay--;//Ê¹ÓÃ¼òµ¥ÑÓÊ±µÈ´ý¶æ»úµ½Î»ºóÇÐ¾µ£¬·ÀÖ¹±¶¾µ×²Ïà»ú
+        if (Set_Photo_Angle_delay > 0)   Set_Photo_Angle_delay--;//Ê¹ï¿½Ã¼ï¿½ï¿½ï¿½Ê±ï¿½È´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½ï¿½Ð¾ï¿½ï¿½ï¿½ï¿½ï¿½Ö¹ï¿½ï¿½ï¿½ï¿½×²ï¿½ï¿½ï¿½
         if (Set_Photo_Angle_delay == 0)
         {
             Set_encoder = lock_position_encoder + move + 90000;
         }
     }        
     
-    if (Status == -1) //ÓÉÓÚ±àÂëÖµ»áÆ®£¬ËùÒÔÃ¿´Î¿ª¾µ¶¼Çá×²ÏÞÎ»ÖØÖÃ
+    if (Status == -1) //ï¿½ï¿½ï¿½Ú±ï¿½ï¿½ï¿½Öµï¿½ï¿½Æ®ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã¿ï¿½Î¿ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×²ï¿½ï¿½Î»ï¿½ï¿½ï¿½ï¿½
     {
-        Set_encoder = lock_position_encoder + move;//¿ª¾µ
+        Set_encoder = lock_position_encoder + move;//ï¿½ï¿½ï¿½ï¿½
         
-        if (FUCK == 1)//²Ùµ°¿ª¾µÐ£×¼
+        if (FUCK == 1)//ï¿½Ùµï¿½ï¿½ï¿½ï¿½ï¿½Ð£×¼
         {
-            Gimbal.Photo_Motor->current_input = to_lock > 0? (-2000):0 ;//×ª¶¯µ½ÏÞÎ»
-            if (abs(Gimbal.Photo_Motor->Motor_Information.speed) < 10)//µ½Î»ºó¶Â×ª
+            Gimbal.Photo_Motor->current_input = to_lock > 0? (-2000):0 ;//×ªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î»
+            if (abs(Gimbal.Photo_Motor->Motor_Information.speed) < 10)//ï¿½ï¿½Î»ï¿½ï¿½ï¿½×ª
             {
-                if (to_lock > 0)    to_lock--;//ÍíÉÏºÃÒ¹Ö®³Ç 
+                if (to_lock > 0)    to_lock--;//ï¿½ï¿½ï¿½Ïºï¿½Ò¹Ö®ï¿½ï¿½ 
             }
-            if (to_lock == 0)//¶Â×ª¼ÆÊ±µ½
+            if (to_lock == 0)//ï¿½ï¿½×ªï¿½ï¿½Ê±ï¿½ï¿½
             {
                 if (to_unlock > 0) to_unlock--;
                 if (to_unlock == 0)
                 {
-                    //ÒÑÍê³ÉÐ£×¼
-                    lock_position_encoder = Gimbal.Photo_Motor->Motor_encoder.Encode_Record_Val;//¼ÇÂ¼¶Â×ª±àÂëÖµ
-//                    Set_encoder = lock_position_encoder + move;//¿ª¾µ
+                    //ï¿½ï¿½ï¿½ï¿½ï¿½Ð£×¼
+                    lock_position_encoder = Gimbal.Photo_Motor->Motor_encoder.Encode_Record_Val;//ï¿½ï¿½Â¼ï¿½ï¿½×ªï¿½ï¿½ï¿½ï¿½Öµ
+//                    Set_encoder = lock_position_encoder + move;//ï¿½ï¿½ï¿½ï¿½
                     FUCK = 0;
                 }
             }
@@ -701,14 +701,14 @@ void Photo_Control(void)
         }
         else
         {
-            if (Set_MG995_Angle_flag && (abs(Gimbal.Photo_Motor->Motor_encoder.Encode_Record_Val - Set_encoder) < 10000))//¿ª¾µµ½Î»ºó¶æ»ú×Ô¶¯µ½Î»
+            if (Set_MG995_Angle_flag && (abs(Gimbal.Photo_Motor->Motor_encoder.Encode_Record_Val - Set_encoder) < 10000))//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½ï¿½ï¿½ï¿½Ô¶ï¿½ï¿½ï¿½Î»
             {
                 Set_MG995_Angle_flag = 0;
                 Gimbal.Phtot_Angle = 85 + Gimbal.ins->Pitch * spin;
             }
             value_limit(Gimbal.Phtot_Angle,85,130);
         }
-    }//·Å´ó¶æ»ú½Ç¶È   
+    }//ï¿½Å´ï¿½ï¿½ï¿½ï¿½Ç¶ï¿½   
     
 }
 void RGB_LED(void)
@@ -721,7 +721,7 @@ void RGB_LED(void)
         __HAL_TIM_SET_COMPARE(&htim5,TIM_CHANNEL_2,sin_value[idx_2]*1000);
         __HAL_TIM_SET_COMPARE(&htim5,TIM_CHANNEL_3,sin_value[idx_3]*1000);
     
-    //ÈýÉ«µÆÒÔ²»Í¬ÖÜÆÚÔËÐÐÕýÏÒ²¨
+    //ï¿½ï¿½É«ï¿½ï¿½ï¿½Ô²ï¿½Í¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò²ï¿½
    if (idx_1 < 990)  idx_1+=1;
     else    idx_1 = 0;
     
@@ -739,9 +739,9 @@ void Gimbal_Work()
         MI_motor_enable(Gimbal.PITCH_Motor);
         Enable_pitch_motor--;
     }
-    Motor_Choice_Lock_Type();//Ëøµç»ú»òÍÓÂÝÒÇ
-    Pitch_Calc();//PÖá¼ÆËã
-    Yaw_Calc();//Öá¼ÆËã
+    Motor_Choice_Lock_Type();//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Pitch_Calc();//Pï¿½ï¿½ï¿½ï¿½ï¿½
+    Yaw_Calc();//ï¿½ï¿½ï¿½ï¿½ï¿½
 }
 
 void Gimbal_Not_Work()

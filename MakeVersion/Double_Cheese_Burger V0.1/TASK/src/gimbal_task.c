@@ -114,10 +114,10 @@ void Send_Photo_Current()
 
 /*LQR�����б�*/
 //����lqr����
-float k_pitch_lqr[2] = {1.43f, 2.005f};
+float k_pitch_lqr[2] = {1.401f, 2.005f};
 
 float k_pitch_lqr_down[2] = {0.8f, 2.0f};
-float k_yaw_lqr[2] = {-77.3f, -1.0f};
+float k_yaw_lqr[2] = {-77.15f, -1.0f};
 //����lqr����
 float k_virtual_pitch_lqr[2] = {60.0f, 1.2f};
 float k_virtual_yaw_lqr[2] = {-40.0f, -1.0f};

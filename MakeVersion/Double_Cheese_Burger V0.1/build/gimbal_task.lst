@@ -1,4 +1,4 @@
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 1
 
 
    1              		.cpu cortex-m4
@@ -58,7 +58,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
   28:TASK/src/gimbal_task.c **** 
   29:TASK/src/gimbal_task.c **** 
   30:TASK/src/gimbal_task.c **** static void Photo_Control(void);
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 2
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 2
 
 
   31:TASK/src/gimbal_task.c **** static void RGB_LED(void);
@@ -118,7 +118,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
   41              		.global	pitch_motor_disconnect
   42              		.syntax unified
   43              		.thumb
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 3
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 3
 
 
   44              		.thumb_func
@@ -178,7 +178,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
   86              		@ frame_needed = 0, uses_anonymous_args = 0
   87              		@ link register save eliminated.
   89:TASK/src/gimbal_task.c ****     }
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 4
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 4
 
 
   88              		.loc 1 89 5 view .LVU10
@@ -238,7 +238,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  107:TASK/src/gimbal_task.c ****     static uint32_t send_mail_box;
  108:TASK/src/gimbal_task.c ****     CAN_TxHeader.StdId = 0x1FF;
  109:TASK/src/gimbal_task.c ****     CAN_TxHeader.IDE = CAN_ID_STD;
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 5
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 5
 
 
  110:TASK/src/gimbal_task.c ****     CAN_TxHeader.RTR = CAN_RTR_DATA;
@@ -248,10 +248,10 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  114:TASK/src/gimbal_task.c **** 
  115:TASK/src/gimbal_task.c **** /*LQR�����б�*/
  116:TASK/src/gimbal_task.c **** //����lqr����
- 117:TASK/src/gimbal_task.c **** float k_pitch_lqr[2] = {1.43f, 2.005f};
+ 117:TASK/src/gimbal_task.c **** float k_pitch_lqr[2] = {1.401f, 2.005f};
  118:TASK/src/gimbal_task.c **** 
  119:TASK/src/gimbal_task.c **** float k_pitch_lqr_down[2] = {0.8f, 2.0f};
- 120:TASK/src/gimbal_task.c **** float k_yaw_lqr[2] = {-77.3f, -1.0f};
+ 120:TASK/src/gimbal_task.c **** float k_yaw_lqr[2] = {-77.15f, -1.0f};
  121:TASK/src/gimbal_task.c **** //����lqr����
  122:TASK/src/gimbal_task.c **** float k_virtual_pitch_lqr[2] = {60.0f, 1.2f};
  123:TASK/src/gimbal_task.c **** float k_virtual_yaw_lqr[2] = {-40.0f, -1.0f};
@@ -298,7 +298,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  164:TASK/src/gimbal_task.c ****             
  165:TASK/src/gimbal_task.c ****             MI_motor_enable(Gimbal.PITCH_Motor);
  166:TASK/src/gimbal_task.c ****             vTaskDelay(1);
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 6
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 6
 
 
  167:TASK/src/gimbal_task.c ****             continue;
@@ -358,7 +358,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  221:TASK/src/gimbal_task.c ****         DJMotor_Send_only_one(Gimbal.YAW_Motor);
  222:TASK/src/gimbal_task.c ****         MI_motor_controlmode(Gimbal.PITCH_Motor, Pitch_output_torque, 0, 0, 0, 0);
  223:TASK/src/gimbal_task.c **** 
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 7
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 7
 
 
  224:TASK/src/gimbal_task.c **** 		taskEXIT_CRITICAL();              // �˳��ٽ���
@@ -418,7 +418,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  278:TASK/src/gimbal_task.c ****     //������ȫ����
  279:TASK/src/gimbal_task.c ****     Pitch_Motor_Safe = Safe_task_add("Pitch_Motor_Safe", 30, pitch_motor_disconnect, pitch_motor_on
  280:TASK/src/gimbal_task.c ****     //����ص���������
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 8
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 8
 
 
  281:TASK/src/gimbal_task.c ****     MI_Motor_CanRx_Callback(Gimbal.PITCH_Motor, pitch_can_rx_CallBack);
@@ -478,7 +478,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  335:TASK/src/gimbal_task.c ****         }
  336:TASK/src/gimbal_task.c ****         if (ABS(Gimbal.ins->Yaw - Gimbal.Gimbal_CMD->Yaw_Set_IMU) < 8.0f && Gimbal.Gimbal_CMD->Yaw_
  337:TASK/src/gimbal_task.c ****         {//�ﵽĿ��IMU PITCH
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 9
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 9
 
 
  338:TASK/src/gimbal_task.c ****             Gimbal_Yaw_Lock(ENCODER);
@@ -538,7 +538,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  392:TASK/src/gimbal_task.c ****     else//��imu
  393:TASK/src/gimbal_task.c ****     {
  394:TASK/src/gimbal_task.c ****         Gimbal.lqr_pitch.k[0] = k_pitch_lqr[0];
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 10
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 10
 
 
  395:TASK/src/gimbal_task.c ****         Gimbal.lqr_pitch.k[1] = k_pitch_lqr[1];
@@ -598,7 +598,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  449:TASK/src/gimbal_task.c ****     {   
  450:TASK/src/gimbal_task.c ****         Gimbal.lqr_encoder_yaw.k[0] = k_encoder_yaw_lqr[0];
  451:TASK/src/gimbal_task.c ****         Gimbal.lqr_encoder_yaw.k[1] = k_encoder_yaw_lqr[1];
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 11
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 11
 
 
  452:TASK/src/gimbal_task.c **** 
@@ -658,7 +658,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  506:TASK/src/gimbal_task.c ****     
  507:TASK/src/gimbal_task.c ****     //������ 
  508:TASK/src/gimbal_task.c ****     //���� ������λ ���ҡ��
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 12
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 12
 
 
  509:TASK/src/gimbal_task.c ****     //���� ���ҡ�� ��������
@@ -718,7 +718,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  563:TASK/src/gimbal_task.c ****         Off_set_time++;//������ʱ��
  564:TASK/src/gimbal_task.c ****         if (B_set)//���¼�΢��
  565:TASK/src/gimbal_task.c ****         {
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 13
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 13
 
 
  566:TASK/src/gimbal_task.c ****             B_set = 0;
@@ -778,7 +778,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  620:TASK/src/gimbal_task.c ****         move-=500;
  621:TASK/src/gimbal_task.c ****     }
  622:TASK/src/gimbal_task.c ****     if (Right_move_flag == 1)//����΢��
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 14
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 14
 
 
  623:TASK/src/gimbal_task.c ****     {
@@ -838,7 +838,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  677:TASK/src/gimbal_task.c ****     
  678:TASK/src/gimbal_task.c ****     if (Status == -1) //���ڱ���ֵ��Ʈ������ÿ�ο�������
  679:TASK/src/gimbal_task.c ****     {
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 15
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 15
 
 
  680:TASK/src/gimbal_task.c ****         Set_encoder = lock_position_encoder + move;//����
@@ -898,7 +898,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  142 0002 1F4B     		ldr	r3, .L17
  143 0004 1988     		ldrh	r1, [r3]
  144 0006 1F4C     		ldr	r4, .L17+4
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 16
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 16
 
 
  145 0008 34F81130 		ldrh	r3, [r4, r1, lsl #1]
@@ -958,7 +958,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  188 0056 9342     		cmp	r3, r2
  189 0058 0DD8     		bhi	.L14
  190              		.loc 1 731 26 is_stmt 1 discriminator 1 view .LVU32
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 17
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 17
 
 
  191              		.loc 1 731 31 is_stmt 0 discriminator 1 view .LVU33
@@ -1018,7 +1018,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  238              		.section	.text.pitch_can_rx_CallBack,"ax",%progbits
  239              		.align	1
  240              		.global	pitch_can_rx_CallBack
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 18
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 18
 
 
  241              		.syntax unified
@@ -1078,7 +1078,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  288              		.loc 1 232 1 is_stmt 1 view -0
  289              		.cfi_startproc
  290              		@ args = 0, pretend = 0, frame = 0
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 19
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 19
 
 
  291              		@ frame_needed = 0, uses_anonymous_args = 0
@@ -1138,7 +1138,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  335              	.LVL3:
  236:TASK/src/gimbal_task.c ****     Gimbal.YAW_Motor = DJIMotor_Init(2,1,false,GM6020,3600/2/PI);
  336              		.loc 1 236 24 view .LVU58
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 20
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 20
 
 
  337 0030 E060     		str	r0, [r4, #12]
@@ -1198,7 +1198,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  381 0086 04F5F275 		add	r5, r4, #484
  382 008a 4FF48371 		mov	r1, #262
  383 008e B0EE481A 		vmov.f32	s2, s16
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 21
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 21
 
 
  384 0092 F0EE480A 		vmov.f32	s1, s16
@@ -1258,7 +1258,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  432 010c 2846     		mov	r0, r5
  433 010e FFF7FEFF 		bl	PidInitMode
  434              	.LVL15:
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 22
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 22
 
 
  253:TASK/src/gimbal_task.c ****     PidInitMode(&Gimbal.YAW_Motor_Position_PID,Output_Limit,200,0);//����޷�ģʽ���
@@ -1318,7 +1318,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  482              		.loc 1 260 5 view .LVU81
  483 0186 FBEE040A 		vmov.f32	s1, #-2.0e+1
  484 018a B3EE040A 		vmov.f32	s0, #2.0e+1
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 23
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 23
 
 
  485 018e 1021     		movs	r1, #16
@@ -1378,7 +1378,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  533 0202 FFF7FEFF 		bl	PidInitMode
  534              	.LVL28:
  271:TASK/src/gimbal_task.c ****     LQR_Init(&Gimbal.lqr_pitch_litter, 2, 1, k_pitch_lqr_down);
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 24
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 24
 
 
  535              		.loc 1 271 5 view .LVU88
@@ -1438,7 +1438,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  581              		.loc 1 281 5 is_stmt 1 view .LVU96
  582 025c 1C49     		ldr	r1, .L25+76
  583 025e 2069     		ldr	r0, [r4, #16]
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 25
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 25
 
 
  584 0260 FFF7FEFF 		bl	MI_Motor_CanRx_Callback
@@ -1498,7 +1498,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  634 02cc 00000000 		.word	.LANCHOR7
  635 02d0 00000000 		.word	pitch_can_rx_CallBack
  636 02d4 00000000 		.word	yaw_can_rx_CallBack
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 26
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 26
 
 
  637 02d8 00000000 		.word	Photo_motor_CanRx_callback
@@ -1558,7 +1558,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  298:TASK/src/gimbal_task.c ****     #else
  683              		.loc 1 298 11 view .LVU111
  684 0020 77EEC77A 		vsub.f32	s15, s15, s14
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 27
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 27
 
 
  685              	.LVL41:
@@ -1618,7 +1618,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  312:TASK/src/gimbal_task.c **** 
  721              		.loc 1 312 5 view .LVU130
  314:TASK/src/gimbal_task.c ****     if (filter_init_flag)
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 28
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 28
 
 
  722              		.loc 1 314 5 view .LVU131
@@ -1678,7 +1678,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  764 008c 00000000 		.word	.LANCHOR14
  765 0090 00000000 		.word	.LANCHOR15
  766              		.cfi_endproc
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 29
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 29
 
 
  767              	.LFE182:
@@ -1738,7 +1738,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  804              	.L35:
  805 001a 00BF     		.align	2
  806              	.L34:
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 30
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 30
 
 
  807 001c 00000000 		.word	.LANCHOR1
@@ -1798,7 +1798,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  858 0004 1A70     		strb	r2, [r3]
   87:TASK/src/gimbal_task.c **** void yaw_can_rx_CallBack(void){//Safe_Task_online_name_("Yaw_Motor_Safe");
  859              		.loc 1 87 57 view .LVU159
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 31
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 31
 
 
  860 0006 7047     		bx	lr
@@ -1858,7 +1858,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  903              		.loc 1 102 20 is_stmt 0 view .LVU172
  904 000e 1371     		strb	r3, [r2, #4]
  103:TASK/src/gimbal_task.c ****     Can_Tx_Data[6] = Gimbal.Photo_Motor->current_input >> 8;
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 32
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 32
 
 
  905              		.loc 1 103 5 is_stmt 1 view .LVU173
@@ -1918,7 +1918,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  941              		.loc 1 113 1 is_stmt 0 view .LVU191
  942 003a 08BD     		pop	{r3, pc}
  943              	.L45:
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 33
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 33
 
 
  944              		.align	2
@@ -1978,7 +1978,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  990 0012 404B     		ldr	r3, .L66
  991 0014 1B68     		ldr	r3, [r3]
  349:TASK/src/gimbal_task.c ****         {
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 34
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 34
 
 
  992              		.loc 1 349 30 view .LVU202
@@ -2038,7 +2038,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  1035 0060 37EEE67A 		vsub.f32	s14, s15, s13
  336:TASK/src/gimbal_task.c ****         {//�ﵽĿ��IMU PITCH
  1036              		.loc 1 336 67 view .LVU214
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 35
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 35
 
 
  1037 0064 B5EEC07A 		vcmpe.f32	s14, #0
@@ -2098,7 +2098,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  1080 00b4 0122     		movmi	r2, #1
  1081 00b6 0022     		movpl	r2, #0
  1082 00b8 C7E7     		b	.L50
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 36
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 36
 
 
  1083              	.L65:
@@ -2158,7 +2158,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  1126 0100 FFF7FEFF 		bl	Gimbal_Yaw_Lock
  1127              	.LVL58:
  352:TASK/src/gimbal_task.c ****         }    
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 37
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 37
 
 
  1128              		.loc 1 352 13 view .LVU237
@@ -2218,7 +2218,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  1176              	.LBB2:
  394:TASK/src/gimbal_task.c ****         Gimbal.lqr_pitch.k[1] = k_pitch_lqr[1];
  1177              		.loc 1 394 9 is_stmt 1 view .LVU246
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 38
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 38
 
 
  394:TASK/src/gimbal_task.c ****         Gimbal.lqr_pitch.k[1] = k_pitch_lqr[1];
@@ -2278,7 +2278,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  1214              		.loc 1 398 60 view .LVU264
  1215 003a F1EE677A 		vneg.f32	s15, s15
  398:TASK/src/gimbal_task.c ****         
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 39
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 39
 
 
  1216              		.loc 1 398 15 view .LVU265
@@ -2338,7 +2338,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  1254 006e 1160     		str	r1, [r2]	@ float
  410:TASK/src/gimbal_task.c ****             
  1255              		.loc 1 410 13 is_stmt 1 view .LVU282
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 40
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 40
 
 
  410:TASK/src/gimbal_task.c ****             
@@ -2398,7 +2398,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  1296 00aa F4EEE76A 		vcmpe.f32	s13, s15
  1297 00ae F1EE10FA 		vmrs	APSR_nzcv, FPSCR
  1298 00b2 01DD     		ble	.L79
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 41
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 41
 
 
  1299 00b4 F0EE667A 		vmov.f32	s15, s13
@@ -2458,7 +2458,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  363:TASK/src/gimbal_task.c **** 
  1340              		.loc 1 363 9 is_stmt 1 view .LVU310
  363:TASK/src/gimbal_task.c **** 
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 42
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 42
 
 
  1341              		.loc 1 363 33 is_stmt 0 view .LVU311
@@ -2518,7 +2518,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  1379              		.loc 1 372 9 view .LVU327
  372:TASK/src/gimbal_task.c ****         value_limit(Pitch_output_torque,-PITCH_TORQUE_LIMIT,PITCH_TORQUE_LIMIT);
  1380              		.loc 1 372 55 is_stmt 0 view .LVU328
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 43
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 43
 
 
  1381 011c D4F88430 		ldr	r3, [r4, #132]
@@ -2578,7 +2578,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  1423              		.loc 1 421 13 view .LVU340
  1424 016c 2846     		mov	r0, r5
  1425 016e FFF7FEFF 		bl	LQR_Calculate
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 44
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 44
 
 
  1426              	.LVL70:
@@ -2638,7 +2638,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  1477 0006 83B0     		sub	sp, sp, #12
  1478              	.LCFI19:
  1479              		.cfi_def_cfa_offset 32
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 45
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 45
 
 
  448:TASK/src/gimbal_task.c ****     {   
@@ -2698,7 +2698,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  469:TASK/src/gimbal_task.c ****         LQR_Data_Update(&Gimbal.lqr_yaw, Yaw_system_state);
  1518              		.loc 1 469 9 is_stmt 1 view .LVU362
  469:TASK/src/gimbal_task.c ****         LQR_Data_Update(&Gimbal.lqr_yaw, Yaw_system_state);
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 46
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 46
 
 
  1519              		.loc 1 469 40 is_stmt 0 view .LVU363
@@ -2758,7 +2758,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  1559              		.loc 1 474 41 view .LVU377
  1560              	.LBE5:
  476:TASK/src/gimbal_task.c **** 
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 47
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 47
 
 
  1561              		.loc 1 476 1 view .LVU378
@@ -2818,7 +2818,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  1602 009e 2B6A     		ldr	r3, [r5, #32]
  453:TASK/src/gimbal_task.c ****         float Yaw_system_state[2] = {Yaw_motortarget, Gimbal.YAW_Motor->Motor_Information.speed};
  1603              		.loc 1 453 68 view .LVU392
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 48
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 48
 
 
  1604 00a0 C01A     		subs	r0, r0, r3
@@ -2878,7 +2878,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  1643 00e2 D3E90801 		ldrd	r0, [r3, #32]
  1644 00e6 FFF7FEFF 		bl	__aeabi_l2f
  1645              	.LVL81:
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 49
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 49
 
 
  1646 00ea F0EE480A 		vmov.f32	s1, s16
@@ -2938,7 +2938,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  1691              	.L99:
  1692 013c 00000000 		.word	.LANCHOR1
  1693 0140 00000000 		.word	.LANCHOR11
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 50
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 50
 
 
  1694 0144 00003443 		.word	1127481344
@@ -2998,7 +2998,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  1741 001a FFF7FEFF 		bl	MI_motor_enable
  1742              	.LVL90:
  740:TASK/src/gimbal_task.c ****     }
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 51
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 51
 
 
  1743              		.loc 1 740 9 view .LVU426
@@ -3058,7 +3058,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  1790 0022 7047     		bx	lr
  1791              	.L109:
  1792              		.align	2
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 52
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 52
 
 
  1793              	.L108:
@@ -3118,7 +3118,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  1839              		.loc 1 519 5 view .LVU445
  520:TASK/src/gimbal_task.c ****     static uint16_t Off_set_time = 0;//�����ؾ���ʱ��
  1840              		.loc 1 520 5 view .LVU446
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 53
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 53
 
 
  521:TASK/src/gimbal_task.c ****     static uint8_t  Left_move_flag = 0;//����΢����־
@@ -3178,7 +3178,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  1877 003c B3F90020 		ldrsh	r2, [r3]
  534:TASK/src/gimbal_task.c ****         
  1878              		.loc 1 534 43 view .LVU465
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 54
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 54
 
 
  1879 0040 002A     		cmp	r2, #0
@@ -3238,7 +3238,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  1919 0078 013B     		subs	r3, r3, #1
  1920 007a 1BB2     		sxth	r3, r3
  1921 007c 1380     		strh	r3, [r2]	@ movhi
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 55
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 55
 
 
  543:TASK/src/gimbal_task.c ****             {
@@ -3298,7 +3298,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  1961              		.loc 1 560 15 is_stmt 0 view .LVU494
  1962 00ac 6D4A     		ldr	r2, .L161+36
  1963 00ae 1268     		ldr	r2, [r2]
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 56
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 56
 
 
  560:TASK/src/gimbal_task.c ****     {
@@ -3358,7 +3358,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  2002 00da 6748     		ldr	r0, .L161+56
  2003 00dc 0078     		ldrb	r0, [r0]	@ zero_extendqisi2
  564:TASK/src/gimbal_task.c ****         {
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 57
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 57
 
 
  2004              		.loc 1 564 12 view .LVU511
@@ -3418,7 +3418,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  2043              		.loc 1 579 9 is_stmt 1 view .LVU526
  579:TASK/src/gimbal_task.c ****         if (C_set)//���¼�΢��
  2044              		.loc 1 579 20 is_stmt 0 view .LVU527
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 58
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 58
 
 
  2045 010a 5E48     		ldr	r0, .L161+68
@@ -3478,7 +3478,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  2084              		.loc 1 589 9 is_stmt 1 view .LVU542
  589:TASK/src/gimbal_task.c ****     }
  2085              		.loc 1 589 25 is_stmt 0 view .LVU543
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 59
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 59
 
 
  2086 0138 524B     		ldr	r3, .L161+68
@@ -3538,7 +3538,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  2124              		.loc 1 599 13 is_stmt 1 view .LVU559
  599:TASK/src/gimbal_task.c ****             Set_MG995_Angle_flag = 1;
  2125              		.loc 1 599 35 is_stmt 0 view .LVU560
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 60
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 60
 
 
  2126 016c 4948     		ldr	r0, .L161+84
@@ -3598,7 +3598,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  2164              		.loc 1 611 34 is_stmt 0 view .LVU576
  2165 019c 2C48     		ldr	r0, .L161+16
  2166 019e 0370     		strb	r3, [r0]
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 61
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 61
 
 
  612:TASK/src/gimbal_task.c ****         }
@@ -3658,7 +3658,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  2204              		.loc 1 637 17 is_stmt 1 view .LVU593
  637:TASK/src/gimbal_task.c ****             }
  2205              		.loc 1 637 23 is_stmt 0 view .LVU594
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 62
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 62
 
 
  2206 01c6 1E4B     		ldr	r3, .L161
@@ -3718,7 +3718,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  2249 0210 0121     		movs	r1, #1
  2250 0212 1970     		strb	r1, [r3]
  2251              	.L125:
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 63
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 63
 
 
  644:TASK/src/gimbal_task.c ****         if (Gimbal.Gimbal_CMD->rc_ctl->kb.bit.V == 1)
@@ -3778,7 +3778,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  2293 0260 30F8FFFF 		.word	-2000
  2294 0264 00000000 		.word	.LANCHOR1
  2295 0268 00000000 		.word	.LANCHOR29
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 64
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 64
 
 
  2296 026c 00000000 		.word	.LANCHOR30
@@ -3838,7 +3838,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  2342              	.LBE7:
  661:TASK/src/gimbal_task.c ****     {
  2343              		.loc 1 661 5 is_stmt 1 view .LVU627
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 65
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 65
 
 
  661:TASK/src/gimbal_task.c ****     {
@@ -3898,7 +3898,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  2385 030c 674A     		ldr	r2, .L163+20
  2386 030e D2ED007A 		vldr.32	s15, [r2]
  2387 0312 9FED687A 		vldr.32	s14, .L163+28
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 66
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 66
 
 
  2388 0316 F4EEC77A 		vcmpe.f32	s15, s14
@@ -3958,7 +3958,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  2428              		.loc 1 674 13 is_stmt 1 view .LVU654
  674:TASK/src/gimbal_task.c ****         }
  2429              		.loc 1 674 49 is_stmt 0 view .LVU655
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 67
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 67
 
 
  2430 035c 5849     		ldr	r1, .L163+40
@@ -4018,7 +4018,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  2473              		.loc 1 704 16 view .LVU666
  2474 03a2 29B3     		cbz	r1, .L140
  704:TASK/src/gimbal_task.c ****             {
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 68
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 68
 
 
  2475              		.loc 1 704 42 discriminator 1 view .LVU667
@@ -4078,7 +4078,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  2518 03fe F1EE10FA 		vmrs	APSR_nzcv, FPSCR
  2519 0402 01D5     		bpl	.L141
  2520 0404 F0EE477A 		vmov.f32	s15, s14
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 69
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 69
 
 
  2521              	.L141:
@@ -4138,7 +4138,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  2562 044a 04D8     		bhi	.L137
  687:TASK/src/gimbal_task.c ****             }
  2563              		.loc 1 687 17 is_stmt 1 view .LVU692
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 70
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 70
 
 
  687:TASK/src/gimbal_task.c ****             }
@@ -4198,7 +4198,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  695:TASK/src/gimbal_task.c **** //                    Set_encoder = lock_position_encoder + move;//����
  2602              		.loc 1 695 43 view .LVU709
  2603 047a 114B     		ldr	r3, .L163+40
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 71
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 71
 
 
  2604 047c 1960     		str	r1, [r3]
@@ -4258,7 +4258,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  2653              		.syntax unified
  2654              		.thumb
  2655              		.thumb_func
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 72
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 72
 
 
  2657              	GIMBAL_TASK:
@@ -4318,7 +4318,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  2699 001e 644A     		ldr	r2, .L188+8
  2700 0020 5A63     		str	r2, [r3, #52]
  162:TASK/src/gimbal_task.c ****             __HAL_TIM_SET_COMPARE(&htim5,TIM_CHANNEL_3,0);
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 73
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 73
 
 
  2701              		.loc 1 162 13 view .LVU728
@@ -4378,7 +4378,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  2740 004e 632B     		cmp	r3, #99
  2741 0050 E3D9     		bls	.L184
  170:TASK/src/gimbal_task.c ****         {
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 74
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 74
 
 
  2742              		.loc 1 170 9 is_stmt 1 view .LVU744
@@ -4438,7 +4438,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  2782 0090 D6ED000A 		vldr.32	s1, [r6]
  2783 0094 95ED000A 		vldr.32	s0, [r5]
  2784 0098 FFF7FEFF 		bl	Gimbal_CMD_Set
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 75
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 75
 
 
  2785              	.LVL112:
@@ -4498,7 +4498,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  2822 00c6 93ED240A 		vldr.32	s0, [r3, #144]
  2823 00ca FFF7FEFF 		bl	Gimbal_Pitch_Set_IMU
  2824              	.LVL116:
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 76
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 76
 
 
  207:TASK/src/gimbal_task.c ****         }
@@ -4558,7 +4558,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  2867              		.loc 1 172 13 view .LVU787
  2868 0114 254B     		ldr	r3, .L188+4
  2869 0116 1B68     		ldr	r3, [r3]
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 77
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 77
 
 
  2870 0118 0022     		movs	r2, #0
@@ -4618,7 +4618,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  2913 016a 0120     		movs	r0, #1
  2914 016c FFF7FEFF 		bl	vTaskDelay
  2915              	.LVL124:
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 78
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 78
 
 
  179:TASK/src/gimbal_task.c ****         }
@@ -4678,7 +4678,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  2963 01d0 00000000 		.word	.LANCHOR46
  2964 01d4 8FC2F53C 		.word	1022739087
  2965 01d8 8FC2F5BC 		.word	-1124744561
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 79
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 79
 
 
  2966              		.cfi_endproc
@@ -4738,7 +4738,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  3020      00000000 
  3021              		.section	.bss.Left_move_flag.7,"aw",%nobits
  3022              		.set	.LANCHOR38,. + 0
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 80
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 80
 
 
  3025              	Left_move_flag.7:
@@ -4798,7 +4798,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  3094              		.section	.bss.filter_IMU_Pitch_Up_Limit.23,"aw",%nobits
  3095              		.align	2
  3096              		.set	.LANCHOR14,. + 0
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 81
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 81
 
 
  3099              	filter_IMU_Pitch_Up_Limit.23:
@@ -4858,7 +4858,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  3167              	send_mail_box.26:
  3168 0000 00000000 		.space	4
  3169              		.section	.bss.time.25,"aw",%nobits
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 82
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 82
 
 
  3170              		.align	1
@@ -4918,7 +4918,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  3250 0000 01       		.byte	1
  3251              		.section	.data.k_encoder_pitch_lqr,"aw"
  3252              		.align	2
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 83
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 83
 
 
  3253              		.set	.LANCHOR12,. + 0
@@ -4935,7 +4935,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  3268              		.align	2
  3269              		.set	.LANCHOR9,. + 0
  3272              	k_pitch_lqr:
- 3273 0000 3D0AB73F 		.word	1068960317
+ 3273 0000 F853B33F 		.word	1068717048
  3274 0004 EC510040 		.word	1073762796
  3275              		.section	.data.k_pitch_lqr_down,"aw"
  3276              		.align	2
@@ -4957,7 +4957,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  3298              		.align	2
  3299              		.set	.LANCHOR11,. + 0
  3302              	k_yaw_lqr:
- 3303 0000 9A999AC2 		.word	-1030055526
+ 3303 0000 CD4C9AC2 		.word	-1030075187
  3304 0004 000080BF 		.word	-1082130432
  3305              		.section	.data.move,"aw"
  3306              		.align	3
@@ -4978,7 +4978,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  3325 000c 0602     		.short	518
  3326 000e 0902     		.short	521
  3327 0010 0D02     		.short	525
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 84
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 84
 
 
  3328 0012 1002     		.short	528
@@ -5038,7 +5038,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  3382 007e B402     		.short	692
  3383 0080 B702     		.short	695
  3384 0082 BA02     		.short	698
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 85
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 85
 
 
  3385 0084 BD02     		.short	701
@@ -5098,7 +5098,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  3439 00f0 4A03     		.short	842
  3440 00f2 4C03     		.short	844
  3441 00f4 4E03     		.short	846
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 86
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 86
 
 
  3442 00f6 5103     		.short	849
@@ -5158,7 +5158,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  3496 0162 B403     		.short	948
  3497 0164 B503     		.short	949
  3498 0166 B703     		.short	951
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 87
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 87
 
 
  3499 0168 B803     		.short	952
@@ -5218,7 +5218,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  3553 01d4 E503     		.short	997
  3554 01d6 E503     		.short	997
  3555 01d8 E603     		.short	998
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 88
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 88
 
 
  3556 01da E603     		.short	998
@@ -5278,7 +5278,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  3610 0246 D703     		.short	983
  3611 0248 D603     		.short	982
  3612 024a D503     		.short	981
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 89
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 89
 
 
  3613 024c D503     		.short	981
@@ -5338,7 +5338,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  3667 02b8 8C03     		.short	908
  3668 02ba 8A03     		.short	906
  3669 02bc 8803     		.short	904
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 90
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 90
 
 
  3670 02be 8603     		.short	902
@@ -5398,7 +5398,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  3724 032a 0D03     		.short	781
  3725 032c 0A03     		.short	778
  3726 032e 0703     		.short	775
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 91
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 91
 
 
  3727 0330 0503     		.short	773
@@ -5458,7 +5458,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  3781 039c 6A02     		.short	618
  3782 039e 6702     		.short	615
  3783 03a0 6402     		.short	612
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 92
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 92
 
 
  3784 03a2 6102     		.short	609
@@ -5518,7 +5518,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  3838 040e B801     		.short	440
  3839 0410 B501     		.short	437
  3840 0412 B201     		.short	434
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 93
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 93
 
 
  3841 0414 AF01     		.short	431
@@ -5578,7 +5578,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  3895 0480 0E01     		.short	270
  3896 0482 0B01     		.short	267
  3897 0484 0801     		.short	264
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 94
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 94
 
 
  3898 0486 0501     		.short	261
@@ -5638,7 +5638,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  3952 04f2 8100     		.short	129
  3953 04f4 7F00     		.short	127
  3954 04f6 7C00     		.short	124
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 95
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 95
 
 
  3955 04f8 7A00     		.short	122
@@ -5698,7 +5698,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  4009 0564 2300     		.short	35
  4010 0566 2100     		.short	33
  4011 0568 2000     		.short	32
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 96
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 96
 
 
  4012 056a 1F00     		.short	31
@@ -5758,7 +5758,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  4066 05d6 0000     		.short	0
  4067 05d8 0000     		.short	0
  4068 05da 0000     		.short	0
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 97
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 97
 
 
  4069 05dc 0000     		.short	0
@@ -5818,7 +5818,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  4123 0648 1C00     		.short	28
  4124 064a 1D00     		.short	29
  4125 064c 1E00     		.short	30
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 98
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 98
 
 
  4126 064e 1F00     		.short	31
@@ -5878,7 +5878,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  4180 06ba 7400     		.short	116
  4181 06bc 7600     		.short	118
  4182 06be 7800     		.short	120
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 99
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 99
 
 
  4183 06c0 7A00     		.short	122
@@ -5938,7 +5938,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  4237 072c FD00     		.short	253
  4238 072e 0001     		.short	256
  4239 0730 0301     		.short	259
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 100
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 100
 
 
  4240 0732 0501     		.short	261
@@ -5998,7 +5998,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  4294 079e A501     		.short	421
  4295 07a0 A801     		.short	424
  4296 07a2 AB01     		.short	427
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 101
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 101
 
 
  4297 07a4 AF01     		.short	431
@@ -6058,7 +6058,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  4359              		.file 13 "ACE-ECF/Algorithm/inc/pid.h"
  4360              		.file 14 "ACE-ECF/Bsp/Inc/bsp_Motor_Encoder.h"
  4361              		.file 15 "Core/Inc/can.h"
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 102
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 102
 
 
  4362              		.file 16 "ACE-ECF/Control/Inc/Cybergear_Motor.h"
@@ -6073,171 +6073,171 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 1
  4371              		.file 25 "ACE-ECF/Algorithm/inc/maths.h"
  4372              		.file 26 "Middlewares/Third_Party/FreeRTOS/Source/include/task.h"
  4373              		.file 27 "Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/portmacro.h"
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 103
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 103
 
 
 DEFINED SYMBOLS
                             *ABS*:00000000 gimbal_task.c
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:20     .text.pitch_motor_online:00000000 $t
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:26     .text.pitch_motor_online:00000000 pitch_motor_online
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:40     .text.pitch_motor_disconnect:00000000 $t
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:46     .text.pitch_motor_disconnect:00000000 pitch_motor_disconnect
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:69     .text.pitch_motor_disconnect:00000010 $d
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:75     .text.yaw_can_rx_CallBack:00000000 $t
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:81     .text.yaw_can_rx_CallBack:00000000 yaw_can_rx_CallBack
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:94     .text.Photo_motor_CanRx_callback:00000000 $t
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:100    .text.Photo_motor_CanRx_callback:00000000 Photo_motor_CanRx_callback
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:117    .text.Photo_motor_CanRx_callback:00000008 $d
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:122    .text.RGB_LED:00000000 $t
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:127    .text.RGB_LED:00000000 RGB_LED
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:230    .text.RGB_LED:00000080 $d
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:239    .text.pitch_can_rx_CallBack:00000000 $t
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:245    .text.pitch_can_rx_CallBack:00000000 pitch_can_rx_CallBack
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:271    .text.pitch_can_rx_CallBack:00000014 $d
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:277    .rodata.Gimbal_Init.str1.4:00000000 $d
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:281    .text.Gimbal_Init:00000000 $t
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:286    .text.Gimbal_Init:00000000 Gimbal_Init
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:616    .text.Gimbal_Init:00000284 $d
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:642    .text.IMU_PITCH_Angle_Set_Limit:00000000 $t
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:647    .text.IMU_PITCH_Angle_Set_Limit:00000000 IMU_PITCH_Angle_Set_Limit
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:761    .text.IMU_PITCH_Angle_Set_Limit:00000080 $d
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:770    .text.Gimbal_Not_Work:00000000 $t
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:775    .text.Gimbal_Not_Work:00000000 Gimbal_Not_Work
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:807    .text.Gimbal_Not_Work:0000001c $d
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:813    .text.yaw_motor_online:00000000 $t
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:819    .text.yaw_motor_online:00000000 yaw_motor_online
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:836    .text.yaw_motor_online:00000008 $d
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:841    .text.yaw_motor_disconnect:00000000 $t
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:847    .text.yaw_motor_disconnect:00000000 yaw_motor_disconnect
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:864    .text.yaw_motor_disconnect:00000008 $d
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:869    .text.Send_Photo_Current:00000000 $t
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:875    .text.Send_Photo_Current:00000000 Send_Photo_Current
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:946    .text.Send_Photo_Current:0000003c $d
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:955    .text.Motor_Choice_Lock_Type:00000000 $t
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:961    .text.Motor_Choice_Lock_Type:00000000 Motor_Choice_Lock_Type
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:1141   .text.Motor_Choice_Lock_Type:00000114 $d
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:1146   .text.Pitch_Calc:00000000 $t
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:1152   .text.Pitch_Calc:00000000 Pitch_Calc
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:1439   .text.Pitch_Calc:0000017c $d
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:1454   .text.Yaw_Calc:00000000 $t
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:1460   .text.Yaw_Calc:00000000 Yaw_Calc
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:1692   .text.Yaw_Calc:0000013c $d
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:1703   .text.Gimbal_Work:00000000 $t
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:1708   .text.Gimbal_Work:00000000 Gimbal_Work
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:1753   .text.Gimbal_Work:00000028 $d
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:1759   .text.GetCCR:00000000 $t
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:1765   .text.GetCCR:00000000 GetCCR
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:1794   .text.GetCCR:00000024 $d
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:1801   .text.Photo_Control:00000000 $t
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:1806   .text.Photo_Control:00000000 Photo_Control
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:2285   .text.Photo_Control:00000240 $d
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:2312   .text.Photo_Control:000002a0 $t
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:2628   .text.Photo_Control:00000498 $d
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 104
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:20     .text.pitch_motor_online:00000000 $t
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:26     .text.pitch_motor_online:00000000 pitch_motor_online
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:40     .text.pitch_motor_disconnect:00000000 $t
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:46     .text.pitch_motor_disconnect:00000000 pitch_motor_disconnect
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:69     .text.pitch_motor_disconnect:00000010 $d
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:75     .text.yaw_can_rx_CallBack:00000000 $t
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:81     .text.yaw_can_rx_CallBack:00000000 yaw_can_rx_CallBack
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:94     .text.Photo_motor_CanRx_callback:00000000 $t
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:100    .text.Photo_motor_CanRx_callback:00000000 Photo_motor_CanRx_callback
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:117    .text.Photo_motor_CanRx_callback:00000008 $d
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:122    .text.RGB_LED:00000000 $t
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:127    .text.RGB_LED:00000000 RGB_LED
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:230    .text.RGB_LED:00000080 $d
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:239    .text.pitch_can_rx_CallBack:00000000 $t
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:245    .text.pitch_can_rx_CallBack:00000000 pitch_can_rx_CallBack
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:271    .text.pitch_can_rx_CallBack:00000014 $d
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:277    .rodata.Gimbal_Init.str1.4:00000000 $d
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:281    .text.Gimbal_Init:00000000 $t
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:286    .text.Gimbal_Init:00000000 Gimbal_Init
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:616    .text.Gimbal_Init:00000284 $d
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:642    .text.IMU_PITCH_Angle_Set_Limit:00000000 $t
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:647    .text.IMU_PITCH_Angle_Set_Limit:00000000 IMU_PITCH_Angle_Set_Limit
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:761    .text.IMU_PITCH_Angle_Set_Limit:00000080 $d
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:770    .text.Gimbal_Not_Work:00000000 $t
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:775    .text.Gimbal_Not_Work:00000000 Gimbal_Not_Work
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:807    .text.Gimbal_Not_Work:0000001c $d
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:813    .text.yaw_motor_online:00000000 $t
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:819    .text.yaw_motor_online:00000000 yaw_motor_online
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:836    .text.yaw_motor_online:00000008 $d
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:841    .text.yaw_motor_disconnect:00000000 $t
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:847    .text.yaw_motor_disconnect:00000000 yaw_motor_disconnect
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:864    .text.yaw_motor_disconnect:00000008 $d
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:869    .text.Send_Photo_Current:00000000 $t
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:875    .text.Send_Photo_Current:00000000 Send_Photo_Current
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:946    .text.Send_Photo_Current:0000003c $d
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:955    .text.Motor_Choice_Lock_Type:00000000 $t
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:961    .text.Motor_Choice_Lock_Type:00000000 Motor_Choice_Lock_Type
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:1141   .text.Motor_Choice_Lock_Type:00000114 $d
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:1146   .text.Pitch_Calc:00000000 $t
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:1152   .text.Pitch_Calc:00000000 Pitch_Calc
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:1439   .text.Pitch_Calc:0000017c $d
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:1454   .text.Yaw_Calc:00000000 $t
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:1460   .text.Yaw_Calc:00000000 Yaw_Calc
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:1692   .text.Yaw_Calc:0000013c $d
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:1703   .text.Gimbal_Work:00000000 $t
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:1708   .text.Gimbal_Work:00000000 Gimbal_Work
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:1753   .text.Gimbal_Work:00000028 $d
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:1759   .text.GetCCR:00000000 $t
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:1765   .text.GetCCR:00000000 GetCCR
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:1794   .text.GetCCR:00000024 $d
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:1801   .text.Photo_Control:00000000 $t
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:1806   .text.Photo_Control:00000000 Photo_Control
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:2285   .text.Photo_Control:00000240 $d
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:2312   .text.Photo_Control:000002a0 $t
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:2628   .text.Photo_Control:00000498 $d
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 104
 
 
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:2651   .text.GIMBAL_TASK:00000000 $t
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:2657   .text.GIMBAL_TASK:00000000 GIMBAL_TASK
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:2953   .text.GIMBAL_TASK:000001a8 $d
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:4330   .data.spin:00000000 spin
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3310   .data.move:00000000 move
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3147   .bss.lock_position_encoder:00000000 lock_position_encoder
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3217   .data.PITCH_TORQUE_LIMIT:00000000 PITCH_TORQUE_LIMIT
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3198   .data.Enable_pitch_motor:00000000 Enable_pitch_motor
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3224   .data.Pitch_gravity_feedforward_torque:00000000 Pitch_gravity_feedforward_torque
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3059   .bss.Pitch_output_torque:00000000 Pitch_output_torque
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3012   .bss.DOWN_ANGLE:00000000 DOWN_ANGLE
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3085   .bss.UP_ANGLE:00000000 UP_ANGLE
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3264   .data.k_encoder_yaw_lqr:00000000 k_encoder_yaw_lqr
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3256   .data.k_encoder_pitch_lqr:00000000 k_encoder_pitch_lqr
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3294   .data.k_virtual_yaw_lqr:00000000 k_virtual_yaw_lqr
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3287   .data.k_virtual_pitch_lqr:00000000 k_virtual_pitch_lqr
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3302   .data.k_yaw_lqr:00000000 k_yaw_lqr
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3280   .data.k_pitch_lqr_down:00000000 k_pitch_lqr_down
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3272   .data.k_pitch_lqr:00000000 k_pitch_lqr
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3045   .bss.Photo_motor_online:00000000 Photo_motor_online
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3180   .bss.yaw_motor_is_online:00000000 yaw_motor_is_online
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3160   .bss.pitch_motor_is_online:00000000 pitch_motor_is_online
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3052   .bss.Pitch_Motor_Safe:00000000 Pitch_Motor_Safe
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3154   .bss.pitch_motor_init_flag:00000000 pitch_motor_init_flag
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3019   .bss.Gimbal:00000000 Gimbal
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3318   .data.sin_value:00000000 sin_value
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:4323   .data.size:00000000 size
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:2994   .bss.CAN_TxHeader.27:00000000 $d
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:2998   .bss.CAN_TxHeader.27:00000000 CAN_TxHeader.27
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3001   .bss.Can_Tx_Data.28:00000000 $d
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3005   .bss.Can_Tx_Data.28:00000000 Can_Tx_Data.28
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3008   .bss.DOWN_ANGLE:00000000 $d
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3015   .bss.Gimbal:00000000 $d
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3025   .bss.Left_move_flag.7:00000000 Left_move_flag.7
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3026   .bss.Left_move_flag.7:00000000 $d
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3028   .bss.Off_set_time.12:00000000 $d
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3032   .bss.Off_set_time.12:00000000 Off_set_time.12
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3035   .bss.On_set_time.9:00000000 $d
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3039   .bss.On_set_time.9:00000000 On_set_time.9
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3046   .bss.Photo_motor_online:00000000 $d
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3048   .bss.Pitch_Motor_Safe:00000000 $d
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3055   .bss.Pitch_output_torque:00000000 $d
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3065   .bss.Right_move_flag.10:00000000 Right_move_flag.10
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3066   .bss.Right_move_flag.10:00000000 $d
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3068   .bss.Set_encoder.13:00000000 $d
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3072   .bss.Set_encoder.13:00000000 Set_encoder.13
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3078   .bss.Status.16:00000000 Status.16
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3079   .bss.Status.16:00000000 $d
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3081   .bss.UP_ANGLE:00000000 $d
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3088   .bss.filter_IMU_Pitch_Down_Limit.22:00000000 $d
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3092   .bss.filter_IMU_Pitch_Down_Limit.22:00000000 filter_IMU_Pitch_Down_Limit.22
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3095   .bss.filter_IMU_Pitch_Up_Limit.23:00000000 $d
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3099   .bss.filter_IMU_Pitch_Up_Limit.23:00000000 filter_IMU_Pitch_Up_Limit.23
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3102   .bss.idx_1.21:00000000 $d
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3106   .bss.idx_1.21:00000000 idx_1.21
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3109   .bss.idx_2.20:00000000 $d
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3113   .bss.idx_2.20:00000000 idx_2.20
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 105
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:2651   .text.GIMBAL_TASK:00000000 $t
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:2657   .text.GIMBAL_TASK:00000000 GIMBAL_TASK
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:2953   .text.GIMBAL_TASK:000001a8 $d
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:4330   .data.spin:00000000 spin
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3310   .data.move:00000000 move
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3147   .bss.lock_position_encoder:00000000 lock_position_encoder
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3217   .data.PITCH_TORQUE_LIMIT:00000000 PITCH_TORQUE_LIMIT
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3198   .data.Enable_pitch_motor:00000000 Enable_pitch_motor
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3224   .data.Pitch_gravity_feedforward_torque:00000000 Pitch_gravity_feedforward_torque
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3059   .bss.Pitch_output_torque:00000000 Pitch_output_torque
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3012   .bss.DOWN_ANGLE:00000000 DOWN_ANGLE
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3085   .bss.UP_ANGLE:00000000 UP_ANGLE
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3264   .data.k_encoder_yaw_lqr:00000000 k_encoder_yaw_lqr
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3256   .data.k_encoder_pitch_lqr:00000000 k_encoder_pitch_lqr
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3294   .data.k_virtual_yaw_lqr:00000000 k_virtual_yaw_lqr
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3287   .data.k_virtual_pitch_lqr:00000000 k_virtual_pitch_lqr
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3302   .data.k_yaw_lqr:00000000 k_yaw_lqr
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3280   .data.k_pitch_lqr_down:00000000 k_pitch_lqr_down
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3272   .data.k_pitch_lqr:00000000 k_pitch_lqr
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3045   .bss.Photo_motor_online:00000000 Photo_motor_online
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3180   .bss.yaw_motor_is_online:00000000 yaw_motor_is_online
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3160   .bss.pitch_motor_is_online:00000000 pitch_motor_is_online
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3052   .bss.Pitch_Motor_Safe:00000000 Pitch_Motor_Safe
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3154   .bss.pitch_motor_init_flag:00000000 pitch_motor_init_flag
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3019   .bss.Gimbal:00000000 Gimbal
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3318   .data.sin_value:00000000 sin_value
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:4323   .data.size:00000000 size
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:2994   .bss.CAN_TxHeader.27:00000000 $d
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:2998   .bss.CAN_TxHeader.27:00000000 CAN_TxHeader.27
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3001   .bss.Can_Tx_Data.28:00000000 $d
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3005   .bss.Can_Tx_Data.28:00000000 Can_Tx_Data.28
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3008   .bss.DOWN_ANGLE:00000000 $d
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3015   .bss.Gimbal:00000000 $d
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3025   .bss.Left_move_flag.7:00000000 Left_move_flag.7
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3026   .bss.Left_move_flag.7:00000000 $d
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3028   .bss.Off_set_time.12:00000000 $d
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3032   .bss.Off_set_time.12:00000000 Off_set_time.12
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3035   .bss.On_set_time.9:00000000 $d
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3039   .bss.On_set_time.9:00000000 On_set_time.9
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3046   .bss.Photo_motor_online:00000000 $d
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3048   .bss.Pitch_Motor_Safe:00000000 $d
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3055   .bss.Pitch_output_torque:00000000 $d
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3065   .bss.Right_move_flag.10:00000000 Right_move_flag.10
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3066   .bss.Right_move_flag.10:00000000 $d
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3068   .bss.Set_encoder.13:00000000 $d
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3072   .bss.Set_encoder.13:00000000 Set_encoder.13
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3078   .bss.Status.16:00000000 Status.16
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3079   .bss.Status.16:00000000 $d
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3081   .bss.UP_ANGLE:00000000 $d
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3088   .bss.filter_IMU_Pitch_Down_Limit.22:00000000 $d
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3092   .bss.filter_IMU_Pitch_Down_Limit.22:00000000 filter_IMU_Pitch_Down_Limit.22
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3095   .bss.filter_IMU_Pitch_Up_Limit.23:00000000 $d
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3099   .bss.filter_IMU_Pitch_Up_Limit.23:00000000 filter_IMU_Pitch_Up_Limit.23
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3102   .bss.idx_1.21:00000000 $d
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3106   .bss.idx_1.21:00000000 idx_1.21
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3109   .bss.idx_2.20:00000000 $d
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3113   .bss.idx_2.20:00000000 idx_2.20
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 105
 
 
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3116   .bss.idx_3.19:00000000 $d
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3120   .bss.idx_3.19:00000000 idx_3.19
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3123   .bss.lastPitch_Set_IMU.1:00000000 $d
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3127   .bss.lastPitch_Set_IMU.1:00000000 lastPitch_Set_IMU.1
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3130   .bss.last_Photo_Motor_encoder.2:00000000 $d
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3134   .bss.last_Photo_Motor_encoder.2:00000000 last_Photo_Motor_encoder.2
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3140   .bss.litter_lqr_time.0:00000000 litter_lqr_time.0
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3141   .bss.litter_lqr_time.0:00000000 $d
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3143   .bss.lock_position_encoder:00000000 $d
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3150   .bss.pitch_motor_init_flag:00000000 $d
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3161   .bss.pitch_motor_is_online:00000000 $d
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3163   .bss.send_mail_box.26:00000000 $d
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3167   .bss.send_mail_box.26:00000000 send_mail_box.26
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3170   .bss.time.25:00000000 $d
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3174   .bss.time.25:00000000 time.25
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3181   .bss.yaw_motor_is_online:00000000 $d
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3186   .data.B_set.11:00000000 B_set.11
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3192   .data.C_set.8:00000000 C_set.8
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3204   .data.FUCK.6:00000000 FUCK.6
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3210   .data.F_set.4:00000000 F_set.4
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3213   .data.PITCH_TORQUE_LIMIT:00000000 $d
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3220   .data.Pitch_gravity_feedforward_torque:00000000 $d
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3230   .data.Reset_flag.18:00000000 Reset_flag.18
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3236   .data.Set_MG995_Angle_flag.17:00000000 Set_MG995_Angle_flag.17
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3239   .data.Set_Photo_Angle_delay.5:00000000 $d
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3243   .data.Set_Photo_Angle_delay.5:00000000 Set_Photo_Angle_delay.5
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3249   .data.V_set.3:00000000 V_set.3
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3252   .data.k_encoder_pitch_lqr:00000000 $d
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3260   .data.k_encoder_yaw_lqr:00000000 $d
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3268   .data.k_pitch_lqr:00000000 $d
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3276   .data.k_pitch_lqr_down:00000000 $d
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3284   .data.k_virtual_pitch_lqr:00000000 $d
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3291   .data.k_virtual_yaw_lqr:00000000 $d
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3298   .data.k_yaw_lqr:00000000 $d
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3306   .data.move:00000000 $d
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:3314   .data.sin_value:00000000 $d
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:4320   .data.size:00000000 $d
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:4326   .data.spin:00000000 $d
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:4333   .data.to_lock.15:00000000 $d
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:4337   .data.to_lock.15:00000000 to_lock.15
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:4340   .data.to_unlock.14:00000000 $d
-C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s:4344   .data.to_unlock.14:00000000 to_unlock.14
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3116   .bss.idx_3.19:00000000 $d
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3120   .bss.idx_3.19:00000000 idx_3.19
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3123   .bss.lastPitch_Set_IMU.1:00000000 $d
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3127   .bss.lastPitch_Set_IMU.1:00000000 lastPitch_Set_IMU.1
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3130   .bss.last_Photo_Motor_encoder.2:00000000 $d
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3134   .bss.last_Photo_Motor_encoder.2:00000000 last_Photo_Motor_encoder.2
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3140   .bss.litter_lqr_time.0:00000000 litter_lqr_time.0
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3141   .bss.litter_lqr_time.0:00000000 $d
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3143   .bss.lock_position_encoder:00000000 $d
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3150   .bss.pitch_motor_init_flag:00000000 $d
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3161   .bss.pitch_motor_is_online:00000000 $d
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3163   .bss.send_mail_box.26:00000000 $d
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3167   .bss.send_mail_box.26:00000000 send_mail_box.26
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3170   .bss.time.25:00000000 $d
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3174   .bss.time.25:00000000 time.25
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3181   .bss.yaw_motor_is_online:00000000 $d
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3186   .data.B_set.11:00000000 B_set.11
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3192   .data.C_set.8:00000000 C_set.8
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3204   .data.FUCK.6:00000000 FUCK.6
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3210   .data.F_set.4:00000000 F_set.4
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3213   .data.PITCH_TORQUE_LIMIT:00000000 $d
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3220   .data.Pitch_gravity_feedforward_torque:00000000 $d
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3230   .data.Reset_flag.18:00000000 Reset_flag.18
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3236   .data.Set_MG995_Angle_flag.17:00000000 Set_MG995_Angle_flag.17
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3239   .data.Set_Photo_Angle_delay.5:00000000 $d
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3243   .data.Set_Photo_Angle_delay.5:00000000 Set_Photo_Angle_delay.5
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3249   .data.V_set.3:00000000 V_set.3
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3252   .data.k_encoder_pitch_lqr:00000000 $d
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3260   .data.k_encoder_yaw_lqr:00000000 $d
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3268   .data.k_pitch_lqr:00000000 $d
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3276   .data.k_pitch_lqr_down:00000000 $d
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3284   .data.k_virtual_pitch_lqr:00000000 $d
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3291   .data.k_virtual_yaw_lqr:00000000 $d
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3298   .data.k_yaw_lqr:00000000 $d
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3306   .data.move:00000000 $d
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:3314   .data.sin_value:00000000 $d
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:4320   .data.size:00000000 $d
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:4326   .data.spin:00000000 $d
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:4333   .data.to_lock.15:00000000 $d
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:4337   .data.to_lock.15:00000000 to_lock.15
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:4340   .data.to_unlock.14:00000000 $d
+C:\Users\28212\AppData\Local\Temp\cc9WaACs.s:4344   .data.to_unlock.14:00000000 to_unlock.14
 
 UNDEFINED SYMBOLS
 htim5
@@ -6253,7 +6253,7 @@ Safe_task_add
 MI_Motor_CanRx_Callback
 DJIMotor_CanRx_Callback
 MI_motor_enable
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccxgBE6t.s 			page 106
+ARM GAS  C:\Users\28212\AppData\Local\Temp\cc9WaACs.s 			page 106
 
 
 hcan1

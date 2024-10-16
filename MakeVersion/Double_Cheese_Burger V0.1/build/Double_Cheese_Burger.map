@@ -2277,7 +2277,7 @@ Discarded input sections
                 0x00000000        0x4 build/music_task.o
  .bss.music_time
                 0x00000000        0x8 build/music_task.o
- .data.Moon     0x00000000      0x104 build/music_task.o
+ .data.Moon     0x00000000      0x10c build/music_task.o
  .data.note_list
                 0x00000000       0x94 build/music_task.o
  .debug_info    0x00000000      0x2c7 build/music_task.o
@@ -2286,7 +2286,7 @@ Discarded input sections
  .debug_aranges
                 0x00000000       0x30 build/music_task.o
  .debug_ranges  0x00000000       0x38 build/music_task.o
- .debug_line    0x00000000      0x24c build/music_task.o
+ .debug_line    0x00000000      0x282 build/music_task.o
  .debug_str     0x00000000      0x29f build/music_task.o
  .comment       0x00000000       0x4a build/music_task.o
  .debug_frame   0x00000000       0x48 build/music_task.o

@@ -1,4 +1,4 @@
-ARM GAS  C:\Users\28212\AppData\Local\Temp\cckeERVv.s 			page 1
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccjjJV0N.s 			page 1
 
 
    1              		.cpu cortex-m4
@@ -40,11 +40,11 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\cckeERVv.s 			page 1
   10:TASK/src/music_task.c **** extern TIM_HandleTypeDef htim4;
   11:TASK/src/music_task.c ****     unsigned int Moon[]={
   12:TASK/src/music_task.c **** //SuperMario
-  13:TASK/src/music_task.c **** //17,2,17,4,17,2,0,2,13,2,17,4,20,4,0,4,8,4,0,4,13,4,0,2,8,2,0,4,5,4,0,2,10,4,12,2,0,2,12,2,10,4,8,
-  14:TASK/src/music_task.c **** //Ò»Â·¿¿±±
+  13:TASK/src/music_task.c **** 17,2,17,4,17,2,0,2,13,2,17,4,20,4,0,4,8,4,0,4,13,4,0,2,8,2,0,4,5,4,0,2,10,4,12,2,0,2,12,2,10,4,8,4,
+  14:TASK/src/music_task.c **** //Ò»Â·ï¿½ï¿½ï¿½ï¿½
   15:TASK/src/music_task.c **** //13,4,13,4,17,4,24,4,24,4,25,8,25,4,25,4,27,4,25,4,24,4,24,4,25,8,25,4,25,4,27,4,25,4,27,4,29,4,27
-  16:TASK/src/music_task.c ****  //ÇçÌì//¹Ö¹ÖµÄ
-  17:TASK/src/music_task.c **** 0,8,0,8,13,4,15,4,17,8,0,4,20,4,17,8,15,20,13,8,10,20,8,8,13,20,13,4,15,4,17,8,0,4,20,4,17,8,25,20,
+  16:TASK/src/music_task.c ****  //ï¿½ï¿½ï¿½ï¿½//ï¿½Ö¹Öµï¿½
+  17:TASK/src/music_task.c **** //0,8,0,8,13,4,15,4,17,8,0,4,20,4,17,8,15,20,13,8,10,20,8,8,13,20,13,4,15,4,17,8,0,4,20,4,17,8,25,2
   18:TASK/src/music_task.c ****         0xFF
   19:TASK/src/music_task.c **** };
   20:TASK/src/music_task.c **** 
@@ -58,7 +58,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\cckeERVv.s 			page 1
   28:TASK/src/music_task.c ****         NOTE_E4,
   29:TASK/src/music_task.c ****         NOTE_F4,
   30:TASK/src/music_task.c ****         NOTE_FS4,
-ARM GAS  C:\Users\28212\AppData\Local\Temp\cckeERVv.s 			page 2
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccjjJV0N.s 			page 2
 
 
   31:TASK/src/music_task.c ****         NOTE_G4,
@@ -118,7 +118,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\cckeERVv.s 			page 1
   34              		.loc 1 79 1 view .LVU1
   35 0000 7047     		bx	lr
   36              		.cfi_endproc
-ARM GAS  C:\Users\28212\AppData\Local\Temp\cckeERVv.s 			page 3
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccjjJV0N.s 			page 3
 
 
   37              	.LFE135:
@@ -178,7 +178,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\cckeERVv.s 			page 1
   71              		.loc 1 101 1 view .LVU10
   72 0012 7047     		bx	lr
   73              	.L5:
-ARM GAS  C:\Users\28212\AppData\Local\Temp\cckeERVv.s 			page 4
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccjjJV0N.s 			page 4
 
 
   74              		.align	2
@@ -238,7 +238,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\cckeERVv.s 			page 1
  115:TASK/src/music_task.c ****             music_time += 2;
  116:TASK/src/music_task.c ****             if (music_list_point[music_time] == 0xff)
  117:TASK/src/music_task.c ****             {
-ARM GAS  C:\Users\28212\AppData\Local\Temp\cckeERVv.s 			page 5
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccjjJV0N.s 			page 5
 
 
  118:TASK/src/music_task.c ****                 music_time = 0;
@@ -269,7 +269,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\cckeERVv.s 			page 1
  137              	.LVL6:
  138              	.L8:
  123:TASK/src/music_task.c ****         }
- 124:TASK/src/music_task.c ****         vTaskDelay(1); // ¾ø¶ÔÑÓÊ±//vTaskDelay(2);
+ 124:TASK/src/music_task.c ****         vTaskDelay(1); // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±//vTaskDelay(2);
  139              		.loc 1 124 9 is_stmt 1 view .LVU21
  140 003e 0120     		movs	r0, #1
  141 0040 FFF7FEFF 		bl	vTaskDelay
@@ -298,7 +298,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\cckeERVv.s 			page 1
  157              		.loc 1 110 83 view .LVU28
  158 004e 1D4B     		ldr	r3, .L13
  159 0050 1B68     		ldr	r3, [r3]
-ARM GAS  C:\Users\28212\AppData\Local\Temp\cckeERVv.s 			page 6
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccjjJV0N.s 			page 6
 
 
  160 0052 0133     		adds	r3, r3, #1
@@ -358,7 +358,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\cckeERVv.s 			page 1
  200              		.loc 1 115 13 is_stmt 1 view .LVU42
  115:TASK/src/music_task.c ****             if (music_list_point[music_time] == 0xff)
  201              		.loc 1 115 24 is_stmt 0 view .LVU43
-ARM GAS  C:\Users\28212\AppData\Local\Temp\cckeERVv.s 			page 7
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccjjJV0N.s 			page 7
 
 
  202 0092 0C4A     		ldr	r2, .L13
@@ -418,7 +418,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\cckeERVv.s 			page 1
  252 0000 00       		.space	1
  253              		.section	.bss.last_note_systick.0,"aw",%nobits
  254              		.align	2
-ARM GAS  C:\Users\28212\AppData\Local\Temp\cckeERVv.s 			page 8
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccjjJV0N.s 			page 8
 
 
  255              		.set	.LANCHOR3,. + 0
@@ -439,150 +439,152 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\cckeERVv.s 			page 1
  275              		.align	2
  276              		.set	.LANCHOR1,. + 0
  279              	Moon:
- 280 0000 00000000 		.word	0
- 281 0004 08000000 		.word	8
- 282 0008 00000000 		.word	0
- 283 000c 08000000 		.word	8
- 284 0010 0D000000 		.word	13
- 285 0014 04000000 		.word	4
- 286 0018 0F000000 		.word	15
- 287 001c 04000000 		.word	4
- 288 0020 11000000 		.word	17
- 289 0024 08000000 		.word	8
- 290 0028 00000000 		.word	0
+ 280 0000 11000000 		.word	17
+ 281 0004 02000000 		.word	2
+ 282 0008 11000000 		.word	17
+ 283 000c 04000000 		.word	4
+ 284 0010 11000000 		.word	17
+ 285 0014 02000000 		.word	2
+ 286 0018 00000000 		.word	0
+ 287 001c 02000000 		.word	2
+ 288 0020 0D000000 		.word	13
+ 289 0024 02000000 		.word	2
+ 290 0028 11000000 		.word	17
  291 002c 04000000 		.word	4
  292 0030 14000000 		.word	20
  293 0034 04000000 		.word	4
- 294 0038 11000000 		.word	17
- 295 003c 08000000 		.word	8
- 296 0040 0F000000 		.word	15
- 297 0044 14000000 		.word	20
- 298 0048 0D000000 		.word	13
- 299 004c 08000000 		.word	8
- 300 0050 0A000000 		.word	10
- 301 0054 14000000 		.word	20
- 302 0058 08000000 		.word	8
- 303 005c 08000000 		.word	8
- 304 0060 0D000000 		.word	13
- 305 0064 14000000 		.word	20
- 306 0068 0D000000 		.word	13
+ 294 0038 00000000 		.word	0
+ 295 003c 04000000 		.word	4
+ 296 0040 08000000 		.word	8
+ 297 0044 04000000 		.word	4
+ 298 0048 00000000 		.word	0
+ 299 004c 04000000 		.word	4
+ 300 0050 0D000000 		.word	13
+ 301 0054 04000000 		.word	4
+ 302 0058 00000000 		.word	0
+ 303 005c 02000000 		.word	2
+ 304 0060 08000000 		.word	8
+ 305 0064 02000000 		.word	2
+ 306 0068 00000000 		.word	0
  307 006c 04000000 		.word	4
- 308 0070 0F000000 		.word	15
+ 308 0070 05000000 		.word	5
  309 0074 04000000 		.word	4
- 310 0078 11000000 		.word	17
- 311 007c 08000000 		.word	8
- 312 0080 00000000 		.word	0
+ 310 0078 00000000 		.word	0
+ 311 007c 02000000 		.word	2
+ 312 0080 0A000000 		.word	10
  313 0084 04000000 		.word	4
- 314 0088 14000000 		.word	20
- 315 008c 04000000 		.word	4
- 316 0090 11000000 		.word	17
- 317 0094 08000000 		.word	8
- 318 0098 19000000 		.word	25
-ARM GAS  C:\Users\28212\AppData\Local\Temp\cckeERVv.s 			page 9
+ 314 0088 0C000000 		.word	12
+ 315 008c 02000000 		.word	2
+ 316 0090 00000000 		.word	0
+ 317 0094 02000000 		.word	2
+ 318 0098 0C000000 		.word	12
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccjjJV0N.s 			page 9
 
 
- 319 009c 14000000 		.word	20
- 320 00a0 16000000 		.word	22
- 321 00a4 08000000 		.word	8
- 322 00a8 14000000 		.word	20
- 323 00ac 08000000 		.word	8
- 324 00b0 00000000 		.word	0
+ 319 009c 02000000 		.word	2
+ 320 00a0 0A000000 		.word	10
+ 321 00a4 04000000 		.word	4
+ 322 00a8 08000000 		.word	8
+ 323 00ac 04000000 		.word	4
+ 324 00b0 11000000 		.word	17
  325 00b4 04000000 		.word	4
- 326 00b8 0F000000 		.word	15
+ 326 00b8 14000000 		.word	20
  327 00bc 04000000 		.word	4
- 328 00c0 11000000 		.word	17
+ 328 00c0 16000000 		.word	22
  329 00c4 04000000 		.word	4
  330 00c8 12000000 		.word	18
- 331 00cc 04000000 		.word	4
- 332 00d0 11000000 		.word	17
- 333 00d4 14000000 		.word	20
- 334 00d8 0D000000 		.word	13
- 335 00dc 04000000 		.word	4
- 336 00e0 0F000000 		.word	15
+ 331 00cc 02000000 		.word	2
+ 332 00d0 14000000 		.word	20
+ 333 00d4 02000000 		.word	2
+ 334 00d8 00000000 		.word	0
+ 335 00dc 02000000 		.word	2
+ 336 00e0 11000000 		.word	17
  337 00e4 04000000 		.word	4
- 338 00e8 11000000 		.word	17
- 339 00ec 08000000 		.word	8
- 340 00f0 11000000 		.word	17
- 341 00f4 08000000 		.word	8
- 342 00f8 11000000 		.word	17
- 343 00fc 08000000 		.word	8
- 344 0100 FF000000 		.word	255
- 345              		.section	.data.note_list,"aw"
- 346              		.align	2
- 347              		.set	.LANCHOR4,. + 0
- 350              	note_list:
- 351 0000 00247449 		.word	1232348160
- 352 0004 A4D08243 		.word	1132646564
- 353 0008 0A978A43 		.word	1133156106
- 354 000c 7BD49243 		.word	1133696123
- 355 0010 A4909B43 		.word	1134268580
- 356 0014 A4D0A443 		.word	1134874788
- 357 0018 719DAE43 		.word	1135517041
- 358 001c B8FEB843 		.word	1136197304
- 359 0020 0000C443 		.word	1136918528
- 360 0024 66A6CF43 		.word	1137682022
- 361 0028 0000DC43 		.word	1138491392
- 362 002c 7B14E943 		.word	1139348603
- 363 0030 A4F0F643 		.word	1140256932
- 364 0034 00D00244 		.word	1141035008
- 365 0038 AE970A44 		.word	1141544878
- 366 003c 1FD51244 		.word	1142084895
- 367 0040 00901B44 		.word	1142657024
- 368 0044 A4D02444 		.word	1143263396
- 369 0048 719D2E44 		.word	1143905649
- 370 004c 5CFF3844 		.word	1144586076
- 371 0050 5CFF4344 		.word	1145306972
- 372 0054 0AA74F44 		.word	1146070794
- 373 0058 00005C44 		.word	1146880000
- 374 005c 1F156944 		.word	1147737375
- 375 0060 48F17644 		.word	1148645704
- 376 0064 00D08244 		.word	1149423616
- 377 0068 5C978A44 		.word	1149933404
-ARM GAS  C:\Users\28212\AppData\Local\Temp\cckeERVv.s 			page 10
+ 338 00e8 0D000000 		.word	13
+ 339 00ec 02000000 		.word	2
+ 340 00f0 0F000000 		.word	15
+ 341 00f4 02000000 		.word	2
+ 342 00f8 0C000000 		.word	12
+ 343 00fc 04000000 		.word	4
+ 344 0100 00000000 		.word	0
+ 345 0104 02000000 		.word	2
+ 346 0108 FF000000 		.word	255
+ 347              		.section	.data.note_list,"aw"
+ 348              		.align	2
+ 349              		.set	.LANCHOR4,. + 0
+ 352              	note_list:
+ 353 0000 00247449 		.word	1232348160
+ 354 0004 A4D08243 		.word	1132646564
+ 355 0008 0A978A43 		.word	1133156106
+ 356 000c 7BD49243 		.word	1133696123
+ 357 0010 A4909B43 		.word	1134268580
+ 358 0014 A4D0A443 		.word	1134874788
+ 359 0018 719DAE43 		.word	1135517041
+ 360 001c B8FEB843 		.word	1136197304
+ 361 0020 0000C443 		.word	1136918528
+ 362 0024 66A6CF43 		.word	1137682022
+ 363 0028 0000DC43 		.word	1138491392
+ 364 002c 7B14E943 		.word	1139348603
+ 365 0030 A4F0F643 		.word	1140256932
+ 366 0034 00D00244 		.word	1141035008
+ 367 0038 AE970A44 		.word	1141544878
+ 368 003c 1FD51244 		.word	1142084895
+ 369 0040 00901B44 		.word	1142657024
+ 370 0044 A4D02444 		.word	1143263396
+ 371 0048 719D2E44 		.word	1143905649
+ 372 004c 5CFF3844 		.word	1144586076
+ 373 0050 5CFF4344 		.word	1145306972
+ 374 0054 0AA74F44 		.word	1146070794
+ 375 0058 00005C44 		.word	1146880000
+ 376 005c 1F156944 		.word	1147737375
+ 377 0060 48F17644 		.word	1148645704
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccjjJV0N.s 			page 10
 
 
- 378 006c 1FD59244 		.word	1150473503
- 379 0070 52909B44 		.word	1151045714
- 380 0074 52D0A444 		.word	1151651922
- 381 0078 1F9DAE44 		.word	1152294175
- 382 007c 5CFFB844 		.word	1152974684
- 383 0080 5CFFC344 		.word	1153695580
- 384 0084 0AA7CF44 		.word	1154459402
- 385 0088 0000DC44 		.word	1155268608
- 386 008c 1F15E944 		.word	1156125983
- 387 0090 000080BF 		.word	-1082130432
- 388              		.text
- 389              	.Letext0:
- 390              		.file 2 "d:\\gcc-arm-none-eabi-10.3-2021.10\\arm-none-eabi\\include\\machine\\_default_types.h"
- 391              		.file 3 "d:\\gcc-arm-none-eabi-10.3-2021.10\\arm-none-eabi\\include\\sys\\_stdint.h"
- 392              		.file 4 "Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/portmacro.h"
- 393              		.file 5 "ACE-ECF/Bsp/Inc/bsp_buzzer.h"
- 394              		.file 6 "Middlewares/Third_Party/FreeRTOS/Source/include/task.h"
-ARM GAS  C:\Users\28212\AppData\Local\Temp\cckeERVv.s 			page 11
+ 378 0064 00D08244 		.word	1149423616
+ 379 0068 5C978A44 		.word	1149933404
+ 380 006c 1FD59244 		.word	1150473503
+ 381 0070 52909B44 		.word	1151045714
+ 382 0074 52D0A444 		.word	1151651922
+ 383 0078 1F9DAE44 		.word	1152294175
+ 384 007c 5CFFB844 		.word	1152974684
+ 385 0080 5CFFC344 		.word	1153695580
+ 386 0084 0AA7CF44 		.word	1154459402
+ 387 0088 0000DC44 		.word	1155268608
+ 388 008c 1F15E944 		.word	1156125983
+ 389 0090 000080BF 		.word	-1082130432
+ 390              		.text
+ 391              	.Letext0:
+ 392              		.file 2 "c:\\program files (x86)\\gnu arm embedded toolchain\\10 2021.10\\arm-none-eabi\\include\\
+ 393              		.file 3 "c:\\program files (x86)\\gnu arm embedded toolchain\\10 2021.10\\arm-none-eabi\\include\\
+ 394              		.file 4 "Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/portmacro.h"
+ 395              		.file 5 "ACE-ECF/Bsp/Inc/bsp_buzzer.h"
+ 396              		.file 6 "Middlewares/Third_Party/FreeRTOS/Source/include/task.h"
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccjjJV0N.s 			page 11
 
 
 DEFINED SYMBOLS
                             *ABS*:00000000 music_task.c
-C:\Users\28212\AppData\Local\Temp\cckeERVv.s:20     .text.music:00000000 $t
-C:\Users\28212\AppData\Local\Temp\cckeERVv.s:26     .text.music:00000000 music
-C:\Users\28212\AppData\Local\Temp\cckeERVv.s:40     .text.Music_choice:00000000 $t
-C:\Users\28212\AppData\Local\Temp\cckeERVv.s:46     .text.Music_choice:00000000 Music_choice
-C:\Users\28212\AppData\Local\Temp\cckeERVv.s:76     .text.Music_choice:00000014 $d
-C:\Users\28212\AppData\Local\Temp\cckeERVv.s:83     .text.MUSIC_TASK:00000000 $t
-C:\Users\28212\AppData\Local\Temp\cckeERVv.s:89     .text.MUSIC_TASK:00000000 MUSIC_TASK
-C:\Users\28212\AppData\Local\Temp\cckeERVv.s:234    .text.MUSIC_TASK:000000c4 $d
-C:\Users\28212\AppData\Local\Temp\cckeERVv.s:265    .bss.music_list_point:00000000 music_list_point
-C:\Users\28212\AppData\Local\Temp\cckeERVv.s:272    .bss.music_time:00000000 music_time
-C:\Users\28212\AppData\Local\Temp\cckeERVv.s:251    .bss.Music:00000000 Music
-C:\Users\28212\AppData\Local\Temp\cckeERVv.s:350    .data.note_list:00000000 note_list
-C:\Users\28212\AppData\Local\Temp\cckeERVv.s:279    .data.Moon:00000000 Moon
-C:\Users\28212\AppData\Local\Temp\cckeERVv.s:252    .bss.Music:00000000 $d
-C:\Users\28212\AppData\Local\Temp\cckeERVv.s:254    .bss.last_note_systick.0:00000000 $d
-C:\Users\28212\AppData\Local\Temp\cckeERVv.s:258    .bss.last_note_systick.0:00000000 last_note_systick.0
-C:\Users\28212\AppData\Local\Temp\cckeERVv.s:261    .bss.music_list_point:00000000 $d
-C:\Users\28212\AppData\Local\Temp\cckeERVv.s:268    .bss.music_time:00000000 $d
-C:\Users\28212\AppData\Local\Temp\cckeERVv.s:275    .data.Moon:00000000 $d
-C:\Users\28212\AppData\Local\Temp\cckeERVv.s:346    .data.note_list:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccjjJV0N.s:20     .text.music:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccjjJV0N.s:26     .text.music:00000000 music
+C:\Users\28212\AppData\Local\Temp\ccjjJV0N.s:40     .text.Music_choice:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccjjJV0N.s:46     .text.Music_choice:00000000 Music_choice
+C:\Users\28212\AppData\Local\Temp\ccjjJV0N.s:76     .text.Music_choice:00000014 $d
+C:\Users\28212\AppData\Local\Temp\ccjjJV0N.s:83     .text.MUSIC_TASK:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccjjJV0N.s:89     .text.MUSIC_TASK:00000000 MUSIC_TASK
+C:\Users\28212\AppData\Local\Temp\ccjjJV0N.s:234    .text.MUSIC_TASK:000000c4 $d
+C:\Users\28212\AppData\Local\Temp\ccjjJV0N.s:265    .bss.music_list_point:00000000 music_list_point
+C:\Users\28212\AppData\Local\Temp\ccjjJV0N.s:272    .bss.music_time:00000000 music_time
+C:\Users\28212\AppData\Local\Temp\ccjjJV0N.s:251    .bss.Music:00000000 Music
+C:\Users\28212\AppData\Local\Temp\ccjjJV0N.s:352    .data.note_list:00000000 note_list
+C:\Users\28212\AppData\Local\Temp\ccjjJV0N.s:279    .data.Moon:00000000 Moon
+C:\Users\28212\AppData\Local\Temp\ccjjJV0N.s:252    .bss.Music:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccjjJV0N.s:254    .bss.last_note_systick.0:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccjjJV0N.s:258    .bss.last_note_systick.0:00000000 last_note_systick.0
+C:\Users\28212\AppData\Local\Temp\ccjjJV0N.s:261    .bss.music_list_point:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccjjJV0N.s:268    .bss.music_time:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccjjJV0N.s:275    .data.Moon:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccjjJV0N.s:348    .data.note_list:00000000 $d
 
 UNDEFINED SYMBOLS
 buzzer_off

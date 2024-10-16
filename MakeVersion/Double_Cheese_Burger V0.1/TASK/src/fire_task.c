@@ -77,11 +77,11 @@ void FIRE_TASK(void const *argument)
 		fire_behaviour_choose();
 		fire_pid_calculate();
         
-        Shoot_Check();//�����飬�����ӳ�У׼
-        
+        //Shoot_Check();//�����飬�����ӳ�У׼
+        Set_Fire_Open_State(1);
 //        if (time % 2 ==0)   Send_Fire_Current();//500hz����Ƶ��
         
-		DJIMotor_Send(Fire.left_motor);
+		//DJIMotor_Send(Fire.left_motor);
         taskEXIT_CRITICAL();              // �˳��ٽ���
 
 
@@ -93,11 +93,11 @@ void FIRE_TASK(void const *argument)
 void fire_task_init(void)
 {
 	memset(&Fire, 0, sizeof(Fire_t));
-	// ��ò���ָ��
-    Fire.left_motor_up = DJIMotor_Init(1,4,false,M3508,30);
-    Fire.right_motor_up = DJIMotor_Init(1,2,true,M3508,30);
-    Fire.left_motor  = DJIMotor_Init(1,3,false,M3508,30);
-    Fire.right_motor = DJIMotor_Init(1,1,true,M3508,30);
+	// ��ò���ָ��?
+    // Fire.left_motor_up = DJIMotor_Init(1,4,false,M3508,30);
+    // Fire.right_motor_up = DJIMotor_Init(1,2,true,M3508,30);
+    // Fire.left_motor  = DJIMotor_Init(1,3,false,M3508,30);
+    // Fire.right_motor = DJIMotor_Init(1,1,true,M3508,30);
 
     Fire.left_motor->Using_PID = Speed_PID;
     Fire.left_motor_up->Using_PID = Speed_PID;
@@ -105,20 +105,20 @@ void fire_task_init(void)
     Fire.right_motor->Using_PID = Speed_PID;
     
     PidInit(&Fire.left_motor->Speed_PID,1.0f,0,0,Output_Limit|StepIn|Integral_Limit);
- 	PidInitMode(&Fire.left_motor->Speed_PID,Output_Limit,16000,0);//����޷�ģʽ����
+ 	PidInitMode(&Fire.left_motor->Speed_PID,Output_Limit,16000,0);//����޷�ģʽ����?
     PidInitMode(&Fire.left_motor->Speed_PID,StepIn,10,0);//����ļӼ��ٻᵼ�·�������������ϵ�
     PidInitMode(&Fire.left_motor->Speed_PID,Integral_Limit,1000,0);
 
     PidInit(&Fire.right_motor->Speed_PID,1.0435f,0,0,Output_Limit|StepIn|Integral_Limit);
- 	PidInitMode(&Fire.right_motor->Speed_PID,Output_Limit,16000,0);//����޷�ģʽ����
+ 	PidInitMode(&Fire.right_motor->Speed_PID,Output_Limit,16000,0);//����޷�ģʽ����?
     PidInitMode(&Fire.right_motor->Speed_PID,StepIn,10,0);//�𽥼��٣�ʵ�ⷢ������ٶȼ��ٻᵼ�·�������������ϵ�
     PidInitMode(&Fire.left_motor->Speed_PID,Integral_Limit,1000,0);
 
     PidInit(&Fire.left_motor_up->Speed_PID,1.02f,0,0,Output_Limit|StepIn);
- 	PidInitMode(&Fire.left_motor_up->Speed_PID,Output_Limit,16000,0);//����޷�ģʽ����
+ 	PidInitMode(&Fire.left_motor_up->Speed_PID,Output_Limit,16000,0);//����޷�ģʽ����?
     PidInitMode(&Fire.left_motor_up->Speed_PID,StepIn,10,0);//����ļӼ��ٻᵼ�·�������������ϵ�
     PidInit(&Fire.right_motor_up->Speed_PID,1.0f,0,0,Output_Limit|StepIn);
- 	PidInitMode(&Fire.right_motor_up->Speed_PID,Output_Limit,16000,0);//����޷�ģʽ����
+ 	PidInitMode(&Fire.right_motor_up->Speed_PID,Output_Limit,16000,0);//����޷�ģʽ����?
     PidInitMode(&Fire.right_motor_up->Speed_PID,StepIn,10,0);//�𽥼��٣�ʵ�ⷢ������ٶȼ��ٻᵼ�·�������������ϵ�
     
 	Fire.Gimbal_CMD = Get_Gimbal_CMD_point();

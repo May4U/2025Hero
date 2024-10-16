@@ -1,4 +1,4 @@
-ARM GAS  C:\Users\28212\AppData\Local\Temp\cckAsXKe.s 			page 1
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccVceRtG.s 			page 1
 
 
    1              		.cpu cortex-m4
@@ -58,7 +58,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\cckAsXKe.s 			page 1
   27:User/src/bsp_Motor_Encoder.c **** *  使用方法：
   28:User/src/bsp_Motor_Encoder.c **** *      将CAN_DATA_Encoder_Deal扔CAN接收部分
   29:User/src/bsp_Motor_Encoder.c **** *      在初始化阶段加入Encoder_Init
-ARM GAS  C:\Users\28212\AppData\Local\Temp\cckAsXKe.s 			page 2
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccVceRtG.s 			page 2
 
 
   30:User/src/bsp_Motor_Encoder.c **** *      done
@@ -118,7 +118,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\cckAsXKe.s 			page 1
   84:User/src/bsp_Motor_Encoder.c **** 		}break;
   85:User/src/bsp_Motor_Encoder.c **** 			 
   86:User/src/bsp_Motor_Encoder.c ****        case M3508: {
-ARM GAS  C:\Users\28212\AppData\Local\Temp\cckAsXKe.s 			page 3
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccVceRtG.s 			page 3
 
 
   87:User/src/bsp_Motor_Encoder.c ****            Temp_Encoder->lap_encoder = 8192;//编码器单圈码盘值
@@ -178,7 +178,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\cckAsXKe.s 			page 1
  141:User/src/bsp_Motor_Encoder.c ****    /*速度处理*/
  142:User/src/bsp_Motor_Encoder.c ****    Encoder->Speed[1] = rpm;                                                   //mm转cm
  143:User/src/bsp_Motor_Encoder.c ****    Encoder->linear_speed[1] = (float)(rpm/Encoder->gear_Ratio) * PI * 2.0f * (Encoder->radius /10) 
-ARM GAS  C:\Users\28212\AppData\Local\Temp\cckAsXKe.s 			page 4
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccVceRtG.s 			page 4
 
 
  144:User/src/bsp_Motor_Encoder.c ****    //加速度计算
@@ -238,7 +238,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\cckAsXKe.s 			page 1
   44 0006 0022     		movs	r2, #0
   45 0008 8261     		str	r2, [r0, #24]	@ float
  184:User/src/bsp_Motor_Encoder.c ****    Encoder->State = NORM;
-ARM GAS  C:\Users\28212\AppData\Local\Temp\cckAsXKe.s 			page 5
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccVceRtG.s 			page 5
 
 
   46              		.loc 1 184 4 is_stmt 1 view .LVU7
@@ -298,7 +298,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\cckAsXKe.s 			page 1
   94              	Encoder_Init:
   95              	.LVL3:
   96              	.LFB134:
-ARM GAS  C:\Users\28212\AppData\Local\Temp\cckAsXKe.s 			page 6
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccVceRtG.s 			page 6
 
 
   72:User/src/bsp_Motor_Encoder.c ****    Encoder_Struct_Zero(Temp_Encoder);
@@ -358,7 +358,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\cckAsXKe.s 			page 1
  139 0030 6DB1     		cbz	r5, .L10
  140              	.L4:
  100:User/src/bsp_Motor_Encoder.c **** 
-ARM GAS  C:\Users\28212\AppData\Local\Temp\cckAsXKe.s 			page 7
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccVceRtG.s 			page 7
 
 
  141              		.loc 1 100 1 is_stmt 0 view .LVU28
@@ -418,7 +418,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\cckAsXKe.s 			page 1
   89:User/src/bsp_Motor_Encoder.c ****            Temp_Encoder->Max_Block_Num = 256;
  181              		.loc 1 89 12 is_stmt 1 view .LVU43
   89:User/src/bsp_Motor_Encoder.c ****            Temp_Encoder->Max_Block_Num = 256;
-ARM GAS  C:\Users\28212\AppData\Local\Temp\cckAsXKe.s 			page 8
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccVceRtG.s 			page 8
 
 
  182              		.loc 1 89 46 is_stmt 0 view .LVU44
@@ -478,7 +478,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\cckAsXKe.s 			page 1
  226              		.cfi_offset 14, -4
  104:User/src/bsp_Motor_Encoder.c ****         case CHASSIS_MOTOR_RF_ENCODER: 
  227              		.loc 1 104 5 is_stmt 1 view .LVU57
-ARM GAS  C:\Users\28212\AppData\Local\Temp\cckAsXKe.s 			page 9
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccVceRtG.s 			page 9
 
 
  228 0002 0428     		cmp	r0, #4
@@ -538,7 +538,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\cckAsXKe.s 			page 1
  270 0028 0B4C     		ldr	r4, .L21+8
  271 002a 2046     		mov	r0, r4
  272              	.LVL13:
-ARM GAS  C:\Users\28212\AppData\Local\Temp\cckAsXKe.s 			page 10
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccVceRtG.s 			page 10
 
 
  114:User/src/bsp_Motor_Encoder.c ****             return &CAN_Encoder[CHASSIS_MOTOR_LB_ENCODER];
@@ -598,7 +598,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\cckAsXKe.s 			page 1
  127:User/src/bsp_Motor_Encoder.c ****     }
  313              		.loc 1 127 13 is_stmt 1 view .LVU84
  314 004e E4E7     		b	.L11
-ARM GAS  C:\Users\28212\AppData\Local\Temp\cckAsXKe.s 			page 11
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccVceRtG.s 			page 11
 
 
  315              	.L22:
@@ -658,7 +658,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\cckAsXKe.s 			page 1
  358 0014 9A42     		cmp	r2, r3
  359 0016 09DA     		bge	.L25
  208:User/src/bsp_Motor_Encoder.c ****        Encoder->Block_Count++;
-ARM GAS  C:\Users\28212\AppData\Local\Temp\cckAsXKe.s 			page 12
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccVceRtG.s 			page 12
 
 
  360              		.loc 1 208 8 is_stmt 1 view .LVU95
@@ -718,7 +718,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\cckAsXKe.s 			page 1
  397 003e EEE7     		b	.L26
  398              	.LVL25:
  399              	.L28:
-ARM GAS  C:\Users\28212\AppData\Local\Temp\cckAsXKe.s 			page 13
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccVceRtG.s 			page 13
 
 
  204:User/src/bsp_Motor_Encoder.c **** 
@@ -778,7 +778,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\cckAsXKe.s 			page 1
  443 000e 431E     		subs	r3, r0, #1
  444 0010 18B2     		sxth	r0, r3
  445              	.LVL29:
-ARM GAS  C:\Users\28212\AppData\Local\Temp\cckAsXKe.s 			page 14
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccVceRtG.s 			page 14
 
 
  446              	.L31:
@@ -838,7 +838,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\cckAsXKe.s 			page 1
  140:User/src/bsp_Motor_Encoder.c ****    /*速度处理*/
  494              		.loc 1 140 4 is_stmt 1 view .LVU132
  140:User/src/bsp_Motor_Encoder.c ****    /*速度处理*/
-ARM GAS  C:\Users\28212\AppData\Local\Temp\cckAsXKe.s 			page 15
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccVceRtG.s 			page 15
 
 
  495              		.loc 1 140 22 is_stmt 0 view .LVU133
@@ -898,7 +898,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\cckAsXKe.s 			page 1
  532 0048 9B1A     		subs	r3, r3, r2
  145:User/src/bsp_Motor_Encoder.c ****    Encoder->Speed[0] = Encoder->Speed[1];
  533              		.loc 1 145 22 view .LVU151
-ARM GAS  C:\Users\28212\AppData\Local\Temp\cckAsXKe.s 			page 16
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccVceRtG.s 			page 16
 
 
  534 004a 6385     		strh	r3, [r4, #42]	@ movhi
@@ -958,7 +958,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\cckAsXKe.s 			page 1
  568              		.loc 1 157 70 view .LVU171
  569 0070 E38D     		ldrh	r3, [r4, #46]
  157:User/src/bsp_Motor_Encoder.c ****    
-ARM GAS  C:\Users\28212\AppData\Local\Temp\cckAsXKe.s 			page 17
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccVceRtG.s 			page 17
 
 
  570              		.loc 1 157 61 view .LVU172
@@ -1018,7 +1018,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\cckAsXKe.s 			page 1
  167:User/src/bsp_Motor_Encoder.c ****    Encoder->Record_Angle = (float)(Encoder->Encode_Record_Val) / (Encoder->gear_Ratio * Encoder->la
  610              		.loc 1 167 26 view .LVU187
  611 00b4 84ED077A 		vstr.32	s14, [r4, #28]
-ARM GAS  C:\Users\28212\AppData\Local\Temp\cckAsXKe.s 			page 18
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccVceRtG.s 			page 18
 
 
  168:User/src/bsp_Motor_Encoder.c **** 
@@ -1078,7 +1078,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\cckAsXKe.s 			page 1
  655              		.syntax unified
  656              		.thumb
  657              		.thumb_func
-ARM GAS  C:\Users\28212\AppData\Local\Temp\cckAsXKe.s 			page 19
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccVceRtG.s 			page 19
 
 
  659              	check_codevalue:
@@ -1138,7 +1138,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\cckAsXKe.s 			page 1
  703              		.syntax unified
  704              		.thumb
  705              		.thumb_func
-ARM GAS  C:\Users\28212\AppData\Local\Temp\cckAsXKe.s 			page 20
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccVceRtG.s 			page 20
 
 
  707              	Briter_Encoder_Code_Set:
@@ -1198,7 +1198,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\cckAsXKe.s 			page 1
  744              		.loc 1 262 20 view .LVU219
  745 001e 1A70     		strb	r2, [r3]
  263:User/src/bsp_Motor_Encoder.c ****            temp[1] = 0x01;
-ARM GAS  C:\Users\28212\AppData\Local\Temp\cckAsXKe.s 			page 21
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccVceRtG.s 			page 21
 
 
  746              		.loc 1 263 12 is_stmt 1 view .LVU220
@@ -1258,7 +1258,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\cckAsXKe.s 			page 1
  296:User/src/bsp_Motor_Encoder.c ****            temp[0] = 0x05;
  297:User/src/bsp_Motor_Encoder.c ****            temp[1] = 0x01;
  298:User/src/bsp_Motor_Encoder.c ****            temp[2] = Set_Auto_Return_Time;
-ARM GAS  C:\Users\28212\AppData\Local\Temp\cckAsXKe.s 			page 22
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccVceRtG.s 			page 22
 
 
  299:User/src/bsp_Motor_Encoder.c ****            temp[3] = (uint8_t)data;//低位
@@ -1318,7 +1318,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\cckAsXKe.s 			page 1
  344:User/src/bsp_Motor_Encoder.c ****    Txmessage.RTR = CAN_RTR_DATA;
  776              		.loc 1 344 4 is_stmt 1 view .LVU234
  777              		.loc 1 344 18 is_stmt 0 view .LVU235
-ARM GAS  C:\Users\28212\AppData\Local\Temp\cckAsXKe.s 			page 23
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccVceRtG.s 			page 23
 
 
  778 0034 0493     		str	r3, [sp, #16]
@@ -1378,7 +1378,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\cckAsXKe.s 			page 1
  272:User/src/bsp_Motor_Encoder.c ****            temp[2] = Set_Encoder_ID;
  823              		.loc 1 272 20 is_stmt 0 view .LVU250
  824 0060 0121     		movs	r1, #1
-ARM GAS  C:\Users\28212\AppData\Local\Temp\cckAsXKe.s 			page 24
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccVceRtG.s 			page 24
 
 
  825 0062 5970     		strb	r1, [r3, #1]
@@ -1438,7 +1438,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\cckAsXKe.s 			page 1
  286:User/src/bsp_Motor_Encoder.c ****                return ;
  861              		.loc 1 286 12 is_stmt 1 view .LVU269
  286:User/src/bsp_Motor_Encoder.c ****                return ;
-ARM GAS  C:\Users\28212\AppData\Local\Temp\cckAsXKe.s 			page 25
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccVceRtG.s 			page 25
 
 
  862              		.loc 1 286 15 is_stmt 0 view .LVU270
@@ -1498,7 +1498,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\cckAsXKe.s 			page 1
  899 00ac 9970     		strb	r1, [r3, #2]
  299:User/src/bsp_Motor_Encoder.c ****            temp[4] = (uint8_t)data>>8;//高位
  900              		.loc 1 299 12 is_stmt 1 view .LVU288
-ARM GAS  C:\Users\28212\AppData\Local\Temp\cckAsXKe.s 			page 26
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccVceRtG.s 			page 26
 
 
  299:User/src/bsp_Motor_Encoder.c ****            temp[4] = (uint8_t)data>>8;//高位
@@ -1558,7 +1558,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\cckAsXKe.s 			page 1
  309:User/src/bsp_Motor_Encoder.c ****                return;
  938              		.loc 1 309 12 is_stmt 1 view .LVU306
  309:User/src/bsp_Motor_Encoder.c ****                return;
-ARM GAS  C:\Users\28212\AppData\Local\Temp\cckAsXKe.s 			page 27
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccVceRtG.s 			page 27
 
 
  939              		.loc 1 309 15 is_stmt 0 view .LVU307
@@ -1618,7 +1618,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\cckAsXKe.s 			page 1
  976 00ec 9A70     		strb	r2, [r3, #2]
  321:User/src/bsp_Motor_Encoder.c ****        } break;
  977              		.loc 1 321 12 is_stmt 1 view .LVU325
-ARM GAS  C:\Users\28212\AppData\Local\Temp\cckAsXKe.s 			page 28
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccVceRtG.s 			page 28
 
 
  321:User/src/bsp_Motor_Encoder.c ****        } break;
@@ -1678,7 +1678,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\cckAsXKe.s 			page 1
  1013              		.loc 1 332 8 is_stmt 0 view .LVU344
  1014 010c 8DE7     		b	.L42
  1015              	.L43:
-ARM GAS  C:\Users\28212\AppData\Local\Temp\cckAsXKe.s 			page 29
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccVceRtG.s 			page 29
 
 
  334:User/src/bsp_Motor_Encoder.c ****            temp[1] = 0x01;
@@ -1738,7 +1738,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\cckAsXKe.s 			page 1
  1059      00000000 
  1059      00000000 
  1059      00000000 
-ARM GAS  C:\Users\28212\AppData\Local\Temp\cckAsXKe.s 			page 30
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccVceRtG.s 			page 30
 
 
  1060              		.section	.bss.pitch_encoder,"aw",%nobits
@@ -1766,8 +1766,8 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\cckAsXKe.s 			page 1
  1079 0005 000000   		.space	3
  1080              		.text
  1081              	.Letext0:
- 1082              		.file 2 "c:\\program files (x86)\\gnu arm embedded toolchain\\10 2021.10\\arm-none-eabi\\include\\
- 1083              		.file 3 "c:\\program files (x86)\\gnu arm embedded toolchain\\10 2021.10\\arm-none-eabi\\include\\
+ 1082              		.file 2 "d:\\gcc-arm-none-eabi-10.3-2021.10\\arm-none-eabi\\include\\machine\\_default_types.h"
+ 1083              		.file 3 "d:\\gcc-arm-none-eabi-10.3-2021.10\\arm-none-eabi\\include\\sys\\_stdint.h"
  1084              		.file 4 "Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f407xx.h"
  1085              		.file 5 "Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h"
  1086              		.file 6 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_can.h"
@@ -1775,46 +1775,46 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\cckAsXKe.s 			page 1
  1088              		.file 8 "User/inc/bsp_Motor_Encoder.h"
  1089              		.file 9 "Core/Inc/can.h"
  1090              		.file 10 "<built-in>"
-ARM GAS  C:\Users\28212\AppData\Local\Temp\cckAsXKe.s 			page 31
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccVceRtG.s 			page 31
 
 
 DEFINED SYMBOLS
                             *ABS*:00000000 bsp_Motor_Encoder.c
-C:\Users\28212\AppData\Local\Temp\cckAsXKe.s:20     .text.EncoderValZero:00000000 $t
-C:\Users\28212\AppData\Local\Temp\cckAsXKe.s:26     .text.EncoderValZero:00000000 EncoderValZero
-C:\Users\28212\AppData\Local\Temp\cckAsXKe.s:58     .text.Encoder_Struct_Zero:00000000 $t
-C:\Users\28212\AppData\Local\Temp\cckAsXKe.s:64     .text.Encoder_Struct_Zero:00000000 Encoder_Struct_Zero
-C:\Users\28212\AppData\Local\Temp\cckAsXKe.s:88     .text.Encoder_Init:00000000 $t
-C:\Users\28212\AppData\Local\Temp\cckAsXKe.s:94     .text.Encoder_Init:00000000 Encoder_Init
-C:\Users\28212\AppData\Local\Temp\cckAsXKe.s:208    .text.Get_Chassis_motor_encoder_point:00000000 $t
-C:\Users\28212\AppData\Local\Temp\cckAsXKe.s:214    .text.Get_Chassis_motor_encoder_point:00000000 Get_Chassis_motor_encoder_point
-C:\Users\28212\AppData\Local\Temp\cckAsXKe.s:232    .text.Get_Chassis_motor_encoder_point:0000000a $d
-C:\Users\28212\AppData\Local\Temp\cckAsXKe.s:318    .text.Get_Chassis_motor_encoder_point:00000050 $d
-C:\Users\28212\AppData\Local\Temp\cckAsXKe.s:327    .text.Block_Detect:00000000 $t
-C:\Users\28212\AppData\Local\Temp\cckAsXKe.s:333    .text.Block_Detect:00000000 Block_Detect
-C:\Users\28212\AppData\Local\Temp\cckAsXKe.s:415    .text.angle_limiting_int16:00000000 $t
-C:\Users\28212\AppData\Local\Temp\cckAsXKe.s:421    .text.angle_limiting_int16:00000000 angle_limiting_int16
-C:\Users\28212\AppData\Local\Temp\cckAsXKe.s:467    .text.CAN_DATA_Encoder_Deal:00000000 $t
-C:\Users\28212\AppData\Local\Temp\cckAsXKe.s:473    .text.CAN_DATA_Encoder_Deal:00000000 CAN_DATA_Encoder_Deal
-C:\Users\28212\AppData\Local\Temp\cckAsXKe.s:646    .text.CAN_DATA_Encoder_Deal:000000e4 $d
-C:\Users\28212\AppData\Local\Temp\cckAsXKe.s:653    .text.check_codevalue:00000000 $t
-C:\Users\28212\AppData\Local\Temp\cckAsXKe.s:659    .text.check_codevalue:00000000 check_codevalue
-C:\Users\28212\AppData\Local\Temp\cckAsXKe.s:701    .text.Briter_Encoder_Code_Set:00000000 $t
-C:\Users\28212\AppData\Local\Temp\cckAsXKe.s:707    .text.Briter_Encoder_Code_Set:00000000 Briter_Encoder_Code_Set
-C:\Users\28212\AppData\Local\Temp\cckAsXKe.s:722    .text.Briter_Encoder_Code_Set:0000000a $d
-C:\Users\28212\AppData\Local\Temp\cckAsXKe.s:1044   .text.Briter_Encoder_Code_Set:00000124 $d
-C:\Users\28212\AppData\Local\Temp\cckAsXKe.s:1077   .data.temp:00000000 temp
-C:\Users\28212\AppData\Local\Temp\cckAsXKe.s:1058   .bss.CAN_Encoder:00000000 CAN_Encoder
-C:\Users\28212\AppData\Local\Temp\cckAsXKe.s:1064   .bss.pitch_encoder:00000000 pitch_encoder
-C:\Users\28212\AppData\Local\Temp\cckAsXKe.s:1070   .bss.yaw_encoder:00000000 yaw_encoder
-C:\Users\28212\AppData\Local\Temp\cckAsXKe.s:1054   .bss.CAN_Encoder:00000000 $d
-C:\Users\28212\AppData\Local\Temp\cckAsXKe.s:1061   .bss.pitch_encoder:00000000 $d
-C:\Users\28212\AppData\Local\Temp\cckAsXKe.s:1067   .bss.yaw_encoder:00000000 $d
-C:\Users\28212\AppData\Local\Temp\cckAsXKe.s:1073   .data.temp:00000000 $d
-C:\Users\28212\AppData\Local\Temp\cckAsXKe.s:237    .text.Get_Chassis_motor_encoder_point:0000000f $d
-C:\Users\28212\AppData\Local\Temp\cckAsXKe.s:237    .text.Get_Chassis_motor_encoder_point:00000010 $t
-C:\Users\28212\AppData\Local\Temp\cckAsXKe.s:737    .text.Briter_Encoder_Code_Set:00000019 $d
-C:\Users\28212\AppData\Local\Temp\cckAsXKe.s:737    .text.Briter_Encoder_Code_Set:0000001a $t
+C:\Users\28212\AppData\Local\Temp\ccVceRtG.s:20     .text.EncoderValZero:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccVceRtG.s:26     .text.EncoderValZero:00000000 EncoderValZero
+C:\Users\28212\AppData\Local\Temp\ccVceRtG.s:58     .text.Encoder_Struct_Zero:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccVceRtG.s:64     .text.Encoder_Struct_Zero:00000000 Encoder_Struct_Zero
+C:\Users\28212\AppData\Local\Temp\ccVceRtG.s:88     .text.Encoder_Init:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccVceRtG.s:94     .text.Encoder_Init:00000000 Encoder_Init
+C:\Users\28212\AppData\Local\Temp\ccVceRtG.s:208    .text.Get_Chassis_motor_encoder_point:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccVceRtG.s:214    .text.Get_Chassis_motor_encoder_point:00000000 Get_Chassis_motor_encoder_point
+C:\Users\28212\AppData\Local\Temp\ccVceRtG.s:232    .text.Get_Chassis_motor_encoder_point:0000000a $d
+C:\Users\28212\AppData\Local\Temp\ccVceRtG.s:318    .text.Get_Chassis_motor_encoder_point:00000050 $d
+C:\Users\28212\AppData\Local\Temp\ccVceRtG.s:327    .text.Block_Detect:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccVceRtG.s:333    .text.Block_Detect:00000000 Block_Detect
+C:\Users\28212\AppData\Local\Temp\ccVceRtG.s:415    .text.angle_limiting_int16:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccVceRtG.s:421    .text.angle_limiting_int16:00000000 angle_limiting_int16
+C:\Users\28212\AppData\Local\Temp\ccVceRtG.s:467    .text.CAN_DATA_Encoder_Deal:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccVceRtG.s:473    .text.CAN_DATA_Encoder_Deal:00000000 CAN_DATA_Encoder_Deal
+C:\Users\28212\AppData\Local\Temp\ccVceRtG.s:646    .text.CAN_DATA_Encoder_Deal:000000e4 $d
+C:\Users\28212\AppData\Local\Temp\ccVceRtG.s:653    .text.check_codevalue:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccVceRtG.s:659    .text.check_codevalue:00000000 check_codevalue
+C:\Users\28212\AppData\Local\Temp\ccVceRtG.s:701    .text.Briter_Encoder_Code_Set:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccVceRtG.s:707    .text.Briter_Encoder_Code_Set:00000000 Briter_Encoder_Code_Set
+C:\Users\28212\AppData\Local\Temp\ccVceRtG.s:722    .text.Briter_Encoder_Code_Set:0000000a $d
+C:\Users\28212\AppData\Local\Temp\ccVceRtG.s:1044   .text.Briter_Encoder_Code_Set:00000124 $d
+C:\Users\28212\AppData\Local\Temp\ccVceRtG.s:1077   .data.temp:00000000 temp
+C:\Users\28212\AppData\Local\Temp\ccVceRtG.s:1058   .bss.CAN_Encoder:00000000 CAN_Encoder
+C:\Users\28212\AppData\Local\Temp\ccVceRtG.s:1064   .bss.pitch_encoder:00000000 pitch_encoder
+C:\Users\28212\AppData\Local\Temp\ccVceRtG.s:1070   .bss.yaw_encoder:00000000 yaw_encoder
+C:\Users\28212\AppData\Local\Temp\ccVceRtG.s:1054   .bss.CAN_Encoder:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccVceRtG.s:1061   .bss.pitch_encoder:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccVceRtG.s:1067   .bss.yaw_encoder:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccVceRtG.s:1073   .data.temp:00000000 $d
+C:\Users\28212\AppData\Local\Temp\ccVceRtG.s:237    .text.Get_Chassis_motor_encoder_point:0000000f $d
+C:\Users\28212\AppData\Local\Temp\ccVceRtG.s:237    .text.Get_Chassis_motor_encoder_point:00000010 $t
+C:\Users\28212\AppData\Local\Temp\ccVceRtG.s:737    .text.Briter_Encoder_Code_Set:00000019 $d
+C:\Users\28212\AppData\Local\Temp\ccVceRtG.s:737    .text.Briter_Encoder_Code_Set:0000001a $t
 
 UNDEFINED SYMBOLS
 memset

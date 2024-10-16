@@ -64,28 +64,47 @@ void SystemClock_Config(void);
 typedef struct{
     DJIMotor_object_t*   left_motor;
     DJIMotor_object_t*   right_motor;
+    DJIMotor_object_t*   left_motor_up;
+    DJIMotor_object_t*   right_motor_up;
 }Fire_t;
 Fire_t Fire;
 int16_t left_speed = 0;
 int16_t right_speed = 0;
+int16_t left_speed_up = 0;
+int16_t right_speed_up = 0;
 uint8_t fire_set = 0;
 
 void fire_task_init(void)
 {
     memset(&Fire, 0, sizeof(Fire_t));
 	  // 获得拨弹指针
-    Fire.left_motor  = DJIMotor_Init(1,2,false,M3508,30);
-    Fire.right_motor = DJIMotor_Init(1,4,true,M3508,30);
+    Fire.left_motor_up = DJIMotor_Init(1,4,false,M3508,30);
+    Fire.right_motor_up = DJIMotor_Init(1,2,true,M3508,30);
+    Fire.left_motor  = DJIMotor_Init(1,3,false,M3508,30);
+    Fire.right_motor = DJIMotor_Init(1,1,true,M3508,30);
 
     Fire.left_motor->Using_PID = Speed_PID;
+    Fire.left_motor_up->Using_PID = Speed_PID;
+    Fire.right_motor_up->Using_PID = Speed_PID;
     Fire.right_motor->Using_PID = Speed_PID;
     
-    PidInit(&Fire.left_motor->Speed_PID,1.45f,0,0,Output_Limit|StepIn);
- 	  PidInitMode(&Fire.left_motor->Speed_PID,Output_Limit,16000,0);//输出限幅模式设置
-    PidInitMode(&Fire.left_motor->Speed_PID,StepIn,10,0);//过大的加减�?�会导致发射机构超电流断�?
-    PidInit(&Fire.right_motor->Speed_PID,1.0f,0,0,Output_Limit|StepIn);
- 	  PidInitMode(&Fire.right_motor->Speed_PID,Output_Limit,16000,0);//输出限幅模式设置
-    PidInitMode(&Fire.right_motor->Speed_PID,StepIn,10,0);//逐渐减�?�，实测发现�?大�?�度减�?�会导致发射机构超电流断�?
+    PidInit(&Fire.left_motor->Speed_PID,1.0f,0,0,Output_Limit|StepIn|Integral_Limit);
+ 	PidInitMode(&Fire.left_motor->Speed_PID,Output_Limit,16000,0);//锟斤拷锟斤拷薹锟侥Ｊ斤拷锟斤拷锟�
+    PidInitMode(&Fire.left_motor->Speed_PID,StepIn,10,0);//锟斤拷锟斤拷募蛹锟斤拷倩岬硷拷路锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟较碉拷
+    PidInitMode(&Fire.left_motor->Speed_PID,Integral_Limit,1000,0);
+
+    PidInit(&Fire.right_motor->Speed_PID,1.0435f,0,0,Output_Limit|StepIn|Integral_Limit);
+ 	PidInitMode(&Fire.right_motor->Speed_PID,Output_Limit,16000,0);//锟斤拷锟斤拷薹锟侥Ｊ斤拷锟斤拷锟�
+    PidInitMode(&Fire.right_motor->Speed_PID,StepIn,10,0);//锟金渐硷拷锟劫ｏ拷实锟解发锟斤拷锟斤拷锟斤拷俣燃锟斤拷倩岬硷拷路锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟较碉拷
+    PidInitMode(&Fire.left_motor->Speed_PID,Integral_Limit,1000,0);
+
+    PidInit(&Fire.left_motor_up->Speed_PID,1.02f,0,0,Output_Limit|StepIn);
+ 	PidInitMode(&Fire.left_motor_up->Speed_PID,Output_Limit,16000,0);//锟斤拷锟斤拷薹锟侥Ｊ斤拷锟斤拷锟�
+    PidInitMode(&Fire.left_motor_up->Speed_PID,StepIn,10,0);//锟斤拷锟斤拷募蛹锟斤拷倩岬硷拷路锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟较碉拷
+    PidInit(&Fire.right_motor_up->Speed_PID,1.0f,0,0,Output_Limit|StepIn);
+ 	PidInitMode(&Fire.right_motor_up->Speed_PID,Output_Limit,16000,0);//锟斤拷锟斤拷薹锟侥Ｊ斤拷锟斤拷锟�
+    PidInitMode(&Fire.right_motor_up->Speed_PID,StepIn,10,0);//锟金渐硷拷锟劫ｏ拷实锟解发锟斤拷锟斤拷锟斤拷俣燃锟斤拷倩岬硷拷路锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟较碉拷
+    
 }
 
 
@@ -110,11 +129,15 @@ void fire_behaviour_choose(void)
     {
       DJIMotor_Set_val(Fire.left_motor, 0);
       DJIMotor_Set_val(Fire.right_motor, 0);
+      DJIMotor_Set_val(Fire.left_motor_up, 0);
+      DJIMotor_Set_val(Fire.right_motor_up, 0);
     }
     else
     {
       DJIMotor_Set_val(Fire.left_motor, 4800);
       DJIMotor_Set_val(Fire.right_motor, 4800);
+      DJIMotor_Set_val(Fire.left_motor_up, 4800);
+      DJIMotor_Set_val(Fire.right_motor_up, 4800);
     }
     
 }
@@ -127,6 +150,12 @@ void fire_pid_calculate(void)
     Fire.right_motor->current_input = motor_speed_control(&Fire.right_motor->Speed_PID,
                                                           Fire.right_motor->set_speed,
                                                           Fire.right_motor->Motor_Information.speed);
+    Fire.left_motor_up->current_input = motor_speed_control(&Fire.left_motor_up->Speed_PID,
+                                                          Fire.left_motor_up->set_speed,
+                                                          Fire.left_motor_up->Motor_Information.speed);
+    Fire.right_motor_up->current_input = motor_speed_control(&Fire.right_motor_up->Speed_PID,
+                                                          Fire.right_motor_up->set_speed,
+                                                          Fire.right_motor_up->Motor_Information.speed);
 }
 
 
@@ -175,9 +204,12 @@ int main(void)
   {
     left_speed = Fire.left_motor->Motor_Information.speed;
     right_speed = -Fire.right_motor->Motor_Information.speed;
+    left_speed_up = Fire.left_motor_up->Motor_Information.speed;
+    right_speed_up = -Fire.right_motor_up->Motor_Information.speed;
     fire_behaviour_choose();
 		fire_pid_calculate();
     DJIMotor_Send(Fire.left_motor);
+    DJIMotor_Send(Fire.left_motor_up);
     // DJMotor_Send_only_one(Fire.left_motor);
     // DJMotor_Send_only_one(Fire.right_motor);
     HAL_Delay(1);

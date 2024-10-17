@@ -741,7 +741,7 @@ void Gimbal_Work()
     }
     Motor_Choice_Lock_Type();//锁电机或陀螺仪
     Pitch_Calc();//P轴计算
-    Yaw_Calc();//轴计算
+    Yaw_Calc();//Y轴计算
 }
 
 void Gimbal_Not_Work()

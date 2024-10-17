@@ -5946,7 +5946,7 @@ LOAD d:/gcc-arm-none-eabi-10.3-2021.10/bin/../lib/gcc/arm-none-eabi/10.3.1/thumb
  .debug_ranges  0x000025f8       0x10 Middlewares/ST/ARM/DSP/Lib/libarm_cortexM4lf_math.a(arm_sin_f32.o)
  .debug_ranges  0x00002608       0x10 Middlewares/ST/ARM/DSP/Lib/libarm_cortexM4lf_math.a(arm_cos_f32.o)
 
-.debug_line     0x00000000    0x2bf92
+.debug_line     0x00000000    0x2bf5c
  .debug_line    0x00000000      0x498 build/main.o
  .debug_line    0x00000498      0x255 build/gpio.o
  .debug_line    0x000006ed      0x250 build/freertos.o
@@ -6007,17 +6007,17 @@ LOAD d:/gcc-arm-none-eabi-10.3-2021.10/bin/../lib/gcc/arm-none-eabi/10.3.1/thumb
  .debug_line    0x000276b5      0xcd3 build/Cybergear_Motor.o
  .debug_line    0x00028388      0x997 build/DJI_Motor.o
  .debug_line    0x00028d1f      0x567 build/fire_task.o
- .debug_line    0x00029286     0x105b build/gimbal_task.o
- .debug_line    0x0002a2e1       0x76 build/startup_stm32f407xx.o
- .debug_line    0x0002a357      0x330 Middlewares/ST/ARM/DSP/Lib/libarm_cortexM4lf_math.a(arm_mat_trans_f32.o)
- .debug_line    0x0002a687      0x31e Middlewares/ST/ARM/DSP/Lib/libarm_cortexM4lf_math.a(arm_mat_sub_f32.o)
- .debug_line    0x0002a9a5      0x39a Middlewares/ST/ARM/DSP/Lib/libarm_cortexM4lf_math.a(arm_mat_mult_f32.o)
- .debug_line    0x0002ad3f      0x4f6 Middlewares/ST/ARM/DSP/Lib/libarm_cortexM4lf_math.a(arm_mat_inverse_f32.o)
- .debug_line    0x0002b235      0x259 Middlewares/ST/ARM/DSP/Lib/libarm_cortexM4lf_math.a(arm_mat_init_f32.o)
- .debug_line    0x0002b48e      0x31e Middlewares/ST/ARM/DSP/Lib/libarm_cortexM4lf_math.a(arm_mat_add_f32.o)
- .debug_line    0x0002b7ac      0x2d0 Middlewares/ST/ARM/DSP/Lib/libarm_cortexM4lf_math.a(arm_sin_f32.o)
- .debug_line    0x0002ba7c      0x2d3 Middlewares/ST/ARM/DSP/Lib/libarm_cortexM4lf_math.a(arm_cos_f32.o)
- .debug_line    0x0002bd4f      0x243 Middlewares/ST/ARM/DSP/Lib/libarm_cortexM4lf_math.a(arm_common_tables.o)
+ .debug_line    0x00029286     0x1025 build/gimbal_task.o
+ .debug_line    0x0002a2ab       0x76 build/startup_stm32f407xx.o
+ .debug_line    0x0002a321      0x330 Middlewares/ST/ARM/DSP/Lib/libarm_cortexM4lf_math.a(arm_mat_trans_f32.o)
+ .debug_line    0x0002a651      0x31e Middlewares/ST/ARM/DSP/Lib/libarm_cortexM4lf_math.a(arm_mat_sub_f32.o)
+ .debug_line    0x0002a96f      0x39a Middlewares/ST/ARM/DSP/Lib/libarm_cortexM4lf_math.a(arm_mat_mult_f32.o)
+ .debug_line    0x0002ad09      0x4f6 Middlewares/ST/ARM/DSP/Lib/libarm_cortexM4lf_math.a(arm_mat_inverse_f32.o)
+ .debug_line    0x0002b1ff      0x259 Middlewares/ST/ARM/DSP/Lib/libarm_cortexM4lf_math.a(arm_mat_init_f32.o)
+ .debug_line    0x0002b458      0x31e Middlewares/ST/ARM/DSP/Lib/libarm_cortexM4lf_math.a(arm_mat_add_f32.o)
+ .debug_line    0x0002b776      0x2d0 Middlewares/ST/ARM/DSP/Lib/libarm_cortexM4lf_math.a(arm_sin_f32.o)
+ .debug_line    0x0002ba46      0x2d3 Middlewares/ST/ARM/DSP/Lib/libarm_cortexM4lf_math.a(arm_cos_f32.o)
+ .debug_line    0x0002bd19      0x243 Middlewares/ST/ARM/DSP/Lib/libarm_cortexM4lf_math.a(arm_common_tables.o)
 
 .debug_str      0x00000000     0xe0f2
  .debug_str     0x00000000      0xd86 build/main.o

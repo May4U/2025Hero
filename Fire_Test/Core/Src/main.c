@@ -80,8 +80,8 @@ void fire_task_init(void)
 	  // 获得拨弹指针
     Fire.left_motor_up = DJIMotor_Init(1,4,false,M3508,30);
     Fire.right_motor_up = DJIMotor_Init(1,2,true,M3508,30);
-    Fire.left_motor  = DJIMotor_Init(1,3,false,M3508,30);
-    Fire.right_motor = DJIMotor_Init(1,1,true,M3508,30);
+    Fire.left_motor  = DJIMotor_Init(2,1,true,M3508,30);
+    Fire.right_motor = DJIMotor_Init(2,3,false,M3508,30);
 
     Fire.left_motor->Using_PID = Speed_PID;
     Fire.left_motor_up->Using_PID = Speed_PID;
@@ -202,8 +202,8 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    left_speed = Fire.left_motor->Motor_Information.speed;
-    right_speed = -Fire.right_motor->Motor_Information.speed;
+    left_speed = -Fire.left_motor->Motor_Information.speed;
+    right_speed = Fire.right_motor->Motor_Information.speed;
     left_speed_up = Fire.left_motor_up->Motor_Information.speed;
     right_speed_up = -Fire.right_motor_up->Motor_Information.speed;
     fire_behaviour_choose();

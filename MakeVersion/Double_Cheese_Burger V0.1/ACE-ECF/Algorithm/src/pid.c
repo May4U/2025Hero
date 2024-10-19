@@ -179,10 +179,10 @@ fp32 PidCalculate(pid_parameter_t *pid, fp32 SetValue, fp32 ActualValue)
         if (pid->mode & Output_Limit)
             f_Output_Limit(pid);
     }
-    // else
-    // {
-    //     pid_clear(pid);
-    // }
+    else
+    {
+        // pid_clear(pid);
+    }
 
     pid->LastActualValue = pid->ActualValue;
     pid->LastSetValue = pid->SetValue;
@@ -319,7 +319,7 @@ void f_StepIn(pid_parameter_t *pid)
  */
 void f_Separated_Integral(pid_parameter_t *pid)
 {
-    if (pid->threshold_min > pid->error && pid->error < pid->threshold_max)
+    if (pid->threshold_min < pid->error && pid->error < pid->threshold_max)
         pid->Iout = 0;
 }
 /**

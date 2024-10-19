@@ -456,7 +456,7 @@ void Yaw_Calc(void)
         LQR_Data_Update(&Gimbal.lqr_encoder_yaw, Yaw_system_state);
         LQR_Calculate(&Gimbal.lqr_encoder_yaw);
         
-        int64_t Yaw_Motor_Output =  Gimbal.lqr_encoder_yaw.Output[0] + PidCalculate(&Gimbal.yaw_only_i_pid, Gimbal.Gimbal_CMD->Yaw_Set_Encoder, Gimbal.YAW_Motor->Motor_encoder.Encode_Record_Val);;
+        int64_t Yaw_Motor_Output =  Gimbal.lqr_encoder_yaw.Output[0] + PidCalculate(&Gimbal.yaw_only_i_pid, Gimbal.Gimbal_CMD->Yaw_Set_Encoder, Gimbal.YAW_Motor->Motor_encoder.Encode_Record_Val);
         value_limit(Yaw_Motor_Output,-25000,25000);//LQR运算有很大概率超int16
         Gimbal.YAW_Motor->voltage_input = Yaw_Motor_Output;
     }

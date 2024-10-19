@@ -75,7 +75,7 @@ void Virtual_recive(gimbal_auto_control_t *Virtual_recive_p)
 			{
 				#if(VISION_CONTROLLER == PC_Vision)
 				Virtual_recive_p->auto_yaw = -(((float)((int16_t)(read_buff[2]<<8 | read_buff[1]))) / 100.0f);        //自动打击的y轴角度计算/100
-				Virtual_recive_p->auto_pitch = -(((float)((int16_t)(read_buff[4]<<8 | read_buff[3]))) / 100.0f);      //自动打击的p轴角度计算
+				Virtual_recive_p->auto_pitch = -(((float)((int16_t)(read_buff[4]<<8 | read_buff[3]))) / 100.0f);      //`````````````````````````````````````
 				Virtual_recive_p->auto_pitch_speed = (read_buff[5]<<8 | read_buff[6]) / 10000; //自动打击的p轴角度计算/100
 				#elif(VISION_CONTROLLER == PC_VisionPro)
 				memcpy(&Virtual_recive_p->tracking,&read_buff[1],1);//tracking标志位

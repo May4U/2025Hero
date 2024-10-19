@@ -5946,7 +5946,7 @@ LOAD d:/gcc-arm-none-eabi-10.3-2021.10/bin/../lib/gcc/arm-none-eabi/10.3.1/thumb
  .debug_ranges  0x000025f8       0x10 Middlewares/ST/ARM/DSP/Lib/libarm_cortexM4lf_math.a(arm_sin_f32.o)
  .debug_ranges  0x00002608       0x10 Middlewares/ST/ARM/DSP/Lib/libarm_cortexM4lf_math.a(arm_cos_f32.o)
 
-.debug_line     0x00000000    0x2bf5c
+.debug_line     0x00000000    0x2bf59
  .debug_line    0x00000000      0x498 build/main.o
  .debug_line    0x00000498      0x255 build/gpio.o
  .debug_line    0x000006ed      0x250 build/freertos.o
@@ -5989,35 +5989,35 @@ LOAD d:/gcc-arm-none-eabi-10.3-2021.10/bin/../lib/gcc/arm-none-eabi/10.3.1/thumb
  .debug_line    0x0001eae1      0x530 build/filter.o
  .debug_line    0x0001f011      0x4bb build/lqr.o
  .debug_line    0x0001f4cc      0x633 build/maths.o
- .debug_line    0x0001faff      0x64a build/pid.o
- .debug_line    0x00020149      0xaf5 build/BMI088driver.o
- .debug_line    0x00020c3e      0x263 build/BMI088Middleware.o
- .debug_line    0x00020ea1      0x3bc build/bsp_dwt.o
- .debug_line    0x0002125d      0x1e2 build/bsp_PWM.o
- .debug_line    0x0002143f      0x9d1 build/kalman_filter.o
- .debug_line    0x00021e10      0xdea build/QuaternionEKF.o
- .debug_line    0x00022bfa      0xbb4 build/user_lib.o
- .debug_line    0x000237ae      0xc40 build/imu_task.o
- .debug_line    0x000243ee      0x4f1 build/safe_task.o
- .debug_line    0x000248df      0x3d5 build/bsp_can.o
- .debug_line    0x00024cb4      0x790 build/bsp_dr16.o
- .debug_line    0x00025444      0x78c build/bsp_Motor_Encoder.o
- .debug_line    0x00025bd0      0xc43 build/bsp_referee.o
- .debug_line    0x00026813      0xea2 build/robot_cmd.o
- .debug_line    0x000276b5      0xcd3 build/Cybergear_Motor.o
- .debug_line    0x00028388      0x997 build/DJI_Motor.o
- .debug_line    0x00028d1f      0x567 build/fire_task.o
- .debug_line    0x00029286     0x1025 build/gimbal_task.o
- .debug_line    0x0002a2ab       0x76 build/startup_stm32f407xx.o
- .debug_line    0x0002a321      0x330 Middlewares/ST/ARM/DSP/Lib/libarm_cortexM4lf_math.a(arm_mat_trans_f32.o)
- .debug_line    0x0002a651      0x31e Middlewares/ST/ARM/DSP/Lib/libarm_cortexM4lf_math.a(arm_mat_sub_f32.o)
- .debug_line    0x0002a96f      0x39a Middlewares/ST/ARM/DSP/Lib/libarm_cortexM4lf_math.a(arm_mat_mult_f32.o)
- .debug_line    0x0002ad09      0x4f6 Middlewares/ST/ARM/DSP/Lib/libarm_cortexM4lf_math.a(arm_mat_inverse_f32.o)
- .debug_line    0x0002b1ff      0x259 Middlewares/ST/ARM/DSP/Lib/libarm_cortexM4lf_math.a(arm_mat_init_f32.o)
- .debug_line    0x0002b458      0x31e Middlewares/ST/ARM/DSP/Lib/libarm_cortexM4lf_math.a(arm_mat_add_f32.o)
- .debug_line    0x0002b776      0x2d0 Middlewares/ST/ARM/DSP/Lib/libarm_cortexM4lf_math.a(arm_sin_f32.o)
- .debug_line    0x0002ba46      0x2d3 Middlewares/ST/ARM/DSP/Lib/libarm_cortexM4lf_math.a(arm_cos_f32.o)
- .debug_line    0x0002bd19      0x243 Middlewares/ST/ARM/DSP/Lib/libarm_cortexM4lf_math.a(arm_common_tables.o)
+ .debug_line    0x0001faff      0x64b build/pid.o
+ .debug_line    0x0002014a      0xaf5 build/BMI088driver.o
+ .debug_line    0x00020c3f      0x263 build/BMI088Middleware.o
+ .debug_line    0x00020ea2      0x3bc build/bsp_dwt.o
+ .debug_line    0x0002125e      0x1e2 build/bsp_PWM.o
+ .debug_line    0x00021440      0x9d1 build/kalman_filter.o
+ .debug_line    0x00021e11      0xdea build/QuaternionEKF.o
+ .debug_line    0x00022bfb      0xbb4 build/user_lib.o
+ .debug_line    0x000237af      0xc40 build/imu_task.o
+ .debug_line    0x000243ef      0x4f1 build/safe_task.o
+ .debug_line    0x000248e0      0x3d5 build/bsp_can.o
+ .debug_line    0x00024cb5      0x790 build/bsp_dr16.o
+ .debug_line    0x00025445      0x78c build/bsp_Motor_Encoder.o
+ .debug_line    0x00025bd1      0xc43 build/bsp_referee.o
+ .debug_line    0x00026814      0xea2 build/robot_cmd.o
+ .debug_line    0x000276b6      0xcd3 build/Cybergear_Motor.o
+ .debug_line    0x00028389      0x997 build/DJI_Motor.o
+ .debug_line    0x00028d20      0x567 build/fire_task.o
+ .debug_line    0x00029287     0x1021 build/gimbal_task.o
+ .debug_line    0x0002a2a8       0x76 build/startup_stm32f407xx.o
+ .debug_line    0x0002a31e      0x330 Middlewares/ST/ARM/DSP/Lib/libarm_cortexM4lf_math.a(arm_mat_trans_f32.o)
+ .debug_line    0x0002a64e      0x31e Middlewares/ST/ARM/DSP/Lib/libarm_cortexM4lf_math.a(arm_mat_sub_f32.o)
+ .debug_line    0x0002a96c      0x39a Middlewares/ST/ARM/DSP/Lib/libarm_cortexM4lf_math.a(arm_mat_mult_f32.o)
+ .debug_line    0x0002ad06      0x4f6 Middlewares/ST/ARM/DSP/Lib/libarm_cortexM4lf_math.a(arm_mat_inverse_f32.o)
+ .debug_line    0x0002b1fc      0x259 Middlewares/ST/ARM/DSP/Lib/libarm_cortexM4lf_math.a(arm_mat_init_f32.o)
+ .debug_line    0x0002b455      0x31e Middlewares/ST/ARM/DSP/Lib/libarm_cortexM4lf_math.a(arm_mat_add_f32.o)
+ .debug_line    0x0002b773      0x2d0 Middlewares/ST/ARM/DSP/Lib/libarm_cortexM4lf_math.a(arm_sin_f32.o)
+ .debug_line    0x0002ba43      0x2d3 Middlewares/ST/ARM/DSP/Lib/libarm_cortexM4lf_math.a(arm_cos_f32.o)
+ .debug_line    0x0002bd16      0x243 Middlewares/ST/ARM/DSP/Lib/libarm_cortexM4lf_math.a(arm_common_tables.o)
 
 .debug_str      0x00000000     0xe0f2
  .debug_str     0x00000000      0xd86 build/main.o

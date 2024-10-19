@@ -1,4 +1,4 @@
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s 			page 1
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccdi6OTi.s 			page 1
 
 
    1              		.cpu cortex-m4
@@ -58,7 +58,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s 			page 1
   28:ACE-ECF/Algorithm/src/pid.c ****  *             PidCalculate(&motor6020pid_s,setvalue,ActualValue);   //计算
   29:ACE-ECF/Algorithm/src/pid.c ****  *          }
   30:ACE-ECF/Algorithm/src/pid.c ****  *
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s 			page 2
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccdi6OTi.s 			page 2
 
 
   31:ACE-ECF/Algorithm/src/pid.c ****  * @attention
@@ -118,7 +118,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s 			page 1
   85:ACE-ECF/Algorithm/src/pid.c ****  */
   86:ACE-ECF/Algorithm/src/pid.c **** void PidInitMode(pid_parameter_t *pid, uint32_t mode, fp32 num1, fp32 num2)
   87:ACE-ECF/Algorithm/src/pid.c **** {
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s 			page 3
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccdi6OTi.s 			page 3
 
 
   88:ACE-ECF/Algorithm/src/pid.c ****     switch (mode)
@@ -178,7 +178,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s 			page 1
  142:ACE-ECF/Algorithm/src/pid.c ****     pid->Derror = pid->error - pid->LastError;
  143:ACE-ECF/Algorithm/src/pid.c ****     if (abs(pid->error) > pid->deadband) // 死区
  144:ACE-ECF/Algorithm/src/pid.c ****     {
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s 			page 4
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccdi6OTi.s 			page 4
 
 
  145:ACE-ECF/Algorithm/src/pid.c ****         pid->Pout = pid->error * pid->Kp;
@@ -218,10 +218,10 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s 			page 1
  179:ACE-ECF/Algorithm/src/pid.c ****         if (pid->mode & Output_Limit)
  180:ACE-ECF/Algorithm/src/pid.c ****             f_Output_Limit(pid);
  181:ACE-ECF/Algorithm/src/pid.c ****     }
- 182:ACE-ECF/Algorithm/src/pid.c ****     // else
- 183:ACE-ECF/Algorithm/src/pid.c ****     // {
- 184:ACE-ECF/Algorithm/src/pid.c ****     //     pid_clear(pid);
- 185:ACE-ECF/Algorithm/src/pid.c ****     // }
+ 182:ACE-ECF/Algorithm/src/pid.c ****     else
+ 183:ACE-ECF/Algorithm/src/pid.c ****     {
+ 184:ACE-ECF/Algorithm/src/pid.c ****         // pid_clear(pid);
+ 185:ACE-ECF/Algorithm/src/pid.c ****     }
  186:ACE-ECF/Algorithm/src/pid.c **** 
  187:ACE-ECF/Algorithm/src/pid.c ****     pid->LastActualValue = pid->ActualValue;
  188:ACE-ECF/Algorithm/src/pid.c ****     pid->LastSetValue = pid->SetValue;
@@ -238,7 +238,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s 			page 1
  199:ACE-ECF/Algorithm/src/pid.c ****  */
  200:ACE-ECF/Algorithm/src/pid.c **** void pid_clear(pid_parameter_t *pid)
  201:ACE-ECF/Algorithm/src/pid.c **** {
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s 			page 5
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccdi6OTi.s 			page 5
 
 
  202:ACE-ECF/Algorithm/src/pid.c ****     pid->error = pid->LastError = 0.0f;
@@ -298,7 +298,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s 			page 1
  256:ACE-ECF/Algorithm/src/pid.c **** fp32 first_order_filter(first_order_filter_t *first_order_filter_type, fp32 input)
  257:ACE-ECF/Algorithm/src/pid.c **** {
   29              		.loc 1 257 1 view -0
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s 			page 6
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccdi6OTi.s 			page 6
 
 
   30              		.cfi_startproc
@@ -358,7 +358,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s 			page 1
   72              		.loc 1 271 1 is_stmt 1 view -0
   73              		.cfi_startproc
   74              		@ args = 0, pretend = 0, frame = 0
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s 			page 7
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccdi6OTi.s 			page 7
 
 
   75              		@ frame_needed = 0, uses_anonymous_args = 0
@@ -418,7 +418,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s 			page 1
  122 0040 77EE877A 		vadd.f32	s15, s15, s14
  123              		.loc 1 278 15 view .LVU39
  124 0044 C0ED0B7A 		vstr.32	s15, [r0, #44]
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s 			page 8
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccdi6OTi.s 			page 8
 
 
  279:ACE-ECF/Algorithm/src/pid.c **** }
@@ -478,7 +478,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s 			page 1
  299:ACE-ECF/Algorithm/src/pid.c ****         if ((pid->LastSetValue - pid->SetValue) > 0.0f)
  161              		.loc 1 299 9 is_stmt 1 view .LVU47
  162              		.loc 1 299 12 is_stmt 0 view .LVU48
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s 			page 9
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccdi6OTi.s 			page 9
 
 
  163 0028 F5EEC07A 		vcmpe.f32	s15, #0
@@ -538,7 +538,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s 			page 1
  198              		.align	2
  199              	.L16:
  200 0058 00000000 		.word	0
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s 			page 10
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccdi6OTi.s 			page 10
 
 
  201              		.cfi_endproc
@@ -564,7 +564,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s 			page 1
  215              		@ args = 0, pretend = 0, frame = 0
  216              		@ frame_needed = 0, uses_anonymous_args = 0
  217              		@ link register save eliminated.
- 322:ACE-ECF/Algorithm/src/pid.c ****     if (pid->threshold_min > pid->error && pid->error < pid->threshold_max)
+ 322:ACE-ECF/Algorithm/src/pid.c ****     if (pid->threshold_min < pid->error && pid->error < pid->threshold_max)
  218              		.loc 1 322 5 view .LVU61
  219              		.loc 1 322 12 is_stmt 0 view .LVU62
  220 0000 90ED187A 		vldr.32	s14, [r0, #96]
@@ -573,7 +573,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s 			page 1
  223              		.loc 1 322 8 view .LVU64
  224 0008 B4EEE77A 		vcmpe.f32	s14, s15
  225 000c F1EE10FA 		vmrs	APSR_nzcv, FPSCR
- 226 0010 08DD     		ble	.L18
+ 226 0010 08D5     		bpl	.L18
  227              		.loc 1 322 60 discriminator 1 view .LVU65
  228 0012 90ED177A 		vldr.32	s14, [r0, #92]
  229              		.loc 1 322 41 discriminator 1 view .LVU66
@@ -598,7 +598,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s 			page 1
  247              		.thumb_func
  249              	f_Integral_Limit:
  250              	.LVL14:
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s 			page 11
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccdi6OTi.s 			page 11
 
 
  251              	.LFB141:
@@ -658,7 +658,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s 			page 1
  289              		.align	1
  290              		.syntax unified
  291              		.thumb
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s 			page 12
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccdi6OTi.s 			page 12
 
 
  292              		.thumb_func
@@ -718,7 +718,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s 			page 1
  330 0034 EBE7     		b	.L32
  331              	.L37:
  358:ACE-ECF/Algorithm/src/pid.c ****     }
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s 			page 13
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccdi6OTi.s 			page 13
 
 
  359:ACE-ECF/Algorithm/src/pid.c ****     else
@@ -778,7 +778,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s 			page 1
  372              		.loc 1 374 9 is_stmt 1 view .LVU106
  373              		.loc 1 374 18 is_stmt 0 view .LVU107
  374 0012 C0ED0D7A 		vstr.32	s15, [r0, #52]
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s 			page 14
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccdi6OTi.s 			page 14
 
 
  375              	.L40:
@@ -838,7 +838,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s 			page 1
   62:ACE-ECF/Algorithm/src/pid.c ****     pid->User_Fun = NULL;
  423              		.loc 1 62 5 is_stmt 1 view .LVU117
  424 0014 9822     		movs	r2, #152
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s 			page 15
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccdi6OTi.s 			page 15
 
 
  425 0016 0021     		movs	r1, #0
@@ -898,7 +898,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s 			page 1
  467 0004 E9B1     		cbz	r1, .L48
  468 0006 0139     		subs	r1, r1, #1
  469              	.LVL21:
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s 			page 16
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccdi6OTi.s 			page 16
 
 
   88:ACE-ECF/Algorithm/src/pid.c ****     {
@@ -958,7 +958,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s 			page 1
  519              		.loc 1 123 9 is_stmt 1 view .LVU136
  520              	.LVL23:
  521              	.L48:
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s 			page 17
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccdi6OTi.s 			page 17
 
 
  126:ACE-ECF/Algorithm/src/pid.c **** /**
@@ -1018,7 +1018,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s 			page 1
  100:ACE-ECF/Algorithm/src/pid.c ****         return;
  560              		.loc 1 100 28 is_stmt 0 view .LVU153
  561 0066 C0ED180A 		vstr.32	s1, [r0, #96]
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s 			page 18
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccdi6OTi.s 			page 18
 
 
  101:ACE-ECF/Algorithm/src/pid.c ****     case Output_Limit:
@@ -1078,7 +1078,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s 			page 1
  598              		.loc 1 120 9 is_stmt 1 view .LVU171
  599 008c 7047     		bx	lr
  600              		.cfi_endproc
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s 			page 19
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccdi6OTi.s 			page 19
 
 
  601              	.LFE131:
@@ -1138,7 +1138,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s 			page 1
  646 001c D4ED047A 		vldr.32	s15, [r4, #16]
  141:ACE-ECF/Algorithm/src/pid.c ****     pid->Derror = pid->error - pid->LastError;
  647              		.loc 1 141 32 view .LVU183
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s 			page 20
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccdi6OTi.s 			page 20
 
 
  648 0020 77EEC80A 		vsub.f32	s1, s15, s16
@@ -1198,7 +1198,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s 			page 1
  149:ACE-ECF/Algorithm/src/pid.c ****             f_Derivative_On_Measurement(pid);
  685              		.loc 1 149 16 is_stmt 0 view .LVU201
  686 0068 236D     		ldr	r3, [r4, #80]
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s 			page 21
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccdi6OTi.s 			page 21
 
 
  149:ACE-ECF/Algorithm/src/pid.c ****             f_Derivative_On_Measurement(pid);
@@ -1258,7 +1258,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s 			page 1
  723 009c 236D     		ldr	r3, [r4, #80]
  164:ACE-ECF/Algorithm/src/pid.c ****             f_Separated_Integral(pid);
  724              		.loc 1 164 12 view .LVU220
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s 			page 22
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccdi6OTi.s 			page 22
 
 
  725 009e 13F0100F 		tst	r3, #16
@@ -1318,7 +1318,7 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s 			page 1
  761              		.loc 1 172 18 view .LVU238
  762 00dc 84ED0D0A 		vstr.32	s0, [r4, #52]
  175:ACE-ECF/Algorithm/src/pid.c ****             pid->out = first_order_filter(&pid->out_filter, pid->out);
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s 			page 23
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccdi6OTi.s 			page 23
 
 
  763              		.loc 1 175 9 is_stmt 1 view .LVU239
@@ -1340,400 +1340,402 @@ ARM GAS  C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s 			page 1
  774 00ea 13F0040F 		tst	r3, #4
  775 00ee 32D1     		bne	.L89
  776              	.L69:
+ 185:ACE-ECF/Algorithm/src/pid.c **** 
+ 777              		.loc 1 185 5 is_stmt 1 view .LVU245
  187:ACE-ECF/Algorithm/src/pid.c ****     pid->LastSetValue = pid->SetValue;
- 777              		.loc 1 187 5 is_stmt 1 view .LVU245
+ 778              		.loc 1 187 5 view .LVU246
  187:ACE-ECF/Algorithm/src/pid.c ****     pid->LastSetValue = pid->SetValue;
- 778              		.loc 1 187 31 is_stmt 0 view .LVU246
- 779 00f0 E369     		ldr	r3, [r4, #28]	@ float
+ 779              		.loc 1 187 31 is_stmt 0 view .LVU247
+ 780 00f0 E369     		ldr	r3, [r4, #28]	@ float
  187:ACE-ECF/Algorithm/src/pid.c ****     pid->LastSetValue = pid->SetValue;
- 780              		.loc 1 187 26 view .LVU247
- 781 00f2 A361     		str	r3, [r4, #24]	@ float
+ 781              		.loc 1 187 26 view .LVU248
+ 782 00f2 A361     		str	r3, [r4, #24]	@ float
  188:ACE-ECF/Algorithm/src/pid.c ****     pid->LastDerror = pid->Derror;
- 782              		.loc 1 188 5 is_stmt 1 view .LVU248
+ 783              		.loc 1 188 5 is_stmt 1 view .LVU249
  188:ACE-ECF/Algorithm/src/pid.c ****     pid->LastDerror = pid->Derror;
- 783              		.loc 1 188 28 is_stmt 0 view .LVU249
- 784 00f4 2369     		ldr	r3, [r4, #16]	@ float
+ 784              		.loc 1 188 28 is_stmt 0 view .LVU250
+ 785 00f4 2369     		ldr	r3, [r4, #16]	@ float
  188:ACE-ECF/Algorithm/src/pid.c ****     pid->LastDerror = pid->Derror;
- 785              		.loc 1 188 23 view .LVU250
- 786 00f6 6361     		str	r3, [r4, #20]	@ float
+ 786              		.loc 1 188 23 view .LVU251
+ 787 00f6 6361     		str	r3, [r4, #20]	@ float
  189:ACE-ECF/Algorithm/src/pid.c ****     pid->LastError = pid->error;
- 787              		.loc 1 189 5 is_stmt 1 view .LVU251
+ 788              		.loc 1 189 5 is_stmt 1 view .LVU252
  189:ACE-ECF/Algorithm/src/pid.c ****     pid->LastError = pid->error;
- 788              		.loc 1 189 26 is_stmt 0 view .LVU252
- 789 00f8 A36B     		ldr	r3, [r4, #56]	@ float
+ 789              		.loc 1 189 26 is_stmt 0 view .LVU253
+ 790 00f8 A36B     		ldr	r3, [r4, #56]	@ float
  189:ACE-ECF/Algorithm/src/pid.c ****     pid->LastError = pid->error;
- 790              		.loc 1 189 21 view .LVU253
- 791 00fa E363     		str	r3, [r4, #60]	@ float
+ 791              		.loc 1 189 21 view .LVU254
+ 792 00fa E363     		str	r3, [r4, #60]	@ float
  190:ACE-ECF/Algorithm/src/pid.c **** 
- 792              		.loc 1 190 5 is_stmt 1 view .LVU254
+ 793              		.loc 1 190 5 is_stmt 1 view .LVU255
  190:ACE-ECF/Algorithm/src/pid.c **** 
- 793              		.loc 1 190 25 is_stmt 0 view .LVU255
- 794 00fc 636C     		ldr	r3, [r4, #68]	@ float
+ 794              		.loc 1 190 25 is_stmt 0 view .LVU256
+ 795 00fc 636C     		ldr	r3, [r4, #68]	@ float
  190:ACE-ECF/Algorithm/src/pid.c **** 
- 795              		.loc 1 190 20 view .LVU256
- 796 00fe A364     		str	r3, [r4, #72]	@ float
+ 796              		.loc 1 190 20 view .LVU257
+ 797 00fe A364     		str	r3, [r4, #72]	@ float
  192:ACE-ECF/Algorithm/src/pid.c **** }
- 797              		.loc 1 192 5 is_stmt 1 view .LVU257
+ 798              		.loc 1 192 5 is_stmt 1 view .LVU258
  193:ACE-ECF/Algorithm/src/pid.c **** /**
- 798              		.loc 1 193 1 is_stmt 0 view .LVU258
- 799 0100 94ED0D0A 		vldr.32	s0, [r4, #52]
- 800 0104 BDEC028B 		vldm	sp!, {d8}
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s 			page 24
+ 799              		.loc 1 193 1 is_stmt 0 view .LVU259
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccdi6OTi.s 			page 24
 
 
- 801              	.LCFI3:
- 802              		.cfi_remember_state
- 803              		.cfi_restore 80
- 804              		.cfi_restore 81
- 805              		.cfi_def_cfa_offset 8
- 806              	.LVL31:
+ 800 0100 94ED0D0A 		vldr.32	s0, [r4, #52]
+ 801 0104 BDEC028B 		vldm	sp!, {d8}
+ 802              	.LCFI3:
+ 803              		.cfi_remember_state
+ 804              		.cfi_restore 80
+ 805              		.cfi_restore 81
+ 806              		.cfi_def_cfa_offset 8
+ 807              	.LVL31:
  193:ACE-ECF/Algorithm/src/pid.c **** /**
- 807              		.loc 1 193 1 view .LVU259
- 808 0108 10BD     		pop	{r4, pc}
- 809              	.LVL32:
- 810              	.L81:
- 811              	.LCFI4:
- 812              		.cfi_restore_state
+ 808              		.loc 1 193 1 view .LVU260
+ 809 0108 10BD     		pop	{r4, pc}
+ 810              	.LVL32:
+ 811              	.L81:
+ 812              	.LCFI4:
+ 813              		.cfi_restore_state
  139:ACE-ECF/Algorithm/src/pid.c ****     pid->ActualValue = ActualValue;
- 813              		.loc 1 139 9 is_stmt 1 view .LVU260
- 814 010a FFF7FEFF 		bl	f_StepIn
- 815              	.LVL33:
+ 814              		.loc 1 139 9 is_stmt 1 view .LVU261
+ 815 010a FFF7FEFF 		bl	f_StepIn
+ 816              	.LVL33:
  139:ACE-ECF/Algorithm/src/pid.c ****     pid->ActualValue = ActualValue;
- 816              		.loc 1 139 9 is_stmt 0 view .LVU261
- 817 010e 83E7     		b	.L67
- 818              	.L82:
+ 817              		.loc 1 139 9 is_stmt 0 view .LVU262
+ 818 010e 83E7     		b	.L67
+ 819              	.L82:
  143:ACE-ECF/Algorithm/src/pid.c ****     {
- 819              		.loc 1 143 9 discriminator 2 view .LVU262
- 820 0110 B1EE607A 		vneg.f32	s14, s1
- 821 0114 95E7     		b	.L68
- 822              	.L83:
+ 820              		.loc 1 143 9 discriminator 2 view .LVU263
+ 821 0110 B1EE607A 		vneg.f32	s14, s1
+ 822 0114 95E7     		b	.L68
+ 823              	.L83:
  150:ACE-ECF/Algorithm/src/pid.c ****         else
- 823              		.loc 1 150 13 is_stmt 1 view .LVU263
- 824 0116 2046     		mov	r0, r4
- 825 0118 FFF7FEFF 		bl	f_Derivative_On_Measurement
- 826              	.LVL34:
- 827 011c AEE7     		b	.L72
- 828              	.L84:
+ 824              		.loc 1 150 13 is_stmt 1 view .LVU264
+ 825 0116 2046     		mov	r0, r4
+ 826 0118 FFF7FEFF 		bl	f_Derivative_On_Measurement
+ 827              	.LVL34:
+ 828 011c AEE7     		b	.L72
+ 829              	.L84:
  156:ACE-ECF/Algorithm/src/pid.c **** 
- 829              		.loc 1 156 13 view .LVU264
- 830 011e 2046     		mov	r0, r4
- 831 0120 FFF7FEFF 		bl	Changing_Integration_Rate
- 832              	.LVL35:
- 833 0124 AEE7     		b	.L73
- 834              	.L85:
+ 830              		.loc 1 156 13 view .LVU265
+ 831 011e 2046     		mov	r0, r4
+ 832 0120 FFF7FEFF 		bl	Changing_Integration_Rate
+ 833              	.LVL35:
+ 834 0124 AEE7     		b	.L73
+ 835              	.L85:
  160:ACE-ECF/Algorithm/src/pid.c ****         pid->Iout = pid->Ki * pid->Ierror;
- 835              		.loc 1 160 13 view .LVU265
- 836 0126 2046     		mov	r0, r4
- 837 0128 FFF7FEFF 		bl	f_Integral_Limit
- 838              	.LVL36:
- 839 012c AEE7     		b	.L74
- 840              	.L86:
+ 836              		.loc 1 160 13 view .LVU266
+ 837 0126 2046     		mov	r0, r4
+ 838 0128 FFF7FEFF 		bl	f_Integral_Limit
+ 839              	.LVL36:
+ 840 012c AEE7     		b	.L74
+ 841              	.L86:
  165:ACE-ECF/Algorithm/src/pid.c **** 
- 841              		.loc 1 165 13 view .LVU266
- 842 012e 2046     		mov	r0, r4
- 843 0130 FFF7FEFF 		bl	f_Separated_Integral
- 844              	.LVL37:
- 845 0134 B6E7     		b	.L75
- 846              	.L87:
+ 842              		.loc 1 165 13 view .LVU267
+ 843 012e 2046     		mov	r0, r4
+ 844 0130 FFF7FEFF 		bl	f_Separated_Integral
+ 845              	.LVL37:
+ 846 0134 B6E7     		b	.L75
+ 847              	.L87:
  169:ACE-ECF/Algorithm/src/pid.c **** 
- 847              		.loc 1 169 13 view .LVU267
- 169:ACE-ECF/Algorithm/src/pid.c **** 
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s 			page 25
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccdi6OTi.s 			page 25
 
 
- 848              		.loc 1 169 25 is_stmt 0 view .LVU268
- 849 0136 94ED0B0A 		vldr.32	s0, [r4, #44]
- 850 013a 04F17000 		add	r0, r4, #112
- 851 013e FFF7FEFF 		bl	first_order_filter
- 852              	.LVL38:
+ 848              		.loc 1 169 13 view .LVU268
  169:ACE-ECF/Algorithm/src/pid.c **** 
- 853              		.loc 1 169 23 view .LVU269
- 854 0142 84ED0B0A 		vstr.32	s0, [r4, #44]
- 855 0146 B1E7     		b	.L76
- 856              	.L88:
+ 849              		.loc 1 169 25 is_stmt 0 view .LVU269
+ 850 0136 94ED0B0A 		vldr.32	s0, [r4, #44]
+ 851 013a 04F17000 		add	r0, r4, #112
+ 852 013e FFF7FEFF 		bl	first_order_filter
+ 853              	.LVL38:
+ 169:ACE-ECF/Algorithm/src/pid.c **** 
+ 854              		.loc 1 169 23 view .LVU270
+ 855 0142 84ED0B0A 		vstr.32	s0, [r4, #44]
+ 856 0146 B1E7     		b	.L76
+ 857              	.L88:
  176:ACE-ECF/Algorithm/src/pid.c **** 
- 857              		.loc 1 176 13 is_stmt 1 view .LVU270
+ 858              		.loc 1 176 13 is_stmt 1 view .LVU271
  176:ACE-ECF/Algorithm/src/pid.c **** 
- 858              		.loc 1 176 24 is_stmt 0 view .LVU271
- 859 0148 04F18000 		add	r0, r4, #128
- 860 014c FFF7FEFF 		bl	first_order_filter
- 861              	.LVL39:
+ 859              		.loc 1 176 24 is_stmt 0 view .LVU272
+ 860 0148 04F18000 		add	r0, r4, #128
+ 861 014c FFF7FEFF 		bl	first_order_filter
+ 862              	.LVL39:
  176:ACE-ECF/Algorithm/src/pid.c **** 
- 862              		.loc 1 176 22 view .LVU272
- 863 0150 84ED0D0A 		vstr.32	s0, [r4, #52]
- 864 0154 C8E7     		b	.L77
- 865              	.L89:
+ 863              		.loc 1 176 22 view .LVU273
+ 864 0150 84ED0D0A 		vstr.32	s0, [r4, #52]
+ 865 0154 C8E7     		b	.L77
+ 866              	.L89:
  180:ACE-ECF/Algorithm/src/pid.c ****     }
- 866              		.loc 1 180 13 is_stmt 1 view .LVU273
- 867 0156 2046     		mov	r0, r4
- 868 0158 FFF7FEFF 		bl	f_Output_Limit
- 869              	.LVL40:
- 870 015c C8E7     		b	.L69
- 871              		.cfi_endproc
- 872              	.LFE132:
- 874              		.section	.text.pid_clear,"ax",%progbits
- 875              		.align	1
- 876              		.global	pid_clear
- 877              		.syntax unified
- 878              		.thumb
- 879              		.thumb_func
- 881              	pid_clear:
- 882              	.LVL41:
- 883              	.LFB133:
+ 867              		.loc 1 180 13 is_stmt 1 view .LVU274
+ 868 0156 2046     		mov	r0, r4
+ 869 0158 FFF7FEFF 		bl	f_Output_Limit
+ 870              	.LVL40:
+ 871 015c C8E7     		b	.L69
+ 872              		.cfi_endproc
+ 873              	.LFE132:
+ 875              		.section	.text.pid_clear,"ax",%progbits
+ 876              		.align	1
+ 877              		.global	pid_clear
+ 878              		.syntax unified
+ 879              		.thumb
+ 880              		.thumb_func
+ 882              	pid_clear:
+ 883              	.LVL41:
+ 884              	.LFB133:
  201:ACE-ECF/Algorithm/src/pid.c ****     pid->error = pid->LastError = 0.0f;
- 884              		.loc 1 201 1 view -0
- 885              		.cfi_startproc
- 886              		@ args = 0, pretend = 0, frame = 0
- 887              		@ frame_needed = 0, uses_anonymous_args = 0
- 888              		@ link register save eliminated.
+ 885              		.loc 1 201 1 view -0
+ 886              		.cfi_startproc
+ 887              		@ args = 0, pretend = 0, frame = 0
+ 888              		@ frame_needed = 0, uses_anonymous_args = 0
+ 889              		@ link register save eliminated.
  202:ACE-ECF/Algorithm/src/pid.c ****     pid->Derror = pid->LastDerror = pid->LastLastDerror = 0.0f;
- 889              		.loc 1 202 5 view .LVU275
+ 890              		.loc 1 202 5 view .LVU276
  202:ACE-ECF/Algorithm/src/pid.c ****     pid->Derror = pid->LastDerror = pid->LastLastDerror = 0.0f;
- 890              		.loc 1 202 33 is_stmt 0 view .LVU276
- 891 0000 0023     		movs	r3, #0
- 892 0002 8364     		str	r3, [r0, #72]	@ float
+ 891              		.loc 1 202 33 is_stmt 0 view .LVU277
+ 892 0000 0023     		movs	r3, #0
+ 893 0002 8364     		str	r3, [r0, #72]	@ float
  202:ACE-ECF/Algorithm/src/pid.c ****     pid->Derror = pid->LastDerror = pid->LastLastDerror = 0.0f;
- 893              		.loc 1 202 16 view .LVU277
- 894 0004 4364     		str	r3, [r0, #68]	@ float
+ 894              		.loc 1 202 16 view .LVU278
+ 895 0004 4364     		str	r3, [r0, #68]	@ float
  203:ACE-ECF/Algorithm/src/pid.c ****     pid->out = pid->Pout = pid->Iout = pid->Dout = pid->Ierror = 0.0f;
- 895              		.loc 1 203 5 is_stmt 1 view .LVU278
- 203:ACE-ECF/Algorithm/src/pid.c ****     pid->out = pid->Pout = pid->Iout = pid->Dout = pid->Ierror = 0.0f;
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s 			page 26
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccdi6OTi.s 			page 26
 
 
- 896              		.loc 1 203 57 is_stmt 0 view .LVU279
- 897 0006 0364     		str	r3, [r0, #64]	@ float
+ 896              		.loc 1 203 5 is_stmt 1 view .LVU279
  203:ACE-ECF/Algorithm/src/pid.c ****     pid->out = pid->Pout = pid->Iout = pid->Dout = pid->Ierror = 0.0f;
- 898              		.loc 1 203 35 view .LVU280
- 899 0008 C363     		str	r3, [r0, #60]	@ float
+ 897              		.loc 1 203 57 is_stmt 0 view .LVU280
+ 898 0006 0364     		str	r3, [r0, #64]	@ float
  203:ACE-ECF/Algorithm/src/pid.c ****     pid->out = pid->Pout = pid->Iout = pid->Dout = pid->Ierror = 0.0f;
- 900              		.loc 1 203 17 view .LVU281
- 901 000a 8363     		str	r3, [r0, #56]	@ float
+ 899              		.loc 1 203 35 view .LVU281
+ 900 0008 C363     		str	r3, [r0, #60]	@ float
+ 203:ACE-ECF/Algorithm/src/pid.c ****     pid->out = pid->Pout = pid->Iout = pid->Dout = pid->Ierror = 0.0f;
+ 901              		.loc 1 203 17 view .LVU282
+ 902 000a 8363     		str	r3, [r0, #56]	@ float
  204:ACE-ECF/Algorithm/src/pid.c ****     pid->ActualValue = pid->SetValue = pid->LastActualValue = pid->LastSetValue = 0.0f;
- 902              		.loc 1 204 5 is_stmt 1 view .LVU282
+ 903              		.loc 1 204 5 is_stmt 1 view .LVU283
  204:ACE-ECF/Algorithm/src/pid.c ****     pid->ActualValue = pid->SetValue = pid->LastActualValue = pid->LastSetValue = 0.0f;
- 903              		.loc 1 204 64 is_stmt 0 view .LVU283
- 904 000c 0362     		str	r3, [r0, #32]	@ float
+ 904              		.loc 1 204 64 is_stmt 0 view .LVU284
+ 905 000c 0362     		str	r3, [r0, #32]	@ float
  204:ACE-ECF/Algorithm/src/pid.c ****     pid->ActualValue = pid->SetValue = pid->LastActualValue = pid->LastSetValue = 0.0f;
- 905              		.loc 1 204 50 view .LVU284
- 906 000e C362     		str	r3, [r0, #44]	@ float
+ 906              		.loc 1 204 50 view .LVU285
+ 907 000e C362     		str	r3, [r0, #44]	@ float
  204:ACE-ECF/Algorithm/src/pid.c ****     pid->ActualValue = pid->SetValue = pid->LastActualValue = pid->LastSetValue = 0.0f;
- 907              		.loc 1 204 38 view .LVU285
- 908 0010 8362     		str	r3, [r0, #40]	@ float
+ 908              		.loc 1 204 38 view .LVU286
+ 909 0010 8362     		str	r3, [r0, #40]	@ float
  204:ACE-ECF/Algorithm/src/pid.c ****     pid->ActualValue = pid->SetValue = pid->LastActualValue = pid->LastSetValue = 0.0f;
- 909              		.loc 1 204 26 view .LVU286
- 910 0012 4362     		str	r3, [r0, #36]	@ float
+ 910              		.loc 1 204 26 view .LVU287
+ 911 0012 4362     		str	r3, [r0, #36]	@ float
  204:ACE-ECF/Algorithm/src/pid.c ****     pid->ActualValue = pid->SetValue = pid->LastActualValue = pid->LastSetValue = 0.0f;
- 911              		.loc 1 204 14 view .LVU287
- 912 0014 4363     		str	r3, [r0, #52]	@ float
+ 912              		.loc 1 204 14 view .LVU288
+ 913 0014 4363     		str	r3, [r0, #52]	@ float
  205:ACE-ECF/Algorithm/src/pid.c ****     pid->d_filter.last_input = pid->out_filter.last_input = 0;
- 913              		.loc 1 205 5 is_stmt 1 view .LVU288
+ 914              		.loc 1 205 5 is_stmt 1 view .LVU289
  205:ACE-ECF/Algorithm/src/pid.c ****     pid->d_filter.last_input = pid->out_filter.last_input = 0;
- 914              		.loc 1 205 81 is_stmt 0 view .LVU289
- 915 0016 4361     		str	r3, [r0, #20]	@ float
+ 915              		.loc 1 205 81 is_stmt 0 view .LVU290
+ 916 0016 4361     		str	r3, [r0, #20]	@ float
  205:ACE-ECF/Algorithm/src/pid.c ****     pid->d_filter.last_input = pid->out_filter.last_input = 0;
- 916              		.loc 1 205 61 view .LVU290
- 917 0018 8361     		str	r3, [r0, #24]	@ float
+ 917              		.loc 1 205 61 view .LVU291
+ 918 0018 8361     		str	r3, [r0, #24]	@ float
  205:ACE-ECF/Algorithm/src/pid.c ****     pid->d_filter.last_input = pid->out_filter.last_input = 0;
- 918              		.loc 1 205 38 view .LVU291
- 919 001a 0361     		str	r3, [r0, #16]	@ float
+ 919              		.loc 1 205 38 view .LVU292
+ 920 001a 0361     		str	r3, [r0, #16]	@ float
  205:ACE-ECF/Algorithm/src/pid.c ****     pid->d_filter.last_input = pid->out_filter.last_input = 0;
- 920              		.loc 1 205 22 view .LVU292
- 921 001c C361     		str	r3, [r0, #28]	@ float
+ 921              		.loc 1 205 22 view .LVU293
+ 922 001c C361     		str	r3, [r0, #28]	@ float
  206:ACE-ECF/Algorithm/src/pid.c **** }
- 922              		.loc 1 206 5 is_stmt 1 view .LVU293
+ 923              		.loc 1 206 5 is_stmt 1 view .LVU294
  206:ACE-ECF/Algorithm/src/pid.c **** }
- 923              		.loc 1 206 59 is_stmt 0 view .LVU294
- 924 001e C0F88430 		str	r3, [r0, #132]	@ float
+ 924              		.loc 1 206 59 is_stmt 0 view .LVU295
+ 925 001e C0F88430 		str	r3, [r0, #132]	@ float
  206:ACE-ECF/Algorithm/src/pid.c **** }
- 925              		.loc 1 206 30 view .LVU295
- 926 0022 4367     		str	r3, [r0, #116]	@ float
+ 926              		.loc 1 206 30 view .LVU296
+ 927 0022 4367     		str	r3, [r0, #116]	@ float
  207:ACE-ECF/Algorithm/src/pid.c **** /**
- 927              		.loc 1 207 1 view .LVU296
- 928 0024 7047     		bx	lr
- 929              		.cfi_endproc
- 930              	.LFE133:
- 932              		.section	.text.User_Fun_Callback_Register,"ax",%progbits
- 933              		.align	1
- 934              		.global	User_Fun_Callback_Register
- 935              		.syntax unified
- 936              		.thumb
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s 			page 27
+ 928              		.loc 1 207 1 view .LVU297
+ 929 0024 7047     		bx	lr
+ 930              		.cfi_endproc
+ 931              	.LFE133:
+ 933              		.section	.text.User_Fun_Callback_Register,"ax",%progbits
+ 934              		.align	1
+ 935              		.global	User_Fun_Callback_Register
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccdi6OTi.s 			page 27
 
 
- 937              		.thumb_func
- 939              	User_Fun_Callback_Register:
- 940              	.LVL42:
- 941              	.LFB134:
+ 936              		.syntax unified
+ 937              		.thumb
+ 938              		.thumb_func
+ 940              	User_Fun_Callback_Register:
+ 941              	.LVL42:
+ 942              	.LFB134:
  216:ACE-ECF/Algorithm/src/pid.c ****     pid->User_Fun = User_Fun;
- 942              		.loc 1 216 1 is_stmt 1 view -0
- 943              		.cfi_startproc
- 944              		@ args = 0, pretend = 0, frame = 0
- 945              		@ frame_needed = 0, uses_anonymous_args = 0
- 946              		@ link register save eliminated.
+ 943              		.loc 1 216 1 is_stmt 1 view -0
+ 944              		.cfi_startproc
+ 945              		@ args = 0, pretend = 0, frame = 0
+ 946              		@ frame_needed = 0, uses_anonymous_args = 0
+ 947              		@ link register save eliminated.
  217:ACE-ECF/Algorithm/src/pid.c **** }
- 947              		.loc 1 217 5 view .LVU298
+ 948              		.loc 1 217 5 view .LVU299
  217:ACE-ECF/Algorithm/src/pid.c **** }
- 948              		.loc 1 217 19 is_stmt 0 view .LVU299
- 949 0000 C0F89410 		str	r1, [r0, #148]
+ 949              		.loc 1 217 19 is_stmt 0 view .LVU300
+ 950 0000 C0F89410 		str	r1, [r0, #148]
  218:ACE-ECF/Algorithm/src/pid.c **** 
- 950              		.loc 1 218 1 view .LVU300
- 951 0004 7047     		bx	lr
- 952              		.cfi_endproc
- 953              	.LFE134:
- 955              		.section	.text.motor_speed_control,"ax",%progbits
- 956              		.align	1
- 957              		.global	motor_speed_control
- 958              		.syntax unified
- 959              		.thumb
- 960              		.thumb_func
- 962              	motor_speed_control:
- 963              	.LVL43:
- 964              	.LFB135:
+ 951              		.loc 1 218 1 view .LVU301
+ 952 0004 7047     		bx	lr
+ 953              		.cfi_endproc
+ 954              	.LFE134:
+ 956              		.section	.text.motor_speed_control,"ax",%progbits
+ 957              		.align	1
+ 958              		.global	motor_speed_control
+ 959              		.syntax unified
+ 960              		.thumb
+ 961              		.thumb_func
+ 963              	motor_speed_control:
+ 964              	.LVL43:
+ 965              	.LFB135:
  229:ACE-ECF/Algorithm/src/pid.c ****     return PidCalculate(spid, setSpeed, actualSpeed);
- 965              		.loc 1 229 1 is_stmt 1 view -0
- 966              		.cfi_startproc
- 967              		@ args = 0, pretend = 0, frame = 0
- 968              		@ frame_needed = 0, uses_anonymous_args = 0
+ 966              		.loc 1 229 1 is_stmt 1 view -0
+ 967              		.cfi_startproc
+ 968              		@ args = 0, pretend = 0, frame = 0
+ 969              		@ frame_needed = 0, uses_anonymous_args = 0
  229:ACE-ECF/Algorithm/src/pid.c ****     return PidCalculate(spid, setSpeed, actualSpeed);
- 969              		.loc 1 229 1 is_stmt 0 view .LVU302
- 970 0000 08B5     		push	{r3, lr}
- 971              	.LCFI5:
- 972              		.cfi_def_cfa_offset 8
- 973              		.cfi_offset 3, -8
- 974              		.cfi_offset 14, -4
+ 970              		.loc 1 229 1 is_stmt 0 view .LVU303
+ 971 0000 08B5     		push	{r3, lr}
+ 972              	.LCFI5:
+ 973              		.cfi_def_cfa_offset 8
+ 974              		.cfi_offset 3, -8
+ 975              		.cfi_offset 14, -4
  230:ACE-ECF/Algorithm/src/pid.c **** }
- 975              		.loc 1 230 5 is_stmt 1 view .LVU303
+ 976              		.loc 1 230 5 is_stmt 1 view .LVU304
  230:ACE-ECF/Algorithm/src/pid.c **** }
- 976              		.loc 1 230 12 is_stmt 0 view .LVU304
- 977 0002 FFF7FEFF 		bl	PidCalculate
- 978              	.LVL44:
+ 977              		.loc 1 230 12 is_stmt 0 view .LVU305
+ 978 0002 FFF7FEFF 		bl	PidCalculate
+ 979              	.LVL44:
  230:ACE-ECF/Algorithm/src/pid.c **** }
- 979              		.loc 1 230 12 view .LVU305
- 980 0006 BDEEC00A 		vcvt.s32.f32	s0, s0
+ 980              		.loc 1 230 12 view .LVU306
+ 981 0006 BDEEC00A 		vcvt.s32.f32	s0, s0
  231:ACE-ECF/Algorithm/src/pid.c **** 
- 981              		.loc 1 231 1 view .LVU306
- 982 000a 10EE103A 		vmov	r3, s0	@ int
- 983 000e 18B2     		sxth	r0, r3
- 984 0010 08BD     		pop	{r3, pc}
- 985              		.cfi_endproc
- 986              	.LFE135:
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s 			page 28
+ 982              		.loc 1 231 1 view .LVU307
+ 983 000a 10EE103A 		vmov	r3, s0	@ int
+ 984 000e 18B2     		sxth	r0, r3
+ 985 0010 08BD     		pop	{r3, pc}
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccdi6OTi.s 			page 28
 
 
- 988              		.section	.text.motor_position_speed_control,"ax",%progbits
- 989              		.align	1
- 990              		.global	motor_position_speed_control
- 991              		.syntax unified
- 992              		.thumb
- 993              		.thumb_func
- 995              	motor_position_speed_control:
- 996              	.LVL45:
- 997              	.LFB136:
+ 986              		.cfi_endproc
+ 987              	.LFE135:
+ 989              		.section	.text.motor_position_speed_control,"ax",%progbits
+ 990              		.align	1
+ 991              		.global	motor_position_speed_control
+ 992              		.syntax unified
+ 993              		.thumb
+ 994              		.thumb_func
+ 996              	motor_position_speed_control:
+ 997              	.LVL45:
+ 998              	.LFB136:
  243:ACE-ECF/Algorithm/src/pid.c ****     speed_pid->SetValue = PidCalculate(position_pid, setPosition, actual_position); // 速度环设
- 998              		.loc 1 243 1 is_stmt 1 view -0
- 999              		.cfi_startproc
- 1000              		@ args = 0, pretend = 0, frame = 0
- 1001              		@ frame_needed = 0, uses_anonymous_args = 0
+ 999              		.loc 1 243 1 is_stmt 1 view -0
+ 1000              		.cfi_startproc
+ 1001              		@ args = 0, pretend = 0, frame = 0
+ 1002              		@ frame_needed = 0, uses_anonymous_args = 0
  243:ACE-ECF/Algorithm/src/pid.c ****     speed_pid->SetValue = PidCalculate(position_pid, setPosition, actual_position); // 速度环设
- 1002              		.loc 1 243 1 is_stmt 0 view .LVU308
- 1003 0000 10B5     		push	{r4, lr}
- 1004              	.LCFI6:
- 1005              		.cfi_def_cfa_offset 8
- 1006              		.cfi_offset 4, -8
- 1007              		.cfi_offset 14, -4
- 1008 0002 2DED028B 		vpush.64	{d8}
- 1009              	.LCFI7:
- 1010              		.cfi_def_cfa_offset 16
- 1011              		.cfi_offset 80, -16
- 1012              		.cfi_offset 81, -12
- 1013 0006 0446     		mov	r4, r0
- 1014 0008 B0EE418A 		vmov.f32	s16, s2
+ 1003              		.loc 1 243 1 is_stmt 0 view .LVU309
+ 1004 0000 10B5     		push	{r4, lr}
+ 1005              	.LCFI6:
+ 1006              		.cfi_def_cfa_offset 8
+ 1007              		.cfi_offset 4, -8
+ 1008              		.cfi_offset 14, -4
+ 1009 0002 2DED028B 		vpush.64	{d8}
+ 1010              	.LCFI7:
+ 1011              		.cfi_def_cfa_offset 16
+ 1012              		.cfi_offset 80, -16
+ 1013              		.cfi_offset 81, -12
+ 1014 0006 0446     		mov	r4, r0
+ 1015 0008 B0EE418A 		vmov.f32	s16, s2
  244:ACE-ECF/Algorithm/src/pid.c ****     return PidCalculate(speed_pid, speed_pid->SetValue, actual_speed);              // 电机输出
- 1015              		.loc 1 244 5 is_stmt 1 view .LVU309
+ 1016              		.loc 1 244 5 is_stmt 1 view .LVU310
  244:ACE-ECF/Algorithm/src/pid.c ****     return PidCalculate(speed_pid, speed_pid->SetValue, actual_speed);              // 电机输出
- 1016              		.loc 1 244 27 is_stmt 0 view .LVU310
- 1017 000c 0846     		mov	r0, r1
- 1018              	.LVL46:
+ 1017              		.loc 1 244 27 is_stmt 0 view .LVU311
+ 1018 000c 0846     		mov	r0, r1
+ 1019              	.LVL46:
  244:ACE-ECF/Algorithm/src/pid.c ****     return PidCalculate(speed_pid, speed_pid->SetValue, actual_speed);              // 电机输出
- 1019              		.loc 1 244 27 view .LVU311
- 1020 000e FFF7FEFF 		bl	PidCalculate
- 1021              	.LVL47:
+ 1020              		.loc 1 244 27 view .LVU312
+ 1021 000e FFF7FEFF 		bl	PidCalculate
+ 1022              	.LVL47:
  244:ACE-ECF/Algorithm/src/pid.c ****     return PidCalculate(speed_pid, speed_pid->SetValue, actual_speed);              // 电机输出
- 1022              		.loc 1 244 25 view .LVU312
- 1023 0012 84ED040A 		vstr.32	s0, [r4, #16]
+ 1023              		.loc 1 244 25 view .LVU313
+ 1024 0012 84ED040A 		vstr.32	s0, [r4, #16]
  245:ACE-ECF/Algorithm/src/pid.c **** }
- 1024              		.loc 1 245 5 is_stmt 1 view .LVU313
+ 1025              		.loc 1 245 5 is_stmt 1 view .LVU314
  245:ACE-ECF/Algorithm/src/pid.c **** }
- 1025              		.loc 1 245 12 is_stmt 0 view .LVU314
- 1026 0016 F0EE480A 		vmov.f32	s1, s16
- 1027 001a 2046     		mov	r0, r4
- 1028 001c FFF7FEFF 		bl	PidCalculate
- 1029              	.LVL48:
- 1030 0020 BDEEC00A 		vcvt.s32.f32	s0, s0
+ 1026              		.loc 1 245 12 is_stmt 0 view .LVU315
+ 1027 0016 F0EE480A 		vmov.f32	s1, s16
+ 1028 001a 2046     		mov	r0, r4
+ 1029 001c FFF7FEFF 		bl	PidCalculate
+ 1030              	.LVL48:
+ 1031 0020 BDEEC00A 		vcvt.s32.f32	s0, s0
  246:ACE-ECF/Algorithm/src/pid.c **** 
- 1031              		.loc 1 246 1 view .LVU315
- 1032 0024 10EE103A 		vmov	r3, s0	@ int
- 1033 0028 18B2     		sxth	r0, r3
- 1034 002a BDEC028B 		vldm	sp!, {d8}
- 1035              	.LCFI8:
- 1036              		.cfi_restore 80
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s 			page 29
+ 1032              		.loc 1 246 1 view .LVU316
+ 1033 0024 10EE103A 		vmov	r3, s0	@ int
+ 1034 0028 18B2     		sxth	r0, r3
+ 1035 002a BDEC028B 		vldm	sp!, {d8}
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccdi6OTi.s 			page 29
 
 
- 1037              		.cfi_restore 81
- 1038              		.cfi_def_cfa_offset 8
- 1039              	.LVL49:
+ 1036              	.LCFI8:
+ 1037              		.cfi_restore 80
+ 1038              		.cfi_restore 81
+ 1039              		.cfi_def_cfa_offset 8
+ 1040              	.LVL49:
  246:ACE-ECF/Algorithm/src/pid.c **** 
- 1040              		.loc 1 246 1 view .LVU316
- 1041 002e 10BD     		pop	{r4, pc}
+ 1041              		.loc 1 246 1 view .LVU317
+ 1042 002e 10BD     		pop	{r4, pc}
  246:ACE-ECF/Algorithm/src/pid.c **** 
- 1042              		.loc 1 246 1 view .LVU317
- 1043              		.cfi_endproc
- 1044              	.LFE136:
- 1046              		.text
- 1047              	.Letext0:
- 1048              		.file 2 "ACE-ECF/Algorithm/inc/struct_typedef.h"
- 1049              		.file 3 "d:\\gcc-arm-none-eabi-10.3-2021.10\\arm-none-eabi\\include\\machine\\_default_types.h"
- 1050              		.file 4 "d:\\gcc-arm-none-eabi-10.3-2021.10\\arm-none-eabi\\include\\sys\\_stdint.h"
- 1051              		.file 5 "ACE-ECF/Algorithm/inc/pid.h"
- 1052              		.file 6 "<built-in>"
-ARM GAS  C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s 			page 30
+ 1043              		.loc 1 246 1 view .LVU318
+ 1044              		.cfi_endproc
+ 1045              	.LFE136:
+ 1047              		.text
+ 1048              	.Letext0:
+ 1049              		.file 2 "ACE-ECF/Algorithm/inc/struct_typedef.h"
+ 1050              		.file 3 "d:\\gcc-arm-none-eabi-10.3-2021.10\\arm-none-eabi\\include\\machine\\_default_types.h"
+ 1051              		.file 4 "d:\\gcc-arm-none-eabi-10.3-2021.10\\arm-none-eabi\\include\\sys\\_stdint.h"
+ 1052              		.file 5 "ACE-ECF/Algorithm/inc/pid.h"
+ 1053              		.file 6 "<built-in>"
+ARM GAS  C:\Users\28212\AppData\Local\Temp\ccdi6OTi.s 			page 30
 
 
 DEFINED SYMBOLS
                             *ABS*:00000000 pid.c
-C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s:20     .text.first_order_filter:00000000 $t
-C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s:25     .text.first_order_filter:00000000 first_order_filter
-C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s:64     .text.f_Derivative_On_Measurement:00000000 $t
-C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s:69     .text.f_Derivative_On_Measurement:00000000 f_Derivative_On_Measurement
-C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s:131    .text.f_StepIn:00000000 $t
-C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s:136    .text.f_StepIn:00000000 f_StepIn
-C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s:200    .text.f_StepIn:00000058 $d
-C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s:205    .text.f_Separated_Integral:00000000 $t
-C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s:210    .text.f_Separated_Integral:00000000 f_Separated_Integral
-C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s:244    .text.f_Integral_Limit:00000000 $t
-C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s:249    .text.f_Integral_Limit:00000000 f_Integral_Limit
-C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s:289    .text.Changing_Integration_Rate:00000000 $t
-C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s:294    .text.Changing_Integration_Rate:00000000 Changing_Integration_Rate
-C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s:350    .text.f_Output_Limit:00000000 $t
-C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s:355    .text.f_Output_Limit:00000000 f_Output_Limit
-C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s:395    .text.PidInit:00000000 $t
-C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s:401    .text.PidInit:00000000 PidInit
-C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s:450    .text.PidInitMode:00000000 $t
-C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s:456    .text.PidInitMode:00000000 PidInitMode
-C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s:475    .text.PidInitMode:00000010 $d
-C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s:508    .text.PidInitMode:00000030 $t
-C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s:604    .text.PidCalculate:00000000 $t
-C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s:610    .text.PidCalculate:00000000 PidCalculate
-C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s:875    .text.pid_clear:00000000 $t
-C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s:881    .text.pid_clear:00000000 pid_clear
-C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s:933    .text.User_Fun_Callback_Register:00000000 $t
-C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s:939    .text.User_Fun_Callback_Register:00000000 User_Fun_Callback_Register
-C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s:956    .text.motor_speed_control:00000000 $t
-C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s:962    .text.motor_speed_control:00000000 motor_speed_control
-C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s:989    .text.motor_position_speed_control:00000000 $t
-C:\Users\28212\AppData\Local\Temp\ccG5OkEH.s:995    .text.motor_position_speed_control:00000000 motor_position_speed_control
+C:\Users\28212\AppData\Local\Temp\ccdi6OTi.s:20     .text.first_order_filter:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccdi6OTi.s:25     .text.first_order_filter:00000000 first_order_filter
+C:\Users\28212\AppData\Local\Temp\ccdi6OTi.s:64     .text.f_Derivative_On_Measurement:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccdi6OTi.s:69     .text.f_Derivative_On_Measurement:00000000 f_Derivative_On_Measurement
+C:\Users\28212\AppData\Local\Temp\ccdi6OTi.s:131    .text.f_StepIn:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccdi6OTi.s:136    .text.f_StepIn:00000000 f_StepIn
+C:\Users\28212\AppData\Local\Temp\ccdi6OTi.s:200    .text.f_StepIn:00000058 $d
+C:\Users\28212\AppData\Local\Temp\ccdi6OTi.s:205    .text.f_Separated_Integral:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccdi6OTi.s:210    .text.f_Separated_Integral:00000000 f_Separated_Integral
+C:\Users\28212\AppData\Local\Temp\ccdi6OTi.s:244    .text.f_Integral_Limit:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccdi6OTi.s:249    .text.f_Integral_Limit:00000000 f_Integral_Limit
+C:\Users\28212\AppData\Local\Temp\ccdi6OTi.s:289    .text.Changing_Integration_Rate:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccdi6OTi.s:294    .text.Changing_Integration_Rate:00000000 Changing_Integration_Rate
+C:\Users\28212\AppData\Local\Temp\ccdi6OTi.s:350    .text.f_Output_Limit:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccdi6OTi.s:355    .text.f_Output_Limit:00000000 f_Output_Limit
+C:\Users\28212\AppData\Local\Temp\ccdi6OTi.s:395    .text.PidInit:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccdi6OTi.s:401    .text.PidInit:00000000 PidInit
+C:\Users\28212\AppData\Local\Temp\ccdi6OTi.s:450    .text.PidInitMode:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccdi6OTi.s:456    .text.PidInitMode:00000000 PidInitMode
+C:\Users\28212\AppData\Local\Temp\ccdi6OTi.s:475    .text.PidInitMode:00000010 $d
+C:\Users\28212\AppData\Local\Temp\ccdi6OTi.s:508    .text.PidInitMode:00000030 $t
+C:\Users\28212\AppData\Local\Temp\ccdi6OTi.s:604    .text.PidCalculate:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccdi6OTi.s:610    .text.PidCalculate:00000000 PidCalculate
+C:\Users\28212\AppData\Local\Temp\ccdi6OTi.s:876    .text.pid_clear:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccdi6OTi.s:882    .text.pid_clear:00000000 pid_clear
+C:\Users\28212\AppData\Local\Temp\ccdi6OTi.s:934    .text.User_Fun_Callback_Register:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccdi6OTi.s:940    .text.User_Fun_Callback_Register:00000000 User_Fun_Callback_Register
+C:\Users\28212\AppData\Local\Temp\ccdi6OTi.s:957    .text.motor_speed_control:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccdi6OTi.s:963    .text.motor_speed_control:00000000 motor_speed_control
+C:\Users\28212\AppData\Local\Temp\ccdi6OTi.s:990    .text.motor_position_speed_control:00000000 $t
+C:\Users\28212\AppData\Local\Temp\ccdi6OTi.s:996    .text.motor_position_speed_control:00000000 motor_position_speed_control
 
 UNDEFINED SYMBOLS
 memset
